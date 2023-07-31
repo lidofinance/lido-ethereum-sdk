@@ -1,0 +1,13 @@
+{
+    "name": "@lidofinance/lido-sdk",
+    "private": true,
+    "version": "0.0.1",
+    "scripts": {
+      "typecheck": "echo typecheck sdk",
+      "build": "echo build sdk"
+    },
+    "dependencies": {
+      "@lidofinance/lido-sdk-core": "0.0.1",
+      "@lidofinance/lido-sdk-stake": "0.0.1"
+    }
+  }

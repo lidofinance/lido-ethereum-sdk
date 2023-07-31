@@ -1,0 +1,15 @@
+{
+    "name": "@lidofinance/lido-sdk-stake",
+    "private": true,
+    "version": "0.0.1",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+      "typecheck": "tsc",
+      "build": "node build.js & yarn typecheck"
+    },
+    "dependencies": {},
+    "peerDependencies": {
+      "@lidofinance/lido-sdk-core": "0.0.1"
+    }
+  }

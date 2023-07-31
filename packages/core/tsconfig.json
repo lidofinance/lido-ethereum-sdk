@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "baseUrl": "./src/",
+    "paths": {
+      "@/*": ["*"],
+      "@common/*": ["../../common/*"],
+      "@stake/*": ["../../stake/*"]
+    }
+  },
+  "extends": "../../tsconfig.base.json",
+  "include": ["src/"]
+}
