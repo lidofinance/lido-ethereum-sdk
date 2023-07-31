@@ -1,6 +1,5 @@
 {
     "name": "@lidofinance/lido-sdk",
-    "private": true,
     "version": "0.0.1",
     "scripts": {
       "typecheck": "echo typecheck sdk",

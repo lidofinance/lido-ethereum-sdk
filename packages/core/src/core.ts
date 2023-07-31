@@ -3,8 +3,12 @@ import {
   Web3Provider,
   JsonRpcSigner,
 } from "@ethersproject/providers";
-import { BigNumberish } from "ethers";
+import { BigNumber } from "@ethersproject/bignumber";
+import { getSTETHContract, StethAbi } from "@lido-sdk/contracts";
+import { getTokenAddress, CHAINS, TOKENS } from "@lido-sdk/constants";
 
+import { getFeeData, FeeData } from "@common/utils/getFeeData";
+import { Logger } from "@common/utils/decorators";
 import { LidoSDKCoreProps } from "@/types";
 
 const SUPPORTED_CHAINS = [1, 5];
@@ -34,11 +38,39 @@ export class LidoSDKCore {
     }
 
     this.chain = chain;
+    // TODO: think about batch provider
     this.provider = provider;
     this.signer = getSigner(provider);
   }
 
-  balanceETH(): Promise<BigNumberish> {
-    return this.provider!.getBalance(this.signer!.getAddress());
+  // Contracts
+
+  @Logger("Contracts:")
+  public contractAddressStETH(): string {
+    return getTokenAddress(CHAINS.Mainnet, TOKENS.STETH);
+  }
+
+  @Logger("Contracts:")
+  public contractStETH(): StethAbi {
+    return getSTETHContract(this.contractAddressStETH(), this.provider!);
+  }
+
+  // Balances
+
+  @Logger("Balances:")
+  public balanceETH(address: string): Promise<BigNumber> {
+    return this.provider!.getBalance(address);
+  }
+
+  @Logger("Balances:")
+  public balanceStETH(address: string): Promise<BigNumber> {
+    return this.contractStETH().balanceOf(address);
+  }
+
+  // utils
+
+  @Logger("Utils:")
+  public async getFeeData(): Promise<FeeData> {
+    return getFeeData(this.provider!);
   }
 }

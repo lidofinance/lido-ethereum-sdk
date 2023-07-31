@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["ES6", "dom"],
+    "lib": ["es2016", "dom"],
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
     "esModuleInterop": true,

@@ -1,20 +1,26 @@
 {
   "name": "@lidofinance/lido-sdk-core",
-  "private": true,
   "version": "0.0.1",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/core/src/index.d.ts",
   "scripts": {
-    "typecheck": "tsc",
+    "typecheck": "tsc && tsc-alias",
     "build": "node build.js & yarn typecheck"
   },
   "devDependencies": {
     "esbuild-plugin-tsc": "^0.4.0",
+    "tsc-alias": "^1.8.7",
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@ethersproject/abstract-signer": "^5.7.0",
+    "@ethersproject/bignumber": "^5.7.0",
+    "@ethersproject/contracts": "^5.7.0",
     "@ethersproject/providers": "^5.7.2",
-    "ethers": "^6.6.7"
+    "@lido-sdk/constants": "^3.1.0",
+    "@lido-sdk/contracts": "^3.0.2",
+    "add": "^2.0.6",
+    "yarn": "^1.22.19"
   },
   "peerDependencies": {}
 }
