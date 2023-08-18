@@ -1,10 +1,10 @@
-import {
-  Provider,
-  Web3Provider,
-  JsonRpcSigner,
-} from "@ethersproject/providers";
-import { BigNumber } from "@ethersproject/bignumber";
 import { CHAINS } from "@lido-sdk/constants";
+import {
+  type Address,
+  type WalletClient,
+  type PublicClient,
+  type Account,
+} from "viem";
 
 import { getFeeData, FeeData } from "./common/utils/getFeeData";
 import { ErrorHandler, Logger } from "./common/decorators";
@@ -13,20 +13,19 @@ import { LidoSDKCoreProps } from "./types";
 const SUPPORTED_CHAINS = [1, 5];
 
 const getSigner = (
-  provider: Provider | Web3Provider
-): JsonRpcSigner | undefined => {
-  if (provider instanceof Web3Provider) return provider.getSigner();
-
-  return undefined;
+  provider: WalletClient | PublicClient
+): Account | undefined => {
+  return provider.account;
 };
 
 export default class LidoSDKCore {
   protected chain: CHAINS.Mainnet | CHAINS.Goerli | undefined;
-  protected signer: JsonRpcSigner | undefined;
-  protected provider: Provider | Web3Provider | undefined;
+  protected signer: Account | undefined;
+  protected provider: PublicClient | undefined;
+  protected web3Provider: WalletClient | undefined;
 
   constructor(props: LidoSDKCoreProps) {
-    const { chain, provider } = props;
+    const { chain, provider, web3Provider } = props;
 
     if (!SUPPORTED_CHAINS.includes(chain)) {
       throw new Error(`Unsupported chain: ${chain}`);
@@ -39,14 +38,18 @@ export default class LidoSDKCore {
     this.chain = chain;
     // TODO: think about batch provider
     this.provider = provider;
+    this.web3Provider = web3Provider;
     this.signer = getSigner(provider);
   }
 
   // Balances
 
   @Logger("Balances:")
-  public balanceETH(address: string): Promise<BigNumber> {
-    return this.provider!.getBalance(address);
+  public async balanceETH(address: Address): Promise<bigint> {
+    if (!this.provider) {
+      throw new Error("Provider is not defined");
+    }
+    return this.provider.getBalance({ address });
   }
 
   // utils
