@@ -1,13 +1,11 @@
 {
-  "compilerOptions": {
-    "outDir": "dist",
-    "baseUrl": "./src/",
-    "paths": {
-      "@/*": ["*"],
-      "@common/*": ["../../common/*"],
-      "@stake/*": ["../../stake/*"]
-    }
-  },
+  // This configuration is used for local development and type checking.
   "extends": "../../tsconfig.base.json",
-  "include": ["src/"]
+  "outDir": "dist",
+  "baseUrl": "./src/",
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "**/*.test.*"],
+  "compilerOptions": {
+    "resolveJsonModule": true
+  }
 }

@@ -1,18 +1,41 @@
-import { LidoSDKCore } from "@lidofinance/lido-sdk-core";
+import {
+  LidoSDKCore,
+  LidoSDKCoreProps,
+  ErrorHandler,
+  Logger,
+  Cache,
+} from "@lidofinance/lido-sdk-core";
 import { AddressZero } from "@ethersproject/constants";
 import { parseEther } from "@ethersproject/units";
 import { BigNumber } from "@ethersproject/bignumber";
-
-import { ErrorHandler, Logger } from "@common/utils/decorators";
+import { CHAINS, TOKENS, getTokenAddress } from "@lido-sdk/constants";
+import { StethAbi, getSTETHContract } from "@lido-sdk/contracts";
 
 // TODO: move to constants
 const SUBMIT_EXTRA_GAS_TRANSACTION_RATIO = 1.05;
 
-export class LidoSDKStake {
-  protected core: LidoSDKCore;
+export class LidoSDKStake extends LidoSDKCore {
+  constructor(props: LidoSDKCoreProps) {
+    super(props);
+  }
 
-  constructor(core: LidoSDKCore) {
-    this.core = core;
+  // Balances
+
+  @Logger("Balances:")
+  public balanceStETH(address: string): Promise<BigNumber> {
+    return this.contractStETH().balanceOf(address);
+  }
+
+  // Contracts
+
+  @Logger("Contracts:")
+  public contractAddressStETH(): string {
+    return getTokenAddress(this.chain || CHAINS.Mainnet, TOKENS.STETH);
+  }
+
+  @Logger("Contracts:")
+  public contractStETH(): StethAbi {
+    return getSTETHContract(this.contractAddressStETH(), this.provider!);
   }
 
   // Calls
@@ -22,27 +45,40 @@ export class LidoSDKStake {
     value: string,
     referralAddress = AddressZero
   ): Promise<void> {
+    // Checking the daily protocol staking limit
+    await this.checkStakeLimit(value);
+
     const { gasLimit, overrides } = await this.submitGasLimit(
       value,
       referralAddress
     );
 
-    const transaction = await this.core
-      .contractStETH()
-      .submit(referralAddress || AddressZero, {
+    const transaction = await this.contractStETH().submit(
+      referralAddress || AddressZero,
+      {
         ...overrides,
         gasLimit,
-      });
+      }
+    );
 
     if (typeof transaction === "object") {
       await transaction.wait();
     }
   }
 
-  // utils
+  // Views
 
-  @ErrorHandler("CALL:")
-  @Logger("Utils")
+  @ErrorHandler("Views:")
+  @Cache(30 * 1000)
+  @Logger("Views:")
+  public getStakeLimitInfo(): ReturnType<StethAbi["getStakeLimitFullInfo"]> {
+    return this.contractStETH().getStakeLimitFullInfo();
+  }
+
+  // Utils
+
+  @ErrorHandler("Call:")
+  @Logger("Utils:")
   private async submitGasLimit(
     value: string,
     referralAddress = AddressZero
@@ -54,16 +90,17 @@ export class LidoSDKStake {
       maxFeePerGas: BigNumber | undefined;
     };
   }> {
-    const feeData = await this.core.getFeeData();
+    const feeData = await this.getFeeData();
     const overrides = {
       value: parseEther(value),
       maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? undefined,
       maxFeePerGas: feeData.maxFeePerGas ?? undefined,
     };
 
-    const originalGasLimit = await this.core
-      .contractStETH()
-      .estimateGas.submit(referralAddress, overrides);
+    const originalGasLimit = await this.contractStETH().estimateGas.submit(
+      referralAddress,
+      overrides
+    );
     const gasLimit = originalGasLimit
       ? BigNumber.from(
           Math.ceil(
@@ -73,5 +110,18 @@ export class LidoSDKStake {
       : undefined;
 
     return { gasLimit, overrides };
+  }
+
+  @ErrorHandler("Utils:")
+  @Logger("Utils:")
+  private async checkStakeLimit(value: string): Promise<void> {
+    const { currentStakeLimit } = await this.getStakeLimitInfo();
+    const parsedValue = parseEther(value);
+
+    if (parsedValue.gt(currentStakeLimit)) {
+      throw new Error(
+        `Stake value is greater than daily protocol staking limit (${currentStakeLimit})`
+      );
+    }
   }
 }

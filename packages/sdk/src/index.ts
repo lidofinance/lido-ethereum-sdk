@@ -6,5 +6,5 @@ export class LidoSDK extends LidoSDKCore {
     super(props);
   }
 
-  stake = new LidoSDKStake(this);
+  staking = new LidoSDKStake(this);
 }

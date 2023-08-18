@@ -1,17 +1,32 @@
 {
+  "include": [],
   "compilerOptions": {
-    "lib": ["es2016", "dom"],
-    "allowSyntheticDefaultImports": true,
-    "downlevelIteration": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "Node",
-    "emitDeclarationOnly": true,
-    "declaration": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
-    "skipLibCheck": true,
+    // Type checking
     "strict": true,
-    "removeComments": true
+    "useDefineForClassFields": true, // Not enabled by default in `strict` mode unless we bump `target` to ES2022.
+    "noFallthroughCasesInSwitch": true, // Not enabled by default in `strict` mode.
+    "noImplicitReturns": true, // Not enabled by default in `strict` mode.
+    "useUnknownInCatchVariables": true, // Not enabled by default in `strict` mode.
+    "noImplicitOverride": true, // Not enabled by default in `strict` mode.
+    "noUnusedLocals": true, // Not enabled by default in `strict` mode.
+    "noUnusedParameters": true, // Not enabled by default in `strict` mode.
+    "noUncheckedIndexedAccess": true, // Not enabled by default in `strict` mode.
+
+    // Interop constraints
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": false,
+    "forceConsistentCasingInFileNames": true,
+
+    // Language and environment
+    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "target": "ES2021", // Setting this to `ES2021` enables native support for `Node v16+`: https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping.
+    "lib": [
+      "ES2022", // By using ES2022 we get access to the `.cause` property on `Error` instances.
+      "DOM" // We are adding `DOM` here to get the `fetch`, etc. types. This should be removed once these types are available via DefinitelyTyped.
+    ],
+
+    // Skip type checking for node modules
+    "skipLibCheck": true
   }
 }

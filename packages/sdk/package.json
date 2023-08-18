@@ -3,7 +3,8 @@
     "version": "0.0.1",
     "scripts": {
       "typecheck": "echo typecheck sdk",
-      "build": "echo build sdk"
+      "build": "echo build sdk",
+      "publish:package": "yarn build && npm publish --registry http://localhost:4873/"
     },
     "dependencies": {
       "@lidofinance/lido-sdk-core": "0.0.1",

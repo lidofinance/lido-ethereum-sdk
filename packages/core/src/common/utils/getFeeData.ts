@@ -11,6 +11,7 @@ export type FeeData = {
 export const getFeeData = async (
   provider: Provider | Web3Provider
 ): Promise<FeeData> => {
+  // TODO: change for cold wallets
   if (!(provider instanceof Web3Provider))
     throw new Error("Provider is not Web3Provider");
 

@@ -12,10 +12,28 @@
   ],
   "scripts": {
     "w-info": "yarn workspaces info",
-    "build": "yarn workspaces run build"
+    "build": "yarn workspaces run build",
+    "publish": "yarn workspaces run publish:package"
   },
   "devDependencies": {
-    "esbuild": "^0.18.17",
+    "@lidofinance/eslint-config": "^0.34.0",
+    "@typescript-eslint/eslint-plugin": "^6.2.1",
+    "@typescript-eslint/parser": "^6.2.1",
+    "eslint": "^8.46.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-import-resolver-node": "^0.3.6",
+    "eslint-import-resolver-typescript": "^3",
+    "eslint-plugin-eslint-comments": "^3",
+    "eslint-plugin-import": "^2",
+    "eslint-plugin-jest": "^27",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-prettier": "^4",
+    "eslint-plugin-promise": "^6",
+    "eslint-plugin-react": "^7",
+    "eslint-plugin-react-hooks": "^4",
+    "eslint-plugin-sonarjs": "^0.20.0",
+    "eslint-plugin-unicorn": "^48.0.1",
+    "prettier": "^3.0.1",
     "typescript": "^5.1.6"
   },
   "workspaces": [
