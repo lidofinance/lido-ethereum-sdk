@@ -1,3 +1,5 @@
+import { callConsoleMessage } from "./utils";
+
 export const Cache = function (timeMs = 0) {
   const cache = new Map<string, { data: any; timestamp: number }>();
 
@@ -10,22 +12,31 @@ export const Cache = function (timeMs = 0) {
   ) {
     const methodName = String(context.name);
     const replacementMethod = function (this: This, ...args: Args): Return {
-      if (cache.has(methodName)) {
-        const cachedEntry = cache.get(methodName);
+      const hash = JSON.stringify(args);
+      const cacheKey = `${methodName}:${hash}`;
+
+      if (cache.has(cacheKey)) {
+        const cachedEntry = cache.get(cacheKey);
         const currentTime = Date.now();
 
         if (cachedEntry && currentTime - cachedEntry.timestamp <= timeMs) {
-          console.log(`Caching: Using cache for method '${methodName}'.`);
+          callConsoleMessage(
+            "Cache:",
+            `Using cache for method '${methodName}'.`
+          );
           return cachedEntry.data;
         } else {
-          console.log(`Caching: Cache for method '${methodName}' has expired.`);
-          cache.delete(methodName);
+          callConsoleMessage(
+            "Cache:",
+            `Cache for method '${methodName}' has expired.`
+          );
+          cache.delete(cacheKey);
         }
       }
 
-      console.log(`Caching: Caching method '${methodName}'.`);
+      callConsoleMessage("Cache:", `Cache for method '${methodName}' set.`);
       const result = originalMethod.call(this, ...args);
-      cache.set(methodName, { data: result, timestamp: Date.now() });
+      cache.set(cacheKey, { data: result, timestamp: Date.now() });
       return result;
     };
     return replacementMethod;

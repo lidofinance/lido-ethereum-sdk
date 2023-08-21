@@ -1,4 +1,7 @@
-export const ErrorHandler = function (headMessage = "Error:") {
+import { callConsoleMessage } from "./utils";
+import { HeadMessage } from "./types";
+
+export const ErrorHandler = function (headMessage: HeadMessage = "Error:") {
   return function ErrorHandlerMethod<This, Args extends any[], Return>(
     originalMethod: (this: This, ...args: Args) => Return,
     context: ClassMethodDecoratorContext<
@@ -11,6 +14,11 @@ export const ErrorHandler = function (headMessage = "Error:") {
       try {
         return originalMethod.call(this, ...args);
       } catch (error) {
+        callConsoleMessage(
+          headMessage,
+          `Error in method '${methodName}': ${error}.`,
+          "Error:"
+        );
         console.error(`${headMessage} Error in method '${methodName}'.`);
         throw error;
       }
