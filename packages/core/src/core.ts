@@ -2,7 +2,6 @@ import {
   type Address,
   type WalletClient,
   type PublicClient,
-  type Account,
   type Chain,
   createPublicClient,
   createWalletClient,
@@ -19,15 +18,23 @@ import { SUPPORTED_CHAINS } from "./contants";
 import { LidoSDKCoreProps } from "./types";
 
 export default class LidoSDKCore {
-  protected chainId: (typeof SUPPORTED_CHAINS)[number] | undefined;
-  protected signer: Account | undefined;
-  protected rpcUrls: string[] = [];
-  protected rpcProvider: PublicClient | undefined;
-  protected web3Provider: WalletClient | undefined;
-  protected chain: Chain | undefined;
+  readonly chainId: (typeof SUPPORTED_CHAINS)[number] | undefined;
+  readonly rpcUrls: string[] = [];
+  readonly rpcProvider: PublicClient | undefined;
+  readonly web3Provider: WalletClient | undefined;
+  readonly chain: Chain | undefined;
 
   constructor(props: LidoSDKCoreProps, version?: string) {
-    this.init(props, version);
+    const { chain, chainId, rpcUrls, rpcProvider, web3Provider } = this.init(
+      props,
+      version
+    );
+
+    this.chainId = chainId;
+    this.chain = chain;
+    this.rpcUrls = rpcUrls;
+    this.rpcProvider = rpcProvider;
+    this.web3Provider = web3Provider;
   }
 
   @Initialize("Init:")
@@ -43,12 +50,13 @@ export default class LidoSDKCore {
       throw new Error("rpcUrls is required");
     }
 
-    this.chainId = chainId;
-    this.chain = chainId === 1 ? mainnet : goerli;
-    this.rpcUrls = rpcUrls;
-    this.rpcProvider = this.createRpcProvider();
-    this.web3Provider = web3Provider ?? this.createWeb3Provider();
-    this.signer = web3Provider?.account;
+    return {
+      chainId,
+      chain: chainId === 1 ? mainnet : goerli,
+      rpcUrls,
+      rpcProvider: this.createRpcProvider(),
+      web3Provider: web3Provider ?? this.createWeb3Provider(),
+    };
   }
 
   // Provider

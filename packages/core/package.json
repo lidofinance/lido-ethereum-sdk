@@ -1,6 +1,6 @@
 {
   "name": "@lidofinance/lido-sdk-core",
-  "version": "0.0.4",
+  "version": "0.0.1",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",

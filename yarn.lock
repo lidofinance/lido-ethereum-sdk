@@ -126,26 +126,6 @@
   dependencies:
     typescript "^4.7"
 
-"@lidofinance/lido-sdk-core@0.0.1", "@lidofinance/lido-sdk-core@^0.0.1":
-  version "0.0.1"
-  resolved "http://localhost:4873/@lidofinance/lido-sdk-core/-/lido-sdk-core-0.0.1.tgz#6d078bb64aac419dbc4150c1f96fa8908cf5d973"
-  integrity sha512-fEV/alMoVSvW1xz056mbQelOmVtrhuX26CFDLa+izJ87nz6OZ9lBZfQzovrLa6DSOD9BZbJLT1rbCe/W3XiZ9g==
-  dependencies:
-    "@lido-sdk/constants" "^3.1.0"
-    tiny-invariant "^1.3.1"
-    viem "^1.6.0"
-
-"@lidofinance/lido-sdk-stake@0.0.1":
-  version "0.0.1"
-  resolved "http://localhost:4873/@lidofinance/lido-sdk-stake/-/lido-sdk-stake-0.0.1.tgz#750d19df813e2e91454f58587a20e656082f59dc"
-  integrity sha512-n2V9iVyNNw2jLKBi3QD67Vob3NbqHcWkzvpqqemo1ogHqO33t4R8AWbmLDpdNEuDQxLc/aA/urDTrV8ZBUQ+2g==
-  dependencies:
-    "@lido-sdk/constants" "^3.1.0"
-    "@lido-sdk/contracts" "^3.0.2"
-    "@lidofinance/lido-sdk-core" "^0.0.1"
-    tiny-invariant "^1.3.1"
-    viem "^1.6.0"
-
 "@noble/curves@1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-1.1.0.tgz#f13fc667c89184bc04cccb9b11e8e7bae27d8c3d"

@@ -11,7 +11,6 @@ import {
 import invariant from "tiny-invariant";
 import {
   LidoSDKCore,
-  type LidoSDKCoreProps,
   ErrorHandler,
   Logger,
   Cache,
@@ -22,16 +21,21 @@ import {} from "@lido-sdk/contracts/dist/cjs";
 import { SUBMIT_EXTRA_GAS_TRANSACTION_RATIO } from "./constants";
 import { version } from "./version";
 import { abi } from "./abi/abi";
+import { LidoSDKStakeProps } from "./types";
 
 // TODO: move to constants
 
-export class LidoSDKStake extends LidoSDKCore {
+export class LidoSDKStake {
+  protected core: LidoSDKCore;
   protected contractStETH:
     | GetContractReturnType<typeof abi, PublicClient, WalletClient>
     | undefined;
 
-  constructor(props: LidoSDKCoreProps) {
-    super(props, version);
+  constructor(props: LidoSDKStakeProps) {
+    const { core, ...rest } = props;
+
+    if (core) this.core = core;
+    else this.core = new LidoSDKCore(rest, version);
   }
 
   // Balances
@@ -46,8 +50,8 @@ export class LidoSDKStake extends LidoSDKCore {
   @Logger("Contracts:")
   @Cache(30 * 1000)
   public contractAddressStETH(): Address {
-    invariant(this.chain, "Chain is not defined");
-    return getTokenAddress(this.chain?.id, TOKENS.STETH) as Address;
+    invariant(this.core.chain, "Chain is not defined");
+    return getTokenAddress(this.core.chain?.id, TOKENS.STETH) as Address;
   }
 
   @Logger("Contracts:")
@@ -61,8 +65,8 @@ export class LidoSDKStake extends LidoSDKCore {
     this.contractStETH = getContract({
       address: this.contractAddressStETH(),
       abi: abi,
-      publicClient: this.rpcProvider,
-      walletClient: this.web3Provider,
+      publicClient: this.core.rpcProvider,
+      walletClient: this.core.web3Provider,
     });
 
     return this.contractStETH;
@@ -76,8 +80,8 @@ export class LidoSDKStake extends LidoSDKCore {
     value: string,
     referralAddress: Address = zeroAddress
   ): Promise<void> {
-    invariant(this.rpcProvider, "RPC provider is not defined");
-    invariant(this.web3Provider, "Web3 provider is not defined");
+    invariant(this.core.rpcProvider, "RPC provider is not defined");
+    invariant(this.core.web3Provider, "Web3 provider is not defined");
     // Checking the daily protocol staking limit
     await this.checkStakeLimit(value);
 
@@ -85,22 +89,22 @@ export class LidoSDKStake extends LidoSDKCore {
       value,
       referralAddress
     );
-
-    const [address] = await this.web3Provider.getAddresses();
-    invariant(address, "Web3 address is not defined");
+    const address = await this.core.getWeb3Address();
 
     const transaction = await this.getContractStETH().write.submit(
       [referralAddress],
       {
         ...overrides,
         value: parseEther(value),
-        chain: this.chain,
+        chain: this.core.chain,
         gas: gasLimit,
         account: address,
       }
     );
 
-    await this.rpcProvider.waitForTransactionReceipt({ hash: transaction });
+    await this.core.rpcProvider.waitForTransactionReceipt({
+      hash: transaction,
+    });
   }
 
   // Views
@@ -129,10 +133,10 @@ export class LidoSDKStake extends LidoSDKCore {
       maxFeePerGas: bigint | undefined;
     };
   }> {
-    invariant(this.web3Provider, "Web3 provider is not defined");
+    invariant(this.core.web3Provider, "Web3 provider is not defined");
 
-    const address = await this.getWeb3Address();
-    const feeData = await this.getFeeData();
+    const address = await this.core.getWeb3Address();
+    const feeData = await this.core.getFeeData();
 
     const overrides = {
       account: address,
