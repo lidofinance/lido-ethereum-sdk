@@ -34,10 +34,7 @@ export const Cache = function (timeMs = 0) {
         }
       }
 
-      callConsoleMessage(
-        "Cache:",
-        `Cache for method '${methodName}' not found.`
-      );
+      callConsoleMessage("Cache:", `Cache for method '${methodName}' set.`);
       const result = originalMethod.call(this, ...args);
       cache.set(cacheKey, { data: result, timestamp: Date.now() });
       return result;

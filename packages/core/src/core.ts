@@ -12,8 +12,8 @@ import {
 import { goerli, mainnet } from "viem/chains";
 import invariant from "tiny-invariant";
 
-import { getFeeData, FeeData } from "./common/utils/getFeeData";
-import { ErrorHandler, Logger, Initialize } from "./common/decorators";
+import { getFeeData, FeeData, checkIsContract } from "./common/utils";
+import { ErrorHandler, Logger, Initialize, Cache } from "./common/decorators";
 import { SUPPORTED_CHAINS } from "./contants";
 import { LidoSDKCoreProps } from "./types";
 
@@ -119,6 +119,7 @@ export default class LidoSDKCore {
     invariant(this.web3Provider, "Web3 provider is not defined");
 
     if (this.web3Provider.account) return this.web3Provider.account.address;
+    // For walletconnect
     if ("getAddresses" in this.web3Provider) {
       const [address] = await this.web3Provider.getAddresses();
       invariant(address, "Web3 address is not defined");
@@ -136,5 +137,15 @@ export default class LidoSDKCore {
     invariant(account, "Web3 address is not defined");
 
     return account;
+  }
+
+  @ErrorHandler("Utils:")
+  @Logger("Utils:")
+  @Cache(30 * 1000)
+  public async isContract(address: Address): Promise<boolean> {
+    invariant(this.rpcProvider, "RPC provider is not defined");
+    const { isContract } = await checkIsContract(this.rpcProvider, address);
+
+    return isContract;
   }
 }
