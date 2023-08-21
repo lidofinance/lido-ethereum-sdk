@@ -1,4 +1,7 @@
-export const Logger = function (headMessage = "LOG:") {
+import { callConsoleMessage } from "./utils";
+import { HeadMessage } from "./types";
+
+export const Logger = function (headMessage: HeadMessage = "LOG:") {
   return function LoggerMethod<This, Args extends any[], Return>(
     originalMethod: (this: This, ...args: Args) => Return,
     context: ClassMethodDecoratorContext<
@@ -9,23 +12,25 @@ export const Logger = function (headMessage = "LOG:") {
     const methodName = String(context.name);
 
     const replacementMethod = function (this: This, ...args: Args): Return {
-      console.log(`${headMessage} Entering method '${methodName}'.`);
+      callConsoleMessage(headMessage, `Entering method '${methodName}'.`);
       const result = originalMethod.call(this, ...args);
 
       if (result instanceof Promise) {
         return result
           .then((resolvedResult) => {
-            console.log(`${headMessage} Exiting method '${methodName}'.`);
+            callConsoleMessage(headMessage, `Exiting method '${methodName}'.`);
             return resolvedResult;
           })
           .catch((error) => {
-            console.log(
-              `${headMessage} Exiting method '${methodName}' with error: ${error}.`
+            callConsoleMessage(
+              headMessage,
+              `Exiting method '${methodName}' with error: ${error}.`,
+              "Error:"
             );
-            return error;
+            throw error;
           }) as Return;
       } else {
-        console.log(`${headMessage} Exiting method '${methodName}'.`);
+        callConsoleMessage(headMessage, `Exiting method '${methodName}'.`);
         return result;
       }
     };

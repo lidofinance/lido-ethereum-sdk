@@ -1,13 +1,4 @@
 import {
-  LidoSDKCore,
-  type LidoSDKCoreProps,
-  ErrorHandler,
-  Logger,
-  Cache,
-} from "@lidofinance/lido-sdk-core";
-import { CHAINS, TOKENS, getTokenAddress } from "@lido-sdk/constants";
-import {} from "@lido-sdk/contracts/dist/cjs";
-import {
   zeroAddress,
   parseEther,
   getContract,
@@ -17,55 +8,76 @@ import {
   type PublicClient,
   type WalletClient,
 } from "viem";
+import invariant from "tiny-invariant";
+import {
+  LidoSDKCore,
+  type LidoSDKCoreProps,
+  ErrorHandler,
+  Logger,
+  Cache,
+} from "@lidofinance/lido-sdk-core";
+import { TOKENS, getTokenAddress } from "@lido-sdk/constants";
+import {} from "@lido-sdk/contracts/dist/cjs";
 
+import { SUBMIT_EXTRA_GAS_TRANSACTION_RATIO } from "./constants";
+import { version } from "./version";
 import { abi } from "./abi/abi";
 
 // TODO: move to constants
-const SUBMIT_EXTRA_GAS_TRANSACTION_RATIO = 1.05;
 
 export class LidoSDKStake extends LidoSDKCore {
+  protected contractStETH:
+    | GetContractReturnType<typeof abi, PublicClient, WalletClient>
+    | undefined;
+
   constructor(props: LidoSDKCoreProps) {
-    super(props);
+    super(props, version);
   }
 
   // Balances
 
   @Logger("Balances:")
   public balanceStETH(address: Address): Promise<bigint> {
-    return this.contractStETH().read.balanceOf([address]);
+    return this.getContractStETH().read.balanceOf([address]);
   }
 
   // Contracts
 
   @Logger("Contracts:")
+  @Cache(30 * 1000)
   public contractAddressStETH(): Address {
-    return getTokenAddress(
-      this.chain || CHAINS.Mainnet,
-      TOKENS.STETH
-    ) as Address;
+    invariant(this.chain, "Chain is not defined");
+    return getTokenAddress(this.chain?.id, TOKENS.STETH) as Address;
   }
 
   @Logger("Contracts:")
-  public contractStETH(): GetContractReturnType<
+  public getContractStETH(): GetContractReturnType<
     typeof abi,
     PublicClient,
     WalletClient
   > {
-    return getContract({
+    if (this.contractStETH) return this.contractStETH;
+
+    this.contractStETH = getContract({
       address: this.contractAddressStETH(),
       abi: abi,
-      publicClient: this.provider,
+      publicClient: this.rpcProvider,
       walletClient: this.web3Provider,
     });
+
+    return this.contractStETH;
   }
 
   // Calls
 
-  @ErrorHandler("CALL:")
+  @ErrorHandler("Call:")
+  @Logger("Call:")
   public async stake(
     value: string,
     referralAddress: Address = zeroAddress
   ): Promise<void> {
+    invariant(this.rpcProvider, "RPC provider is not defined");
+    invariant(this.web3Provider, "Web3 provider is not defined");
     // Checking the daily protocol staking limit
     await this.checkStakeLimit(value);
 
@@ -74,16 +86,21 @@ export class LidoSDKStake extends LidoSDKCore {
       referralAddress
     );
 
-    const transaction = await this.contractStETH().write.submit(
+    const [address] = await this.web3Provider.getAddresses();
+    invariant(address, "Web3 address is not defined");
+
+    const transaction = await this.getContractStETH().write.submit(
       [referralAddress],
       {
         ...overrides,
-        chain: null,
+        value: parseEther(value),
+        chain: this.chain,
         gas: gasLimit,
+        account: address,
       }
     );
 
-    await this.provider?.waitForTransactionReceipt({ hash: transaction });
+    await this.rpcProvider.waitForTransactionReceipt({ hash: transaction });
   }
 
   // Views
@@ -92,12 +109,13 @@ export class LidoSDKStake extends LidoSDKCore {
   @Cache(30 * 1000)
   @Logger("Views:")
   public getStakeLimitInfo() {
-    return this.contractStETH().read.getStakeLimitFullInfo();
+    return this.getContractStETH().read.getStakeLimitFullInfo();
   }
 
   // Utils
 
   @ErrorHandler("Call:")
+  @Cache(30 * 1000)
   @Logger("Utils:")
   private async submitGasLimit(
     value: string,
@@ -111,15 +129,19 @@ export class LidoSDKStake extends LidoSDKCore {
       maxFeePerGas: bigint | undefined;
     };
   }> {
+    invariant(this.web3Provider, "Web3 provider is not defined");
+
+    const address = await this.getWeb3Address();
     const feeData = await this.getFeeData();
+
     const overrides = {
-      account: this.web3Provider?.account || zeroAddress,
+      account: address,
       value: parseEther(value),
       maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? undefined,
       maxFeePerGas: feeData.maxFeePerGas ?? undefined,
     };
 
-    const originalGasLimit = await this.contractStETH().estimateGas.submit(
+    const originalGasLimit = await this.getContractStETH().estimateGas.submit(
       [referralAddress],
       overrides
     );

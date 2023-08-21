@@ -1,7 +1,9 @@
-import { PublicClient, WalletClient } from "viem";
+import { WalletClient } from "viem";
+
+import { SUPPORTED_CHAINS } from "./contants";
 
 export type LidoSDKCoreProps = {
-  chain: number;
-  provider: PublicClient;
+  chainId: (typeof SUPPORTED_CHAINS)[number];
+  rpcUrls: string[];
   web3Provider?: WalletClient;
 };
