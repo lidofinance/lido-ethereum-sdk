@@ -50,27 +50,29 @@ export default class LidoSDKCore {
       throw new Error("rpcUrls is required");
     }
 
+    const chain = chainId === 1 ? mainnet : goerli;
+
     return {
       chainId,
-      chain: chainId === 1 ? mainnet : goerli,
+      chain,
       rpcUrls,
-      rpcProvider: this.createRpcProvider(),
-      web3Provider: web3Provider ?? this.createWeb3Provider(),
+      rpcProvider: this.createRpcProvider(chain, rpcUrls),
+      web3Provider: web3Provider ?? this.createWeb3Provider(chain),
     };
   }
 
   // Provider
 
   @Logger("Provider:")
-  public createRpcProvider(): PublicClient {
+  public createRpcProvider(chain: Chain, rpcUrls: string[]): PublicClient {
     if (!this.rpcProvider) {
-      const rpcs = this.rpcUrls.map((url) => http(url));
+      const rpcs = rpcUrls.map((url) => http(url));
 
       return createPublicClient({
         batch: {
           multicall: true,
         },
-        chain: this.chain,
+        chain,
         transport: fallback(rpcs),
       });
     }
@@ -78,10 +80,10 @@ export default class LidoSDKCore {
   }
 
   @Logger("Provider:")
-  public createWeb3Provider(): WalletClient {
+  public createWeb3Provider(chain: Chain): WalletClient {
     if (!this.web3Provider) {
       return createWalletClient({
-        chain: this.chain,
+        chain,
         // TODO: fix type
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -117,10 +119,22 @@ export default class LidoSDKCore {
     invariant(this.web3Provider, "Web3 provider is not defined");
 
     if (this.web3Provider.account) return this.web3Provider.account.address;
+    if ("getAddresses" in this.web3Provider) {
+      const [address] = await this.web3Provider.getAddresses();
+      invariant(address, "Web3 address is not defined");
 
-    const [address] = await this.web3Provider.getAddresses();
-    invariant(address, "Web3 address is not defined");
+      return address;
+    }
 
-    return address;
+    // TODO: fix type
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
+    const [account] = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+
+    invariant(account, "Web3 address is not defined");
+
+    return account;
   }
 }
