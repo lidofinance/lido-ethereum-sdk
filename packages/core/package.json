@@ -1,6 +1,6 @@
 {
   "name": "@lidofinance/lido-sdk-core",
-  "version": "0.0.0-semantic-release",
+  "version": "0.0.0",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
