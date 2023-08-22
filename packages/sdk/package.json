@@ -27,8 +27,8 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@lidofinance/lido-sdk-core": "workspaces:*",
-    "@lidofinance/lido-sdk-stake": "workspaces:*",
+    "@lidofinance/lido-sdk-core": "workspace:*",
+    "@lidofinance/lido-sdk-stake": "workspace:*",
     "viem": "^1.6.7"
   },
   "devDependencies": {

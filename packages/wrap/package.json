@@ -16,7 +16,7 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "@lidofinance/lido-sdk-core": "workspaces:*"
+    "@lidofinance/lido-sdk-core": "workspace:*"
   },
   "devDependencies": {
     "rimraf": "^5.0.1"

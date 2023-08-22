@@ -28,7 +28,7 @@
   "dependencies": {
     "@lido-sdk/constants": "^3.1.0",
     "@lido-sdk/contracts": "^3.0.2",
-    "@lidofinance/lido-sdk-core": "workspaces:*",
+    "@lidofinance/lido-sdk-core": "workspace:*",
     "tiny-invariant": "^1.3.1",
     "viem": "^1.6.7"
   },
