@@ -7,28 +7,14 @@ export type FeeData = {
   gasPrice: null | bigint;
 };
 
-const getFeeHistory = (
-  provider: PublicClient,
-  blockCount: number,
-  blockTag: BlockTag,
-  rewardPercentiles: number[]
-): Promise<{
-  baseFeePerGas: bigint[];
-  gasUsedRatio: number[];
-  oldestBlock: bigint;
-  reward?: bigint[][];
-}> => {
-  return provider.getFeeHistory({
-    blockCount,
-    rewardPercentiles,
-    blockTag,
-  });
-};
-
 export const getFeeData = async (provider: PublicClient): Promise<FeeData> => {
   // we look back 5 blocks at fees of botton 25% txs
   // if you want to increase maxPriorityFee output increase percentile
-  const feeHistory = await getFeeHistory(provider, 5, "pending", [25]);
+  const feeHistory = await provider.getFeeHistory({
+    blockCount: 5,
+    blockTag: "pending",
+    rewardPercentiles: [25],
+  });
 
   // get average priority fee
   const maxPriorityFeePerGas =
