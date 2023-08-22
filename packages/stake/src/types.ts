@@ -2,6 +2,7 @@ import { type Address, type Hash, type TransactionReceipt } from "viem";
 import {
   type LidoSDKCoreProps,
   type LidoSDKCore,
+  type SDKError,
 } from "@lidofinance/lido-sdk-core";
 
 export type LidoSDKStakeProps = LidoSDKCoreProps & {
@@ -14,6 +15,7 @@ export enum StakeCallbackStage {
   "CONFIRMATION" = "confirmation",
   "DONE" = "done",
   "MULTISIG_DONE" = "multisig_done",
+  "ERROR" = "error",
 }
 
 export type StakeCallbackProps =
@@ -21,7 +23,8 @@ export type StakeCallbackProps =
   | { stage: StakeCallbackStage.RECEIPT; payload: Hash }
   | { stage: StakeCallbackStage.CONFIRMATION; payload: TransactionReceipt }
   | { stage: StakeCallbackStage.DONE; payload: bigint }
-  | { stage: StakeCallbackStage.MULTISIG_DONE; payload?: undefined };
+  | { stage: StakeCallbackStage.MULTISIG_DONE; payload?: undefined }
+  | { stage: StakeCallbackStage.ERROR; payload: SDKError };
 
 export type StageCallback = (props: StakeCallbackProps) => void;
 

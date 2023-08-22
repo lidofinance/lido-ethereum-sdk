@@ -1,4 +1,4 @@
-import { PublicClient, type BlockTag } from "viem";
+import { PublicClient } from "viem";
 
 export type FeeData = {
   lastBaseFeePerGas: null | bigint;

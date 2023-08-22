@@ -12,7 +12,15 @@ import {
 import { goerli, mainnet } from "viem/chains";
 import invariant from "tiny-invariant";
 
-import { getFeeData, FeeData, checkIsContract } from "./common/utils";
+import {
+  getFeeData,
+  type FeeData,
+  checkIsContract,
+  SDKError,
+  type SDKErrorProps,
+  getErrorMessage,
+  type ErrorMessage,
+} from "./common/utils";
 import { ErrorHandler, Logger, Initialize, Cache } from "./common/decorators";
 import { SUPPORTED_CHAINS } from "./contants";
 import { LidoSDKCoreProps } from "./types";
@@ -149,5 +157,20 @@ export default class LidoSDKCore {
     const { isContract } = await checkIsContract(this.rpcProvider, address);
 
     return isContract;
+  }
+
+  @ErrorHandler("Utils:")
+  @Logger("Utils:")
+  public error(props: SDKErrorProps): SDKError {
+    return new SDKError(props);
+  }
+
+  @ErrorHandler("Utils:")
+  @Logger("Utils:")
+  public getErrorMessage(error: unknown): {
+    message: ErrorMessage;
+    code: string | number;
+  } {
+    return getErrorMessage(error);
   }
 }

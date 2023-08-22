@@ -7,7 +7,7 @@
 You can install the Lido Ethereum SDK using npm or yarn:
 
 [Docs Stake package](./packages/stake/README.md)
-Stake functionality
+Stake functionality:
 
 ```bash
 // Stake
@@ -15,7 +15,7 @@ yarn add @lidofinance/lido-sdk-stake
 ```
 
 [Docs Wrap package](./packages/wrap/README.md)
-Wrap functionality
+Wrap functionality:
 
 ```bash
 // Wrap
@@ -23,7 +23,7 @@ yarn add @lidofinance/lido-sdk-wrap
 ```
 
 [Docs Withdrawals package](./packages/withdrawals/README.md)
-Withdrawals functionality
+Withdrawals functionality:
 
 ```bash
 // Withdrawals
@@ -31,7 +31,7 @@ yarn add @lidofinance/lido-sdk-withdrawals
 ```
 
 [Docs SDK package](./packages/sdk/README.md)
-All functionality (stakes, wrap, withdrawals)
+All functionality (stakes, wrap, withdrawals):
 
 ```bash
 // SDK (stakes, wrap, withdrawals)
@@ -42,7 +42,7 @@ yarn add @lidofinance/lido-sdk
 
 To get started with the Lido Ethereum SDK, you need to import the necessary modules:
 
-```js
+```ts
 const { LidoSDK } = require("@lidofinance/lido-sdk");
 
 // Or, if you are using ES6+:
@@ -53,7 +53,7 @@ import { LidoSDK } from "@lidofinance/lido-sdk";
 
 Before using the SDK, you need to create an instance of the LidoSDK class:
 
-```js
+```ts
 // With own rpc provider
 const sdk = new LidoSDK({
   chainId: 5,
@@ -64,18 +64,16 @@ const sdk = new LidoSDK({
 // With RPC urls (without own rpc provider)
 const sdk = new LidoSDK({
   chainId: 5,
-  rpcUrls: ["https://goerli.infura.io/v3/your-infura-id"],
+  rpcUrls: ["https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}"],
   web3Provider: provider, // optional
 });
 ```
 
-Replace "https://goerli.infura.io/v3/your-infura-id" with the address of your Ethereum provider.
+Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address of your Ethereum provider.
 
 ## Examples
 
-Getting Information About the Current State of Lido
-
-```js
+```ts
 const lidoSDK = new LidoSDK({
   chainId: 5,
   rpcUrls: ["https://goerli.infura.io/v3/your-infura-id"],

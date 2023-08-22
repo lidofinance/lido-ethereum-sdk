@@ -16,7 +16,6 @@ import {
   Cache,
 } from "@lidofinance/lido-sdk-core";
 import { TOKENS, getTokenAddress } from "@lido-sdk/constants";
-import {} from "@lido-sdk/contracts/dist/cjs";
 
 import { SUBMIT_EXTRA_GAS_TRANSACTION_RATIO } from "./common/constants";
 import { version } from "./version";
@@ -27,8 +26,6 @@ import {
   StakeProps,
   StakeResult,
 } from "./types";
-
-// TODO: move to constants
 
 export class LidoSDKStake {
   protected core: LidoSDKCore;
@@ -53,7 +50,7 @@ export class LidoSDKStake {
   // Contracts
 
   @Logger("Contracts:")
-  @Cache(30 * 1000)
+  @Cache(60 * 1000)
   public contractAddressStETH(): Address {
     invariant(this.core.chain, "Chain is not defined");
     return getTokenAddress(this.core.chain?.id, TOKENS.STETH) as Address;
@@ -82,11 +79,24 @@ export class LidoSDKStake {
   @ErrorHandler("Call:")
   @Logger("Call:")
   public async stake(props: StakeProps): Promise<StakeResult> {
-    const address = await this.core.getWeb3Address();
-    const isContract = await this.core.isContract(address);
+    const { callback } = props;
+    try {
+      const address = await this.core.getWeb3Address();
+      const isContract = await this.core.isContract(address);
 
-    if (isContract) return await this.stakeMultisig(props);
-    else return await this.stakeEOA(props);
+      if (isContract) return await this.stakeMultisig(props);
+      else return await this.stakeEOA(props);
+    } catch (error) {
+      const { message, code } = this.core.getErrorMessage(error);
+      const txError = this.core.error({
+        message,
+        error,
+        code,
+      });
+      callback({ stage: StakeCallbackStage.ERROR, payload: txError });
+
+      throw txError;
+    }
   }
 
   @ErrorHandler("Call:")
@@ -223,9 +233,9 @@ export class LidoSDKStake {
     const parsedValue = parseEther(value);
 
     if (parsedValue > currentStakeLimit) {
-      throw new Error(
-        `Stake value is greater than daily protocol staking limit (${currentStakeLimit})`
-      );
+      throw this.core.error({
+        message: `Stake value is greater than daily protocol staking limit (${currentStakeLimit})`,
+      });
     }
   }
 }
