@@ -18,21 +18,18 @@ import { SUPPORTED_CHAINS } from "./contants";
 import { LidoSDKCoreProps } from "./types";
 
 export default class LidoSDKCore {
-  readonly chainId: (typeof SUPPORTED_CHAINS)[number] | undefined;
-  readonly rpcUrls: string[] = [];
-  readonly rpcProvider: PublicClient | undefined;
-  readonly web3Provider: WalletClient | undefined;
-  readonly chain: Chain | undefined;
+  readonly chainId: (typeof SUPPORTED_CHAINS)[number];
+  readonly rpcUrls: string[] | undefined;
+  readonly rpcProvider: PublicClient;
+  readonly web3Provider: WalletClient;
+  readonly chain: Chain;
 
   constructor(props: LidoSDKCoreProps, version?: string) {
-    const { chain, chainId, rpcUrls, rpcProvider, web3Provider } = this.init(
-      props,
-      version
-    );
+    const { chain, rpcProvider, web3Provider } = this.init(props, version);
 
-    this.chainId = chainId;
+    this.chainId = props.chainId;
     this.chain = chain;
-    this.rpcUrls = rpcUrls;
+    this.rpcUrls = props.rpcUrls;
     this.rpcProvider = rpcProvider;
     this.web3Provider = web3Provider;
   }
@@ -40,24 +37,29 @@ export default class LidoSDKCore {
   @Initialize("Init:")
   @Logger("LOG:")
   private init(props: LidoSDKCoreProps, _version?: string) {
-    const { chainId, rpcUrls, web3Provider } = props;
+    const { chainId, rpcUrls, web3Provider, rpcProvider } = props;
 
     if (!SUPPORTED_CHAINS.includes(chainId)) {
       throw new Error(`Unsupported chain: ${chainId}`);
     }
 
-    if (rpcUrls.length === 0) {
+    if (!rpcProvider && rpcUrls.length === 0) {
       throw new Error("rpcUrls is required");
     }
 
+    if (!rpcUrls && !rpcProvider) {
+      throw new Error("rpcUrls or rpcProvider is required");
+    }
+
     const chain = chainId === 1 ? mainnet : goerli;
+    const currentRpcProvider =
+      rpcProvider ?? this.createRpcProvider(chain, rpcUrls);
+    const currentWeb3Provider = web3Provider ?? this.createWeb3Provider(chain);
 
     return {
-      chainId,
       chain,
-      rpcUrls,
-      rpcProvider: this.createRpcProvider(chain, rpcUrls),
-      web3Provider: web3Provider ?? this.createWeb3Provider(chain),
+      rpcProvider: currentRpcProvider,
+      web3Provider: currentWeb3Provider,
     };
   }
 
@@ -141,7 +143,7 @@ export default class LidoSDKCore {
 
   @ErrorHandler("Utils:")
   @Logger("Utils:")
-  @Cache(30 * 1000)
+  @Cache(60 * 60 * 1000)
   public async isContract(address: Address): Promise<boolean> {
     invariant(this.rpcProvider, "RPC provider is not defined");
     const { isContract } = await checkIsContract(this.rpcProvider, address);

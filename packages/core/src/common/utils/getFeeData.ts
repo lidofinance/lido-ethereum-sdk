@@ -1,4 +1,4 @@
-import { Client } from "viem";
+import { PublicClient, type BlockTag } from "viem";
 
 export type FeeData = {
   lastBaseFeePerGas: null | bigint;
@@ -7,35 +7,22 @@ export type FeeData = {
   gasPrice: null | bigint;
 };
 
-const getFeeHistory = (
-  provider: Client,
-  blockCount: number,
-  latestBlock: string,
-  percentile?: number[]
-): Promise<{
-  baseFeePerGas: string[];
-  gasUsedRatio: number[];
-  oldestBlock: string;
-  reward: string[][];
-}> => {
-  return provider.request({
-    method: "eth_feeHistory",
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    params: [`0x${blockCount.toString(16)}`, latestBlock, percentile],
-  });
-};
-
-export const getFeeData = async (provider: Client): Promise<FeeData> => {
+export const getFeeData = async (provider: PublicClient): Promise<FeeData> => {
   // we look back 5 blocks at fees of botton 25% txs
   // if you want to increase maxPriorityFee output increase percentile
-  const feeHistory = await getFeeHistory(provider, 5, "pending", [25]);
+  const feeHistory = await provider.getFeeHistory({
+    blockCount: 5,
+    blockTag: "pending",
+    rewardPercentiles: [25],
+  });
 
   // get average priority fee
   const maxPriorityFeePerGas =
-    feeHistory.reward
-      .map((fees) => (fees[0] ? BigInt(fees[0]) : 0n))
-      .reduce((sum, fee) => sum + fee) / BigInt(feeHistory.reward.length);
+    feeHistory.reward && feeHistory.reward.length > 0
+      ? feeHistory.reward
+          .map((fees) => (fees[0] ? BigInt(fees[0]) : 0n))
+          .reduce((sum, fee) => sum + fee) / BigInt(feeHistory.reward.length)
+      : 0n;
 
   const lastBaseFeePerGas = feeHistory.baseFeePerGas[0]
     ? BigInt(feeHistory.baseFeePerGas[0])
