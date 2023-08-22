@@ -15,9 +15,12 @@
     "build": "yarn workspaces run build",
     "types": "yarn workspaces run types",
     "test": "yarn workspaces run test",
-    "publish": "yarn workspaces run publish:package"
+    "publish": "yarn workspaces run publish:package",
+    "prepare": "husky install"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.7.1",
+    "@commitlint/config-conventional": "^17.7.0",
     "@lidofinance/eslint-config": "^0.34.0",
     "@qiwi/multi-semantic-release": "6.7.0",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
@@ -36,6 +39,7 @@
     "eslint-plugin-react-hooks": "^4",
     "eslint-plugin-sonarjs": "^0.20.0",
     "eslint-plugin-unicorn": "^48.0.1",
+    "husky": "^8.0.3",
     "prettier": "^3.0.1",
     "typescript": "^5.1.6"
   },
