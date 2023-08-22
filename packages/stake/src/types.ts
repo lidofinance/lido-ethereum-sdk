@@ -1,4 +1,4 @@
-import { type Address } from "viem";
+import { type Address, type Hash, type TransactionReceipt } from "viem";
 import {
   type LidoSDKCoreProps,
   type LidoSDKCore,
@@ -16,12 +16,23 @@ export enum StakeCallbackStage {
   "MULTISIG_DONE" = "multisig_done",
 }
 
-export type StageCallback = (
-  stage: StakeCallbackStage,
-  payload?: unknown
-) => void;
+export type StakeCallbackProps =
+  | { stage: StakeCallbackStage.SIGN; payload?: undefined }
+  | { stage: StakeCallbackStage.RECEIPT; payload: Hash }
+  | { stage: StakeCallbackStage.CONFIRMATION; payload: TransactionReceipt }
+  | { stage: StakeCallbackStage.DONE; payload: bigint }
+  | { stage: StakeCallbackStage.MULTISIG_DONE; payload?: undefined };
+
+export type StageCallback = (props: StakeCallbackProps) => void;
+
 export type StakeProps = {
   value: string;
   callback: StageCallback;
   referralAddress?: Address;
+};
+
+export type StakeResult = {
+  hash: Hash;
+  receipt?: TransactionReceipt;
+  confirmations?: bigint;
 };
