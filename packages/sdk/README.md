@@ -51,19 +51,19 @@ Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address
 ### Core
 
 ```ts
-const lidoSDKStake = new LidoSDKStake({
+const lidoSDK = new LidoSDK({
   chainId: 5,
   rpcUrls: ["https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}"],
 });
 
 // Views
-const balanceETH = await lidoSDKStake.core.balanceETH(address);
+const balanceETH = await lidoSDK.core.balanceETH(address);
 ```
 
 ### Stake
 
 ```ts
-const lidoSDKStake = new LidoSDKStake({
+const lidoSDK = new LidoSDK({
   chainId: 5,
   rpcUrls: ["https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}"],
 });
@@ -107,9 +107,9 @@ Callback stages:
 - `error` - transaction is failed
 
 ```ts
-import { LidoSDK, StageCallback, SDKError } from "@lidofinance/lido-sdk-stake";
+import { LidoSDK, StageCallback, SDKError } from "@lidofinance/lido-sdk";
 
-const lidoSDKStake = new LidoSDK({
+const lidoSDK = new LidoSDK({
   rpcUrls: ["https://rpc-url"],
   chainId: 5,
 });
@@ -140,7 +140,7 @@ const callback: StageCallback = ({ stage, payload }) => {
 };
 
 try {
-  const stakeResult = await LidoSDK.staking.stake({
+  const stakeResult = await lidoSDK.staking.stake({
     value,
     callback,
     referralAddress,
