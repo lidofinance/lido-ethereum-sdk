@@ -30,7 +30,7 @@
   "dependencies": {
     "@lidofinance/lido-sdk-core": "0.0.1",
     "@lidofinance/lido-sdk-stake": "0.0.1",
-    "viem": "^1.6.4"
+    "viem": "^1.6.7"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.1",
