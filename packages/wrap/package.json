@@ -1,6 +1,6 @@
 {
   "name": "@lidofinance/lido-sdk-wrap",
-  "version": "0.0.1",
+  "version": "0.0.0-semantic-release",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -16,7 +16,7 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "@lidofinance/lido-sdk-core": "0.0.1"
+    "@lidofinance/lido-sdk-core": "workspaces:*"
   },
   "devDependencies": {
     "rimraf": "^5.0.1"

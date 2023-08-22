@@ -1,6 +1,6 @@
 {
   "name": "@lidofinance/lido-sdk",
-  "version": "0.0.1",
+  "version": "0.0.0-semantic-release",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
@@ -27,8 +27,8 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@lidofinance/lido-sdk-core": "0.0.1",
-    "@lidofinance/lido-sdk-stake": "0.0.1",
+    "@lidofinance/lido-sdk-core": "workspaces:*",
+    "@lidofinance/lido-sdk-stake": "workspaces:*",
     "viem": "^1.6.7"
   },
   "devDependencies": {
