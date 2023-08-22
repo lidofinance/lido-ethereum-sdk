@@ -1,0 +1,33 @@
+name: Check all
+on:
+  pull_request:
+jobs:
+  check-all:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+
+      - name: Check types
+        run: yarn types
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Validate package.json
+        run: yarn validate-package-json
+
+      - name: Tests
+        run: yarn test
