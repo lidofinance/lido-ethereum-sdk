@@ -4,7 +4,7 @@
 
 ## Installation
 
-You can install the Lido Ethereum SDK using npm or yarn:
+You can install the Lido Ethereum SDK Stake using npm or yarn:
 
 ```bash
 yarn add @lidofinance/lido-sdk-stake
@@ -12,13 +12,13 @@ yarn add @lidofinance/lido-sdk-stake
 
 ## Usage
 
-To get started with the Lido Ethereum SDK, you need to import the necessary modules:
+To get started with the Lido Ethereum SDK Stake, you need to import the necessary modules:
 
 ```ts
 const { LidoSDKStake } = require("@lidofinance/lido-sdk-stake");
 
 // Or, if you are using ES6+:
-import { LidoSDKStake } from "@lidofinance/lido-sdk";
+import { LidoSDKStake } from "@lidofinance/lido-sdk-stake";
 ```
 
 ## Initialization
@@ -34,7 +34,7 @@ const sdk = new LidoSDKStake({
 });
 
 // With RPC urls (without own rpc provider)
-const sdk = new LidoSDK({
+const sdk = new LidoSDKStake({
   chainId: 5,
   rpcUrls: [
     "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}",

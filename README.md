@@ -7,7 +7,6 @@
 You can install the Lido Ethereum SDK using npm or yarn:
 
 [Docs Stake package](./packages/stake/README.md)
-Stake functionality:
 
 ```bash
 // Stake
@@ -15,7 +14,6 @@ yarn add @lidofinance/lido-sdk-stake
 ```
 
 [Docs Wrap package](./packages/wrap/README.md)
-Wrap functionality:
 
 ```bash
 // Wrap
@@ -23,7 +21,6 @@ yarn add @lidofinance/lido-sdk-wrap
 ```
 
 [Docs Withdrawals package](./packages/withdrawals/README.md)
-Withdrawals functionality:
 
 ```bash
 // Withdrawals
@@ -31,7 +28,6 @@ yarn add @lidofinance/lido-sdk-withdrawals
 ```
 
 [Docs SDK package](./packages/sdk/README.md)
-All functionality (stakes, wrap, withdrawals):
 
 ```bash
 // SDK (stakes, wrap, withdrawals)
@@ -76,7 +72,7 @@ Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address
 ```ts
 const lidoSDK = new LidoSDK({
   chainId: 5,
-  rpcUrls: ["https://goerli.infura.io/v3/your-infura-id"],
+  rpcUrls: ["https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}"],
 });
 
 // Views
