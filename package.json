@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@lidofinance/eslint-config": "^0.34.0",
+    "@qiwi/multi-semantic-release": "6.7.0",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",
     "eslint": "^8.46.0",
@@ -42,7 +43,12 @@
     "packages/core",
     "packages/stake",
     "packages/wrap",
-    "packages/withdrawls",
+    "packages/withdrawals",
     "packages/sdk"
-  ]
+  ],
+  "release": {
+    "branches": [
+      "main"
+    ]
+  }
 }

@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
@@ -27,10 +27,10 @@ jobs:
 
       - name: Authenticate in npm
         run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
-        env: 
+        env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish
-        run: yarn release
+        run: yarn multi-semantic-release --deps.bump=override --deps.release=patch --sequential-init
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
