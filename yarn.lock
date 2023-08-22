@@ -320,10 +320,10 @@
     "@lido-sdk/constants" "3.1.0"
     tiny-invariant "^1.1.0"
 
-"@lidofinance/eslint-config@^0.34.0":
-  version "0.34.0"
-  resolved "https://registry.yarnpkg.com/@lidofinance/eslint-config/-/eslint-config-0.34.0.tgz#5ee60bcf6c2da39bcb712a0169d7365dceb08cfb"
-  integrity sha512-HfcX7tdli4HcJ2iGji3wyLvS9uBRSygSDwhdcnWhJUSHn3/bnlA3+UEXOtHNNnU2vcbRWal42Npo9q//BSM7kA==
+"@lidofinance/eslint-config@^0.35.0":
+  version "0.35.0"
+  resolved "https://registry.yarnpkg.com/@lidofinance/eslint-config/-/eslint-config-0.35.0.tgz#64fae0e8c9f0a33b3b17a425231620b29ae6c7e1"
+  integrity sha512-42pArWonKbckRZpygAQoei5PVIGutrjOzTg4o2vNOrNPzaYTPf+/l9t3dq7v9irB2PJJ9vNBbQbx/ROHlwgd2w==
   dependencies:
     typescript "^4.7"
 
