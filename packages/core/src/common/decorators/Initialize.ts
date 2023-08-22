@@ -13,7 +13,7 @@ export const Initialize = function (headMessage: HeadMessage = "Init:") {
       const result = originalMethod.call(this, ...args);
       const version = args[1];
 
-      callConsoleMessage(headMessage, `LIDO SDK v${version}  `);
+      callConsoleMessage(headMessage, `LIDO SDK ${version}  `);
 
       return result;
     };

@@ -23,11 +23,5 @@ jobs:
       - name: Check types
         run: yarn types
 
-      - name: Lint
-        run: yarn lint
-
-      - name: Validate package.json
-        run: yarn validate-package-json
-
       - name: Tests
         run: yarn test

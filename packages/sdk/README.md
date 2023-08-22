@@ -150,7 +150,7 @@ try {
     stakeResult,
     "transaction hash, transaction receipt, confirmations"
   );
-} catch (error: SDKError) {
-  console.log(error.errorMessage, error.code);
+} catch (error) {
+  console.log((error as SDKError).errorMessage, (error as SDKError).code);
 }
 ```

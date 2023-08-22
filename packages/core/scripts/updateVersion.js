@@ -11,10 +11,10 @@ const cjsCode = `
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.version = void 0;
-exports.version = "Stake v${packageVersion}";
+exports.version = "Core v${packageVersion}";
 //# sourceMappingURL=version.js.map
 `;
-const esmCode = `export const version = 'Stake v${packageVersion}'\n`;
+const esmCode = `export const version = 'Core v${packageVersion}'\n`;
 
 writeFileSync(cjsVersionFilePath, cjsCode);
 writeFileSync(esmVersionFilePath, esmCode);

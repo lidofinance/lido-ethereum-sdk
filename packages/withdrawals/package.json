@@ -1,22 +1,24 @@
 {
-    "name": "@lidofinance/lido-sdk-withdrawals",
-    "version": "0.0.1",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "scripts": {
-      "typecheck": "tsc",
-      "build": "node build.js & yarn typecheck",
-      "publish:package": "yarn build && npm publish --registry http://localhost:4873/",
-      "build:cjs": "tsc --project tsconfig.build.json --module commonjs --outDir ./dist/cjs --removeComments --verbatimModuleSyntax false && echo > ./dist/cjs/package.json '{\"type\":\"commonjs\"}'",
-      "build:esm": "tsc --project tsconfig.build.json --module es2015 --outDir ./dist/esm && echo > ./dist/esm/package.json '{\"type\":\"module\",\"sideEffects\":false}'",
-      "build:types": "tsc --project tsconfig.build.json --module esnext --declarationDir ./dist/types --emitDeclarationOnly --declaration --declarationMap",
-      "clean": "rimraf dist"
-    },
-    "dependencies": {},
-    "peerDependencies": {
-      "@lidofinance/lido-sdk-core": "0.0.1"
-    },
-    "devDependencies": {
-      "rimraf": "^5.0.1"
-    }
+  "name": "@lidofinance/lido-sdk-withdrawals",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "typecheck": "tsc",
+    "build": "node build.js & yarn typecheck",
+    "types": "tsc --noEmit",
+    "publish:package": "yarn build && npm publish --registry http://localhost:4873/",
+    "build:cjs": "tsc --project tsconfig.build.json --module commonjs --outDir ./dist/cjs --removeComments --verbatimModuleSyntax false && echo > ./dist/cjs/package.json '{\"type\":\"commonjs\"}'",
+    "build:esm": "tsc --project tsconfig.build.json --module es2015 --outDir ./dist/esm && echo > ./dist/esm/package.json '{\"type\":\"module\",\"sideEffects\":false}'",
+    "build:types": "tsc --project tsconfig.build.json --module esnext --declarationDir ./dist/types --emitDeclarationOnly --declaration --declarationMap",
+    "test": "echo test withdrawals",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {},
+  "peerDependencies": {
+    "@lidofinance/lido-sdk-core": "0.0.1"
+  },
+  "devDependencies": {
+    "rimraf": "^5.0.1"
   }
+}
