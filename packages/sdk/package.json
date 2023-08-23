@@ -25,10 +25,10 @@
       "default": "./dist/cjs/core/index.js",
       "types": "./dist/types/core/index.d.ts"
     },
-    "./stake": {
-      "import": "./dist/esm/stake/index.js",
-      "default": "./dist/cjs/stake/index.js",
-      "types": "./dist/types/stake/index.d.ts"
+    "./staking": {
+      "import": "./dist/esm/staking/index.js",
+      "default": "./dist/cjs/staking/index.js",
+      "types": "./dist/types/staking/index.d.ts"
     },
     "./package.json": "./package.json"
   },

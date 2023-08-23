@@ -1,5 +1,5 @@
 import { LidoSDKCore, LidoSDKCoreProps } from "./core/index.js";
-import { LidoSDKStake } from "./stake/index.js";
+import { LidoSDKStake } from "./staking/index.js";
 
 import { version } from "./version.js";
 

@@ -5,4 +5,4 @@ export {
   StakeCallbackStage,
   StageCallback,
   StakeProps,
-} from "./stake/index.js";
+} from "./staking/index.js";
