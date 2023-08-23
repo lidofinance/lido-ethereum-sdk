@@ -123,14 +123,14 @@ Callback stages:
 - `error` - transaction is failed
 
 ```ts
-import { LidoSDK, StageCallback, SDKError } from "@lidofinance/lido-sdk";
+import { LidoSDK, StakeStageCallback, SDKError } from "@lidofinance/lido-sdk";
 
 const lidoSDK = new LidoSDK({
   rpcUrls: ["https://rpc-url"],
   chainId: 5,
 });
 
-const callback: StageCallback = ({ stage, payload }) => {
+const callback: StakeStageCallback = ({ stage, payload }) => {
   switch (stage) {
     case StakeCallbackStage.SIGN:
       console.log("wait for sign");
