@@ -23,7 +23,7 @@ import {
   StakeResult,
 } from "./types.js";
 
-export class LidoSDKStake {
+export class LidoSDKStaking {
   protected core: LidoSDKCore;
   protected contractStETH:
     | GetContractReturnType<typeof abi, PublicClient, WalletClient>

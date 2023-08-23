@@ -3,6 +3,6 @@ export { type SDKError } from "./common/utils/SDKError.js";
 export * from "./common/decorators/index.js";
 export {
   StakeCallbackStage,
-  StageCallback,
+  StakeStageCallback,
   StakeProps,
 } from "./staking/index.js";

@@ -23,11 +23,11 @@ export type StakeCallbackProps =
   | { stage: StakeCallbackStage.MULTISIG_DONE; payload?: undefined }
   | { stage: StakeCallbackStage.ERROR; payload: SDKError };
 
-export type StageCallback = (props: StakeCallbackProps) => void;
+export type StakeStageCallback = (props: StakeCallbackProps) => void;
 
 export type StakeProps = {
   value: string;
-  callback: StageCallback;
+  callback: StakeStageCallback;
   referralAddress?: Address;
 };
 
