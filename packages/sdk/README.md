@@ -107,6 +107,8 @@ console.log(stakeResult, "stake result");
 
 ## Stake
 
+### Call
+
 Arguments:
 
 - `value`: _string_ - amount of ETH to stake (in ETH)
@@ -129,6 +131,9 @@ const lidoSDK = new LidoSDK({
   rpcUrls: ["https://rpc-url"],
   chainId: 5,
 });
+
+// Create default web3 provider (window.ethereum)
+lidoSDK.createWeb3Provider(lidoSDK.chain);
 
 const callback: StakeStageCallback = ({ stage, payload }) => {
   switch (stage) {
@@ -169,4 +174,42 @@ try {
 } catch (error) {
   console.log((error as SDKError).errorMessage, (error as SDKError).code);
 }
+```
+
+### Populate transaction
+
+```ts
+import { LidoSDK } from "@lidofinance/lido-sdk";
+
+const lidoSDK = new LidoSDK({
+  rpcUrls: ["https://rpc-url"],
+  chainId: 5,
+});
+
+const populateResult = await lidoSDK.staking.stakePopulateTx({
+  value,
+  callback,
+  referralAddress,
+  account,
+});
+
+console.log(populateResult, "to, from, value, data");
+```
+
+### Simulate transaction
+
+```ts
+import { LidoSDK } from "@lidofinance/lido-sdk";
+
+const lidoSDK = new LidoSDK({
+  rpcUrls: ["https://rpc-url"],
+  chainId: 5,
+});
+
+const simulateResult = await lidoSDK.staking.stakeSimulateTx({
+  value,
+  callback,
+  referralAddress,
+  account,
+});
 ```

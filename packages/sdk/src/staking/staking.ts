@@ -2,11 +2,15 @@ import {
   zeroAddress,
   parseEther,
   getContract,
+  encodeFunctionData,
   type Address,
   type Account,
   type GetContractReturnType,
   type PublicClient,
   type WalletClient,
+  type Hash,
+  type WriteContractParameters,
+  type FormattedTransactionRequest,
 } from "viem";
 import invariant from "tiny-invariant";
 import { LidoSDKCore } from "../core/index.js";
@@ -15,12 +19,15 @@ import { TOKENS, getTokenAddress } from "@lido-sdk/constants";
 
 import { SUBMIT_EXTRA_GAS_TRANSACTION_RATIO } from "../common/constants.js";
 import { version } from "../version.js";
-import { abi } from "./abi/abi.js";
+
+import { abi } from "./abi/steth.js";
 import {
   LidoSDKStakingProps,
   StakeCallbackStage,
   StakeProps,
   StakeResult,
+  StakeEncodeDataProps,
+  StakePopulateTxProps,
 } from "./types.js";
 
 export class LidoSDKStaking {
@@ -75,6 +82,8 @@ export class LidoSDKStaking {
   @ErrorHandler("Call:")
   @Logger("Call:")
   public async stake(props: StakeProps): Promise<StakeResult> {
+    invariant(this.core.web3Provider, "Web3 provider is not defined");
+
     const { callback } = props;
     try {
       const address = await this.core.getWeb3Address();
@@ -89,7 +98,7 @@ export class LidoSDKStaking {
         error,
         code,
       });
-      callback({ stage: StakeCallbackStage.ERROR, payload: txError });
+      callback?.({ stage: StakeCallbackStage.ERROR, payload: txError });
 
       throw txError;
     }
@@ -111,7 +120,7 @@ export class LidoSDKStaking {
     );
     const address = await this.core.getWeb3Address();
 
-    callback({ stage: StakeCallbackStage.SIGN });
+    callback?.({ stage: StakeCallbackStage.SIGN });
 
     const transaction = await this.getContractStETH().write.submit(
       [referralAddress],
@@ -124,14 +133,14 @@ export class LidoSDKStaking {
       }
     );
 
-    callback({ stage: StakeCallbackStage.RECEIPT, payload: transaction });
+    callback?.({ stage: StakeCallbackStage.RECEIPT, payload: transaction });
 
     const transactionReceipt =
       await this.core.rpcProvider.waitForTransactionReceipt({
         hash: transaction,
       });
 
-    callback({
+    callback?.({
       stage: StakeCallbackStage.CONFIRMATION,
       payload: transactionReceipt,
     });
@@ -141,7 +150,7 @@ export class LidoSDKStaking {
         hash: transactionReceipt.transactionHash,
       });
 
-    callback({ stage: StakeCallbackStage.DONE, payload: confirmations });
+    callback?.({ stage: StakeCallbackStage.DONE, payload: confirmations });
 
     return { hash: transaction, receipt: transactionReceipt, confirmations };
   }
@@ -153,7 +162,7 @@ export class LidoSDKStaking {
 
     const address = await this.core.getWeb3Address();
 
-    callback({ stage: StakeCallbackStage.SIGN });
+    callback?.({ stage: StakeCallbackStage.SIGN });
 
     const transaction = await this.getContractStETH().write.submit(
       [referralAddress],
@@ -164,9 +173,28 @@ export class LidoSDKStaking {
       }
     );
 
-    callback({ stage: StakeCallbackStage.MULTISIG_DONE });
+    callback?.({ stage: StakeCallbackStage.MULTISIG_DONE });
 
     return { hash: transaction };
+  }
+
+  @ErrorHandler("Call:")
+  @Logger("Call:")
+  public async stakeSimulateTx(
+    props: StakePopulateTxProps
+  ): Promise<WriteContractParameters> {
+    const { referralAddress = zeroAddress, value, account } = props;
+
+    const { request } = await this.core.rpcProvider.simulateContract({
+      address: this.contractAddressStETH(),
+      abi,
+      functionName: "submit",
+      account,
+      args: [referralAddress],
+      value: parseEther(value),
+    });
+
+    return request;
   }
 
   // Views
@@ -233,5 +261,34 @@ export class LidoSDKStaking {
         message: `Stake value is greater than daily protocol staking limit (${currentStakeLimit})`,
       });
     }
+  }
+
+  @ErrorHandler("Utils:")
+  @Logger("Utils:")
+  public stakeEncodeData(props: StakeEncodeDataProps): Hash {
+    const { referralAddress = zeroAddress } = props;
+
+    return encodeFunctionData({
+      abi,
+      functionName: "submit",
+      args: [referralAddress],
+    });
+  }
+
+  @ErrorHandler("Utils:")
+  @Logger("Utils:")
+  public stakePopulateTx(
+    props: StakePopulateTxProps
+  ): Omit<FormattedTransactionRequest, "type"> {
+    const { referralAddress = zeroAddress, value, account } = props;
+
+    const data = this.stakeEncodeData({ referralAddress });
+
+    return {
+      to: this.contractAddressStETH(),
+      from: account,
+      value: parseEther(value),
+      data,
+    };
   }
 }

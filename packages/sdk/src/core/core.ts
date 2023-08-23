@@ -34,7 +34,7 @@ export default class LidoSDKCore {
   readonly chainId: (typeof SUPPORTED_CHAINS)[number];
   readonly rpcUrls: string[] | undefined;
   readonly rpcProvider: PublicClient;
-  readonly web3Provider: WalletClient;
+  readonly web3Provider: WalletClient | undefined;
   readonly chain: Chain;
 
   constructor(props: LidoSDKCoreProps, version?: string) {
@@ -67,7 +67,7 @@ export default class LidoSDKCore {
     const chain = chainId === 1 ? mainnet : goerli;
     const currentRpcProvider =
       rpcProvider ?? this.createRpcProvider(chain, rpcUrls);
-    const currentWeb3Provider = web3Provider ?? this.createWeb3Provider(chain);
+    const currentWeb3Provider = web3Provider;
 
     return {
       chain,
