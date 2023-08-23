@@ -1,9 +1,6 @@
 import { type Address, type Hash, type TransactionReceipt } from "viem";
-import {
-  type LidoSDKCoreProps,
-  type LidoSDKCore,
-  type SDKError,
-} from "@lidofinance/lido-sdk-core";
+import { type LidoSDKCoreProps, type LidoSDKCore } from "../core";
+import { type SDKError } from "../common/utils";
 
 export type LidoSDKStakeProps = LidoSDKCoreProps & {
   core?: LidoSDKCore;

@@ -1,5 +1,5 @@
-import { LidoSDKCore, LidoSDKCoreProps } from "@lidofinance/lido-sdk-core";
-import { LidoSDKStake } from "@lidofinance/lido-sdk-stake";
+import { LidoSDKCore, LidoSDKCoreProps } from "./core";
+import { LidoSDKStake } from "./stake";
 
 import { version } from "./version";
 

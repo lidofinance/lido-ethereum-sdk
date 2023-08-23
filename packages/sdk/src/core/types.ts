@@ -1,6 +1,6 @@
 import { WalletClient, PublicClient } from "viem";
 
-import { SUPPORTED_CHAINS } from "./contants";
+import { SUPPORTED_CHAINS } from "../common/constants";
 
 type LidoSDKCorePropsRpcUrls = {
   chainId: (typeof SUPPORTED_CHAINS)[number];

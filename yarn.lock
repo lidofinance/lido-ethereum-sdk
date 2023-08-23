@@ -305,19 +305,11 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@lido-sdk/constants@3.1.0", "@lido-sdk/constants@^3.1.0":
+"@lido-sdk/constants@^3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@lido-sdk/constants/-/constants-3.1.0.tgz#04527c31ffce4b60b35b5d1cc10560ed96597a14"
   integrity sha512-/UkhD2JtVb6yn6e8JT2spEG7AVgBdkkH7LUttu1+Ih5LlVmtdrCjuwdxUhTK+55lVPKaPb1lg8dNiJqMZ5XWVw==
   dependencies:
-    tiny-invariant "^1.1.0"
-
-"@lido-sdk/contracts@^3.0.2":
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/@lido-sdk/contracts/-/contracts-3.0.2.tgz#2f7fa71816326a2b2aa1df31ccb8b2e3de62edad"
-  integrity sha512-/fZRLPwxwlIut0T0T18GO/hRa7SMSHRaAm7C97V1YUjwW7oP54TakrorCLZ8rTjEprtFMjTrqnksSLDGlJYwXg==
-  dependencies:
-    "@lido-sdk/constants" "3.1.0"
     tiny-invariant "^1.1.0"
 
 "@lidofinance/eslint-config@^0.35.0":

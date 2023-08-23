@@ -20,9 +20,9 @@ import {
   type SDKErrorProps,
   getErrorMessage,
   type ErrorMessage,
-} from "./common/utils";
-import { ErrorHandler, Logger, Initialize, Cache } from "./common/decorators";
-import { SUPPORTED_CHAINS } from "./contants";
+} from "../common/utils";
+import { ErrorHandler, Logger, Initialize, Cache } from "../common/decorators";
+import { SUPPORTED_CHAINS } from "../common/constants";
 import { LidoSDKCoreProps } from "./types";
 
 export default class LidoSDKCore {

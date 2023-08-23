@@ -9,16 +9,12 @@ import {
   type WalletClient,
 } from "viem";
 import invariant from "tiny-invariant";
-import {
-  LidoSDKCore,
-  ErrorHandler,
-  Logger,
-  Cache,
-} from "@lidofinance/lido-sdk-core";
+import { LidoSDKCore } from "../core";
+import { ErrorHandler, Logger, Cache } from "../common/decorators";
 import { TOKENS, getTokenAddress } from "@lido-sdk/constants";
 
-import { SUBMIT_EXTRA_GAS_TRANSACTION_RATIO } from "./common/constants";
-import { version } from "./version";
+import { SUBMIT_EXTRA_GAS_TRANSACTION_RATIO } from "../common/constants";
+import { version } from "../version";
 import { abi } from "./abi/abi";
 import {
   LidoSDKStakeProps,
