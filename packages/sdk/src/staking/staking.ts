@@ -17,7 +17,7 @@ import { SUBMIT_EXTRA_GAS_TRANSACTION_RATIO } from "../common/constants.js";
 import { version } from "../version.js";
 import { abi } from "./abi/abi.js";
 import {
-  LidoSDKStakeProps,
+  LidoSDKStakingProps,
   StakeCallbackStage,
   StakeProps,
   StakeResult,
@@ -29,7 +29,7 @@ export class LidoSDKStaking {
     | GetContractReturnType<typeof abi, PublicClient, WalletClient>
     | undefined;
 
-  constructor(props: LidoSDKStakeProps) {
+  constructor(props: LidoSDKStakingProps) {
     const { core, ...rest } = props;
 
     if (core) this.core = core;
