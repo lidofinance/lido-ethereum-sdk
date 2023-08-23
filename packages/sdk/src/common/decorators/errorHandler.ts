@@ -1,5 +1,5 @@
-import { callConsoleMessage } from "./utils";
-import { HeadMessage } from "./types";
+import { callConsoleMessage } from "./utils.js";
+import { HeadMessage } from "./types.js";
 
 export const ErrorHandler = function (headMessage: HeadMessage = "Error:") {
   return function ErrorHandlerMethod<This, Args extends any[], Return>(

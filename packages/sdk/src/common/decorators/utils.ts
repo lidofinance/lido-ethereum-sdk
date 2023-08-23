@@ -1,5 +1,5 @@
-import { ConsoleCss } from "./constants";
-import { HeadMessage } from "./types";
+import { ConsoleCss } from "./constants.js";
+import { HeadMessage } from "./types.js";
 
 export const callConsoleMessage = (
   headMessage: HeadMessage,

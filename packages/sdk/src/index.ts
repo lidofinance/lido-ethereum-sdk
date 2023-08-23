@@ -1,4 +1,8 @@
-export { LidoSDK } from "./sdk";
-export { type SDKError } from "./common/utils/SDKError";
-export * from "./common/decorators";
-export { StakeCallbackStage, StageCallback, StakeProps } from "./stake";
+export { LidoSDK } from "./sdk.js";
+export { type SDKError } from "./common/utils/SDKError.js";
+export * from "./common/decorators/index.js";
+export {
+  StakeCallbackStage,
+  StageCallback,
+  StakeProps,
+} from "./stake/index.js";

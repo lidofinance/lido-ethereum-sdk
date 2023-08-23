@@ -1,4 +1,4 @@
-import { HeadMessage } from "./types";
+import { HeadMessage } from "./types.js";
 
 export const ConsoleCss: Record<HeadMessage, string> = {
   "Provider:": "color: blue",

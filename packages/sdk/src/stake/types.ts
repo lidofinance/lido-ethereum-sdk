@@ -1,6 +1,6 @@
 import { type Address, type Hash, type TransactionReceipt } from "viem";
-import { type LidoSDKCoreProps, type LidoSDKCore } from "../core";
-import { type SDKError } from "../common/utils";
+import { type LidoSDKCoreProps, type LidoSDKCore } from "../core/index.js";
+import { type SDKError } from "../common/utils/index.js";
 
 export type LidoSDKStakeProps = LidoSDKCoreProps & {
   core?: LidoSDKCore;

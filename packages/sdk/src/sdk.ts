@@ -1,7 +1,7 @@
-import { LidoSDKCore, LidoSDKCoreProps } from "./core";
-import { LidoSDKStake } from "./stake";
+import { LidoSDKCore, LidoSDKCoreProps } from "./core/index.js";
+import { LidoSDKStake } from "./stake/index.js";
 
-import { version } from "./version";
+import { version } from "./version.js";
 
 export class LidoSDK {
   readonly core: LidoSDKCore;

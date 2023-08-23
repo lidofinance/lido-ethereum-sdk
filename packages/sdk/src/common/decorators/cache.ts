@@ -1,4 +1,4 @@
-import { callConsoleMessage } from "./utils";
+import { callConsoleMessage } from "./utils.js";
 
 export const Cache = function (timeMs = 0) {
   const cache = new Map<string, { data: any; timestamp: number }>();

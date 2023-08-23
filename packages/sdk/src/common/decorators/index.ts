@@ -1,4 +1,4 @@
-export { Cache } from "./cache";
-export { ErrorHandler } from "./errorHandler";
-export { Logger } from "./logger";
-export { Initialize } from "./Initialize";
+export { Cache } from "./cache.js";
+export { ErrorHandler } from "./errorHandler.js";
+export { Logger } from "./logger.js";
+export { Initialize } from "./Initialize.js";

@@ -1,2 +1,2 @@
-export { default as LidoSDKCore } from "./core";
-export { LidoSDKCoreProps } from "./types";
+export { default as LidoSDKCore } from "./core.js";
+export { LidoSDKCoreProps } from "./types.js";

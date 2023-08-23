@@ -9,19 +9,19 @@ import {
   type WalletClient,
 } from "viem";
 import invariant from "tiny-invariant";
-import { LidoSDKCore } from "../core";
-import { ErrorHandler, Logger, Cache } from "../common/decorators";
+import { LidoSDKCore } from "../core/index.js";
+import { ErrorHandler, Logger, Cache } from "../common/decorators/index.js";
 import { TOKENS, getTokenAddress } from "@lido-sdk/constants";
 
-import { SUBMIT_EXTRA_GAS_TRANSACTION_RATIO } from "../common/constants";
-import { version } from "../version";
-import { abi } from "./abi/abi";
+import { SUBMIT_EXTRA_GAS_TRANSACTION_RATIO } from "../common/constants.js";
+import { version } from "../version.js";
+import { abi } from "./abi/abi.js";
 import {
   LidoSDKStakeProps,
   StakeCallbackStage,
   StakeProps,
   StakeResult,
-} from "./types";
+} from "./types.js";
 
 export class LidoSDKStake {
   protected core: LidoSDKCore;

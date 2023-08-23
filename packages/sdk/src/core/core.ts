@@ -20,10 +20,15 @@ import {
   type SDKErrorProps,
   getErrorMessage,
   type ErrorMessage,
-} from "../common/utils";
-import { ErrorHandler, Logger, Initialize, Cache } from "../common/decorators";
-import { SUPPORTED_CHAINS } from "../common/constants";
-import { LidoSDKCoreProps } from "./types";
+} from "../common/utils/index.js";
+import {
+  ErrorHandler,
+  Logger,
+  Initialize,
+  Cache,
+} from "../common/decorators/index.js";
+import { SUPPORTED_CHAINS } from "../common/constants.js";
+import { LidoSDKCoreProps } from "./types.js";
 
 export default class LidoSDKCore {
   readonly chainId: (typeof SUPPORTED_CHAINS)[number];
