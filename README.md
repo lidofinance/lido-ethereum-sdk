@@ -13,27 +13,6 @@ You can install the Lido Ethereum SDK using npm or yarn:
 yarn add @lidofinance/lido-sdk
 ```
 
-[Docs Stake package](./packages/stake/README.md)
-
-```bash
-// Stake
-yarn add @lidofinance/lido-sdk-stake
-```
-
-[Docs Wrap package](./packages/wrap/README.md)
-
-```bash
-// Wrap
-yarn add @lidofinance/lido-sdk-wrap
-```
-
-[Docs Withdrawals package](./packages/withdrawals/README.md)
-
-```bash
-// Withdrawals
-yarn add @lidofinance/lido-sdk-withdrawals
-```
-
 ## Usage
 
 To get started with the Lido Ethereum SDK, you need to import the necessary modules:

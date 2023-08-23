@@ -1,3 +1,8 @@
-export { LidoSDK } from "./sdk";
-export { SDKError } from "@lidofinance/lido-sdk-core";
-export { StageCallback, StakeCallbackStage } from "@lidofinance/lido-sdk-stake";
+export { LidoSDK } from "./sdk.js";
+export { type SDKError } from "./common/utils/SDKError.js";
+export * from "./common/decorators/index.js";
+export {
+  StakeCallbackStage,
+  StakeStageCallback,
+  StakeProps,
+} from "./staking/index.js";

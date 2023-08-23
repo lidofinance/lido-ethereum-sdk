@@ -1,6 +1,0 @@
-{
-  "extends": ["../../.eslintrc.base.json"],
-  "parserOptions": {
-    "project": "./packages/stake/tsconfig.json"
-  }
-}

@@ -13,7 +13,7 @@
     "noUncheckedIndexedAccess": true, // Not enabled by default in `strict` mode.
 
     // Interop constraints
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
 

@@ -10,15 +10,31 @@ You can install the Lido Ethereum SDK using npm or yarn:
 yarn add @lidofinance/lido-sdk
 ```
 
+## Modules
+
+The Lido Ethereum SDK consists of several modules:
+
+- **Core** - provides access to the SDK core functionality
+- **Staking** - provides access to the Lido staking functionality
+  ...
+
 ## Usage
 
 To get started with the Lido Ethereum SDK, you need to import the necessary modules:
 
 ```ts
 const { LidoSDK } = require("@lidofinance/lido-sdk");
+// or
+const { LidoSDKStaking } = require("@lidofinance/lido-sdk/staking");
+// or
+const { LidoSDKCore } = require("@lidofinance/lido-sdk/core");
 
 // Or, if you are using ES6+:
 import { LidoSDK } from "@lidofinance/lido-sdk";
+// or
+import { LidoSDKStaking } from "@lidofinance/lido-sdk/staking";
+// or
+import { LidoSDKCore } from "@lidofinance/lido-sdk/core";
 ```
 
 ## Initialization
@@ -60,7 +76,7 @@ const lidoSDK = new LidoSDK({
 const balanceETH = await lidoSDK.core.balanceETH(address);
 ```
 
-### Stake
+### Staking
 
 ```ts
 const lidoSDK = new LidoSDK({
@@ -107,14 +123,14 @@ Callback stages:
 - `error` - transaction is failed
 
 ```ts
-import { LidoSDK, StageCallback, SDKError } from "@lidofinance/lido-sdk";
+import { LidoSDK, StakeStageCallback, SDKError } from "@lidofinance/lido-sdk";
 
 const lidoSDK = new LidoSDK({
   rpcUrls: ["https://rpc-url"],
   chainId: 5,
 });
 
-const callback: StageCallback = ({ stage, payload }) => {
+const callback: StakeStageCallback = ({ stage, payload }) => {
   switch (stage) {
     case StakeCallbackStage.SIGN:
       console.log("wait for sign");
