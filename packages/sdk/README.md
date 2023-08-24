@@ -190,7 +190,7 @@ const lidoSDK = new LidoSDK({
   chainId: 5,
 });
 
-const populateResult = await lidoSDK.staking.stakePopulateTx({
+const populateResult = lidoSDK.staking.stakePopulateTx({
   value,
   callback,
   referralAddress,
