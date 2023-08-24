@@ -1,5 +1,5 @@
 {
-  "name": "@lidofinance/lido-sdk",
+  "name": "@lidofinance/lido-ethereum-sdk",
   "version": "0.0.0",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
@@ -48,6 +48,7 @@
   "keywords": [
     "lido",
     "lido-sdk",
+    "lido-ethereum-sdk",
     "sdk",
     "ethereum",
     "stake",

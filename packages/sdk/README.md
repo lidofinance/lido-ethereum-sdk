@@ -7,7 +7,7 @@
 You can install the Lido Ethereum SDK using npm or yarn:
 
 ```bash
-yarn add @lidofinance/lido-sdk
+yarn add @lidofinance/lido-ethereum-sdk
 ```
 
 ## Modules
@@ -23,18 +23,18 @@ The Lido Ethereum SDK consists of several modules:
 To get started with the Lido Ethereum SDK, you need to import the necessary modules:
 
 ```ts
-const { LidoSDK } = require("@lidofinance/lido-sdk");
+const { LidoSDK } = require("@lidofinance/lido-ethereum-sdk");
 // or
-const { LidoSDKStaking } = require("@lidofinance/lido-sdk/staking");
+const { LidoSDKStaking } = require("@lidofinance/lido-ethereum-sdk/staking");
 // or
-const { LidoSDKCore } = require("@lidofinance/lido-sdk/core");
+const { LidoSDKCore } = require("@lidofinance/lido-ethereum-sdk/core");
 
 // Or, if you are using ES6+:
-import { LidoSDK } from "@lidofinance/lido-sdk";
+import { LidoSDK } from "@lidofinance/lido-ethereum-sdk";
 // or
-import { LidoSDKStaking } from "@lidofinance/lido-sdk/staking";
+import { LidoSDKStaking } from "@lidofinance/lido-ethereum-sdk/staking";
 // or
-import { LidoSDKCore } from "@lidofinance/lido-sdk/core";
+import { LidoSDKCore } from "@lidofinance/lido-ethereum-sdk/core";
 ```
 
 ## Initialization
@@ -125,7 +125,11 @@ Callback stages:
 - `error` - transaction is failed
 
 ```ts
-import { LidoSDK, StakeStageCallback, SDKError } from "@lidofinance/lido-sdk";
+import {
+  LidoSDK,
+  StakeStageCallback,
+  SDKError,
+} from "@lidofinance/lido-ethereum-sdk";
 
 const lidoSDK = new LidoSDK({
   rpcUrls: ["https://rpc-url"],
@@ -179,7 +183,7 @@ try {
 ### Populate transaction
 
 ```ts
-import { LidoSDK } from "@lidofinance/lido-sdk";
+import { LidoSDK } from "@lidofinance/lido-ethereum-sdk";
 
 const lidoSDK = new LidoSDK({
   rpcUrls: ["https://rpc-url"],
@@ -199,7 +203,7 @@ console.log(populateResult, "to, from, value, data");
 ### Simulate transaction
 
 ```ts
-import { LidoSDK } from "@lidofinance/lido-sdk";
+import { LidoSDK } from "@lidofinance/lido-ethereum-sdk";
 
 const lidoSDK = new LidoSDK({
   rpcUrls: ["https://rpc-url"],
