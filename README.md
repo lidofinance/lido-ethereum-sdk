@@ -60,6 +60,9 @@ const lidoSDK = new LidoSDK({
   rpcUrls: ["https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}"],
 });
 
+// Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
+lidoSDK.defineWeb3Provider(lidoSDK.core.chain);
+
 // Views
 const balanceETH = await lidoSDK.core.balanceETH(address);
 const balanceStETH = await lidoSDK.staking.balanceStETH(address);
