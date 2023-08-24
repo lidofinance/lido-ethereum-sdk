@@ -31,7 +31,7 @@ import {
 } from "./types.js";
 
 export class LidoSDKStaking {
-  protected core: LidoSDKCore;
+  readonly core: LidoSDKCore;
   protected contractStETH:
     | GetContractReturnType<typeof abi, PublicClient, WalletClient>
     | undefined;
