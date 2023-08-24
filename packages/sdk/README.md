@@ -150,7 +150,7 @@ const lidoSDK = new LidoSDK({
 });
 
 // Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
-lidoSDK.defineWeb3Provider(lidoSDK.core.chain);
+lidoSDK.core.defineWeb3Provider(lidoSDK.core.chain);
 
 const callback: StakeStageCallback = ({ stage, payload }) => {
   switch (stage) {
