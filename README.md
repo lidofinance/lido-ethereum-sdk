@@ -61,7 +61,7 @@ const lidoSDK = new LidoSDK({
 });
 
 // Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
-lidoSDK.core.defineWeb3Provider(lidoSDK.core.chain);
+lidoSDK.core.defineWeb3Provider();
 
 // Views
 const balanceETH = await lidoSDK.core.balanceETH(address);

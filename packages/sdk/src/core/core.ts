@@ -103,14 +103,20 @@ export default class LidoSDKCore {
   }
 
   @Logger("Provider:")
-  public defineWeb3Provider(chain: Chain): WalletClient {
+  public defineWeb3Provider(): WalletClient {
     invariant(!this.web3Provider, "Web3 provider is already defined");
 
-    this.web3Provider = this.createWeb3Provider(chain);
+    this.web3Provider = this.createWeb3Provider(this.chain);
 
     return this.web3Provider;
   }
 
+  @Logger("Provider:")
+  public setWeb3Provider(web3Provider: WalletClient): void {
+    invariant(web3Provider.chain === this.chain, "Wrong chain");
+
+    this.web3Provider = web3Provider;
+  }
   // Balances
 
   @Logger("Balances:")
