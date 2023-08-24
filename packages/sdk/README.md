@@ -2,6 +2,10 @@
 
 **Lido Ethereum SDK** is a package that provides convenient tools for interacting with Lido contracts on the Ethereum network through a software development kit (SDK). This SDK simplifies working with Lido contracts and accessing their functionality.
 
+## WIP
+
+The project is currently under development and may change in the future.
+
 ## Installation
 
 You can install the Lido Ethereum SDK using npm or yarn:
