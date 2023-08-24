@@ -34,9 +34,9 @@ import { LidoSDKCoreProps } from "./types.js";
 export default class LidoSDKCore {
   readonly chainId: (typeof SUPPORTED_CHAINS)[number];
   readonly rpcUrls: string[] | undefined;
-  readonly rpcProvider: PublicClient;
-  readonly web3Provider: WalletClient | undefined;
   readonly chain: Chain;
+  readonly rpcProvider: PublicClient;
+  public web3Provider: WalletClient | undefined;
 
   constructor(props: LidoSDKCoreProps, version?: string) {
     const { chain, rpcProvider, web3Provider } = this.init(props, version);
@@ -81,35 +81,42 @@ export default class LidoSDKCore {
 
   @Logger("Provider:")
   public createRpcProvider(chain: Chain, rpcUrls: string[]): PublicClient {
-    if (!this.rpcProvider) {
-      const rpcs = rpcUrls.map((url) => http(url));
+    const rpcs = rpcUrls.map((url) => http(url));
 
-      return createPublicClient({
-        batch: {
-          multicall: true,
-        },
-        chain,
-        transport: fallback(rpcs),
-      });
-    }
-    return this.rpcProvider;
+    return createPublicClient({
+      batch: {
+        multicall: true,
+      },
+      chain,
+      transport: fallback(rpcs),
+    });
+  }
+
+  public createWeb3Provider(chain: Chain): WalletClient {
+    return createWalletClient({
+      chain,
+      // TODO: fix type
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      transport: custom(window.ethereum),
+    });
   }
 
   @Logger("Provider:")
-  public createWeb3Provider(chain: Chain): WalletClient {
-    if (!this.web3Provider) {
-      return createWalletClient({
-        chain,
-        // TODO: fix type
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        transport: custom(window.ethereum),
-      });
-    }
+  public defineWeb3Provider(): WalletClient {
+    invariant(!this.web3Provider, "Web3 provider is already defined");
+
+    this.web3Provider = this.createWeb3Provider(this.chain);
 
     return this.web3Provider;
   }
 
+  @Logger("Provider:")
+  public setWeb3Provider(web3Provider: WalletClient): void {
+    invariant(web3Provider.chain === this.chain, "Wrong chain");
+
+    this.web3Provider = web3Provider;
+  }
   // Balances
 
   @Logger("Balances:")
