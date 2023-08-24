@@ -1,54 +1,6 @@
 {
-  "env": {
-    "browser": true,
-    "es2021": true,
-    "node": true
-  },
-  "extends": ["plugin:jsx-a11y/recommended", "@lidofinance", "prettier"],
-  "parser": "@typescript-eslint/parser",
+  "extends": ["../../.eslintrc.base.json"],
   "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "ecmaVersion": 12,
-    "sourceType": "module"
-  },
-  "plugins": ["@typescript-eslint", "react"],
-  "rules": {
-    "@typescript-eslint/require-await": "off",
-    "react/display-name": "off",
-    "@typescript-eslint/no-shadow": "off",
-    "jsx-a11y/no-autofocus": "off",
-    "jsx-a11y/anchor-is-valid": "off",
-    "@next/next/no-img-element": "off",
-    "eslint-plugin-unicorn": "off",
-    "no-console": ["warn", { "allow": ["warn", "error", "info", "debug"] }],
-    "@typescript-eslint/no-unused-vars": [
-      "warn",
-      {
-        "ignoreRestSiblings": true,
-        "argsIgnorePattern": "^_"
-      }
-    ],
-    "promise/param-names": [
-      "warn",
-      {
-        "resolvePattern": "^_?(resolve)$|^_$",
-        "rejectPattern": "^_?(reject)$|^_$"
-      }
-    ],
-    "func-style": ["error", "expression"],
-    "@typescript-eslint/no-misused-promises": [
-      "error",
-      {
-        "checksVoidReturn": false
-      }
-    ],
-    "import/no-cycle": ["error", { "maxDepth": 1 }]
-  },
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
+    "project": "./packages/core/tsconfig.json"
   }
 }
