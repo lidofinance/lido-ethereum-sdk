@@ -1,3 +1,5 @@
+![Lido SDK Logo](./assets/package_logo.png)
+
 # Lido Ethereum SDK
 
 **Lido Ethereum SDK** is a package that provides convenient tools for interacting with Lido contracts on the Ethereum network through a software development kit (SDK). This SDK simplifies working with Lido contracts and accessing their functionality.
