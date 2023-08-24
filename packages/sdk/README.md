@@ -6,8 +6,16 @@
 
 You can install the Lido Ethereum SDK using npm or yarn:
 
+yarn:
+
 ```bash
 yarn add @lidofinance/lido-ethereum-sdk
+```
+
+npm:
+
+```bash
+npm install @lidofinance/lido-ethereum-sdk
 ```
 
 ## Modules
@@ -16,7 +24,7 @@ The Lido Ethereum SDK consists of several modules:
 
 - **Core** - provides access to the SDK core functionality
 - **Staking** - provides access to the Lido staking functionality
-  ...
+  TODO: add more modules
 
 ## Usage
 
@@ -74,6 +82,8 @@ const lidoSDK = new LidoSDK({
 
 // Views
 const balanceETH = await lidoSDK.core.balanceETH(address);
+
+console.log(balanceETH.toString(), "ETH balance");
 ```
 
 ### Staking
@@ -98,7 +108,6 @@ const stakeResult = await lidoSDK.staking.stake({
   referralAddress,
 });
 
-console.log(balanceETH.toString(), "ETH balance");
 console.log(balanceStETH.toString(), "stETH balance");
 console.log(addressStETH, "stETH contract address");
 console.log(contractStETH, "stETH contract");

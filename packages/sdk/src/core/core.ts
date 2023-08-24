@@ -28,6 +28,7 @@ import {
   Cache,
 } from "../common/decorators/index.js";
 import { SUPPORTED_CHAINS } from "../common/constants.js";
+
 import { LidoSDKCoreProps } from "./types.js";
 
 export default class LidoSDKCore {
