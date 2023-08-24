@@ -25,6 +25,11 @@ jobs:
       - name: Build
         run: yarn build
 
+      - name: Authenticate in npm
+        run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Publish
         run: yarn multi-semantic-release --deps.bump=override --deps.release=patch --sequential-init
         env:
