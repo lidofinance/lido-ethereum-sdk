@@ -1,18 +1,8 @@
-import {
-  createContext,
-  useMemo,
-  useCallback,
-  memo,
-  useState,
-  FC,
-  PropsWithChildren,
-  useContext,
-} from 'react';
+import { createContext, useMemo, PropsWithChildren, useContext } from 'react';
 import { useSDK } from '@lido-sdk/react';
 
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import invariant from 'tiny-invariant';
-import { useWeb3 } from '@reef-knot/web3-react';
 import { getBackendRPCPath } from 'config';
 
 const context = createContext<LidoSDK | null>(null);
