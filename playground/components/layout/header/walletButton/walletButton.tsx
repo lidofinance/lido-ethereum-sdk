@@ -8,15 +8,15 @@ import {
   WalledButtonLoaderStyle,
 } from './walletButtonStyles';
 import { useModal } from 'hooks/useModal';
-import { useEthereumBalance, useSDK } from '@lido-sdk/react';
 import FormatToken from 'components/formatToken';
 import { MODAL } from 'providers';
+import { useWeb3 } from '@reef-knot/web3-react';
 
 const WalletButton: FC<ButtonProps> = (props) => {
   const { onClick, ...rest } = props;
   const { openModal } = useModal(MODAL.wallet);
-  const { account } = useSDK();
-  const { data: balance, initialLoading } = useEthereumBalance();
+  const { account } = useWeb3();
+  // const { data: balance, initialLoading } = useEthereumBalance();
 
   return (
     <WalledButtonStyle
@@ -28,11 +28,11 @@ const WalletButton: FC<ButtonProps> = (props) => {
     >
       <WalledButtonWrapperStyle>
         <WalledButtonBalanceStyle>
-          {initialLoading ? (
+          {/* {initialLoading ? (
             <WalledButtonLoaderStyle />
           ) : (
             <FormatToken amount={balance} symbol="ETH" />
-          )}
+          )} */}
         </WalledButtonBalanceStyle>
         <AddressBadge address={account} />
       </WalledButtonWrapperStyle>

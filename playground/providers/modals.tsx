@@ -8,7 +8,7 @@ import {
   PropsWithChildren,
 } from 'react';
 import { useThemeToggle } from '@lidofinance/lido-ui';
-import { WalletsModalForEth } from 'reef-knot';
+import { WalletsModalForEth } from '@reef-knot/connect-wallet-modal';
 import WalletModal from 'components/walletModal';
 
 export type ModalContextValue = {
