@@ -5,6 +5,7 @@ import { GlobalStyle } from 'styles';
 
 import ModalProvider from './modals';
 import Web3Provider from './web3';
+import { LidoSDKProvider } from './sdk';
 export { MODAL, ModalContext } from './modals';
 
 
@@ -12,7 +13,9 @@ const Providers: FC<PropsWithChildren> = ({ children }) => (
   <CookieThemeProvider>
     <GlobalStyle />
     <Web3Provider>
-      <ModalProvider>{children}</ModalProvider>
+      <LidoSDKProvider>
+        <ModalProvider>{children}</ModalProvider>
+      </LidoSDKProvider>
     </Web3Provider>
   </CookieThemeProvider>
 );

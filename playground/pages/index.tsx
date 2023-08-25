@@ -1,6 +1,7 @@
 import Head from 'next/head';
 
 import Layout from 'components/layout';
+import { Demo } from 'demo';
 
 const Home = () => {
   return (
@@ -8,6 +9,7 @@ const Home = () => {
       <Head>
         <title>Lido | Frontend Template</title>
       </Head>
+      <Demo />
     </Layout>
   );
 };

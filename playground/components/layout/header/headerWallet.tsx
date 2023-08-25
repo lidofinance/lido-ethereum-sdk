@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { CHAINS, getChainColor } from '@lido-sdk/constants';
-import { useSDK } from '@lido-sdk/react';
+
 import { useWeb3 } from '@reef-knot/web3-react';
 import { ThemeToggler } from '@lidofinance/lido-ui';
 
@@ -11,10 +11,8 @@ import { HeaderWalletChainStyle } from './headerWalletStyles';
 
 const HeaderWallet: FC = () => {
   const { active, chainId } = useWeb3();
-  // const { chainId } = useSDK();
-
   const chainName = chainId && CHAINS[chainId];
-  const testNet = chainId !== CHAINS.Mainnet;
+
 
   return (
     <>
