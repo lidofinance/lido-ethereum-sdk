@@ -10,20 +10,17 @@ import WalletConnect from 'components/layout/header/walletConnect';
 import { HeaderWalletChainStyle } from './headerWalletStyles';
 
 const HeaderWallet: FC = () => {
-  const { active } = useWeb3();
+  const { active, chainId } = useWeb3();
   // const { chainId } = useSDK();
 
-  // const chainName = CHAINS[chainId];
-  // const testNet = chainId !== CHAINS.Mainnet;
-  // const showNet = testNet && active;
+  const chainName = chainId && CHAINS[chainId];
+  const testNet = chainId !== CHAINS.Mainnet;
 
   return (
     <>
-      {/* {showNet && (
-        <HeaderWalletChainStyle $color={getChainColor(chainId)}>
-          {chainName}
-        </HeaderWalletChainStyle>
-      )} */}
+      {chainId && <HeaderWalletChainStyle $color={getChainColor(chainId)}>
+        {chainName}
+      </HeaderWalletChainStyle>}
       {active ? <WalletButton /> : <WalletConnect size="sm" />}
       <ThemeToggler />
     </>

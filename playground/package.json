@@ -23,9 +23,6 @@
     "@ethersproject/units": "^5.6.1",
     "@lido-sdk/constants": "^1.6.0",
     "@lido-sdk/contracts": "^2.0.0",
-    "@lido-sdk/fetch": "^2.1.0",
-    "@lido-sdk/helpers": "^1.4.3",
-    "@lido-sdk/react": "^1.18.1",
     "@lidofinance/analytics-matomo": "^0.9.0",
     "@lidofinance/lido-ethereum-sdk": "workspace:^",
     "@lidofinance/lido-ui": "^3.0.0-next.17",
@@ -89,8 +86,5 @@
     "./**/*.{ts,tsx,css,md,json}": [
       "prettier --write"
     ]
-  },
-  "resolutions": {
-    "wagmi": "^0.12.19"
   }
 }

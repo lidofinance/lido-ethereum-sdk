@@ -2541,15 +2541,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lido-sdk/constants@npm:3.0.0":
-  version: 3.0.0
-  resolution: "@lido-sdk/constants@npm:3.0.0"
-  dependencies:
-    tiny-invariant: ^1.1.0
-  checksum: 464aaeb99c1d168ab141b06e7c170b92bc7497d8c0fb0c8fce9c65200154c6129c5f7af2bf88139ae4ac68daf358073a8df1a37f91e574420f78bf779931fd72
-  languageName: node
-  linkType: hard
-
 "@lido-sdk/constants@npm:3.1.0, @lido-sdk/constants@npm:^3.1.0":
   version: 3.1.0
   resolution: "@lido-sdk/constants@npm:3.1.0"
@@ -2565,21 +2556,6 @@ __metadata:
   dependencies:
     tiny-invariant: ^1.1.0
   checksum: d2f76cec8a0b801fb881e7f080d483713b554e6f502e61a8efe808f105aa3b8c0efdf0da19ead22b9dee15533aefabb6dfefd1d2bcdb05a8128dfc34eeb7967d
-  languageName: node
-  linkType: hard
-
-"@lido-sdk/contracts@npm:3.0.0":
-  version: 3.0.0
-  resolution: "@lido-sdk/contracts@npm:3.0.0"
-  dependencies:
-    "@lido-sdk/constants": 3.0.0
-    tiny-invariant: ^1.1.0
-  peerDependencies:
-    "@ethersproject/abstract-signer": 5
-    "@ethersproject/contracts": 5
-    "@ethersproject/providers": 5
-    ethers: 5
-  checksum: e492de0b7bdf7d5701881db2379a294d0eb72d25c95b03517b4b6bffeb70f2fb0706a4c9b7fd78a4765b1e963d00f81a666a2af0d02c58fd28887df9ed4bcb67
   languageName: node
   linkType: hard
 
@@ -2613,30 +2589,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lido-sdk/fetch@npm:^2.1.0":
-  version: 2.1.9
-  resolution: "@lido-sdk/fetch@npm:2.1.9"
-  dependencies:
-    "@lido-sdk/constants": 3.1.0
-    node-fetch: ^2.6.7
-    tiny-invariant: ^1.1.0
-  checksum: d4e15399fc138a480f04aada0ee6806afa5894651194ddfcf2d29c21f4a9e8a3cb111b6f2107a8fd02ba20f6612a630aa976547c03b0a57b42d8497ad62e6dfb
-  languageName: node
-  linkType: hard
-
-"@lido-sdk/helpers@npm:1.4.10":
-  version: 1.4.10
-  resolution: "@lido-sdk/helpers@npm:1.4.10"
-  dependencies:
-    "@lido-sdk/constants": 3.0.0
-    tiny-invariant: ^1.1.0
-  peerDependencies:
-    "@ethersproject/bignumber": 5
-  checksum: cabdd0414caab5412bb8d9fd96d14cc6634daaf1f77b16dabd20d95a759418a5eb88b7ef01e02d5e4311a754e4164bce43ef4b99b46627cbf070cf91241c669f
-  languageName: node
-  linkType: hard
-
-"@lido-sdk/helpers@npm:1.4.11, @lido-sdk/helpers@npm:^1.4.3":
+"@lido-sdk/helpers@npm:1.4.11":
   version: 1.4.11
   resolution: "@lido-sdk/helpers@npm:1.4.11"
   dependencies:
@@ -2659,28 +2612,6 @@ __metadata:
     "@ethersproject/properties": 5
     "@ethersproject/providers": 5
   checksum: b1e6a6d27b650493dd050ffe612a9a43d7f27f56994e2a9370dc4b6c533c3af709f2ed578ed4f6b9a93e8445559fbb55f099a79fdff935b3904c2d0c76b1939a
-  languageName: node
-  linkType: hard
-
-"@lido-sdk/react@npm:^1.18.1":
-  version: 1.18.9
-  resolution: "@lido-sdk/react@npm:1.18.9"
-  dependencies:
-    "@lido-sdk/constants": 3.0.0
-    "@lido-sdk/contracts": 3.0.0
-    "@lido-sdk/helpers": 1.4.10
-    swr: ^1.0.1
-    tiny-invariant: ^1.1.0
-    tiny-warning: ^1.0.3
-  peerDependencies:
-    "@ethersproject/bignumber": 5
-    "@ethersproject/bytes": 5
-    "@ethersproject/constants": 5
-    "@ethersproject/contracts": 5
-    "@ethersproject/providers": 5
-    react: ">=16"
-    react-dom: ">=16"
-  checksum: 13cf0670a045d6bd024eb4a3906909290e1759b375c0508861b0ef09de6c679fa85d09bcfb88fb14fc02a93aa8292e69ded37089f24acb5b0690c53d076f9c53
   languageName: node
   linkType: hard
 
@@ -10176,9 +10107,6 @@ __metadata:
     "@ethersproject/units": ^5.6.1
     "@lido-sdk/constants": ^1.6.0
     "@lido-sdk/contracts": ^2.0.0
-    "@lido-sdk/fetch": ^2.1.0
-    "@lido-sdk/helpers": ^1.4.3
-    "@lido-sdk/react": ^1.18.1
     "@lidofinance/analytics-matomo": ^0.9.0
     "@lidofinance/lido-ethereum-sdk": "workspace:^"
     "@lidofinance/lido-ui": ^3.0.0-next.17
