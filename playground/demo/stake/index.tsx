@@ -8,7 +8,7 @@ export const StakeDemo = () => {
     <Section>
       <Button
         onClick={() => {
-          staking.stake({ value: '0x1' });
+          staking.stake({ value: '0.0001' });
         }}
       >
         Stake

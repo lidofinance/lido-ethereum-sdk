@@ -19,16 +19,19 @@ const context = createContext<LidoSDK | null>(null);
 
 export const useLidoSDK = () => {
   const value = useContext(context);
-  invariant(value, 'useLidoSDK was used outside LidoSDKProvider')
-  return value
-}
+  invariant(value, 'useLidoSDK was used outside LidoSDKProvider');
+  return value;
+};
 
 export const LidoSDKProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const { providerRpc, providerWeb3, chainId } = useSDK()
+  const { providerRpc, providerWeb3, chainId } = useSDK();
   const value = useMemo(() => {
-    // @ts-ignore
-    return new LidoSDK({ chainId: chainId as any, rpcUrls: [getBackendRPCPath(chainId)], web3Provider: providerWeb3 })
-  }, [providerRpc, providerWeb3, chainId])
+    return new LidoSDK({
+      chainId: chainId as any,
+      rpcUrls: [getBackendRPCPath(chainId)],
+      web3Provider: providerWeb3?.provider as any,
+    });
+  }, [providerRpc, providerWeb3, chainId]);
 
-  return <context.Provider value={value}>{children}</context.Provider>
-}
+  return <context.Provider value={value}>{children}</context.Provider>;
+};
