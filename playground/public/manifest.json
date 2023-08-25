@@ -1,0 +1,28 @@
+{
+  "name": "Lido Frontend Template",
+  "short_name": "Lido",
+  "description": "Lido is the liquid staking solution for Ethereum.",
+  "iconPath": "favicon-512x512.svg",
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-194x194.png",
+      "sizes": "194x194",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-512x512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

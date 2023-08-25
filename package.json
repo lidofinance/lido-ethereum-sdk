@@ -11,6 +11,7 @@
     "ethereum"
   ],
   "scripts": {
+    "dev": "yarn playground:dev",
     "w-info": "yarn workspaces info",
     "build": "yarn workspaces foreach -pt  run build",
     "types": "yarn workspaces foreach -pt run types",
@@ -43,7 +44,8 @@
     "typescript": "^5.1.6"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "playground"
   ],
   "release": {
     "branches": [
