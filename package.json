@@ -12,10 +12,9 @@
   ],
   "scripts": {
     "w-info": "yarn workspaces info",
-    "build": "yarn workspaces run build",
-    "types": "yarn workspaces run types",
-    "test": "yarn workspaces run test",
-    "publish": "yarn workspaces run publish:package",
+    "build": "yarn workspaces foreach -pt  run build",
+    "types": "yarn workspaces foreach -pt run types",
+    "test": "yarn workspaces foreach -pt run test",
     "prepare": "husky install"
   },
   "devDependencies": {
@@ -44,15 +43,12 @@
     "typescript": "^5.1.6"
   },
   "workspaces": [
-    "packages/core",
-    "packages/stake",
-    "packages/wrap",
-    "packages/withdrawals",
-    "packages/sdk"
+    "packages/*"
   ],
   "release": {
     "branches": [
       "main"
     ]
-  }
+  },
+  "packageManager": "yarn@3.6.3"
 }
