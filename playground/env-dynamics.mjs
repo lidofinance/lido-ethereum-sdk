@@ -1,5 +1,8 @@
-/** @type string */
-export const matomoHost = process.env.MATOMO_HOST;
+/** @type Record<number,string> */
+export const rpcProviderUrls = {
+  1: process.env[`RPC_PROVIDER_URL_1`],
+  5: process.env[`RPC_PROVIDER_URL_5`],
+};
 /** @type number */
 export const defaultChain = parseInt(process.env.DEFAULT_CHAIN, 10) || 1;
 /** @type number[] */
