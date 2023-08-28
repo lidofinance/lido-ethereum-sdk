@@ -112,7 +112,6 @@ export class LidoSDKStaking {
       value,
       referralAddress,
     );
-    const address = await this.core.getWeb3Address();
 
     callback?.({ stage: StakeCallbackStage.SIGN });
 
@@ -123,7 +122,7 @@ export class LidoSDKStaking {
         value: parseEther(value),
         chain: this.core.chain,
         gas: gasLimit,
-        account: address,
+        account,
       },
     );
 
@@ -152,9 +151,7 @@ export class LidoSDKStaking {
   @ErrorHandler("Call:")
   @Logger("LOG:")
   private async stakeMultisig(props: StakeProps): Promise<StakeResult> {
-    const { value, callback, referralAddress = zeroAddress } = props;
-
-    const address = await this.core.getWeb3Address();
+    const { value, callback, referralAddress = zeroAddress, account } = props;
 
     callback?.({ stage: StakeCallbackStage.SIGN });
 
@@ -163,7 +160,7 @@ export class LidoSDKStaking {
       {
         value: parseEther(value),
         chain: this.core.chain,
-        account: address,
+        account,
       },
     );
 

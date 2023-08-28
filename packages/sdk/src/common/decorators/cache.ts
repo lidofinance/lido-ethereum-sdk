@@ -30,7 +30,7 @@ export const Cache = function (timeMs = 0, cacheArgs?: string[]) {
     const methodName = String(context.name);
     const replacementMethod = function (this: This, ...args: Args): Return {
       const decoratorArgsKey = getDecoratorArgsString.call(this, cacheArgs);
-      const argsKey = JSON.stringify(args);
+      const argsKey = serializeArgs(args);
       const cacheKey = `${methodName}:${decoratorArgsKey}:${argsKey}`;
 
       if (cache.has(cacheKey)) {
