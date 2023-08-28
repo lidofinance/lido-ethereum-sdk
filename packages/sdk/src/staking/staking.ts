@@ -42,7 +42,7 @@ export class LidoSDKStaking {
   // Balances
 
   @Logger("Balances:")
-  @Cache(10 * 1000)
+  @Cache(10 * 1000, ["core.chain.id"])
   public balanceStETH(address: Address): Promise<bigint> {
     return this.getContractStETH().read.balanceOf([address]);
   }
