@@ -4,7 +4,7 @@ import withBundlerAnalyzer from '@next/bundle-analyzer';
 buildDynamics();
 
 const basePath = process.env.BASE_PATH || '';
-const ANALYZE_BUNDLE = process.env.ANALYZE_BUNDLE;
+const ANALYZE_BUNDLE = process.env.ANALYZE_BUNDLE == 'true';
 
 export default withBundlerAnalyzer({
   enabled: ANALYZE_BUNDLE,
