@@ -2519,15 +2519,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lido-sdk/constants@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@lido-sdk/constants@npm:2.0.0"
-  dependencies:
-    tiny-invariant: ^1.1.0
-  checksum: 581a84cb38fa314adb4f030d2620e2af4b54368d3723c50d25cd1f3977f97eff4779737e6234a453d111354f083424bb27591b95c05bb3d98bb1a12ee36d2022
-  languageName: node
-  linkType: hard
-
 "@lido-sdk/constants@npm:3.1.0, @lido-sdk/constants@npm:^3.1.0":
   version: 3.1.0
   resolution: "@lido-sdk/constants@npm:3.1.0"
@@ -2558,21 +2549,6 @@ __metadata:
     "@ethersproject/providers": 5
     ethers: 5
   checksum: e733e9778b20587b6e61c1e9b03c8b7e9bed56908a791eea6be3f59ef216dd1443af0b448dea80887439fca78b11126f8d6e30dd35bbf0c18e93111f9030e90e
-  languageName: node
-  linkType: hard
-
-"@lido-sdk/contracts@npm:^2.0.0":
-  version: 2.0.6
-  resolution: "@lido-sdk/contracts@npm:2.0.6"
-  dependencies:
-    "@lido-sdk/constants": 2.0.0
-    tiny-invariant: ^1.1.0
-  peerDependencies:
-    "@ethersproject/abstract-signer": 5
-    "@ethersproject/contracts": 5
-    "@ethersproject/providers": 5
-    ethers: 5
-  checksum: 1ea1d233b087fdf041e945ebb8c1a0632083fada93ccf45890fba112fe892772802f48cf602ec0df0cb84b34a3f72b3a37228c1839ee70c1203993cb6b2b8861
   languageName: node
   linkType: hard
 
@@ -2699,21 +2675,6 @@ __metadata:
   peerDependencies:
     next: ^12.2.0
   checksum: 8d85e5300111d048ea2c84b4e111bdbdcc86f4b14c80dccd3efd5101813742eb387b6788b9591aef653bcc15b23713a4004ad933abb634a509591b432d080620
-  languageName: node
-  linkType: hard
-
-"@lidofinance/next-pages@npm:^0.35.0":
-  version: 0.35.0
-  resolution: "@lidofinance/next-pages@npm:0.35.0"
-  peerDependencies:
-    "@lidofinance/api-logger": ~0.35.0
-    "@lidofinance/api-rpc": ~0.35.0
-    "@lidofinance/rpc": ~0.35.0
-    "@lidofinance/ui-pages": ~0.35.0
-    next: 12 || 13
-    prom-client: ^14.1.0
-    react: 17 || 18
-  checksum: 200d1002c8c5abea032af84acca3e5e2265d55d0b3e2097946e38cf871f79d6e0f7fcdd83a19b38e201b3dccba87a0a2769a38de83bbcd86546b3395a36557d3
   languageName: node
   linkType: hard
 
@@ -6575,13 +6536,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cookie@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "cookie@npm:0.5.0"
-  checksum: 1f4bd2ca5765f8c9689a7e8954183f5332139eb72b6ff783d8947032ec1fdf43109852c178e21a953a30c0dd42257828185be01b49d1eb1a67fd054ca588a180
-  languageName: node
-  linkType: hard
-
 "copy-to-clipboard@npm:^3.3.1, copy-to-clipboard@npm:^3.3.3":
   version: 3.3.3
   resolution: "copy-to-clipboard@npm:3.3.3"
@@ -9699,12 +9653,10 @@ __metadata:
     "@ethersproject/constants": ^5.5.0
     "@ethersproject/units": ^5.6.1
     "@lido-sdk/constants": ^1.6.0
-    "@lido-sdk/contracts": ^2.0.0
     "@lido-sdk/web3-react": "link:./node_modules/@reef-knot/web3-react/node_modules/@lido-sdk/web3-react"
     "@lidofinance/lido-ethereum-sdk": "workspace:^"
     "@lidofinance/lido-ui": ^3.10.1
     "@lidofinance/next-cache-files-middleware": ^0.35.0
-    "@lidofinance/next-pages": ^0.35.0
     "@reef-knot/connect-wallet-modal": 1.6.2
     "@reef-knot/core-react": 1.5.1
     "@reef-knot/ledger-connector": 1.0.1
@@ -9718,7 +9670,6 @@ __metadata:
     "@types/node": ^18.11.9
     "@types/react": ^18.0.25
     "@types/styled-components": ^5.1.23
-    cookie: ^0.5.0
     copy-to-clipboard: ^3.3.1
     fs-extra: ^10.1.0
     next: ^13.0.5
