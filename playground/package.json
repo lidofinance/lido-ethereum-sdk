@@ -6,6 +6,7 @@
     "dev": "next dev",
     "playground:dev": "yarn dev",
     "build": "next build",
+    "analyze:build": "ANALYZE_BUNDLE=true yarn build",
     "start": "NODE_OPTIONS='-r next-logger' next start",
     "lint": "eslint --ext ts,tsx .",
     "lint:fix": "yarn lint --fix"
@@ -43,6 +44,7 @@
   },
   "devDependencies": {
     "@svgr/webpack": "^6.5.1",
+    "@next/bundle-analyzer": "^13.4.19",
     "@types/node": "^18.11.9",
     "@types/react": "^18.0.25",
     "@types/styled-components": "^5.1.23",

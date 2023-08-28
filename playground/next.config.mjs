@@ -1,10 +1,14 @@
 import buildDynamics from './scripts/build-dynamics.mjs';
+import withBundlerAnalyzer from '@next/bundle-analyzer';
 
 buildDynamics();
 
 const basePath = process.env.BASE_PATH || '';
+const ANALYZE_BUNDLE = process.env.ANALYZE_BUNDLE;
 
-export default {
+export default withBundlerAnalyzer({
+  enabled: ANALYZE_BUNDLE,
+})({
   basePath,
   eslint: {
     ignoreDuringBuilds: true,
@@ -36,4 +40,4 @@ export default {
   serverRuntimeConfig: {
     basePath,
   },
-};
+});
