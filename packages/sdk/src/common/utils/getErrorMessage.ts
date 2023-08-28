@@ -8,7 +8,7 @@ export enum ErrorMessage {
 }
 
 export const getErrorMessage = (
-  error: unknown
+  error: unknown,
 ): { message: ErrorMessage; code: string | number } => {
   try {
     console.error("TX_ERROR:", { error, error_string: JSON.stringify(error) });
@@ -40,7 +40,7 @@ export const getErrorMessage = (
 // type safe error code extractor
 export const extractCodeFromError = (
   error: unknown,
-  shouldDig = true
+  shouldDig = true,
 ): number | string => {
   // early exit on non object error
   if (!error || typeof error != "object") return 0;
@@ -96,6 +96,10 @@ export const extractCodeFromError = (
   // errors are sometimes nested :(
   if ("error" in error && shouldDig && error.error) {
     return extractCodeFromError(error.error, false);
+  }
+
+  if ("cause" in error && error.cause) {
+    return extractCodeFromError(error.cause, false);
   }
 
   return 0;

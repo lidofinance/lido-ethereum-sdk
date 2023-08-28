@@ -110,6 +110,7 @@ const stakeResult = await lidoSDK.staking.stake({
   value,
   callback,
   referralAddress,
+  account,
 });
 
 console.log(balanceStETH.toString(), "stETH balance");
@@ -182,11 +183,12 @@ try {
     value,
     callback,
     referralAddress,
+    account,
   });
 
   console.log(
     stakeResult,
-    "transaction hash, transaction receipt, confirmations"
+    "transaction hash, transaction receipt, confirmations",
   );
 } catch (error) {
   console.log((error as SDKError).errorMessage, (error as SDKError).code);
