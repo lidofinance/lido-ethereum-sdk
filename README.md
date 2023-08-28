@@ -72,6 +72,7 @@ const stakeResult = await lidoSDK.staking.stake({
   value,
   callback,
   referralAddress,
+  account,
 });
 
 console.log(balanceETH.toString(), "ETH balance");
