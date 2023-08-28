@@ -27,6 +27,7 @@ export type StakeStageCallback = (props: StakeCallbackProps) => void;
 
 export type StakeProps = {
   value: string;
+  account: Address;
   callback?: StakeStageCallback;
   referralAddress?: Address;
 };
@@ -39,8 +40,4 @@ export type StakeResult = {
 
 export type StakeEncodeDataProps = {
   referralAddress?: Address;
-};
-
-export type StakePopulateTxProps = StakeProps & {
-  account: Address;
 };
