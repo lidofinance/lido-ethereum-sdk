@@ -2,7 +2,6 @@ import { memo } from 'react';
 import { AppProps } from 'next/app';
 import { ToastContainer, CookiesTooltip } from '@lidofinance/lido-ui';
 import Providers from 'providers';
-import { CustomAppProps } from 'types';
 
 const App = (props: AppProps): JSX.Element => {
   const { Component, pageProps } = props;
@@ -12,12 +11,10 @@ const App = (props: AppProps): JSX.Element => {
 
 const MemoApp = memo(App);
 
-const AppWrapper = (props: CustomAppProps): JSX.Element => {
-  const { ...rest } = props;
-
+const AppWrapper = (props: AppProps): JSX.Element => {
   return (
     <Providers>
-      <MemoApp {...rest} />
+      <MemoApp {...props} />
       <CookiesTooltip />
       <ToastContainer />
     </Providers>

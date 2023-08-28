@@ -1,5 +1,3 @@
-import { AppProps } from 'next/app';
-import { EnvConfig } from 'providers';
 import { FC, ReactNode } from 'react';
 
 export type ComponentProps<
@@ -11,5 +9,3 @@ export type Component<
   T extends keyof JSX.IntrinsicElements,
   P extends Record<string, unknown> = { children?: ReactNode },
 > = FC<ComponentProps<T, P>>;
-
-export type CustomAppProps = AppProps & { config: EnvConfig };
