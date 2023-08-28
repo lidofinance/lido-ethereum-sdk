@@ -1,7 +1,6 @@
 import { InputProps } from '@lidofinance/lido-ui';
-import { Component } from 'types';
+import { ComponentPropsWithoutRef, FC } from 'react';
 
-export type TokenInputComponent = Component<
-  'input',
-  InputProps & { onMax: () => void }
+export type TokenInputComponent = FC<
+  ComponentPropsWithoutRef<'input'> & InputProps & { onMax: () => void }
 >;

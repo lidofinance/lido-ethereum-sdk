@@ -1,12 +1,15 @@
-import { LOCALE } from 'config';
-import { FormatPriceComponent } from './types';
+import { ComponentPropsWithoutRef } from 'react';
 
-const FormatPrice: FormatPriceComponent = (props) => {
-  const { amount, ...rest } = props;
+const FormatPrice = ({
+  amount,
+  ...rest
+}: ComponentPropsWithoutRef<'span'> & {
+  amount: number | null;
+}) => {
   const value =
     amount == null
       ? 'Unavailable'
-      : amount.toLocaleString(LOCALE, {
+      : amount.toLocaleString('', {
           style: 'currency',
           currency: 'USD',
         });

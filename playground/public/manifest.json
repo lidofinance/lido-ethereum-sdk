@@ -1,7 +1,7 @@
 {
-  "name": "Lido Frontend Template",
-  "short_name": "Lido",
-  "description": "Lido is the liquid staking solution for Ethereum.",
+  "name": "Lido SDK Playground",
+  "short_name": "SDK",
+  "description": "Playground for Lido Ethereum SDK",
   "iconPath": "favicon-512x512.svg",
   "icons": [
     {

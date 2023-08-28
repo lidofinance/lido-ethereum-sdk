@@ -2,8 +2,7 @@ import { useBreakpoint } from '@lidofinance/lido-ui';
 import { AddressBadgeStyle } from './addressBadgeStyles';
 import { AddressBadgeComponent } from './types';
 
-const AddressBadge: AddressBadgeComponent = (props) => {
-  const { address, ...rest } = props;
+const AddressBadge: AddressBadgeComponent = ({ address, ...rest }) => {
   const isMobile = useBreakpoint('md');
 
   return (
