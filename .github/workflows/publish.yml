@@ -23,11 +23,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: Build
-        run: yarn build
-        env:
-          RPC_PROVIDER_URL_1: $RPC_PROVIDER_URL_1
-          RPC_PROVIDER_URL_5: $RPC_PROVIDER_URL_5
-          WALLETCONNECT_PROJECT_ID: $WALLETCONNECT_PROJECT_ID
+        run: yarn build:packages
 
       - name: Authenticate in npm
         run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
