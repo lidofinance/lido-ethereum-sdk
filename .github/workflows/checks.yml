@@ -18,8 +18,11 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: Build
-        run: RPC_PROVIDER_URL_1=$RPC_PROVIDER_URL_1 RPC_PROVIDER_URL_5=$RPC_PROVIDER_URL_5 WALLETCONNECT_PROJECT_ID=$WALLETCONNECT_PROJECT_ID yarn build
-
+        run: yarn build
+        env:
+          RPC_PROVIDER_URL_1: $RPC_PROVIDER_URL_1
+          RPC_PROVIDER_URL_5: $RPC_PROVIDER_URL_5
+          WALLETCONNECT_PROJECT_ID: $WALLETCONNECT_PROJECT_ID
       - name: Check types
         run: yarn types
 

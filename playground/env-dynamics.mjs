@@ -4,9 +4,9 @@ export const rpcProviderUrls = {
   5: process.env[`RPC_PROVIDER_URL_5`],
 };
 /** @type number */
-export const defaultChain = parseInt(process.env.DEFAULT_CHAIN, 10) || 1;
+export const defaultChain = parseInt(process.env.DEFAULT_CHAIN, 10) || 5;
 /** @type number[] */
 export const supportedChains = process.env?.SUPPORTED_CHAINS?.split(',').map(
   (chainId) => parseInt(chainId, 10),
-) ?? [1, 4, 5];
+) ?? [1, 5];
 export const walletconnectProjectId = process.env.WALLETCONNECT_PROJECT_ID;
