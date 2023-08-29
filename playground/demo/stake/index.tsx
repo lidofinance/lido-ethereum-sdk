@@ -8,10 +8,13 @@ import { useState } from 'react';
 export const StakeDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
   const [stakingValue, setStakingValue] = useState('0.001');
-  const [referralAddress, setReferralAddress] = useState('');
+  const [referralAddressState, setReferralAddress] = useState('');
   const { staking } = useLidoSDK();
 
   const account = web3account as `0x{string}`;
+  const referralAddress = referralAddressState
+    ? (referralAddressState as `0x{string}`)
+    : undefined;
 
   return (
     <Section title="Staking">
@@ -28,7 +31,7 @@ export const StakeDemo = () => {
         <Input
           label="referral address"
           placeholder="0x0000000"
-          value={referralAddress}
+          value={referralAddressState}
           onChange={(e) => setReferralAddress(e.currentTarget.value)}
         />
       </Action>
@@ -38,9 +41,7 @@ export const StakeDemo = () => {
           staking.stakePopulateTx({
             account,
             value: stakingValue,
-            referralAddress: referralAddress
-              ? (referralAddress as `0x{string}`)
-              : undefined,
+            referralAddress,
           })
         }
       />
@@ -48,12 +49,20 @@ export const StakeDemo = () => {
         title="Stake Encode Data"
         action={() =>
           staking.stakeEncodeData({
-            referralAddress: referralAddress
-              ? (referralAddress as `0x{string}`)
-              : undefined,
+            referralAddress,
           })
         }
-      ></Action>
+      />
+      <Action
+        title="Stake Simulate Tx"
+        action={() =>
+          staking.stakeSimulateTx({
+            account,
+            value: stakingValue,
+            referralAddress,
+          })
+        }
+      />
       <Action
         title="Balance StETH"
         action={() => staking.balanceStETH(account)}
