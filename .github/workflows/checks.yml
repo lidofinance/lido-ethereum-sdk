@@ -12,13 +12,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: "yarn"
+          cache: 'yarn'
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
       - name: Build
-        run: yarn build
+        run: RPC_PROVIDER_URL_1=$RPC_PROVIDER_URL_1 RPC_PROVIDER_URL_5=$RPC_PROVIDER_URL_5 WALLETCONNECT_PROJECT_ID=$WALLETCONNECT_PROJECT_ID yarn build
 
       - name: Check types
         run: yarn types
