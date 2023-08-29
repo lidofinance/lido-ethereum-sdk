@@ -12,7 +12,7 @@ const Layout: FC<PropsWithChildren<LayoutProps>> = (props) => {
   return (
     <>
       <Head>
-        <meta name="description" content="Lido Template" />
+        <meta name="description" content="Lido SDK Playground" />
       </Head>
       <Header />
       <Main>

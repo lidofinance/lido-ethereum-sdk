@@ -48,7 +48,7 @@ export default class MyDocument extends Document {
   }
 
   get metaTitle(): string {
-    return 'Lido Frontend Template | Lido';
+    return 'Lido SDK Playground | Lido';
   }
 
   get metaDescription(): string {

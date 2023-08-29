@@ -7,7 +7,7 @@ const Home = () => {
   return (
     <Layout title="Lido Ethereum SDK" subtitle="Playground">
       <Head>
-        <title>Lido | Frontend Template</title>
+        <title>Lido | SDK Playground</title>
       </Head>
       <Demo />
     </Layout>

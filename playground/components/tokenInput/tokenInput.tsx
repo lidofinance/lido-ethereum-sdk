@@ -7,9 +7,7 @@ const handleWheel: React.WheelEventHandler<HTMLInputElement> = (event) => {
   event.currentTarget.blur();
 };
 
-const TokenInput: TokenInputComponent = (props) => {
-  const { onMax, disabled, ...rest } = props;
-
+const TokenInput: TokenInputComponent = ({ onMax, disabled, ...rest }) => {
   return (
     <TokenInputStyle>
       <Input
