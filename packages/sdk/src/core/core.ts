@@ -92,6 +92,7 @@ export default class LidoSDKCore {
     });
   }
 
+  @Logger("Provider:")
   public createWeb3Provider(chain: Chain): WalletClient {
     return createWalletClient({
       chain,
@@ -120,6 +121,7 @@ export default class LidoSDKCore {
   // Balances
 
   @Logger("Balances:")
+  @Cache(10 * 1000, ["chain.id"])
   public async balanceETH(address: Address): Promise<bigint> {
     invariant(this.rpcProvider, "RPC provider is not defined");
 
@@ -164,7 +166,7 @@ export default class LidoSDKCore {
 
   @ErrorHandler("Utils:")
   @Logger("Utils:")
-  @Cache(60 * 60 * 1000)
+  @Cache(60 * 60 * 1000, ["chain.id"])
   public async isContract(address: Address): Promise<boolean> {
     invariant(this.rpcProvider, "RPC provider is not defined");
     const { isContract } = await checkIsContract(this.rpcProvider, address);
