@@ -20,7 +20,7 @@ export const StakeDemo = () => {
     <Section title="Staking">
       <Action
         title="Stake"
-        action={() => staking.stake({ value: stakingValue })}
+        action={() => staking.stake({ value: stakingValue, account })}
       >
         <TokenInput
           label="value"
@@ -41,14 +41,6 @@ export const StakeDemo = () => {
           staking.stakePopulateTx({
             account,
             value: stakingValue,
-            referralAddress,
-          })
-        }
-      />
-      <Action
-        title="Stake Encode Data"
-        action={() =>
-          staking.stakeEncodeData({
             referralAddress,
           })
         }
