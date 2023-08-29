@@ -65,8 +65,8 @@ export const StakeDemo = () => {
         action={() => staking.contractAddressStETH()}
       />
       <Action
-        title="Get Contract Steth"
-        action={() => staking.getContractStETH()}
+        title="Get Contract Steth ABI"
+        action={() => staking.getContractStETH().abi}
       />
     </Section>
   );
