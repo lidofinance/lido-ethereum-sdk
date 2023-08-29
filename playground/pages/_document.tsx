@@ -51,14 +51,6 @@ export default class MyDocument extends Document {
     return 'Lido SDK Playground | Lido';
   }
 
-  get metaDescription(): string {
-    return (
-      'Liquid staking with Lido. ' +
-      'Stake {TOKEN} with Lido to earn daily rewards while keeping full control of your staked tokens. ' +
-      'Start earning rewards in just a few clicks.'
-    );
-  }
-
   get metaPreviewImgUrl(): string {
     return `${host}/lido-preview.png`;
   }
@@ -95,15 +87,12 @@ export default class MyDocument extends Document {
           />
           <meta property="og:type" content="website" />
           <meta property="og:title" content={this.metaTitle} />
-          <meta property="og:description" content={this.metaDescription} />
           <meta property="og:image" content={this.metaPreviewImgUrl} />
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content={this.metaTitle} />
-          <meta name="twitter:description" content={this.metaDescription} />
           <meta name="twitter:image:src" content={this.metaPreviewImgUrl} />
           <meta name="twitter:site" content="@lidofinance" />
           <meta name="twitter:creator" content="@lidofinance" />
-          <meta name="description" content={this.metaDescription} />
           <meta name="currentChain" content={String(dynamics.defaultChain)} />
           <Fonts />
           <LidoUIHead />
