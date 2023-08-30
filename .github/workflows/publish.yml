@@ -21,13 +21,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: "yarn"
+          cache: 'yarn'
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
       - name: Build
-        run: yarn build
+        run: yarn build:packages
 
       - name: Authenticate in npm
         run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc

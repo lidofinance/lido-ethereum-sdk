@@ -12,14 +12,17 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: "yarn"
+          cache: 'yarn'
 
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
       - name: Build
         run: yarn build
-
+        env:
+          RPC_PROVIDER_URL_1: ${{ vars.RPC_PROVIDER_URL_1 }}
+          RPC_PROVIDER_URL_5: ${{ vars.RPC_PROVIDER_URL_5 }}
+          WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
       - name: Check types
         run: yarn types
 
