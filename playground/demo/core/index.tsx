@@ -18,7 +18,10 @@ export const CoreDemo = () => {
 
   return (
     <Section title="Core">
-      <Action title="Get Fee Data" action={core.getFeeData} />
+      <Action
+        title="Get Fee Data"
+        action={async () => await core.getFeeData()}
+      />
       <Action
         title="Is Contract"
         action={() => core.isContract(contractAddress as `0x${string}`)}
