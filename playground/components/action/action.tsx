@@ -1,5 +1,6 @@
 import { Button, Accordion } from '@lidofinance/lido-ui';
 import { PropsWithChildren, useReducer } from 'react';
+import { type SDKError } from '@lidofinance/lido-ethereum-sdk';
 import {
   ActionBlock,
   Controls,
@@ -12,7 +13,7 @@ type ActionProps<TResult> = PropsWithChildren<{
   action: () => Promise<TResult> | TResult;
   title: string;
   renderResult?: (result: TResult) => JSX.Element;
-  renderError?: (error: unknown) => JSX.Element;
+  renderError?: (error: SDKError) => JSX.Element;
 }>;
 
 type ReducerAction<TResult> =
@@ -21,7 +22,7 @@ type ReducerAction<TResult> =
     }
   | {
       type: 'error';
-      error: unknown;
+      error: SDKError;
     }
   | {
       type: 'success';
@@ -33,7 +34,7 @@ type ReducerAction<TResult> =
 
 type ReducerState<TResult> = {
   loading: boolean;
-  error: unknown | undefined;
+  error: SDKError | undefined;
   result: TResult | undefined;
 };
 
@@ -72,14 +73,16 @@ const reducer = <TResult,>(
   }
 };
 
-const defaultRenderError = (error: unknown) => {
+const defaultRenderError = (error: SDKError) => {
   return (
     <Accordion
       summary={
-        <ErrorMessage>{String(error).slice(0, 30) + '...'}</ErrorMessage>
+        <ErrorMessage>
+          {String(error.errorMessage).slice(0, 30) + '...'}
+        </ErrorMessage>
       }
     >
-      <ErrorMessage>{String(error)}</ErrorMessage>
+      <ErrorMessage>{String(error.errorMessage)}</ErrorMessage>
     </Accordion>
   );
 };
@@ -122,7 +125,7 @@ export const Action = <TResult,>({
       dispatch({ type: 'success', result });
     } catch (error) {
       console.error(error);
-      dispatch({ type: 'error', error });
+      dispatch({ type: 'error', error: error as SDKError });
     }
   };
 
