@@ -6,6 +6,21 @@
 
 The project is currently under development and may change in the future.
 
+## Table of contents
+
+- [Installation](#installation)
+- [Modules](#modules)
+- [Usage](#usage)
+- [Initialization](#initialization)
+- [Examples](#examples)
+  - [Core](#core)
+  - [Staking](#staking)
+- [Stake](#stake)
+  - [Call](#call)
+  - [Populate transaction](#populate-transaction)
+  - [Simulate transaction](#simulate-transaction)
+- [Lido contract addresses](#lido-contract-addresses)
+
 ## Installation
 
 You can install the Lido Ethereum SDK using npm or yarn:
@@ -231,4 +246,18 @@ const simulateResult = await lidoSDK.staking.stakeSimulateTx({
   referralAddress,
   account,
 });
+```
+
+## Lido contract addresses
+
+```ts
+import { LidoSDK, LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk';
+
+const lidoSDK = new LidoSDK({
+  rpcUrls: ['https://rpc-url'],
+  chainId: 5,
+});
+
+const stethAddress = await core.getContractAddress(LIDO_CONTRACT_NAMES.lido);
+const wsteth = await core.getContractAddress(LIDO_CONTRACT_NAMES.wsteth);
 ```
