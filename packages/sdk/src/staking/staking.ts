@@ -16,7 +16,10 @@ import invariant from 'tiny-invariant';
 import { LidoSDKCore } from '../core/index.js';
 import { Logger, Cache } from '../common/decorators/index.js';
 
-import { SUBMIT_EXTRA_GAS_TRANSACTION_RATIO } from '../common/constants.js';
+import {
+  SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
+  LIDO_CONTRACT_NAMES,
+} from '../common/constants.js';
 import { version } from '../version.js';
 
 import { abi } from './abi/steth.js';
@@ -55,7 +58,7 @@ export class LidoSDKStaking {
   public async contractAddressStETH(): Promise<Address> {
     invariant(this.core.chain, 'Chain is not defined');
 
-    return await this.core.getContractAddress('lido');
+    return await this.core.getContractAddress(LIDO_CONTRACT_NAMES.lido);
   }
 
   @Logger('Contracts:')

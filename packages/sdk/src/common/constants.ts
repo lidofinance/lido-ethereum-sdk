@@ -17,22 +17,20 @@ export const LIDO_LOCATOR_BY_CHAIN: {
   [CHAINS.Goerli]: '0x1eDf09b5023DC86737b59dE68a8130De878984f5',
 };
 
-export const ContractNames = {
-  accountingOracle: 'accountingOracle',
-  depositSecurityModule: 'depositSecurityModule',
-  elRewardsVault: 'elRewardsVault',
-  legacyOracle: 'legacyOracle',
-  lido: 'lido',
-  oracleReportSanityChecker: 'oracleReportSanityChecker',
-  postTokenRebaseReceiver: 'postTokenRebaseReceiver',
-  burner: 'burner',
-  stakingRouter: 'stakingRouter',
-  treasury: 'treasury',
-  validatorsExitBusOracle: 'validatorsExitBusOracle',
-  withdrawalQueue: 'withdrawalQueue',
-  withdrawalVault: 'withdrawalVault',
-  oracleDaemonConfig: 'oracleDaemonConfig',
-  wsteth: 'wsteth',
-};
-
-export type ContractName = keyof typeof ContractNames;
+export enum LIDO_CONTRACT_NAMES {
+  accountingOracle = 'accountingOracle',
+  depositSecurityModule = 'depositSecurityModule',
+  elRewardsVault = 'elRewardsVault',
+  legacyOracle = 'legacyOracle',
+  lido = 'lido',
+  oracleReportSanityChecker = 'oracleReportSanityChecker',
+  postTokenRebaseReceiver = 'postTokenRebaseReceiver',
+  burner = 'burner',
+  stakingRouter = 'stakingRouter',
+  treasury = 'treasury',
+  validatorsExitBusOracle = 'validatorsExitBusOracle',
+  withdrawalQueue = 'withdrawalQueue',
+  withdrawalVault = 'withdrawalVault',
+  oracleDaemonConfig = 'oracleDaemonConfig',
+  wsteth = 'wsteth',
+}

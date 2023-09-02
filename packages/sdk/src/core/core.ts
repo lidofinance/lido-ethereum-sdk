@@ -28,7 +28,7 @@ import {
   SUPPORTED_CHAINS,
   LIDO_LOCATOR_BY_CHAIN,
   type CHAINS,
-  type ContractName,
+  type LIDO_CONTRACT_NAMES,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
@@ -227,7 +227,9 @@ export default class LidoSDKCore {
 
   @Logger('Utils:')
   @Cache(30 * 60 * 1000, ['chain.id'])
-  public async getContractAddress(contract: ContractName): Promise<Address> {
+  public async getContractAddress(
+    contract: LIDO_CONTRACT_NAMES,
+  ): Promise<Address> {
     invariant(this.rpcProvider, 'RPC provider is not defined');
     const lidoLocator = this.getContractLidoLocator();
 
