@@ -32,6 +32,7 @@ import {
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
+import { wqAbi } from './abi/wq.js';
 import { LidoSDKCoreProps } from './types.js';
 
 export default class LidoSDKCore {
@@ -156,6 +157,18 @@ export default class LidoSDKCore {
     });
   }
 
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['chain.id'])
+  private getContractWQ(
+    address: Address,
+  ): GetContractReturnType<typeof wqAbi, PublicClient> {
+    return getContract({
+      address,
+      abi: wqAbi,
+      publicClient: this.rpcProvider,
+    });
+  }
+
   // Utils
 
   @Logger('Utils:')
@@ -218,6 +231,20 @@ export default class LidoSDKCore {
     invariant(this.rpcProvider, 'RPC provider is not defined');
     const lidoLocator = this.getContractLidoLocator();
 
-    return lidoLocator.read[contract]();
+    invariant(lidoLocator, 'Lido locator is not defined');
+
+    if (contract === 'wsteth') {
+      const withdrawalQueue = await lidoLocator.read.withdrawalQueue();
+      const contract = await this.getContractWQ(withdrawalQueue);
+      const wstethAddress = await contract.read.WSTETH?.();
+
+      invariant(wstethAddress, 'wstETH address is not defined');
+
+      return wstethAddress as Address;
+    } else {
+      invariant(lidoLocator.read[contract], 'Lido locator read is not defined');
+
+      return lidoLocator.read[contract]();
+    }
   }
 }

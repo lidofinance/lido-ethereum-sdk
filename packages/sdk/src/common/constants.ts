@@ -32,6 +32,7 @@ export const ContractNames = {
   withdrawalQueue: 'withdrawalQueue',
   withdrawalVault: 'withdrawalVault',
   oracleDaemonConfig: 'oracleDaemonConfig',
+  wsteth: 'wsteth',
 };
 
 export type ContractName = keyof typeof ContractNames;
