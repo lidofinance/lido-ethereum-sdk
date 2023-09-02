@@ -3,14 +3,16 @@ import {
   type WalletClient,
   type PublicClient,
   type Chain,
+  type GetContractReturnType,
   createPublicClient,
   createWalletClient,
   fallback,
   http,
   custom,
-} from "viem";
-import { goerli, mainnet } from "viem/chains";
-import invariant from "tiny-invariant";
+  getContract,
+} from 'viem';
+import { goerli, mainnet } from 'viem/chains';
+import invariant from 'tiny-invariant';
 
 import {
   getFeeData,
@@ -20,19 +22,20 @@ import {
   type SDKErrorProps,
   getErrorMessage,
   type ErrorMessage,
-} from "../common/utils/index.js";
+} from '../common/utils/index.js';
+import { Logger, Initialize, Cache } from '../common/decorators/index.js';
 import {
-  ErrorHandler,
-  Logger,
-  Initialize,
-  Cache,
-} from "../common/decorators/index.js";
-import { SUPPORTED_CHAINS } from "../common/constants.js";
+  SUPPORTED_CHAINS,
+  LIDO_LOCATOR_BY_CHAIN,
+  type CHAINS,
+  type ContractName,
+} from '../common/constants.js';
 
-import { LidoSDKCoreProps } from "./types.js";
+import { LidoLocatorAbi } from './abi/lidoLocator.js';
+import { LidoSDKCoreProps } from './types.js';
 
 export default class LidoSDKCore {
-  readonly chainId: (typeof SUPPORTED_CHAINS)[number];
+  readonly chainId: CHAINS;
   readonly rpcUrls: string[] | undefined;
   readonly chain: Chain;
   readonly rpcProvider: PublicClient;
@@ -48,8 +51,8 @@ export default class LidoSDKCore {
     this.web3Provider = web3Provider;
   }
 
-  @Initialize("Init:")
-  @Logger("LOG:")
+  @Initialize('Init:')
+  @Logger('LOG:')
   private init(props: LidoSDKCoreProps, _version?: string) {
     const { chainId, rpcUrls, web3Provider, rpcProvider } = props;
 
@@ -58,11 +61,11 @@ export default class LidoSDKCore {
     }
 
     if (!rpcProvider && rpcUrls.length === 0) {
-      throw new Error("rpcUrls is required");
+      throw new Error('rpcUrls is required');
     }
 
     if (!rpcUrls && !rpcProvider) {
-      throw new Error("rpcUrls or rpcProvider is required");
+      throw new Error('rpcUrls or rpcProvider is required');
     }
 
     const chain = chainId === 1 ? mainnet : goerli;
@@ -79,7 +82,7 @@ export default class LidoSDKCore {
 
   // Provider
 
-  @Logger("Provider:")
+  @Logger('Provider:')
   public createRpcProvider(chain: Chain, rpcUrls: string[]): PublicClient {
     const rpcs = rpcUrls.map((url) => http(url));
 
@@ -92,7 +95,7 @@ export default class LidoSDKCore {
     });
   }
 
-  @Logger("Provider:")
+  @Logger('Provider:')
   public createWeb3Provider(chain: Chain): WalletClient {
     return createWalletClient({
       chain,
@@ -103,51 +106,74 @@ export default class LidoSDKCore {
     });
   }
 
-  @Logger("Provider:")
+  @Logger('Provider:')
   public defineWeb3Provider(): WalletClient {
-    invariant(!this.web3Provider, "Web3 provider is already defined");
+    invariant(!this.web3Provider, 'Web3 provider is already defined');
 
     this.web3Provider = this.createWeb3Provider(this.chain);
 
     return this.web3Provider;
   }
 
-  @Logger("Provider:")
+  @Logger('Provider:')
   public setWeb3Provider(web3Provider: WalletClient): void {
-    invariant(web3Provider.chain === this.chain, "Wrong chain");
+    invariant(web3Provider.chain === this.chain, 'Wrong chain');
 
     this.web3Provider = web3Provider;
   }
   // Balances
 
-  @Logger("Balances:")
-  @Cache(10 * 1000, ["chain.id"])
+  @Logger('Balances:')
+  @Cache(10 * 1000, ['chain.id'])
   public async balanceETH(address: Address): Promise<bigint> {
-    invariant(this.rpcProvider, "RPC provider is not defined");
+    invariant(this.rpcProvider, 'RPC provider is not defined');
 
     return this.rpcProvider.getBalance({ address });
   }
 
-  // utils
+  // Contracts
 
-  @ErrorHandler("Utils:")
-  @Logger("Utils:")
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['chain.id'])
+  public contractAddressLidoLocator(): Address {
+    invariant(this.chain, 'Chain is not defined');
+
+    return LIDO_LOCATOR_BY_CHAIN[this.chain.id as CHAINS];
+  }
+
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['chain.id', 'contractAddressLidoLocator'])
+  public getContractLidoLocator(): GetContractReturnType<
+    typeof LidoLocatorAbi,
+    PublicClient,
+    WalletClient
+  > {
+    return getContract({
+      address: this.contractAddressLidoLocator(),
+      abi: LidoLocatorAbi,
+      publicClient: this.rpcProvider,
+      walletClient: this.web3Provider,
+    });
+  }
+
+  // Utils
+
+  @Logger('Utils:')
   public async getFeeData(): Promise<FeeData> {
-    invariant(this.rpcProvider, "RPC provider is not defined");
+    invariant(this.rpcProvider, 'RPC provider is not defined');
 
     return getFeeData(this.rpcProvider);
   }
 
-  @ErrorHandler("Utils:")
-  @Logger("Utils:")
+  @Logger('Utils:')
   public async getWeb3Address(): Promise<Address> {
-    invariant(this.web3Provider, "Web3 provider is not defined");
+    invariant(this.web3Provider, 'Web3 provider is not defined');
 
     if (this.web3Provider.account) return this.web3Provider.account.address;
     // For walletconnect
-    if ("getAddresses" in this.web3Provider) {
+    if ('getAddresses' in this.web3Provider) {
       const [address] = await this.web3Provider.getAddresses();
-      invariant(address, "Web3 address is not defined");
+      invariant(address, 'Web3 address is not defined');
 
       return address;
     }
@@ -156,36 +182,42 @@ export default class LidoSDKCore {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     const [account] = await window.ethereum.request({
-      method: "eth_requestAccounts",
+      method: 'eth_requestAccounts',
     });
 
-    invariant(account, "Web3 address is not defined");
+    invariant(account, 'Web3 address is not defined');
 
     return account;
   }
 
-  @ErrorHandler("Utils:")
-  @Logger("Utils:")
-  @Cache(60 * 60 * 1000, ["chain.id"])
+  @Logger('Utils:')
+  @Cache(60 * 60 * 1000, ['chain.id'])
   public async isContract(address: Address): Promise<boolean> {
-    invariant(this.rpcProvider, "RPC provider is not defined");
+    invariant(this.rpcProvider, 'RPC provider is not defined');
     const { isContract } = await checkIsContract(this.rpcProvider, address);
 
     return isContract;
   }
 
-  @ErrorHandler("Utils:")
-  @Logger("Utils:")
+  @Logger('Utils:')
   public error(props: SDKErrorProps): SDKError {
     return new SDKError(props);
   }
 
-  @ErrorHandler("Utils:")
-  @Logger("Utils:")
+  @Logger('Utils:')
   public getErrorMessage(error: unknown): {
     message: ErrorMessage;
     code: string | number;
   } {
     return getErrorMessage(error);
+  }
+
+  @Logger('Utils:')
+  @Cache(30 * 60 * 1000, ['chain.id'])
+  public async getContractAddress(contract: ContractName): Promise<Address> {
+    invariant(this.rpcProvider, 'RPC provider is not defined');
+    const lidoLocator = this.getContractLidoLocator();
+
+    return lidoLocator.read[contract]();
   }
 }
