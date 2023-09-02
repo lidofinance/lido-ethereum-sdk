@@ -66,7 +66,7 @@ export const StakeDemo = () => {
       />
       <Action
         title="Get Contract Steth ABI"
-        action={() => staking.getContractStETH().abi}
+        action={async () => (await staking.getContractStETH()).abi}
       />
     </Section>
   );
