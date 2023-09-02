@@ -35,18 +35,18 @@ The Lido Ethereum SDK consists of several modules:
 To get started with the Lido Ethereum SDK, you need to import the necessary modules:
 
 ```ts
-const { LidoSDK } = require("@lidofinance/lido-ethereum-sdk");
+const { LidoSDK } = require('@lidofinance/lido-ethereum-sdk');
 // or
-const { LidoSDKStaking } = require("@lidofinance/lido-ethereum-sdk/staking");
+const { LidoSDKStaking } = require('@lidofinance/lido-ethereum-sdk/staking');
 // or
-const { LidoSDKCore } = require("@lidofinance/lido-ethereum-sdk/core");
+const { LidoSDKCore } = require('@lidofinance/lido-ethereum-sdk/core');
 
 // Or, if you are using ES6+:
-import { LidoSDK } from "@lidofinance/lido-ethereum-sdk";
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 // or
-import { LidoSDKStaking } from "@lidofinance/lido-ethereum-sdk/staking";
+import { LidoSDKStaking } from '@lidofinance/lido-ethereum-sdk/staking';
 // or
-import { LidoSDKCore } from "@lidofinance/lido-ethereum-sdk/core";
+import { LidoSDKCore } from '@lidofinance/lido-ethereum-sdk/core';
 ```
 
 ## Initialization
@@ -65,8 +65,8 @@ const sdk = new LidoSDK({
 const sdk = new LidoSDK({
   chainId: 5,
   rpcUrls: [
-    "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}",
-    "https://fallback-provider",
+    'https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}',
+    'https://fallback-provider',
   ],
   web3Provider: provider, // optional
 });
@@ -81,13 +81,13 @@ Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address
 ```ts
 const lidoSDK = new LidoSDK({
   chainId: 5,
-  rpcUrls: ["https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}"],
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
 });
 
 // Views
 const balanceETH = await lidoSDK.core.balanceETH(address);
 
-console.log(balanceETH.toString(), "ETH balance");
+console.log(balanceETH.toString(), 'ETH balance');
 ```
 
 ### Staking
@@ -95,15 +95,15 @@ console.log(balanceETH.toString(), "ETH balance");
 ```ts
 const lidoSDK = new LidoSDK({
   chainId: 5,
-  rpcUrls: ["https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}"],
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
 });
 
 // Views
 const balanceStETH = await lidoSDK.staking.balanceStETH(address);
 
 // Contracts
-const addressStETH = lidoSDK.staking.contractAddressStETH();
-const contractStETH = lidoSDK.staking.getContractStETH();
+const addressStETH = await lidoSDK.staking.contractAddressStETH();
+const contractStETH = await lidoSDK.staking.getContractStETH();
 
 // Calls
 const stakeResult = await lidoSDK.staking.stake({
@@ -113,10 +113,10 @@ const stakeResult = await lidoSDK.staking.stake({
   account,
 });
 
-console.log(balanceStETH.toString(), "stETH balance");
-console.log(addressStETH, "stETH contract address");
-console.log(contractStETH, "stETH contract");
-console.log(stakeResult, "stake result");
+console.log(balanceStETH.toString(), 'stETH balance');
+console.log(addressStETH, 'stETH contract address');
+console.log(contractStETH, 'stETH contract');
+console.log(stakeResult, 'stake result');
 ```
 
 ## Stake
@@ -143,10 +143,10 @@ import {
   LidoSDK,
   StakeStageCallback,
   SDKError,
-} from "@lidofinance/lido-ethereum-sdk";
+} from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ["https://rpc-url"],
+  rpcUrls: ['https://rpc-url'],
   chainId: 5,
 });
 
@@ -156,23 +156,23 @@ lidoSDK.core.defineWeb3Provider();
 const callback: StakeStageCallback = ({ stage, payload }) => {
   switch (stage) {
     case StakeCallbackStage.SIGN:
-      console.log("wait for sign");
+      console.log('wait for sign');
       break;
     case StakeCallbackStage.RECEIPT:
-      console.log("wait for receipt");
-      console.log(payload, "transaction hash");
+      console.log('wait for receipt');
+      console.log(payload, 'transaction hash');
       break;
     case StakeCallbackStage.CONFIRMATION:
-      console.log("wait for confirmation");
-      console.log(payload, "transaction receipt");
+      console.log('wait for confirmation');
+      console.log(payload, 'transaction receipt');
       break;
     case StakeCallbackStage.DONE:
-      console.log("done");
-      console.log(payload, "transaction confirmations");
+      console.log('done');
+      console.log(payload, 'transaction confirmations');
       break;
     case StakeCallbackStage.ERROR:
-      console.log("error");
-      console.log(payload, "error object with code and message");
+      console.log('error');
+      console.log(payload, 'error object with code and message');
       break;
     default:
   }
@@ -188,7 +188,7 @@ try {
 
   console.log(
     stakeResult,
-    "transaction hash, transaction receipt, confirmations",
+    'transaction hash, transaction receipt, confirmations',
   );
 } catch (error) {
   console.log((error as SDKError).errorMessage, (error as SDKError).code);
@@ -198,30 +198,30 @@ try {
 ### Populate transaction
 
 ```ts
-import { LidoSDK } from "@lidofinance/lido-ethereum-sdk";
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ["https://rpc-url"],
+  rpcUrls: ['https://rpc-url'],
   chainId: 5,
 });
 
-const populateResult = lidoSDK.staking.stakePopulateTx({
+const populateResult = await lidoSDK.staking.stakePopulateTx({
   value,
   callback,
   referralAddress,
   account,
 });
 
-console.log(populateResult, "to, from, value, data");
+console.log(populateResult, 'to, from, value, data');
 ```
 
 ### Simulate transaction
 
 ```ts
-import { LidoSDK } from "@lidofinance/lido-ethereum-sdk";
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ["https://rpc-url"],
+  rpcUrls: ['https://rpc-url'],
   chainId: 5,
 });
 
