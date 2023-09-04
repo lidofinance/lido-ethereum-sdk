@@ -75,12 +75,15 @@ export class LidoSDKWithdrawals {
 
   @Logger('Call:')
   public async requestWithoutPermit(props: RequestProps) {
-    const { token, ...rest } = props;
+    const { token, account } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
 
-    if (token === 'stETH') await this.requestStethWithoutPermit(rest);
-    else await this.requestWstethWithoutPermit(rest);
+    const isContract = await this.core.isContract(account);
+
+    if (isContract) return await this.requestMultisig(props);
+    if (token === 'stETH') await this.requestStethWithoutPermit(props);
+    else await this.requestWstethWithoutPermit(props);
   }
 
   @Logger('Call:')

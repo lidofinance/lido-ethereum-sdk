@@ -22,7 +22,8 @@ The project is currently under development and may change in the future.
 - [Withdrawal](#withdrawal)
   - [Call](#call-1)
     - [Request withdrawal with Permit (EOA and contract)](#request-withdrawal-with-permit-eoa-and-contract)
-    - [Request withdrawal without Permit (EOA)](#request-withdrawal-without-permit-eoa)
+    - [Request withdrawal without Permit (EOA and contract)](#request-withdrawal-without-permit-eoa-and-contract)
+    - [Request withdrawal with Permit (EOA)](#request-withdrawal-with-permit-eoa)
     - [Request withdrawal (contract)](#request-withdrawal-contract)
     - [Request withdrawal for stETH with Permit (EOA)](#request-withdrawal-for-steth-with-permit-eoa)
     - [Request withdrawal for stETH without Permit (EOA)](#request-withdrawal-for-steth-without-permit-eoa)
@@ -343,7 +344,70 @@ try {
 }
 ```
 
-#### Request withdrawal with Permit (EOA only)
+#### Request withdrawal without Permit (EOA and contract)
+
+```ts
+import {
+  LidoSDK,
+  RequestStageCallback,
+  RequestCallbackStages,
+  SDKError,
+} from '@lidofinance/lido-ethereum-sdk';
+
+const lidoSDK = new LidoSDK({
+  rpcUrls: ['https://rpc-url'],
+  chainId: 5,
+});
+
+// Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
+lidoSDK.core.defineWeb3Provider();
+
+const callback: RequestStageCallback = ({ stage, payload }) => {
+  switch (stage) {
+    case RequestCallbackStages.GAS_LIMIT:
+      console.log('wait for gas limit');
+      break;
+    case RequestCallbackStages.SIGN:
+      console.log('wait for sign');
+      break;
+    case RequestCallbackStages.RECEIPT:
+      console.log('wait for receipt');
+      console.log(payload, 'transaction hash');
+      break;
+    case RequestCallbackStages.CONFIRMATION:
+      console.log('wait for confirmation');
+      console.log(payload, 'transaction receipt');
+      break;
+    case RequestCallbackStages.DONE:
+      console.log('done');
+      console.log(payload, 'transaction confirmations');
+      break;
+    case RequestCallbackStages.ERROR:
+      console.log('error');
+      console.log(payload, 'error object with code and message');
+      break;
+    default:
+  }
+};
+
+try {
+  const requestResult = await lidoSDK.withdrawals.requestWithoutPermit({
+    requests,
+    token, // 'stETH' | 'wstETH'
+    callback,
+    account,
+  });
+
+  console.log(
+    requestResult,
+    'transaction hash, transaction receipt, confirmations',
+  );
+} catch (error) {
+  console.log((error as SDKError).errorMessage, (error as SDKError).code);
+}
+```
+
+#### Request withdrawal with Permit (EOA)
 
 ```ts
 import {
@@ -395,69 +459,6 @@ const callback: RequestStageCallback = ({ stage, payload }) => {
 try {
   const requestResult = await lidoSDK.withdrawals.requestWithPermit({
     amount,
-    requests,
-    token, // 'stETH' | 'wstETH'
-    callback,
-    account,
-  });
-
-  console.log(
-    requestResult,
-    'transaction hash, transaction receipt, confirmations',
-  );
-} catch (error) {
-  console.log((error as SDKError).errorMessage, (error as SDKError).code);
-}
-```
-
-#### Request withdrawal without Permit (EOA)
-
-```ts
-import {
-  LidoSDK,
-  RequestStageCallback,
-  RequestCallbackStages,
-  SDKError,
-} from '@lidofinance/lido-ethereum-sdk';
-
-const lidoSDK = new LidoSDK({
-  rpcUrls: ['https://rpc-url'],
-  chainId: 5,
-});
-
-// Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
-lidoSDK.core.defineWeb3Provider();
-
-const callback: RequestStageCallback = ({ stage, payload }) => {
-  switch (stage) {
-    case RequestCallbackStages.GAS_LIMIT:
-      console.log('wait for gas limit');
-      break;
-    case RequestCallbackStages.SIGN:
-      console.log('wait for sign');
-      break;
-    case RequestCallbackStages.RECEIPT:
-      console.log('wait for receipt');
-      console.log(payload, 'transaction hash');
-      break;
-    case RequestCallbackStages.CONFIRMATION:
-      console.log('wait for confirmation');
-      console.log(payload, 'transaction receipt');
-      break;
-    case RequestCallbackStages.DONE:
-      console.log('done');
-      console.log(payload, 'transaction confirmations');
-      break;
-    case RequestCallbackStages.ERROR:
-      console.log('error');
-      console.log(payload, 'error object with code and message');
-      break;
-    default:
-  }
-};
-
-try {
-  const requestResult = await lidoSDK.withdrawals.requestWithoutPermit({
     requests,
     token, // 'stETH' | 'wstETH'
     callback,
