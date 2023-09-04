@@ -65,31 +65,31 @@ export class LidoSDKWithdrawals {
 
   @Logger('Call:')
   public async requestWithPermit(props: RequestWithPermitProps) {
-    const { contract, ...rest } = props;
+    const { token, ...rest } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
 
-    if (contract === 'stETH') await this.requestStethWithPermit(rest);
+    if (token === 'stETH') await this.requestStethWithPermit(rest);
     else await this.requestWstethWithPermit(rest);
   }
 
   @Logger('Call:')
   public async requestWithoutPermit(props: RequestProps) {
-    const { contract, ...rest } = props;
+    const { token, ...rest } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
 
-    if (contract === 'stETH') await this.requestStethWithoutPermit(rest);
+    if (token === 'stETH') await this.requestStethWithoutPermit(rest);
     else await this.requestWstethWithoutPermit(rest);
   }
 
   @Logger('Call:')
   public async requestMultisig(props: RequestProps) {
-    const { contract, ...rest } = props;
+    const { token, ...rest } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
 
-    if (contract === 'stETH') await this.requestStethMultisig(rest);
+    if (token === 'stETH') await this.requestStethMultisig(rest);
     else await this.requestWstethMultisig(rest);
   }
 
@@ -107,27 +107,27 @@ export class LidoSDKWithdrawals {
 
   @Logger('Call:')
   public async approveEOA(props: ApproveProps) {
-    const { contract, ...rest } = props;
+    const { token, ...rest } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
 
-    if (contract === 'stETH') await this.approveSteth(rest);
+    if (token === 'stETH') await this.approveSteth(rest);
     else await this.approveWsteth(rest);
   }
 
   @Logger('Call:')
   public async approveMultisig(props: ApproveProps) {
-    const { contract, ...rest } = props;
+    const { token, ...rest } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
 
-    if (contract === 'stETH') await this.approveStethMultisig(rest);
+    if (token === 'stETH') await this.approveStethMultisig(rest);
     else await this.approveWstethMultisig(rest);
   }
 
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async requestStethWithPermit(
-    props: Omit<RequestWithPermitProps, 'contract'>,
+    props: Omit<RequestWithPermitProps, 'token'>,
   ) {
     const { account, amount, requests, callback } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
@@ -142,7 +142,7 @@ export class LidoSDKWithdrawals {
       spender: contract.address,
       deadline: INFINITY_DEADLINE_VALUE,
       amount: parseEther(amount),
-      contract: 'stETH',
+      token: 'stETH',
     });
 
     const params = [
@@ -201,7 +201,7 @@ export class LidoSDKWithdrawals {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async requestWstethWithPermit(
-    props: Omit<RequestWithPermitProps, 'contract'>,
+    props: Omit<RequestWithPermitProps, 'token'>,
   ) {
     const { account, amount, requests, callback } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
@@ -216,7 +216,7 @@ export class LidoSDKWithdrawals {
       spender: contract.address,
       deadline: INFINITY_DEADLINE_VALUE,
       amount: parseEther(amount),
-      contract: 'wstETH',
+      token: 'wstETH',
     });
 
     const params = [
@@ -274,9 +274,7 @@ export class LidoSDKWithdrawals {
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async requestStethWithoutPermit(
-    props: Omit<RequestProps, 'contract'>,
-  ) {
+  public async requestStethWithoutPermit(props: Omit<RequestProps, 'token'>) {
     const { account, requests, callback } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
@@ -322,9 +320,7 @@ export class LidoSDKWithdrawals {
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async requestWstethWithoutPermit(
-    props: Omit<RequestProps, 'contract'>,
-  ) {
+  public async requestWstethWithoutPermit(props: Omit<RequestProps, 'token'>) {
     const { account, requests, callback } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
@@ -373,7 +369,7 @@ export class LidoSDKWithdrawals {
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async requestStethMultisig(props: Omit<RequestProps, 'contract'>) {
+  public async requestStethMultisig(props: Omit<RequestProps, 'token'>) {
     const { account, requests, callback } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
@@ -395,7 +391,7 @@ export class LidoSDKWithdrawals {
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async requestWstethMultisig(props: Omit<RequestProps, 'contract'>) {
+  public async requestWstethMultisig(props: Omit<RequestProps, 'token'>) {
     const { account, requests, callback } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
@@ -420,7 +416,7 @@ export class LidoSDKWithdrawals {
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async approveSteth(props: Omit<ApproveProps, 'contract'>) {
+  public async approveSteth(props: Omit<ApproveProps, 'token'>) {
     const { account, amount, callback } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
@@ -473,7 +469,7 @@ export class LidoSDKWithdrawals {
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async approveWsteth(props: Omit<ApproveProps, 'contract'>) {
+  public async approveWsteth(props: Omit<ApproveProps, 'token'>) {
     const { account, amount, callback } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
@@ -526,7 +522,7 @@ export class LidoSDKWithdrawals {
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async approveStethMultisig(props: Omit<ApproveProps, 'contract'>) {
+  public async approveStethMultisig(props: Omit<ApproveProps, 'token'>) {
     const { account, amount, callback } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
 
@@ -550,7 +546,7 @@ export class LidoSDKWithdrawals {
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async approveWstethMultisig(props: Omit<ApproveProps, 'contract'>) {
+  public async approveWstethMultisig(props: Omit<ApproveProps, 'token'>) {
     const { account, amount, callback } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
 

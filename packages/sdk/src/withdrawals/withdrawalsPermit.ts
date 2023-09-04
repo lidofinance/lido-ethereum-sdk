@@ -56,9 +56,9 @@ export class LidoSDKWithdrawalsPermit {
 
   @Logger('Permit:')
   public async permitSignature(props: PermitProps) {
-    const { contract, ...rest } = props;
+    const { token, ...rest } = props;
 
-    if (contract === 'stETH') return this.stethPermitSignature(rest);
+    if (token === 'stETH') return this.stethPermitSignature(rest);
     return this.wstethPermitSignature(rest);
   }
 

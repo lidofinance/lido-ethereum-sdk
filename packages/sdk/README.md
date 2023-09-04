@@ -329,7 +329,7 @@ try {
   const requestResult = await lidoSDK.withdrawals.request({
     amount,
     requests,
-    contract, // 'stETH' | 'wstETH'
+    token, // 'stETH' | 'wstETH'
     callback,
     account,
   });
@@ -396,7 +396,7 @@ try {
   const requestResult = await lidoSDK.withdrawals.requestWithPermit({
     amount,
     requests,
-    contract, // 'stETH' | 'wstETH'
+    token, // 'stETH' | 'wstETH'
     callback,
     account,
   });
@@ -459,7 +459,7 @@ const callback: RequestStageCallback = ({ stage, payload }) => {
 try {
   const requestResult = await lidoSDK.withdrawals.requestWithoutPermit({
     requests,
-    contract, // 'stETH' | 'wstETH'
+    token, // 'stETH' | 'wstETH'
     callback,
     account,
   });
@@ -511,7 +511,7 @@ const callback: RequestStageCallback = ({ stage, payload }) => {
 try {
   const requestResult = await lidoSDK.withdrawals.requestMultisig({
     requests,
-    contract, // 'stETH' | 'wstETH'
+    token, // 'stETH' | 'wstETH'
     callback,
     account,
   });
@@ -988,7 +988,7 @@ const callback: ApproveStageCallback = ({ stage, payload }) => {
 try {
   const approveResult = await lidoSDK.withdrawals.approve({
     amount,
-    contract, // 'stETH' | 'wstETH'
+    token, // 'stETH' | 'wstETH'
     callback,
     account,
   });
@@ -1051,7 +1051,7 @@ const callback: ApproveStageCallback = ({ stage, payload }) => {
 try {
   const approveResult = await lidoSDK.withdrawals.approveEOA({
     amount,
-    contract, // 'stETH' | 'wstETH'
+    token, // 'stETH' | 'wstETH'
     callback,
     account,
   });
@@ -1103,7 +1103,7 @@ const callback: ApproveStageCallback = ({ stage, payload }) => {
 try {
   const approveResult = await lidoSDK.withdrawals.approveMultisig({
     amount,
-    contract, // 'stETH' | 'wstETH'
+    token, // 'stETH' | 'wstETH'
     callback,
     account,
   });
@@ -1280,7 +1280,7 @@ const callback: ApproveStageCallback = ({ stage, payload }) => {
 try {
   const approveResult = await lidoSDK.withdrawals.approveStethMultisig({
     amount,
-    contract, // 'stETH' | 'wstETH'
+    token, // 'stETH' | 'wstETH'
     callback,
     account,
   });
@@ -1333,7 +1333,7 @@ const callback: ApproveStageCallback = ({ stage, payload }) => {
 try {
   const approveResult = await lidoSDK.withdrawals.approveWstethMultisig({
     amount,
-    contract, // 'stETH' | 'wstETH'
+    token, // 'stETH' | 'wstETH'
     callback,
     account,
   });

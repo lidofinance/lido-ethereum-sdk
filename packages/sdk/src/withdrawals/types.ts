@@ -57,21 +57,21 @@ export type PermitWstETHStETHProps = {
 };
 
 export type PermitProps = PermitWstETHStETHProps & {
-  contract: 'stETH' | 'wstETH';
+  token: 'stETH' | 'wstETH';
 };
 
 export type RequestWithPermitProps = {
   account: Address;
   amount: string;
   requests: readonly bigint[];
-  contract: 'stETH' | 'wstETH';
+  token: 'stETH' | 'wstETH';
   callback?: RequestStageCallback;
 };
 
 export type RequestProps = {
   account: Address;
   requests: readonly bigint[];
-  contract: 'stETH' | 'wstETH';
+  token: 'stETH' | 'wstETH';
   callback?: RequestStageCallback;
 };
 
@@ -140,6 +140,6 @@ export type ApproveStageCallback = (props: ApproveCallbackProps) => void;
 export type ApproveProps = {
   account: Address;
   amount: string;
-  contract: 'stETH' | 'wstETH';
+  token: 'stETH' | 'wstETH';
   callback?: ApproveStageCallback;
 };
