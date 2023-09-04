@@ -1,13 +1,13 @@
-import { callConsoleMessage } from "./utils.js";
-import { HeadMessage } from "./types.js";
+import { callConsoleMessage } from './utils.js';
+import { HeadMessage } from './types.js';
 
-export const Logger = function (headMessage: HeadMessage = "LOG:") {
+export const Logger = function (headMessage: HeadMessage = 'LOG:') {
   return function LoggerMethod<This, Args extends any[], Return>(
     originalMethod: (this: This, ...args: Args) => Return,
     context: ClassMethodDecoratorContext<
       This,
       (this: This, ...args: Args) => Return
-    >
+    >,
   ) {
     const methodName = String(context.name);
 
@@ -24,8 +24,8 @@ export const Logger = function (headMessage: HeadMessage = "LOG:") {
           .catch((error) => {
             callConsoleMessage(
               headMessage,
-              `Exiting method '${methodName}' with error: ${error}.`,
-              "Error:"
+              `Exiting method '${methodName}' with error.`,
+              'Error:',
             );
             throw error;
           }) as Return;
