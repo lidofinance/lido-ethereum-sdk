@@ -258,6 +258,10 @@ const lidoSDK = new LidoSDK({
   chainId: 5,
 });
 
-const stethAddress = await core.getContractAddress(LIDO_CONTRACT_NAMES.lido);
-const wsteth = await core.getContractAddress(LIDO_CONTRACT_NAMES.wsteth);
+const stethAddress = await lidoSDK.core.getContractAddress(
+  LIDO_CONTRACT_NAMES.lido,
+);
+const wsteth = await lidoSDK.core.getContractAddress(
+  LIDO_CONTRACT_NAMES.wsteth,
+);
 ```
