@@ -1,5 +1,1 @@
-export class LidoSDKWithdrawals {
-  constructor() {
-    console.log("LidoSDKWithdrawals");
-  }
-}
+export { LidoSDKWithdrawals } from './withdrawals.js';

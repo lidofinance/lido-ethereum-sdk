@@ -2636,6 +2636,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@lidofinance/lido-ethereum-sdk@workspace:packages/sdk"
   dependencies:
+    "@ethersproject/bytes": ^5.7.0
     "@types/fs-extra": ^11.0.1
     fs-extra: ^11.1.1
     rimraf: ^5.0.1
