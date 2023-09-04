@@ -2,7 +2,7 @@ name: Publish to registry
 on:
   push:
     branches:
-      - "main"
+      - 'main'
 
 permissions:
   contents: write
@@ -30,7 +30,9 @@ jobs:
         run: yarn build:packages
 
       - name: Authenticate in npm
-        run: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+        run: |
+          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
+          echo "workspaces-update = false" >> .npmrc
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
