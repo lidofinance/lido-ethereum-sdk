@@ -68,10 +68,17 @@ export type RequestWithPermitProps = {
   callback?: RequestStageCallback;
 };
 
-export enum RequestCallbackStage {
+export type RequestProps = {
+  account: Address;
+  requests: readonly bigint[];
+  contract: 'stETH' | 'wstETH';
+  callback?: RequestStageCallback;
+};
+
+export enum RequestCallbackStages {
   'BUNKER' = 'bunker',
   'PERMIT' = 'permit',
-  'APPROVE' = 'approve',
+  'GAS_LIMIT' = 'gas_limit',
   'SIGN' = 'sign',
   'RECEIPT' = 'receipt',
   'CONFIRMATION' = 'confirmation',
@@ -81,14 +88,58 @@ export enum RequestCallbackStage {
 }
 
 export type RequestCallbackProps =
-  | { stage: RequestCallbackStage.BUNKER; payload?: undefined }
-  | { stage: RequestCallbackStage.PERMIT; payload?: undefined }
-  | { stage: RequestCallbackStage.APPROVE; payload?: undefined }
-  | { stage: RequestCallbackStage.SIGN; payload?: undefined }
-  | { stage: RequestCallbackStage.RECEIPT; payload: Hash }
-  | { stage: RequestCallbackStage.CONFIRMATION; payload: TransactionReceipt }
-  | { stage: RequestCallbackStage.DONE; payload: bigint }
-  | { stage: RequestCallbackStage.MULTISIG_DONE; payload?: undefined }
-  | { stage: RequestCallbackStage.ERROR; payload: SDKError };
+  | { stage: RequestCallbackStages.BUNKER; payload?: undefined }
+  | { stage: RequestCallbackStages.PERMIT; payload?: undefined }
+  | { stage: RequestCallbackStages.GAS_LIMIT; payload?: undefined }
+  | { stage: RequestCallbackStages.SIGN; payload?: bigint }
+  | { stage: RequestCallbackStages.RECEIPT; payload: Hash }
+  | { stage: RequestCallbackStages.CONFIRMATION; payload: TransactionReceipt }
+  | { stage: RequestCallbackStages.DONE; payload: bigint }
+  | { stage: RequestCallbackStages.MULTISIG_DONE; payload?: undefined }
+  | { stage: RequestCallbackStages.ERROR; payload: SDKError };
 
 export type RequestStageCallback = (props: RequestCallbackProps) => void;
+
+export type Signature = {
+  v: number;
+  r: `0x${string}`;
+  s: `0x${string}`;
+  value: bigint;
+  deadline: bigint;
+  chainId: bigint | number;
+  nonce: `0x${string}`;
+  owner: Address;
+  spender: Address;
+};
+
+export enum ApproveCallbackStages {
+  'GAS_LIMIT' = 'gas_limit',
+  'SIGN' = 'sign',
+  'RECEIPT' = 'receipt',
+  'CONFIRMATION' = 'confirmation',
+  'DONE' = 'done',
+  'MULTISIG_DONE' = 'multisig_done',
+  'ERROR' = 'error',
+}
+
+export type ApproveCallbackProps =
+  | { stage: ApproveCallbackStages.GAS_LIMIT; payload?: undefined }
+  | { stage: ApproveCallbackStages.SIGN; payload?: bigint }
+  | { stage: ApproveCallbackStages.SIGN; payload: Hash }
+  | { stage: ApproveCallbackStages.RECEIPT; payload: Hash }
+  | {
+      stage: ApproveCallbackStages.CONFIRMATION;
+      payload: TransactionReceipt;
+    }
+  | { stage: ApproveCallbackStages.DONE; payload: bigint }
+  | { stage: ApproveCallbackStages.MULTISIG_DONE; payload?: undefined }
+  | { stage: ApproveCallbackStages.ERROR; payload: SDKError };
+
+export type ApproveStageCallback = (props: ApproveCallbackProps) => void;
+
+export type ApproveProps = {
+  account: Address;
+  amount: string;
+  contract: 'stETH' | 'wstETH';
+  callback?: ApproveStageCallback;
+};

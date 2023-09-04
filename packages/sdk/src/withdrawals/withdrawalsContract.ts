@@ -69,7 +69,7 @@ export class LidoSDKWithdrawalsContract {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
   public async getContractStETH(): Promise<
-    GetContractReturnType<typeof PartStethAbi, PublicClient>
+    GetContractReturnType<typeof PartStethAbi, PublicClient, WalletClient>
   > {
     const address = await this.contractAddressStETH();
 
@@ -77,6 +77,7 @@ export class LidoSDKWithdrawalsContract {
       address,
       abi: PartStethAbi,
       publicClient: this.core.rpcProvider,
+      walletClient: this.core.web3Provider,
     });
   }
 
@@ -91,7 +92,7 @@ export class LidoSDKWithdrawalsContract {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressWstETH'])
   public async getContractWstETH(): Promise<
-    GetContractReturnType<typeof PartWstethAbi, PublicClient>
+    GetContractReturnType<typeof PartWstethAbi, PublicClient, WalletClient>
   > {
     const address = await this.contractAddressWstETH();
 
@@ -99,6 +100,7 @@ export class LidoSDKWithdrawalsContract {
       address,
       abi: PartWstethAbi,
       publicClient: this.core.rpcProvider,
+      walletClient: this.core.web3Provider,
     });
   }
 }

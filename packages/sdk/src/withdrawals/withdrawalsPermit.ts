@@ -1,4 +1,4 @@
-import { numberToHex } from 'viem';
+import { numberToHex, isHex, stringify } from 'viem';
 import { splitSignature } from '@ethersproject/bytes';
 import invariant from 'tiny-invariant';
 
@@ -11,6 +11,7 @@ import {
   type LidoSDKWithdrawalsPermitProps,
   type PermitWstETHStETHProps,
   type PermitProps,
+  type Signature,
 } from './types.js';
 
 const EIP2612_TYPE = [
@@ -20,6 +21,22 @@ const EIP2612_TYPE = [
   { name: 'nonce', type: 'uint256' },
   { name: 'deadline', type: 'uint256' },
 ];
+
+const TYPES = {
+  EIP712Domain: [
+    { name: 'name', type: 'string' },
+    { name: 'version', type: 'string' },
+    {
+      name: 'chainId',
+      type: 'uint256',
+    },
+    {
+      name: 'verifyingContract',
+      type: 'address',
+    },
+  ],
+  Permit: EIP2612_TYPE,
+};
 
 export class LidoSDKWithdrawalsPermit {
   readonly core: LidoSDKCore;
@@ -46,7 +63,9 @@ export class LidoSDKWithdrawalsPermit {
   }
 
   @Logger('Permit:')
-  public async stethPermitSignature(props: PermitWstETHStETHProps) {
+  public async stethPermitSignature(
+    props: PermitWstETHStETHProps,
+  ): Promise<Signature> {
     const { amount, account, spender, deadline } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
 
@@ -69,23 +88,21 @@ export class LidoSDKWithdrawalsPermit {
       nonce: numberToHex(nonce),
       deadline: numberToHex(deadline),
     };
-    const types = {
-      Permit: EIP2612_TYPE,
-    };
+    const typedData = stringify(
+      { domain, primaryType: 'Permit', types: TYPES, message },
+      (_, value) => (isHex(value) ? value.toLowerCase() : value),
+    );
 
     const signature = await this.core.web3Provider.request({
       method: 'eth_signTypedData_v4',
-      params: [
-        account,
-        JSON.stringify({ domain, types, message, primaryType: 'Permit' }),
-      ],
+      params: [account, typedData],
     });
     const { s, r, v } = splitSignature(signature);
 
     return {
       v,
-      r,
-      s,
+      r: r as `0x${string}`,
+      s: s as `0x${string}`,
       value: amount,
       deadline,
       chainId: chainId,
@@ -96,7 +113,9 @@ export class LidoSDKWithdrawalsPermit {
   }
 
   @Logger('Permit:')
-  public async wstethPermitSignature(props: PermitWstETHStETHProps) {
+  public async wstethPermitSignature(
+    props: PermitWstETHStETHProps,
+  ): Promise<Signature> {
     const { amount, account, spender, deadline } = props;
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
 
@@ -117,23 +136,21 @@ export class LidoSDKWithdrawalsPermit {
       nonce: numberToHex(nonce),
       deadline: numberToHex(deadline),
     };
-    const types = {
-      Permit: EIP2612_TYPE,
-    };
+    const typedData = stringify(
+      { domain, primaryType: 'Permit', TYPES, message },
+      (_, value) => (isHex(value) ? value.toLowerCase() : value),
+    );
 
     const signature = await this.core.web3Provider.request({
       method: 'eth_signTypedData_v4',
-      params: [
-        account,
-        JSON.stringify({ domain, types, message, primaryType: 'Permit' }),
-      ],
+      params: [account, typedData],
     });
     const { s, r, v } = splitSignature(signature);
 
     return {
       v,
-      r,
-      s,
+      r: r as `0x${string}`,
+      s: s as `0x${string}`,
       value: amount,
       deadline,
       chainId: this.core.chain.id,
