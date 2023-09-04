@@ -11,23 +11,25 @@ import {
   type Hash,
   type WriteContractParameters,
   type FormattedTransactionRequest,
-} from "viem";
-import invariant from "tiny-invariant";
-import { LidoSDKCore } from "../core/index.js";
-import { ErrorHandler, Logger, Cache } from "../common/decorators/index.js";
-import { TOKENS, getTokenAddress } from "@lido-sdk/constants";
+} from 'viem';
+import invariant from 'tiny-invariant';
+import { LidoSDKCore } from '../core/index.js';
+import { Logger, Cache } from '../common/decorators/index.js';
 
-import { SUBMIT_EXTRA_GAS_TRANSACTION_RATIO } from "../common/constants.js";
-import { version } from "../version.js";
+import {
+  SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
+  LIDO_CONTRACT_NAMES,
+} from '../common/constants.js';
+import { version } from '../version.js';
 
-import { abi } from "./abi/steth.js";
+import { abi } from './abi/steth.js';
 import {
   LidoSDKStakingProps,
   StakeCallbackStage,
   StakeProps,
   StakeResult,
   StakeEncodeDataProps,
-} from "./types.js";
+} from './types.js';
 
 export class LidoSDKStaking {
   readonly core: LidoSDKCore;
@@ -41,30 +43,33 @@ export class LidoSDKStaking {
 
   // Balances
 
-  @Logger("Balances:")
-  @Cache(10 * 1000, ["core.chain.id"])
-  public balanceStETH(address: Address): Promise<bigint> {
-    return this.getContractStETH().read.balanceOf([address]);
+  @Logger('Balances:')
+  @Cache(10 * 1000, ['core.chain.id'])
+  public async balanceStETH(address: Address): Promise<bigint> {
+    const contract = await this.getContractStETH();
+
+    return contract.read.balanceOf([address]);
   }
 
   // Contracts
 
-  @Logger("Contracts:")
-  @Cache(30 * 60 * 1000, ["core.chain.id"])
-  public contractAddressStETH(): Address {
-    invariant(this.core.chain, "Chain is not defined");
-    return getTokenAddress(this.core.chain?.id, TOKENS.STETH) as Address;
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  public async contractAddressStETH(): Promise<Address> {
+    invariant(this.core.chain, 'Chain is not defined');
+
+    return await this.core.getContractAddress(LIDO_CONTRACT_NAMES.lido);
   }
 
-  @Logger("Contracts:")
-  @Cache(30 * 60 * 1000, ["core.chain.id", "contractAddressStETH"])
-  public getContractStETH(): GetContractReturnType<
-    typeof abi,
-    PublicClient,
-    WalletClient
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
+  public async getContractStETH(): Promise<
+    GetContractReturnType<typeof abi, PublicClient, WalletClient>
   > {
+    const address = await this.contractAddressStETH();
+
     return getContract({
-      address: this.contractAddressStETH(),
+      address,
       abi: abi,
       publicClient: this.core.rpcProvider,
       walletClient: this.core.web3Provider,
@@ -73,10 +78,9 @@ export class LidoSDKStaking {
 
   // Calls
 
-  @ErrorHandler("Call:")
-  @Logger("Call:")
+  @Logger('Call:')
   public async stake(props: StakeProps): Promise<StakeResult> {
-    invariant(this.core.web3Provider, "Web3 provider is not defined");
+    invariant(this.core.web3Provider, 'Web3 provider is not defined');
 
     const { callback, account } = props;
     try {
@@ -97,13 +101,12 @@ export class LidoSDKStaking {
     }
   }
 
-  @ErrorHandler("Call:")
-  @Logger("LOG:")
+  @Logger('LOG:')
   private async stakeEOA(props: StakeProps): Promise<StakeResult> {
     const { value, callback, referralAddress = zeroAddress, account } = props;
 
-    invariant(this.core.rpcProvider, "RPC provider is not defined");
-    invariant(this.core.web3Provider, "Web3 provider is not defined");
+    invariant(this.core.rpcProvider, 'RPC provider is not defined');
+    invariant(this.core.web3Provider, 'Web3 provider is not defined');
     // Checking the daily protocol staking limit
     await this.validateStakeLimit(value);
 
@@ -115,16 +118,14 @@ export class LidoSDKStaking {
 
     callback?.({ stage: StakeCallbackStage.SIGN });
 
-    const transaction = await this.getContractStETH().write.submit(
-      [referralAddress],
-      {
-        ...overrides,
-        value: parseEther(value),
-        chain: this.core.chain,
-        gas: gasLimit,
-        account,
-      },
-    );
+    const contract = await this.getContractStETH();
+    const transaction = await contract.write.submit([referralAddress], {
+      ...overrides,
+      value: parseEther(value),
+      chain: this.core.chain,
+      gas: gasLimit,
+      account,
+    });
 
     callback?.({ stage: StakeCallbackStage.RECEIPT, payload: transaction });
 
@@ -148,38 +149,35 @@ export class LidoSDKStaking {
     return { hash: transaction, receipt: transactionReceipt, confirmations };
   }
 
-  @ErrorHandler("Call:")
-  @Logger("LOG:")
+  @Logger('LOG:')
   private async stakeMultisig(props: StakeProps): Promise<StakeResult> {
     const { value, callback, referralAddress = zeroAddress, account } = props;
 
     callback?.({ stage: StakeCallbackStage.SIGN });
 
-    const transaction = await this.getContractStETH().write.submit(
-      [referralAddress],
-      {
-        value: parseEther(value),
-        chain: this.core.chain,
-        account,
-      },
-    );
+    const contract = await this.getContractStETH();
+    const transaction = await contract.write.submit([referralAddress], {
+      value: parseEther(value),
+      chain: this.core.chain,
+      account,
+    });
 
     callback?.({ stage: StakeCallbackStage.MULTISIG_DONE });
 
     return { hash: transaction };
   }
 
-  @ErrorHandler("Call:")
-  @Logger("Call:")
+  @Logger('Call:')
   public async stakeSimulateTx(
     props: StakeProps,
   ): Promise<WriteContractParameters> {
     const { referralAddress = zeroAddress, value, account } = props;
 
+    const address = await this.contractAddressStETH();
     const { request } = await this.core.rpcProvider.simulateContract({
-      address: this.contractAddressStETH(),
+      address,
       abi,
-      functionName: "submit",
+      functionName: 'submit',
       account,
       args: [referralAddress],
       value: parseEther(value),
@@ -190,18 +188,18 @@ export class LidoSDKStaking {
 
   // Views
 
-  @ErrorHandler("Views:")
-  @Logger("Views:")
-  @Cache(30 * 1000, ["core.chain.id"])
-  public getStakeLimitInfo() {
-    return this.getContractStETH().read.getStakeLimitFullInfo();
+  @Logger('Views:')
+  @Cache(30 * 1000, ['core.chain.id'])
+  public async getStakeLimitInfo() {
+    const contract = await this.getContractStETH();
+
+    return contract.read.getStakeLimitFullInfo();
   }
 
   // Utils
 
-  @ErrorHandler("Call:")
-  @Logger("Utils:")
-  @Cache(30 * 1000, ["core.chain.id"])
+  @Logger('Utils:')
+  @Cache(30 * 1000, ['core.chain.id'])
   private async submitGasLimit(
     account: Address,
     value: string,
@@ -215,7 +213,7 @@ export class LidoSDKStaking {
       maxFeePerGas: bigint | undefined;
     };
   }> {
-    invariant(this.core.web3Provider, "Web3 provider is not defined");
+    invariant(this.core.web3Provider, 'Web3 provider is not defined');
 
     const feeData = await this.core.getFeeData();
 
@@ -226,7 +224,8 @@ export class LidoSDKStaking {
       maxFeePerGas: feeData.maxFeePerGas ?? undefined,
     };
 
-    const originalGasLimit = await this.getContractStETH().estimateGas.submit(
+    const contract = await this.getContractStETH();
+    const originalGasLimit = await contract.estimateGas.submit(
       [referralAddress],
       overrides,
     );
@@ -241,8 +240,7 @@ export class LidoSDKStaking {
     return { gasLimit, overrides };
   }
 
-  @ErrorHandler("Utils:")
-  @Logger("Utils:")
+  @Logger('Utils:')
   private async validateStakeLimit(value: string): Promise<void> {
     const currentStakeLimit = (await this.getStakeLimitInfo())[3];
     const parsedValue = parseEther(value);
@@ -254,29 +252,28 @@ export class LidoSDKStaking {
     }
   }
 
-  @ErrorHandler("Utils:")
-  @Logger("Utils:")
+  @Logger('Utils:')
   private stakeEncodeData(props: StakeEncodeDataProps): Hash {
     const { referralAddress = zeroAddress } = props;
 
     return encodeFunctionData({
       abi,
-      functionName: "submit",
+      functionName: 'submit',
       args: [referralAddress],
     });
   }
 
-  @ErrorHandler("Utils:")
-  @Logger("Utils:")
-  public stakePopulateTx(
+  @Logger('Utils:')
+  public async stakePopulateTx(
     props: StakeProps,
-  ): Omit<FormattedTransactionRequest, "type"> {
+  ): Promise<Omit<FormattedTransactionRequest, 'type'>> {
     const { referralAddress = zeroAddress, value, account } = props;
 
     const data = this.stakeEncodeData({ referralAddress });
+    const address = await this.contractAddressStETH();
 
     return {
-      to: this.contractAddressStETH(),
+      to: address,
       from: account,
       value: parseEther(value),
       data,
