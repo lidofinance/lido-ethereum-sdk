@@ -32,7 +32,10 @@ The project is currently under development and may change in the future.
     - [Set allowance of WithdrawalQueue contract](#set-allowance-of-withdrawalqueue-contract)
     - [`Allowance` other methods](#allowance-other-methods)
 
-  - [Views] TODO
+  - [Views](#views)
+
+    - [Constants](#constants)
+    - [Requests info](#requests-info)
 
 - [Lido contract addresses](#lido-contract-addresses)
 
@@ -504,6 +507,113 @@ try {
 - approveStethMultisig
 - approveWstethMultisig
 - approveMultisigByToken
+
+### Views
+
+- getWithdrawalRequestsIds
+- getLastCheckpointIndex
+- getWithdrawalStatus
+- findCheckpointHints
+- getClaimableEther
+- getUnfinalizedStETH
+
+#### Constants
+
+- minStethWithdrawalAmount
+- maxStethWithdrawalAmount
+- isPaused
+- isBunkerModeActive
+- isTurboModeActive
+
+#### Requests info
+
+###### `getWithdrawalRequestsInfo`
+
+###### Input Parameters:
+
+- `props: { account: Address }`
+  - `account` (Type: Address): The account address.
+
+##### Output Parameters:
+
+- Type: Object
+- Structure:
+
+  - `claimableInfo` (Type: Object): Information about withdrawal requests that can be claimed.
+    - `claimableRequests` (Type: Array[RequestStatusWithId]): A list of requests with their statuses and identifiers.
+    - `claimableAmountStETH` (Type: bigint): The amount of ETH available for claiming.
+  - `pendingInfo` (Type: Object): Information about pending withdrawal requests.
+    - `pendingRequests` (Type: Array[RequestStatusWithId]): A list of requests with their statuses and identifiers.
+    - `pendingAmountStETH` (Type: bigint): The amount of ETH pending for withdrawal.
+  - `claimableETH` (Type: bigint): The amount of ETH available for claiming.
+
+###### `getWithdrawalRequestsStatus`
+
+###### Input Parameters:
+
+- `props: { account: Address }`
+  - `account` (Type: Address): The account address.
+
+##### Output Parameters:
+
+- Type: Array of RequestStatusWithId objects
+- Structure of each object:
+
+  - `id` (Type: bigint): The request identifier.
+  - `isFinalized` (Type: boolean): A flag indicating whether the request has been finalized.
+  - `isClaimed` (Type: boolean): A flag indicating whether the request has already been claimed.
+  - `amountOfStETH` (Type: bigint): The amount of stETH to be withdrawn.
+  - `amountOfShares` (Type: bigint): The amount of shares to be burned.
+  - `owner` (Type: Address): The account address that initiated the request.
+  - `timestamp` (Type: bigint): The timestamp of the request.
+  - `stringId` (Type: string): The request identifier in string format.
+
+###### `getClaimableRequestsInfo`
+
+###### Input Parameters:
+
+- `props: { account: Address }`
+  - `account` (Type: Address): The account address.
+
+###### Output Parameters:
+
+- Type: Object
+- Structure:
+
+  - `claimableRequests` (Type: Array[RequestStatusWithId]): A list of requests that can be claimed.
+  - `claimableAmountStETH` (Type: bigint): The amount of ETH available for claiming.
+
+###### `getClaimableRequestsETH`
+
+###### Input Parameters:
+
+- `props: { claimableRequestsIds: (bigint | RequestStatusWithId)[] }`
+  - `claimableRequestsIds` (Type: Array): An array of request identifiers for which information is needed.
+
+###### Output Parameters:
+
+- Type: Object
+- Structure:
+
+  - `ethByRequests` (Type: Array of bigint): A list of ETH amounts for each request.
+  - `ethSum` (Type: bigint): The sum of all ETH amounts in the list.
+
+- getPendingRequestsInfo
+
+###### `getPendingRequestsInfo`
+
+##### Input Parameters:
+
+- `props: { account: Address }`
+  - `account` (Type: Address): The account address.
+
+##### Output Parameters:
+
+- Type: Object
+- Structure:
+
+  - `pendingRequests` (Type: Array[RequestStatusWithId]): A list of requests pending finalization.
+  - `pendingAmountStETH` (Type: bigint): The amount of ETH pending claiming.
 
 ## Lido contract addresses
 
