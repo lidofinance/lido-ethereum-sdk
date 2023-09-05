@@ -410,17 +410,18 @@ try {
 
 ##### EOA
 
-- requestWithPermit
 - requestStethWithPermit
 - requestWstethWithPermit
 - requestStethWithoutPermit
 - requestWstethWithoutPermit
+- requestWithoutPermitByToken
+- requestWithPermitByToken
 
 ##### Multisig
 
-- requestMultisig
 - requestStethMultisig
 - requestWstethMultisig
+- requestMultisigByToken
 
 ### Utils
 
@@ -473,7 +474,7 @@ const callback: ApproveStageCallback = ({ stage, payload }) => {
 };
 
 try {
-  const approveResult = await lidoSDK.withdrawals.approve({
+  const approveResult = await lidoSDK.withdrawals.approval.approve({
     amount,
     token, // 'stETH' | 'wstETH'
     callback,
@@ -496,12 +497,13 @@ try {
 - approveEOA
 - approveSteth
 - approveWsteth
+- approveByToken
 
 ##### Multisig
 
-- approveMultisig
 - approveStethMultisig
 - approveWstethMultisig
+- approveMultisigByToken
 
 ## Lido contract addresses
 

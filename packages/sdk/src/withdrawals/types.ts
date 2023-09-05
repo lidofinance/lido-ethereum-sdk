@@ -29,6 +29,11 @@ export type LidoSDKWithdrawalsPermitProps = LidoSDKCoreProps & {
   contract?: LidoSDKWithdrawalsContract;
 };
 
+export type LidoSDKWithdrawalsApproveProps = LidoSDKCoreProps & {
+  core?: LidoSDKCore;
+  contract?: LidoSDKWithdrawalsContract;
+};
+
 export type RequestStatus = {
   amountOfStETH: bigint;
   amountOfShares: bigint;
