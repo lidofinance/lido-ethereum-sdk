@@ -3,35 +3,8 @@ import { type Address, type Hash, type TransactionReceipt } from 'viem';
 import { type LidoSDKCoreProps, type LidoSDKCore } from '../core/index.js';
 import { type SDKError } from '../common/utils/index.js';
 
-import { type LidoSDKWithdrawalsContract } from './withdrawalsContract.js';
-import { type LidoSDKWithdrawalsViews } from './withdrawalsViews.js';
-
 export type LidoSDKWithdrawalsProps = LidoSDKCoreProps & {
   core?: LidoSDKCore;
-};
-
-export type LidoSDKWithdrawalsContractProps = LidoSDKCoreProps & {
-  core?: LidoSDKCore;
-};
-
-export type LidoSDKWithdrawalsViewsProps = LidoSDKCoreProps & {
-  core?: LidoSDKCore;
-  contract?: LidoSDKWithdrawalsContract;
-};
-
-export type LidoSDKWithdrawalsRequestsInfoProps = LidoSDKCoreProps & {
-  core?: LidoSDKCore;
-  views?: LidoSDKWithdrawalsViews;
-};
-
-export type LidoSDKWithdrawalsPermitProps = LidoSDKCoreProps & {
-  core?: LidoSDKCore;
-  contract?: LidoSDKWithdrawalsContract;
-};
-
-export type LidoSDKWithdrawalsApproveProps = LidoSDKCoreProps & {
-  core?: LidoSDKCore;
-  contract?: LidoSDKWithdrawalsContract;
 };
 
 export type RequestStatus = {

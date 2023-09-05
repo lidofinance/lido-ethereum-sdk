@@ -1,4 +1,4 @@
-import { maxUint256, parseEther, type Address, type Account } from 'viem';
+import { maxUint256, parseEther, type Address } from 'viem';
 import invariant from 'tiny-invariant';
 
 import { LidoSDKCore } from '../core/index.js';
@@ -10,6 +10,7 @@ import { LidoSDKWithdrawalsViews } from './withdrawalsViews.js';
 import { LidoSDKWithdrawalsRequestsInfo } from './withdrawalsRequestsInfo.js';
 import { LidoSDKWithdrawalsPermit } from './withdrawalsPermit.js';
 import { LidoSDKWithdrawalsApprove } from './withdrawalsApprove.js';
+import { Bus } from './bus.js';
 import {
   type LidoSDKWithdrawalsProps,
   type RequestWithPermitProps,
@@ -21,6 +22,8 @@ import {
 const INFINITY_DEADLINE_VALUE = maxUint256;
 
 export class LidoSDKWithdrawals {
+  readonly bus: Bus;
+
   readonly core: LidoSDKCore;
   readonly contract: LidoSDKWithdrawalsContract;
   readonly views: LidoSDKWithdrawalsViews;
@@ -29,28 +32,14 @@ export class LidoSDKWithdrawals {
   readonly approval: LidoSDKWithdrawalsApprove;
 
   constructor(props: LidoSDKWithdrawalsProps) {
-    const { core, ...rest } = props;
+    this.bus = new Bus(props, version);
 
-    if (core) this.core = core;
-    else this.core = new LidoSDKCore(rest, version);
-
-    this.contract = new LidoSDKWithdrawalsContract(props);
-    this.views = new LidoSDKWithdrawalsViews({
-      ...props,
-      contract: this.contract,
-    });
-    this.requestsInfo = new LidoSDKWithdrawalsRequestsInfo({
-      ...props,
-      views: this.views,
-    });
-    this.permit = new LidoSDKWithdrawalsPermit({
-      ...props,
-      contract: this.contract,
-    });
-    this.approval = new LidoSDKWithdrawalsApprove({
-      ...props,
-      contract: this.contract,
-    });
+    this.core = this.bus.core;
+    this.contract = this.bus.contract;
+    this.views = this.bus.views;
+    this.requestsInfo = this.bus.requestsInfo;
+    this.permit = this.bus.permit;
+    this.approval = this.bus.approval;
   }
 
   // Calls

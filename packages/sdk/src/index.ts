@@ -7,9 +7,11 @@ export {
   StakeProps,
 } from './staking/index.js';
 export {
-  RequestProps,
-  RequestWithPermitProps,
   RequestCallbackStages,
   RequestStageCallback,
+  RequestProps,
+  RequestWithPermitProps,
+  ApproveCallbackStages,
+  ApproveStageCallback,
 } from './withdrawals/index.js';
 export { LIDO_CONTRACT_NAMES } from './common/constants.js';

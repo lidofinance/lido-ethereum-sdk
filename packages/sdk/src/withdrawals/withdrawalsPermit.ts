@@ -2,13 +2,12 @@ import { numberToHex, isHex, stringify } from 'viem';
 import { splitSignature } from '@ethersproject/bytes';
 import invariant from 'tiny-invariant';
 
-import { LidoSDKCore } from '../core/index.js';
 import { Logger } from '../common/decorators/index.js';
 import { version } from '../version.js';
+import { type LidoSDKCoreProps } from '../core/index.js';
 
-import { LidoSDKWithdrawalsContract } from './withdrawalsContract.js';
+import { Bus } from './bus.js';
 import {
-  type LidoSDKWithdrawalsPermitProps,
   type PermitWstETHStETHProps,
   type PermitProps,
   type Signature,
@@ -39,17 +38,11 @@ const TYPES = {
 };
 
 export class LidoSDKWithdrawalsPermit {
-  readonly core: LidoSDKCore;
-  readonly contract: LidoSDKWithdrawalsContract;
+  private readonly bus: Bus;
 
-  constructor(props: LidoSDKWithdrawalsPermitProps) {
-    const { core, contract, ...rest } = props;
-
-    if (core) this.core = core;
-    else this.core = new LidoSDKCore(rest, version);
-
-    if (contract) this.contract = contract;
-    else this.contract = new LidoSDKWithdrawalsContract(props);
+  constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
+    if (props.bus) this.bus = props.bus;
+    else this.bus = new Bus(props, version);
   }
 
   // Calls
@@ -67,9 +60,9 @@ export class LidoSDKWithdrawalsPermit {
     props: PermitWstETHStETHProps,
   ): Promise<Signature> {
     const { amount, account, spender, deadline } = props;
-    invariant(this.core.web3Provider, 'Web3 provider is not defined');
+    invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
 
-    const contract = await this.contract.getContractStETH();
+    const contract = await this.bus.contract.getContractStETH();
 
     const [name, version, chainId, verifyingContract] =
       await contract.read.eip712Domain();
@@ -93,7 +86,7 @@ export class LidoSDKWithdrawalsPermit {
       (_, value) => (isHex(value) ? value.toLowerCase() : value),
     );
 
-    const signature = await this.core.web3Provider.request({
+    const signature = await this.bus.core.web3Provider.request({
       method: 'eth_signTypedData_v4',
       params: [account, typedData],
     });
@@ -117,14 +110,14 @@ export class LidoSDKWithdrawalsPermit {
     props: PermitWstETHStETHProps,
   ): Promise<Signature> {
     const { amount, account, spender, deadline } = props;
-    invariant(this.core.web3Provider, 'Web3 provider is not defined');
+    invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
 
-    const contract = await this.contract.getContractWstETH();
+    const contract = await this.bus.contract.getContractWstETH();
 
     const domain = {
       name: 'Wrapped liquid staked Ether 2.0',
       version: '1',
-      chainId: this.core.chain.id,
+      chainId: this.bus.core.chain.id,
       verifyingContract: contract.address,
     };
     const nonce = await contract.read.nonces([account]);
@@ -141,7 +134,7 @@ export class LidoSDKWithdrawalsPermit {
       (_, value) => (isHex(value) ? value.toLowerCase() : value),
     );
 
-    const signature = await this.core.web3Provider.request({
+    const signature = await this.bus.core.web3Provider.request({
       method: 'eth_signTypedData_v4',
       params: [account, typedData],
     });
@@ -153,7 +146,7 @@ export class LidoSDKWithdrawalsPermit {
       s: s as `0x${string}`,
       value: amount,
       deadline,
-      chainId: this.core.chain.id,
+      chainId: this.bus.core.chain.id,
       nonce: message.nonce,
       owner: account,
       spender,

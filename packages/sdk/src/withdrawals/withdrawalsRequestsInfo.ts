@@ -1,39 +1,25 @@
 import { type Address } from 'viem';
 
-import { LidoSDKCore } from '../core/index.js';
 import { Logger, Cache } from '../common/decorators/index.js';
 import { isBigint } from '../common/utils/index.js';
 import { version } from '../version.js';
+import { type LidoSDKCoreProps } from '../core/index.js';
 
-import { LidoSDKWithdrawalsViews } from './withdrawalsViews.js';
-
-import {
-  type LidoSDKWithdrawalsRequestsInfoProps,
-  type RequestStatusWithId,
-} from './types.js';
+import { Bus } from './bus.js';
+import { type RequestStatusWithId } from './types.js';
 
 export class LidoSDKWithdrawalsRequestsInfo {
-  readonly core: LidoSDKCore;
-  readonly views: LidoSDKWithdrawalsViews;
+  private readonly bus: Bus;
 
-  constructor(props: LidoSDKWithdrawalsRequestsInfoProps) {
-    const { core, views, ...rest } = props;
-
-    if (core) this.core = core;
-    else this.core = new LidoSDKCore(rest, version);
-
-    if (views) this.views = views;
-    else
-      this.views = new LidoSDKWithdrawalsViews({
-        ...props,
-        core: this.core,
-      });
+  constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
+    if (props.bus) this.bus = props.bus;
+    else this.bus = new Bus(props, version);
   }
 
   // Utils
 
   @Logger('Utils:')
-  @Cache(10 * 1000, ['core.chain.id'])
+  @Cache(10 * 1000, ['bus.core.chain.id'])
   public async getWithdrawalRequestsInfo(props: { account: Address }) {
     const { account } = props;
 
@@ -51,19 +37,19 @@ export class LidoSDKWithdrawalsRequestsInfo {
   }
 
   @Logger('Utils:')
-  @Cache(10 * 1000, ['core.chain.id'])
+  @Cache(10 * 1000, ['bus.core.chain.id'])
   public async getWithdrawalRequestsStatus(props: {
     account: Address;
   }): Promise<readonly RequestStatusWithId[]> {
-    const requestsIds = await this.views.getWithdrawalRequestsIds({
+    const requestsIds = await this.bus.views.getWithdrawalRequestsIds({
       account: props.account,
     });
 
-    return this.views.getWithdrawalStatus({ requestsIds });
+    return this.bus.views.getWithdrawalStatus({ requestsIds });
   }
 
   @Logger('Utils:')
-  @Cache(30 * 1000, ['core.chain.id'])
+  @Cache(30 * 1000, ['bus.core.chain.id'])
   public async getClaimableRequestsInfo(props: { account: Address }): Promise<{
     claimableRequests: RequestStatusWithId[];
     claimableAmountStETH: bigint;
@@ -86,7 +72,7 @@ export class LidoSDKWithdrawalsRequestsInfo {
   }
 
   @Logger('Utils:')
-  @Cache(30 * 1000, ['core.chain.id'])
+  @Cache(30 * 1000, ['bus.core.chain.id'])
   public async getClaimableRequestsETH(props: {
     claimableRequestsIds: (bigint | RequestStatusWithId)[];
   }): Promise<{ ethByRequests: readonly bigint[]; ethSum: bigint }> {
@@ -103,12 +89,12 @@ export class LidoSDKWithdrawalsRequestsInfo {
       })
       .map((req) => (isBigint(req) ? req : req.id));
 
-    const hints = await this.views.findCheckpointHints({
+    const hints = await this.bus.views.findCheckpointHints({
       sortedIds,
-      lastIndex: await this.views.getLastCheckpointIndex(),
+      lastIndex: await this.bus.views.getLastCheckpointIndex(),
     });
 
-    const ethByRequests = await this.views.getClaimableEther({
+    const ethByRequests = await this.bus.views.getClaimableEther({
       sortedIds,
       hints,
     });
@@ -118,7 +104,7 @@ export class LidoSDKWithdrawalsRequestsInfo {
   }
 
   @Logger('Utils:')
-  @Cache(30 * 1000, ['core.chain.id'])
+  @Cache(30 * 1000, ['bus.core.chain.id'])
   public async getPendingRequestsInfo(props: { account: Address }): Promise<{
     pendingRequests: RequestStatusWithId[];
     pendingAmountStETH: bigint;

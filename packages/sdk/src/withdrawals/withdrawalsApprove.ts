@@ -1,39 +1,28 @@
 import { parseEther, type Address } from 'viem';
 import invariant from 'tiny-invariant';
 
-import { LidoSDKCore } from '../core/index.js';
+import { type LidoSDKCoreProps } from '../core/index.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import { version } from '../version.js';
 
-import { LidoSDKWithdrawalsContract } from './withdrawalsContract.js';
-
-import {
-  type ApproveProps,
-  type LidoSDKWithdrawalsApproveProps,
-  ApproveCallbackStages,
-} from './types.js';
+import { Bus } from './bus.js';
+import { type ApproveProps, ApproveCallbackStages } from './types.js';
 
 export class LidoSDKWithdrawalsApprove {
-  private readonly core: LidoSDKCore;
-  private readonly contract: LidoSDKWithdrawalsContract;
+  private readonly bus: Bus;
 
-  constructor(props: LidoSDKWithdrawalsApproveProps) {
-    const { core, contract, ...rest } = props;
-
-    if (core) this.core = core;
-    else this.core = new LidoSDKCore(rest, version);
-
-    if (contract) this.contract = contract;
-    else this.contract = new LidoSDKWithdrawalsContract(props);
+  constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
+    if (props.bus) this.bus = props.bus;
+    else this.bus = new Bus(props, version);
   }
 
   @Logger('Call:')
   public async approve(props: ApproveProps) {
     const { account } = props;
-    invariant(this.core.web3Provider, 'Web3 provider is not defined');
-    invariant(this.core.rpcProvider, 'RPC provider is not defined');
+    invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
+    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
-    const isContract = await this.core.isContract(account);
+    const isContract = await this.bus.core.isContract(account);
 
     if (isContract) return await this.approveMultisigByToken(props);
     else return await this.approveByToken(props);
@@ -41,15 +30,15 @@ export class LidoSDKWithdrawalsApprove {
 
   @Logger('Call:')
   public async approveEOA(props: ApproveProps) {
-    invariant(this.core.web3Provider, 'Web3 provider is not defined');
-    invariant(this.core.rpcProvider, 'RPC provider is not defined');
+    invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
+    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
     this.approveByToken(props);
   }
 
   @Logger('Call:')
   public async approveMultisig(props: ApproveProps) {
-    invariant(this.core.web3Provider, 'Web3 provider is not defined');
+    invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
 
     return this.approveMultisigByToken(props);
   }
@@ -70,21 +59,21 @@ export class LidoSDKWithdrawalsApprove {
   @ErrorHandler('Error:')
   private async approveByToken(props: ApproveProps) {
     const { account, amount, callback, token } = props;
-    invariant(this.core.web3Provider, 'Web3 provider is not defined');
-    invariant(this.core.rpcProvider, 'RPC provider is not defined');
+    invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
+    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
     const isSteth = token === 'stETH';
     let tokenApproveMethod;
     let gasLimitMethod;
 
     const addressWithdrawalsQueue =
-      await this.contract.contractAddressWithdrawalsQueue();
+      await this.bus.contract.contractAddressWithdrawalsQueue();
     if (isSteth) {
-      tokenApproveMethod = (await this.contract.getContractStETH()).write
+      tokenApproveMethod = (await this.bus.contract.getContractStETH()).write
         .approve;
       gasLimitMethod = this.approveStethGasLimit;
     } else {
-      tokenApproveMethod = (await this.contract.getContractWstETH()).write
+      tokenApproveMethod = (await this.bus.contract.getContractWstETH()).write
         .approve;
       gasLimitMethod = this.approveWstethGasLimit;
     }
@@ -92,7 +81,7 @@ export class LidoSDKWithdrawalsApprove {
     callback?.({ stage: ApproveCallbackStages.GAS_LIMIT });
 
     const gasLimit = await gasLimitMethod(amount, account);
-    const feeData = await this.core.getFeeData();
+    const feeData = await this.bus.core.getFeeData();
     const overrides = {
       account,
       maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? undefined,
@@ -103,7 +92,7 @@ export class LidoSDKWithdrawalsApprove {
 
     const transaction = await tokenApproveMethod(
       [addressWithdrawalsQueue, parseEther(amount)],
-      { chain: this.core.chain, ...overrides, gas: gasLimit },
+      { chain: this.bus.core.chain, ...overrides, gas: gasLimit },
     );
 
     callback?.({
@@ -112,7 +101,7 @@ export class LidoSDKWithdrawalsApprove {
     });
 
     const transactionReceipt =
-      await this.core.rpcProvider.waitForTransactionReceipt({
+      await this.bus.core.rpcProvider.waitForTransactionReceipt({
         hash: transaction,
       });
 
@@ -122,7 +111,7 @@ export class LidoSDKWithdrawalsApprove {
     });
 
     const confirmations =
-      await this.core.rpcProvider.getTransactionConfirmations({
+      await this.bus.core.rpcProvider.getTransactionConfirmations({
         hash: transactionReceipt.transactionHash,
       });
 
@@ -150,26 +139,26 @@ export class LidoSDKWithdrawalsApprove {
   @ErrorHandler('Error:')
   private async approveMultisigByToken(props: ApproveProps) {
     const { account, amount, callback, token } = props;
-    invariant(this.core.web3Provider, 'Web3 provider is not defined');
+    invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
 
     const isSteth = token === 'stETH';
     let tokenApproveMethod;
 
     if (isSteth)
-      tokenApproveMethod = (await this.contract.getContractStETH()).write
+      tokenApproveMethod = (await this.bus.contract.getContractStETH()).write
         .approve;
     else
-      tokenApproveMethod = (await this.contract.getContractWstETH()).write
+      tokenApproveMethod = (await this.bus.contract.getContractWstETH()).write
         .approve;
 
     const addressWithdrawalsQueue =
-      await this.contract.contractAddressWithdrawalsQueue();
+      await this.bus.contract.contractAddressWithdrawalsQueue();
 
     callback?.({ stage: ApproveCallbackStages.SIGN });
 
     const transaction = await tokenApproveMethod(
       [addressWithdrawalsQueue, parseEther(amount)],
-      { chain: this.core.chain, account },
+      { chain: this.bus.core.chain, account },
     );
 
     callback?.({
@@ -200,20 +189,20 @@ export class LidoSDKWithdrawalsApprove {
     account: Address,
     token: 'stETH' | 'wstETH',
   ) {
-    invariant(this.core.rpcProvider, 'RPC provider is not defined');
+    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
     const isSteth = token === 'stETH';
     let estimateGasMethod;
 
     if (isSteth)
-      estimateGasMethod = (await this.contract.getContractStETH()).estimateGas
-        .approve;
+      estimateGasMethod = (await this.bus.contract.getContractStETH())
+        .estimateGas.approve;
     else
-      estimateGasMethod = (await this.contract.getContractWstETH()).estimateGas
-        .approve;
+      estimateGasMethod = (await this.bus.contract.getContractWstETH())
+        .estimateGas.approve;
 
     const addressWithdrawalsQueue =
-      await this.contract.contractAddressWithdrawalsQueue();
+      await this.bus.contract.contractAddressWithdrawalsQueue();
 
     const gasLimit = await estimateGasMethod(
       [addressWithdrawalsQueue, parseEther(amount)],
@@ -241,19 +230,20 @@ export class LidoSDKWithdrawalsApprove {
     account: Address,
     token: 'stETH' | 'wstETH',
   ) {
-    invariant(this.core.rpcProvider, 'RPC provider is not defined');
+    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
     const isSteth = token === 'stETH';
     let allowanceMethod;
 
     if (isSteth)
-      allowanceMethod = (await this.contract.getContractStETH()).read.allowance;
+      allowanceMethod = (await this.bus.contract.getContractStETH()).read
+        .allowance;
     else
-      allowanceMethod = (await this.contract.getContractWstETH()).read
+      allowanceMethod = (await this.bus.contract.getContractWstETH()).read
         .allowance;
 
     const addressWithdrawalsQueue =
-      await this.contract.contractAddressWithdrawalsQueue();
+      await this.bus.contract.contractAddressWithdrawalsQueue();
 
     const allowance = await allowanceMethod(
       [account, addressWithdrawalsQueue],
