@@ -18,7 +18,6 @@ export class LidoSDKWithdrawalsViews {
 
   // Views
   @Logger('Views:')
-  @Cache(10 * 1000, ['bus.core.chain.id'])
   public async getWithdrawalRequestsIds(props: {
     account: Address;
   }): Promise<readonly bigint[]> {
@@ -28,7 +27,6 @@ export class LidoSDKWithdrawalsViews {
   }
 
   @Logger('Views:')
-  @Cache(10 * 1000, ['bus.core.chain.id'])
   public async getLastCheckpointIndex(): Promise<bigint> {
     const contract = await this.bus.contract.getContractWithdrawalsQueue();
 
@@ -36,7 +34,6 @@ export class LidoSDKWithdrawalsViews {
   }
 
   @Logger('Views:')
-  @Cache(10 * 1000, ['bus.core.chain.id'])
   public async getWithdrawalStatus(props: {
     requestsIds: readonly bigint[];
   }): Promise<readonly RequestStatusWithId[]> {
@@ -55,7 +52,6 @@ export class LidoSDKWithdrawalsViews {
   }
 
   @Logger('Views:')
-  @Cache(10 * 1000, ['bus.core.chain.id'])
   public async findCheckpointHints(props: {
     sortedIds: bigint[];
     firstIndex?: bigint;
@@ -72,7 +68,6 @@ export class LidoSDKWithdrawalsViews {
   }
 
   @Logger('Views:')
-  @Cache(10 * 1000, ['bus.core.chain.id'])
   public async getClaimableEther(props: {
     sortedIds: bigint[];
     hints: readonly bigint[];
@@ -84,7 +79,6 @@ export class LidoSDKWithdrawalsViews {
   }
 
   @Logger('Views:')
-  @Cache(10 * 1000, ['bus.core.chain.id'])
   public async getUnfinalizedStETH(): Promise<bigint> {
     const contract = await this.bus.contract.getContractWithdrawalsQueue();
 
@@ -94,7 +88,6 @@ export class LidoSDKWithdrawalsViews {
   // Constants
 
   @Logger('Views:')
-  @Cache(60 * 30 * 1000, ['bus.core.chain.id'])
   public async minStethWithdrawalAmount(): Promise<bigint> {
     const contract = await this.bus.contract.getContractWithdrawalsQueue();
 
@@ -102,7 +95,7 @@ export class LidoSDKWithdrawalsViews {
   }
 
   @Logger('Views:')
-  @Cache(60 * 60 * 1000, ['bus.core.chain.id'])
+  @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async maxStethWithdrawalAmount(): Promise<bigint> {
     const contract = await this.bus.contract.getContractWithdrawalsQueue();
 
@@ -110,7 +103,6 @@ export class LidoSDKWithdrawalsViews {
   }
 
   @Logger('Views:')
-  @Cache(60 * 60 * 1000, ['bus.core.chain.id'])
   public async isPaused(): Promise<boolean> {
     const contract = await this.bus.contract.getContractWithdrawalsQueue();
 
@@ -118,7 +110,6 @@ export class LidoSDKWithdrawalsViews {
   }
 
   @Logger('Views:')
-  @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async isBunkerModeActive(): Promise<boolean> {
     const contract = await this.bus.contract.getContractWithdrawalsQueue();
 
@@ -126,11 +117,6 @@ export class LidoSDKWithdrawalsViews {
   }
 
   @Logger('Views:')
-  @Cache(60 * 30 * 1000, [
-    'bus.core.chain.id',
-    'isBunkerModeActive',
-    'isPaused',
-  ])
   public async isTurboModeActive(): Promise<boolean> {
     const isBunkerMode = await this.isBunkerModeActive();
     const isPaused = await this.isPaused();

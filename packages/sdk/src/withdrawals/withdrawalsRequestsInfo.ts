@@ -1,6 +1,6 @@
 import { type Address } from 'viem';
 
-import { Logger, Cache } from '../common/decorators/index.js';
+import { Logger } from '../common/decorators/index.js';
 import { isBigint } from '../common/utils/index.js';
 import { version } from '../version.js';
 import { type LidoSDKCoreProps } from '../core/index.js';
@@ -19,7 +19,6 @@ export class LidoSDKWithdrawalsRequestsInfo {
   // Utils
 
   @Logger('Utils:')
-  @Cache(10 * 1000, ['bus.core.chain.id'])
   public async getWithdrawalRequestsInfo(props: { account: Address }) {
     const { account } = props;
 
@@ -37,7 +36,6 @@ export class LidoSDKWithdrawalsRequestsInfo {
   }
 
   @Logger('Utils:')
-  @Cache(10 * 1000, ['bus.core.chain.id'])
   public async getWithdrawalRequestsStatus(props: {
     account: Address;
   }): Promise<readonly RequestStatusWithId[]> {
@@ -49,7 +47,6 @@ export class LidoSDKWithdrawalsRequestsInfo {
   }
 
   @Logger('Utils:')
-  @Cache(30 * 1000, ['bus.core.chain.id'])
   public async getClaimableRequestsInfo(props: { account: Address }): Promise<{
     claimableRequests: RequestStatusWithId[];
     claimableAmountStETH: bigint;
@@ -72,7 +69,6 @@ export class LidoSDKWithdrawalsRequestsInfo {
   }
 
   @Logger('Utils:')
-  @Cache(30 * 1000, ['bus.core.chain.id'])
   public async getClaimableRequestsETH(props: {
     claimableRequestsIds: (bigint | RequestStatusWithId)[];
   }): Promise<{ ethByRequests: readonly bigint[]; ethSum: bigint }> {
@@ -104,7 +100,6 @@ export class LidoSDKWithdrawalsRequestsInfo {
   }
 
   @Logger('Utils:')
-  @Cache(30 * 1000, ['bus.core.chain.id'])
   public async getPendingRequestsInfo(props: { account: Address }): Promise<{
     pendingRequests: RequestStatusWithId[];
     pendingAmountStETH: bigint;
