@@ -1,4 +1,4 @@
-import { Input, Section } from '@lidofinance/lido-ui';
+import { Input, Accordion } from '@lidofinance/lido-ui';
 import { useWeb3 } from '@reef-knot/web3-react';
 import { Action } from 'components/action';
 import TokenInput from 'components/tokenInput/tokenInput';
@@ -17,7 +17,7 @@ export const StakeDemo = () => {
     : undefined;
 
   return (
-    <Section title="Staking">
+    <Accordion summary="Staking">
       <Action
         title="Stake"
         action={() => staking.stake({ value: stakingValue, account })}
@@ -68,6 +68,6 @@ export const StakeDemo = () => {
         title="Get Contract Steth ABI"
         action={async () => (await staking.getContractStETH()).abi}
       />
-    </Section>
+    </Accordion>
   );
 };

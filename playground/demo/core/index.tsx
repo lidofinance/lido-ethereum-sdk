@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Input, Section } from '@lidofinance/lido-ui';
+import { useCallback, useEffect, useState } from 'react';
+import { Input, Accordion } from '@lidofinance/lido-ui';
 import { Action } from 'components/action';
 import { useLidoSDK } from 'providers/sdk';
 
@@ -17,7 +17,7 @@ export const CoreDemo = () => {
   }, [getStethContract]);
 
   return (
-    <Section title="Core">
+    <Accordion summary="Core">
       <Action
         title="Get Fee Data"
         action={async () => await core.getFeeData()}
@@ -33,6 +33,6 @@ export const CoreDemo = () => {
           onChange={(e) => setContractAddress(e.currentTarget.value)}
         />
       </Action>
-    </Section>
+    </Accordion>
   );
 };
