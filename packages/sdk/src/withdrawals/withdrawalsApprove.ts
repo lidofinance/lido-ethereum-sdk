@@ -17,6 +17,7 @@ export class LidoSDKWithdrawalsApprove {
   }
 
   @Logger('Call:')
+  @ErrorHandler('Error:')
   public async approve(props: ApproveProps) {
     const { account } = props;
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
@@ -24,19 +25,21 @@ export class LidoSDKWithdrawalsApprove {
 
     const isContract = await this.bus.core.isContract(account);
 
-    if (isContract) return await this.approveMultisigByToken(props);
-    else return await this.approveByToken(props);
+    if (isContract) return this.approveMultisigByToken(props);
+    else return this.approveByToken(props);
   }
 
   @Logger('Call:')
+  @ErrorHandler('Error:')
   public async approveEOA(props: ApproveProps) {
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
-    this.approveByToken(props);
+    return this.approveByToken(props);
   }
 
   @Logger('Call:')
+  @ErrorHandler('Error:')
   public async approveMultisig(props: ApproveProps) {
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
 
@@ -46,13 +49,13 @@ export class LidoSDKWithdrawalsApprove {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async approveSteth(props: Omit<ApproveProps, 'token'>) {
-    this.approveByToken({ ...props, token: 'stETH' });
+    return this.approveByToken({ ...props, token: 'stETH' });
   }
 
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async approveWsteth(props: Omit<ApproveProps, 'token'>) {
-    this.approveByToken({ ...props, token: 'wstETH' });
+    return this.approveByToken({ ...props, token: 'wstETH' });
   }
 
   @Logger('Call:')
@@ -217,22 +220,25 @@ export class LidoSDKWithdrawalsApprove {
 
   @Logger('Utils:')
   @ErrorHandler('Error:')
-  public async checkApprovalSteth(amount: string, account: Address) {
-    return this.checkApprovalByToken(amount, account, 'wstETH');
+  public async checkAllowanceSteth(amount: string, account: Address) {
+    return this.checkAllowanceByToken({ amount, account, token: 'wstETH' });
   }
 
   @Logger('Utils:')
   @ErrorHandler('Error:')
-  public async checkApprovalWsteth(amount: string, account: Address) {
-    return this.checkApprovalByToken(amount, account, 'wstETH');
+  public async checkAllowanceWsteth(amount: string, account: Address) {
+    return this.checkAllowanceByToken({ amount, account, token: 'wstETH' });
   }
 
   @Logger('Utils:')
-  public async checkApprovalByToken(
-    amount: string,
-    account: Address,
-    token: 'stETH' | 'wstETH',
-  ) {
+  @ErrorHandler('Error:')
+  public async getAllowanceByToken({
+    account,
+    token,
+  }: {
+    account: Address;
+    token: 'stETH' | 'wstETH';
+  }) {
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
     const isSteth = token === 'stETH';
@@ -253,7 +259,42 @@ export class LidoSDKWithdrawalsApprove {
       [account, addressWithdrawalsQueue],
       { account },
     );
-    const isNeedApprove = allowance > parseEther(amount);
+
+    return allowance;
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler('Error:')
+  public async checkAllowanceByToken({
+    amount,
+    account,
+    token,
+  }: {
+    amount: string;
+    account: Address;
+    token: 'stETH' | 'wstETH';
+  }) {
+    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
+
+    const isSteth = token === 'stETH';
+    let allowanceMethod;
+
+    if (isSteth)
+      allowanceMethod = (await this.bus.contract.getContractStETH()).read
+        .allowance;
+    else
+      allowanceMethod = (await this.bus.contract.getContractWstETH()).read
+        .allowance;
+
+    const addressWithdrawalsQueue =
+      await this.bus.contract.contractAddressWithdrawalsQueue();
+
+    const allowance = await allowanceMethod.call(
+      this,
+      [account, addressWithdrawalsQueue],
+      { account },
+    );
+    const isNeedApprove = allowance < parseEther(amount);
 
     return { allowance, isNeedApprove };
   }
