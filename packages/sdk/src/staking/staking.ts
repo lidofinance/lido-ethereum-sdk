@@ -25,11 +25,11 @@ import { version } from '../version.js';
 import { abi } from './abi/steth.js';
 import {
   LidoSDKStakingProps,
-  StakeCallbackStage,
   StakeProps,
   StakeResult,
   StakeEncodeDataProps,
 } from './types.js';
+import { TransactionCallbackStage } from '../core/types.js';
 
 export class LidoSDKStaking {
   readonly core: LidoSDKCore;
@@ -95,7 +95,7 @@ export class LidoSDKStaking {
         error,
         code,
       });
-      callback?.({ stage: StakeCallbackStage.ERROR, payload: txError });
+      callback?.({ stage: TransactionCallbackStage.ERROR, payload: txError });
 
       throw txError;
     }
@@ -116,7 +116,7 @@ export class LidoSDKStaking {
       referralAddress,
     );
 
-    callback?.({ stage: StakeCallbackStage.SIGN });
+    callback?.({ stage: TransactionCallbackStage.SIGN });
 
     const contract = await this.getContractStETH();
     const transaction = await contract.write.submit([referralAddress], {
@@ -127,7 +127,10 @@ export class LidoSDKStaking {
       account,
     });
 
-    callback?.({ stage: StakeCallbackStage.RECEIPT, payload: transaction });
+    callback?.({
+      stage: TransactionCallbackStage.RECEIPT,
+      payload: transaction,
+    });
 
     const transactionReceipt =
       await this.core.rpcProvider.waitForTransactionReceipt({
@@ -135,7 +138,7 @@ export class LidoSDKStaking {
       });
 
     callback?.({
-      stage: StakeCallbackStage.CONFIRMATION,
+      stage: TransactionCallbackStage.CONFIRMATION,
       payload: transactionReceipt,
     });
 
@@ -144,7 +147,10 @@ export class LidoSDKStaking {
         hash: transactionReceipt.transactionHash,
       });
 
-    callback?.({ stage: StakeCallbackStage.DONE, payload: confirmations });
+    callback?.({
+      stage: TransactionCallbackStage.DONE,
+      payload: confirmations,
+    });
 
     return { hash: transaction, receipt: transactionReceipt, confirmations };
   }
@@ -153,7 +159,7 @@ export class LidoSDKStaking {
   private async stakeMultisig(props: StakeProps): Promise<StakeResult> {
     const { value, callback, referralAddress = zeroAddress, account } = props;
 
-    callback?.({ stage: StakeCallbackStage.SIGN });
+    callback?.({ stage: TransactionCallbackStage.SIGN });
 
     const contract = await this.getContractStETH();
     const transaction = await contract.write.submit([referralAddress], {
@@ -162,7 +168,7 @@ export class LidoSDKStaking {
       account,
     });
 
-    callback?.({ stage: StakeCallbackStage.MULTISIG_DONE });
+    callback?.({ stage: TransactionCallbackStage.MULTISIG_DONE });
 
     return { hash: transaction };
   }

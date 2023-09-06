@@ -9,19 +9,17 @@ import {
 import invariant from 'tiny-invariant';
 import { LidoSDKCore } from '../core/index.js';
 import { Logger, Cache } from '../common/decorators/index.js';
-import {
-  LidoSDKWrapProps,
-  WrapCallbackStage,
-  WrapEthProps,
-  WrapResult,
-  WrapStageCallback,
-} from './types.js';
+import { LidoSDKWrapProps, WrapEthProps, WrapResult } from './types.js';
 import { version } from '../version.js';
 
 import { abi } from './abi/wsteth.js';
 import { stakeLimitAbi } from './abi/stakeLimit.js';
 
 import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
+import {
+  TransactionCallback,
+  TransactionCallbackStage,
+} from '../core/types.js';
 
 export class LidoSDKWrap {
   readonly core: LidoSDKCore;
@@ -112,7 +110,7 @@ export class LidoSDKWrap {
       value,
     });
 
-    callback({ stage: WrapCallbackStage.SIGN });
+    callback({ stage: TransactionCallbackStage.SIGN });
 
     const { maxFeePerGas, maxPriorityFeePerGas } = await this.core.getFeeData();
 
@@ -136,7 +134,7 @@ export class LidoSDKWrap {
 
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
 
-    callback({ stage: WrapCallbackStage.SIGN });
+    callback({ stage: TransactionCallbackStage.SIGN });
 
     const contract = await this.getContractWstETH();
     const hash = await this.core.web3Provider.sendTransaction({
@@ -146,7 +144,7 @@ export class LidoSDKWrap {
       to: contract.address,
     });
 
-    callback({ stage: WrapCallbackStage.MULTISIG_DONE });
+    callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
 
     return { hash };
   }
@@ -172,7 +170,7 @@ export class LidoSDKWrap {
       value,
     });
 
-    callback({ stage: WrapCallbackStage.SIGN });
+    callback({ stage: TransactionCallbackStage.SIGN });
 
     const { maxFeePerGas, maxPriorityFeePerGas } = await this.core.getFeeData();
 
@@ -193,7 +191,7 @@ export class LidoSDKWrap {
 
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
 
-    callback({ stage: WrapCallbackStage.SIGN });
+    callback({ stage: TransactionCallbackStage.SIGN });
 
     const contract = await this.getContractWstETH();
     const transaction = await contract.write.wrap([value], {
@@ -201,7 +199,7 @@ export class LidoSDKWrap {
       account,
     });
 
-    callback?.({ stage: WrapCallbackStage.MULTISIG_DONE });
+    callback?.({ stage: TransactionCallbackStage.MULTISIG_DONE });
 
     return { hash: transaction };
   }
@@ -239,7 +237,10 @@ export class LidoSDKWrap {
         error,
         code,
       });
-      props.callback?.({ stage: WrapCallbackStage.ERROR, payload: txError });
+      props.callback?.({
+        stage: TransactionCallbackStage.ERROR,
+        payload: txError,
+      });
 
       throw txError;
     }
@@ -247,9 +248,9 @@ export class LidoSDKWrap {
 
   private async waitTransactionLifecycle(
     transaction: `0x${string}`,
-    callback: WrapStageCallback,
+    callback: TransactionCallback,
   ) {
-    callback({ stage: WrapCallbackStage.RECEIPT, payload: transaction });
+    callback({ stage: TransactionCallbackStage.RECEIPT, payload: transaction });
 
     const transactionReceipt =
       await this.core.rpcProvider.waitForTransactionReceipt({
@@ -257,7 +258,7 @@ export class LidoSDKWrap {
       });
 
     callback({
-      stage: WrapCallbackStage.CONFIRMATION,
+      stage: TransactionCallbackStage.CONFIRMATION,
       payload: transactionReceipt,
     });
 
@@ -266,7 +267,7 @@ export class LidoSDKWrap {
         hash: transactionReceipt.transactionHash,
       });
 
-    callback({ stage: WrapCallbackStage.DONE, payload: confirmations });
+    callback({ stage: TransactionCallbackStage.DONE, payload: confirmations });
 
     return { hash: transaction, receipt: transactionReceipt, confirmations };
   }
