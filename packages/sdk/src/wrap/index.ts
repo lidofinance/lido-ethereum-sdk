@@ -1,5 +1,1 @@
-export class LidoSDKWrap {
-  constructor() {
-    console.log("LidoSDKWrap");
-  }
-}
+export { LidoSDKWrap } from './wrap.js';

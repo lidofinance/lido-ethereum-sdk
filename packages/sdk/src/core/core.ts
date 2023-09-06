@@ -174,7 +174,6 @@ export default class LidoSDKCore {
   @Logger('Utils:')
   public async getFeeData(): Promise<FeeData> {
     invariant(this.rpcProvider, 'RPC provider is not defined');
-
     return getFeeData(this.rpcProvider);
   }
 

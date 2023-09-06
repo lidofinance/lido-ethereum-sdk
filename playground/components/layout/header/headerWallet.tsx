@@ -13,12 +13,13 @@ const HeaderWallet: FC = () => {
   const { active, chainId } = useWeb3();
   const chainName = chainId && CHAINS[chainId];
 
-
   return (
     <>
-      {chainId && <HeaderWalletChainStyle $color={getChainColor(chainId)}>
-        {chainName}
-      </HeaderWalletChainStyle>}
+      {chainId && (
+        <HeaderWalletChainStyle $color={getChainColor(chainId)}>
+          {chainName}
+        </HeaderWalletChainStyle>
+      )}
       {active ? <WalletButton /> : <WalletConnect size="sm" />}
       <ThemeToggler />
     </>
