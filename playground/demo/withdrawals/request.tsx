@@ -76,13 +76,13 @@ export const WithdrawalsRequestDemo = () => {
       <Action
         title="Check stETH allowance by amount"
         action={() =>
-          withdrawals.approval.checkApprovalSteth(requestValue, account)
+          withdrawals.approval.checkAllowanceSteth(requestValue, account)
         }
       />
       <Action
         title="Check wstETH allowance by amount"
         action={() =>
-          withdrawals.approval.checkApprovalWsteth(requestValue, account)
+          withdrawals.approval.checkAllowanceWsteth(requestValue, account)
         }
       />
     </Accordion>
