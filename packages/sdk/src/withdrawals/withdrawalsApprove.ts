@@ -80,7 +80,7 @@ export class LidoSDKWithdrawalsApprove {
 
     callback?.({ stage: ApproveCallbackStages.GAS_LIMIT });
 
-    const gasLimit = await gasLimitMethod(amount, account);
+    const gasLimit = await gasLimitMethod.call(this, amount, account);
     const feeData = await this.bus.core.getFeeData();
     const overrides = {
       account,
@@ -90,7 +90,8 @@ export class LidoSDKWithdrawalsApprove {
 
     callback?.({ stage: ApproveCallbackStages.SIGN, payload: gasLimit });
 
-    const transaction = await tokenApproveMethod(
+    const transaction = await tokenApproveMethod.call(
+      this,
       [addressWithdrawalsQueue, parseEther(amount)],
       { chain: this.bus.core.chain, ...overrides, gas: gasLimit },
     );
@@ -156,7 +157,8 @@ export class LidoSDKWithdrawalsApprove {
 
     callback?.({ stage: ApproveCallbackStages.SIGN });
 
-    const transaction = await tokenApproveMethod(
+    const transaction = await tokenApproveMethod.call(
+      this,
       [addressWithdrawalsQueue, parseEther(amount)],
       { chain: this.bus.core.chain, account },
     );
@@ -183,7 +185,7 @@ export class LidoSDKWithdrawalsApprove {
   }
 
   @Logger('Utils:')
-  @Cache(30 * 1000, ['core.chain.id'])
+  @Cache(30 * 1000, ['bus.core.chain.id'])
   private async approveGasLimitByToken(
     amount: string,
     account: Address,
@@ -204,7 +206,8 @@ export class LidoSDKWithdrawalsApprove {
     const addressWithdrawalsQueue =
       await this.bus.contract.contractAddressWithdrawalsQueue();
 
-    const gasLimit = await estimateGasMethod(
+    const gasLimit = await estimateGasMethod.call(
+      this,
       [addressWithdrawalsQueue, parseEther(amount)],
       { account },
     );
@@ -245,7 +248,8 @@ export class LidoSDKWithdrawalsApprove {
     const addressWithdrawalsQueue =
       await this.bus.contract.contractAddressWithdrawalsQueue();
 
-    const allowance = await allowanceMethod(
+    const allowance = await allowanceMethod.call(
+      this,
       [account, addressWithdrawalsQueue],
       { account },
     );

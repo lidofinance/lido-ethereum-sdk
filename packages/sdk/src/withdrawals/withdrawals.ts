@@ -122,7 +122,7 @@ export class LidoSDKWithdrawals extends Bus {
 
     callback?.({ stage: RequestCallbackStages.SIGN, payload: gasLimit });
 
-    const transaction = await tokenRequestMethod([...params], {
+    const transaction = await tokenRequestMethod.call(this, [...params], {
       ...overrides,
       chain: this.core.chain,
     });
@@ -206,7 +206,7 @@ export class LidoSDKWithdrawals extends Bus {
 
     callback?.({ stage: RequestCallbackStages.SIGN, payload: gasLimit });
 
-    const transaction = await tokenRequestMethod([...params], {
+    const transaction = await tokenRequestMethod.call(this, [...params], {
       chain: this.core.chain,
       gas: gasLimit,
       ...overrides,
@@ -253,7 +253,7 @@ export class LidoSDKWithdrawals extends Bus {
 
     callback?.({ stage: RequestCallbackStages.SIGN });
 
-    const transaction = await tokenRequestMethod([...params], {
+    const transaction = await tokenRequestMethod.call(this, [...params], {
       account,
       chain: this.core.chain,
     });
@@ -298,7 +298,9 @@ export class LidoSDKWithdrawals extends Bus {
       },
     ] as const;
 
-    const gasLimit = await tokenRequestMethod([...params], { account });
+    const gasLimit = await tokenRequestMethod.call(this, [...params], {
+      account,
+    });
 
     return gasLimit;
   }
@@ -320,7 +322,9 @@ export class LidoSDKWithdrawals extends Bus {
     else tokenRequestMethod = contract.estimateGas.requestWithdrawalsWstETH;
 
     const params = [requests, account] as const;
-    const gasLimit = await tokenRequestMethod([...params], { account });
+    const gasLimit = await tokenRequestMethod.call(this, [...params], {
+      account,
+    });
 
     return gasLimit;
   }
