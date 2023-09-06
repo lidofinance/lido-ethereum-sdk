@@ -29,7 +29,7 @@ export enum TransactionCallbackStage {
   'ERROR' = 'error',
 }
 
-export type TransactionCallbackArgs =
+export type TransactionCallbackProps =
   | { stage: TransactionCallbackStage.SIGN; payload?: undefined }
   | { stage: TransactionCallbackStage.RECEIPT; payload: Hash }
   | {
@@ -40,4 +40,4 @@ export type TransactionCallbackArgs =
   | { stage: TransactionCallbackStage.MULTISIG_DONE; payload?: undefined }
   | { stage: TransactionCallbackStage.ERROR; payload: SDKError };
 
-export type TransactionCallback = (props: TransactionCallbackArgs) => void;
+export type TransactionCallback = (props: TransactionCallbackProps) => void;

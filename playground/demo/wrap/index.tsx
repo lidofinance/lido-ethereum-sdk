@@ -4,6 +4,7 @@ import { Action } from 'components/action';
 import TokenInput from 'components/tokenInput/tokenInput';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
+import { transactionToast } from 'utils/transaction-toast';
 
 export const WrapDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
@@ -17,7 +18,13 @@ export const WrapDemo = () => {
     <Section title="Wrap">
       <Action
         title="Wrap ETH"
-        action={() => wrap.wrapEth({ value: wrapValue, account })}
+        action={() =>
+          wrap.wrapEth({
+            value: wrapValue,
+            account,
+            callback: transactionToast,
+          })
+        }
       >
         <TokenInput
           label="value"
@@ -28,7 +35,13 @@ export const WrapDemo = () => {
       </Action>
       <Action
         title="Wrap stETH"
-        action={() => wrap.wrapSteth({ value: wrapStethValue, account })}
+        action={() =>
+          wrap.wrapSteth({
+            value: wrapStethValue,
+            account,
+            callback: transactionToast,
+          })
+        }
       >
         <TokenInput
           label="value"

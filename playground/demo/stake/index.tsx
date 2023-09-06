@@ -4,6 +4,7 @@ import { Action } from 'components/action';
 import TokenInput from 'components/tokenInput/tokenInput';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
+import { transactionToast } from 'utils/transaction-toast';
 
 export const StakeDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
@@ -20,7 +21,13 @@ export const StakeDemo = () => {
     <Section title="Staking">
       <Action
         title="Stake"
-        action={() => staking.stake({ value: stakingValue, account })}
+        action={() =>
+          staking.stake({
+            value: stakingValue,
+            account,
+            callback: transactionToast,
+          })
+        }
       >
         <TokenInput
           label="value"

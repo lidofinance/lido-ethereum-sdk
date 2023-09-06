@@ -1,2 +1,7 @@
-export { default as LidoSDKCore } from "./core.js";
-export { LidoSDKCoreProps } from "./types.js";
+export { default as LidoSDKCore } from './core.js';
+export {
+  LidoSDKCoreProps,
+  TransactionCallback,
+  TransactionCallbackStage,
+  TransactionCallbackProps,
+} from './types.js';
