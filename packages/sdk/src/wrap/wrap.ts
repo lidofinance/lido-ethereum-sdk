@@ -11,7 +11,12 @@ import {
 import invariant from 'tiny-invariant';
 import { LidoSDKCore } from '../core/index.js';
 import { Logger, Cache } from '../common/decorators/index.js';
-import { LidoSDKWrapProps, CommonWrapProps, TxResult } from './types.js';
+import {
+  LidoSDKWrapProps,
+  CommonWrapProps,
+  TxResult,
+  PopulatedTx,
+} from './types.js';
 import { version } from '../version.js';
 
 import { abi } from './abi/wsteth.js';
@@ -152,9 +157,7 @@ export class LidoSDKWrap {
   }
 
   @Logger('Utils:')
-  public async wrapEthPopulateTx(
-    props: CommonWrapProps,
-  ): Promise<Omit<FormattedTransactionRequest, 'type'>> {
+  public async wrapEthPopulateTx(props: CommonWrapProps): Promise<PopulatedTx> {
     const { value, account } = props;
 
     const address = await this.contractAddressWstETH();
@@ -181,10 +184,8 @@ export class LidoSDKWrap {
 
     const contract = await this.getContractWstETH();
 
-    const gasLimit = await this.core.rpcProvider.estimateGas({
+    const gasLimit = await contract.estimateGas.wrap([value], {
       account,
-      to: contract.address,
-      value,
     });
 
     callback({ stage: TransactionCallbackStage.SIGN });
@@ -225,7 +226,7 @@ export class LidoSDKWrap {
   @Logger('Utils:')
   public async wrapStethPopulateTx(
     props: CommonWrapProps,
-  ): Promise<Omit<FormattedTransactionRequest, 'type'>> {
+  ): Promise<PopulatedTx> {
     const { value: stringValue, account } = props;
     const value = parseEther(stringValue);
     const address = await this.contractAddressWstETH();
@@ -315,6 +316,93 @@ export class LidoSDKWrap {
     callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
 
     return { hash: transaction };
+  }
+
+  public async approveStethForWrapPopulateTx(
+    props: CommonWrapProps,
+  ): Promise<Omit<FormattedTransactionRequest, 'type'>> {
+    const { value: stringValue, account } = props;
+    const value = parseEther(stringValue);
+
+    const stethContract = await this.getStethPartialContract();
+    const wstethContractAddress = await this.contractAddressWstETH();
+
+    return {
+      to: stethContract.address,
+      from: account,
+      data: encodeFunctionData({
+        abi: stethPartialAbi,
+        functionName: 'approve',
+        args: [wstethContractAddress, value],
+      }),
+    };
+  }
+
+  /// UNWRAP
+
+  public async unwrap(props: CommonWrapProps): Promise<TxResult> {
+    return this.methodWrapper(props, this.unwrapEOA, this.unwrapMultisig);
+  }
+
+  private async unwrapEOA(props: CommonWrapProps): Promise<TxResult> {
+    invariant(this.core.web3Provider, 'Web3 provider is not defined');
+    const { value: stringValue, callback = () => {}, account } = props;
+    const value = parseEther(stringValue);
+
+    const contract = await this.getContractWstETH();
+
+    const gasLimit = await contract.estimateGas.unwrap([value], {
+      account,
+    });
+
+    callback({ stage: TransactionCallbackStage.SIGN });
+
+    const { maxFeePerGas, maxPriorityFeePerGas } = await this.core.getFeeData();
+
+    const transaction = await contract.write.unwrap([value], {
+      chain: this.core.chain,
+      gas: gasLimit,
+      maxFeePerGas,
+      maxPriorityFeePerGas,
+      account,
+    });
+
+    return this.waitTransactionLifecycle(transaction, callback);
+  }
+
+  private async unwrapMultisig(props: CommonWrapProps): Promise<TxResult> {
+    invariant(this.core.web3Provider, 'Web3 provider is not defined');
+    const { value: stringValue, callback = () => {}, account } = props;
+    const value = parseEther(stringValue);
+
+    const contract = await this.getContractWstETH();
+
+    callback({ stage: TransactionCallbackStage.SIGN });
+
+    const transaction = await contract.write.unwrap([value], {
+      chain: this.core.chain,
+      account,
+    });
+
+    callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
+
+    return { hash: transaction };
+  }
+
+  public async unwrapPopulateTx(props: CommonWrapProps): Promise<PopulatedTx> {
+    const { value: stringValue, account } = props;
+    const value = parseEther(stringValue);
+    const to = await this.contractAddressWstETH();
+
+    return {
+      to,
+      from: account,
+      data: encodeFunctionData({
+        abi: abi,
+        functionName: 'unwrap',
+        args: [value],
+      }),
+    };
   }
 
   /// UTILS

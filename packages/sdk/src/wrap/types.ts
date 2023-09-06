@@ -1,4 +1,9 @@
-import { type Address, type Hash, type TransactionReceipt } from 'viem';
+import {
+  FormattedTransactionRequest,
+  type Address,
+  type Hash,
+  type TransactionReceipt,
+} from 'viem';
 import LidoSDKCore from '../core/core.js';
 import { LidoSDKCoreProps, TransactionCallback } from '../core/types.js';
 
@@ -17,3 +22,5 @@ export type TxResult = {
   receipt?: TransactionReceipt;
   confirmations?: bigint;
 };
+
+export type PopulatedTx = Omit<FormattedTransactionRequest, 'type'>;
