@@ -1,15 +1,9 @@
 import { maxUint256, parseEther, type Address } from 'viem';
 import invariant from 'tiny-invariant';
 
-import { LidoSDKCore } from '../core/index.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import { version } from '../version.js';
 
-import { LidoSDKWithdrawalsContract } from './withdrawalsContract.js';
-import { LidoSDKWithdrawalsViews } from './withdrawalsViews.js';
-import { LidoSDKWithdrawalsRequestsInfo } from './withdrawalsRequestsInfo.js';
-import { LidoSDKWithdrawalsPermit } from './withdrawalsPermit.js';
-import { LidoSDKWithdrawalsApprove } from './withdrawalsApprove.js';
 import { Bus } from './bus.js';
 import {
   type LidoSDKWithdrawalsProps,
@@ -21,25 +15,9 @@ import {
 
 const INFINITY_DEADLINE_VALUE = maxUint256;
 
-export class LidoSDKWithdrawals {
-  readonly bus: Bus;
-
-  readonly core: LidoSDKCore;
-  readonly contract: LidoSDKWithdrawalsContract;
-  readonly views: LidoSDKWithdrawalsViews;
-  readonly requestsInfo: LidoSDKWithdrawalsRequestsInfo;
-  readonly permit: LidoSDKWithdrawalsPermit;
-  readonly approval: LidoSDKWithdrawalsApprove;
-
+export class LidoSDKWithdrawals extends Bus {
   constructor(props: LidoSDKWithdrawalsProps) {
-    this.bus = new Bus(props, version);
-
-    this.core = this.bus.core;
-    this.contract = this.bus.contract;
-    this.views = this.bus.views;
-    this.requestsInfo = this.bus.requestsInfo;
-    this.permit = this.bus.permit;
-    this.approval = this.bus.approval;
+    super(props, version);
   }
 
   // Calls
