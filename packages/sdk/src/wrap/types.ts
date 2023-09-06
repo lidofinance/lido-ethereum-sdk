@@ -6,13 +6,13 @@ export type LidoSDKWrapProps = LidoSDKCoreProps & {
   core?: LidoSDKCore;
 };
 
-export type WrapEthProps = {
+export type CommonWrapProps = {
   value: string;
   account: Address;
   callback?: TransactionCallback;
 };
 
-export type WrapResult = {
+export type TxResult = {
   hash: Hash;
   receipt?: TransactionReceipt;
   confirmations?: bigint;
