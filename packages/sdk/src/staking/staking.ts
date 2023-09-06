@@ -1,8 +1,5 @@
+import { zeroAddress, parseEther, getContract, encodeFunctionData } from 'viem';
 import {
-  zeroAddress,
-  parseEther,
-  getContract,
-  encodeFunctionData,
   type Address,
   type Account,
   type GetContractReturnType,
@@ -22,10 +19,10 @@ import {
 } from '../common/constants.js';
 import { version } from '../version.js';
 
-import { abi } from './abi/steth.js';
+import { StethAbi } from './abi/steth.js';
 import {
   LidoSDKStakingProps,
-  StakeCallbackStage,
+  StakeCallbackStages,
   StakeProps,
   StakeResult,
   StakeEncodeDataProps,
@@ -64,13 +61,13 @@ export class LidoSDKStaking {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
   public async getContractStETH(): Promise<
-    GetContractReturnType<typeof abi, PublicClient, WalletClient>
+    GetContractReturnType<typeof StethAbi, PublicClient, WalletClient>
   > {
     const address = await this.contractAddressStETH();
 
     return getContract({
       address,
-      abi: abi,
+      abi: StethAbi,
       publicClient: this.core.rpcProvider,
       walletClient: this.core.web3Provider,
     });
@@ -95,7 +92,7 @@ export class LidoSDKStaking {
         error,
         code,
       });
-      callback?.({ stage: StakeCallbackStage.ERROR, payload: txError });
+      callback?.({ stage: StakeCallbackStages.ERROR, payload: txError });
 
       throw txError;
     }
@@ -116,7 +113,7 @@ export class LidoSDKStaking {
       referralAddress,
     );
 
-    callback?.({ stage: StakeCallbackStage.SIGN });
+    callback?.({ stage: StakeCallbackStages.SIGN });
 
     const contract = await this.getContractStETH();
     const transaction = await contract.write.submit([referralAddress], {
@@ -127,7 +124,7 @@ export class LidoSDKStaking {
       account,
     });
 
-    callback?.({ stage: StakeCallbackStage.RECEIPT, payload: transaction });
+    callback?.({ stage: StakeCallbackStages.RECEIPT, payload: transaction });
 
     const transactionReceipt =
       await this.core.rpcProvider.waitForTransactionReceipt({
@@ -135,7 +132,7 @@ export class LidoSDKStaking {
       });
 
     callback?.({
-      stage: StakeCallbackStage.CONFIRMATION,
+      stage: StakeCallbackStages.CONFIRMATION,
       payload: transactionReceipt,
     });
 
@@ -144,7 +141,7 @@ export class LidoSDKStaking {
         hash: transactionReceipt.transactionHash,
       });
 
-    callback?.({ stage: StakeCallbackStage.DONE, payload: confirmations });
+    callback?.({ stage: StakeCallbackStages.DONE, payload: confirmations });
 
     return { hash: transaction, receipt: transactionReceipt, confirmations };
   }
@@ -153,7 +150,7 @@ export class LidoSDKStaking {
   private async stakeMultisig(props: StakeProps): Promise<StakeResult> {
     const { value, callback, referralAddress = zeroAddress, account } = props;
 
-    callback?.({ stage: StakeCallbackStage.SIGN });
+    callback?.({ stage: StakeCallbackStages.SIGN });
 
     const contract = await this.getContractStETH();
     const transaction = await contract.write.submit([referralAddress], {
@@ -162,7 +159,7 @@ export class LidoSDKStaking {
       account,
     });
 
-    callback?.({ stage: StakeCallbackStage.MULTISIG_DONE });
+    callback?.({ stage: StakeCallbackStages.MULTISIG_DONE });
 
     return { hash: transaction };
   }
@@ -176,7 +173,7 @@ export class LidoSDKStaking {
     const address = await this.contractAddressStETH();
     const { request } = await this.core.rpcProvider.simulateContract({
       address,
-      abi,
+      abi: StethAbi,
       functionName: 'submit',
       account,
       args: [referralAddress],
@@ -257,7 +254,7 @@ export class LidoSDKStaking {
     const { referralAddress = zeroAddress } = props;
 
     return encodeFunctionData({
-      abi,
+      abi: StethAbi,
       functionName: 'submit',
       args: [referralAddress],
     });
