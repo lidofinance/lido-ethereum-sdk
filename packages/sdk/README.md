@@ -508,6 +508,13 @@ try {
 - approveWstethMultisig
 - approveMultisigByToken
 
+##### Views
+
+- getAllowanceByToken
+- checkAllowanceByToken
+- checkAllowanceSteth
+- checkAllowanceWsteth
+
 ### Views
 
 - getWithdrawalRequestsIds

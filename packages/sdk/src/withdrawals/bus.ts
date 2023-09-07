@@ -8,15 +8,15 @@ import { LidoSDKWithdrawalsApprove } from './withdrawalsApprove.js';
 import { type LidoSDKWithdrawalsProps } from './types.js';
 
 export class Bus {
-  props: LidoSDKWithdrawalsProps;
-  version: string | undefined;
+  private props: LidoSDKWithdrawalsProps;
+  private version: string | undefined;
 
-  coreInstance: LidoSDKCore | undefined;
-  contractInstance: LidoSDKWithdrawalsContract | undefined;
-  viewsInstance: LidoSDKWithdrawalsViews | undefined;
-  requestsInfoInstance: LidoSDKWithdrawalsRequestsInfo | undefined;
-  permitInstance: LidoSDKWithdrawalsPermit | undefined;
-  approvalInstance: LidoSDKWithdrawalsApprove | undefined;
+  private coreInstance: LidoSDKCore | undefined;
+  private contractInstance: LidoSDKWithdrawalsContract | undefined;
+  private viewsInstance: LidoSDKWithdrawalsViews | undefined;
+  private requestsInfoInstance: LidoSDKWithdrawalsRequestsInfo | undefined;
+  private permitInstance: LidoSDKWithdrawalsPermit | undefined;
+  private approvalInstance: LidoSDKWithdrawalsApprove | undefined;
 
   constructor(props: LidoSDKWithdrawalsProps, version?: string) {
     this.props = props;
