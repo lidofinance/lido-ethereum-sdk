@@ -136,7 +136,7 @@ export const Action = <TResult,>({
         <Button loading={loading} onClick={startLoading}>
           {title}
         </Button>
-        {result && renderResult(result)}
+        {result !== undefined && renderResult(result)}
         {!!error && renderError(error)}
       </Controls>
     </ActionBlock>
