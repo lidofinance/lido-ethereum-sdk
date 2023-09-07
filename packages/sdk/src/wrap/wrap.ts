@@ -101,6 +101,7 @@ export class LidoSDKWrap {
 
   @Logger('LOG:')
   private async wrapEthEOA(props: CommonWrapProps): Promise<TxResult> {
+    invariant(this.core.web3Provider, 'Web3 provider is not defined');
     const { value: stringValue, callback = () => {}, account } = props;
     const value = parseEther(stringValue);
 
@@ -108,20 +109,16 @@ export class LidoSDKWrap {
     // because wrapETH stakes for you
     this.validateStakeLimit(value);
 
-    invariant(this.core.web3Provider, 'Web3 provider is not defined');
-
     const contract = await this.getContractWstETH();
-
     const gasLimit = await this.core.rpcProvider.estimateGas({
       account,
       to: contract.address,
       value,
     });
 
-    callback({ stage: TransactionCallbackStage.SIGN });
-
     const { maxFeePerGas, maxPriorityFeePerGas } = await this.core.getFeeData();
 
+    callback({ stage: TransactionCallbackStage.SIGN });
     const transaction = await this.core.web3Provider.sendTransaction({
       value,
       account,
@@ -137,14 +134,13 @@ export class LidoSDKWrap {
 
   @Logger('LOG:')
   private async wrapEthMultisig(props: CommonWrapProps): Promise<TxResult> {
-    const { value: stringValue, callback = () => {}, account } = props;
-    const value = parseEther(stringValue);
-
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
 
-    callback({ stage: TransactionCallbackStage.SIGN });
-
+    const { value: stringValue, callback = () => {}, account } = props;
+    const value = parseEther(stringValue);
     const contract = await this.getContractWstETH();
+
+    callback({ stage: TransactionCallbackStage.SIGN });
     const hash = await this.core.web3Provider.sendTransaction({
       value,
       chain: this.core.chain,
@@ -182,17 +178,14 @@ export class LidoSDKWrap {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     const { value: stringValue, callback = () => {}, account } = props;
     const value = parseEther(stringValue);
-
     const contract = await this.getContractWstETH();
-
     const gasLimit = await contract.estimateGas.wrap([value], {
       account,
     });
 
-    callback({ stage: TransactionCallbackStage.SIGN });
-
     const { maxFeePerGas, maxPriorityFeePerGas } = await this.core.getFeeData();
 
+    callback({ stage: TransactionCallbackStage.SIGN });
     const transaction = await contract.write.wrap([value], {
       chain: this.core.chain,
       gas: gasLimit,
@@ -206,14 +199,13 @@ export class LidoSDKWrap {
 
   @Logger('LOG:')
   private async wrapStethMultisig(props: CommonWrapProps): Promise<TxResult> {
-    const { value: stringValue, callback = () => {}, account } = props;
-    const value = parseEther(stringValue);
-
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
 
-    callback({ stage: TransactionCallbackStage.SIGN });
-
+    const { value: stringValue, callback = () => {}, account } = props;
+    const value = parseEther(stringValue);
     const contract = await this.getContractWstETH();
+
+    callback({ stage: TransactionCallbackStage.SIGN });
     const transaction = await contract.write.wrap([value], {
       chain: this.core.chain,
       account,
@@ -245,6 +237,7 @@ export class LidoSDKWrap {
 
   /// APPROVE
 
+  @Logger('Call:')
   public async approveStethForWrap(props: CommonWrapProps): Promise<TxResult> {
     return this.methodWrapper(
       props,
@@ -253,6 +246,7 @@ export class LidoSDKWrap {
     );
   }
 
+  @Logger('Utils:')
   public async getStethForWrapAllowance(
     props: CommonWrapProps,
   ): Promise<bigint> {
@@ -261,6 +255,7 @@ export class LidoSDKWrap {
     return stethContract.read.allowance([props.account, wstethAddress]);
   }
 
+  @Logger('LOG:')
   private async approveStethForWrapEOA(
     props: CommonWrapProps,
   ): Promise<TxResult> {
@@ -277,10 +272,9 @@ export class LidoSDKWrap {
       },
     );
 
-    callback({ stage: TransactionCallbackStage.SIGN });
-
     const { maxFeePerGas, maxPriorityFeePerGas } = await this.core.getFeeData();
 
+    callback({ stage: TransactionCallbackStage.SIGN });
     const transaction = await stethContract.write.approve(
       [wstethContractAddress, value],
       {
@@ -295,6 +289,7 @@ export class LidoSDKWrap {
     return this.waitTransactionLifecycle(transaction, callback);
   }
 
+  @Logger('LOG:')
   private async approveStethForWrapMultisig(
     props: CommonWrapProps,
   ): Promise<TxResult> {
@@ -319,6 +314,7 @@ export class LidoSDKWrap {
     return { hash: transaction };
   }
 
+  @Logger('Utils:')
   public async approveStethForWrapPopulateTx(
     props: CommonWrapProps,
   ): Promise<Omit<FormattedTransactionRequest, 'type'>> {
@@ -341,10 +337,12 @@ export class LidoSDKWrap {
 
   /// UNWRAP
 
+  @Logger('Call:')
   public async unwrap(props: CommonWrapProps): Promise<TxResult> {
     return this.methodWrapper(props, this.unwrapEOA, this.unwrapMultisig);
   }
 
+  @Logger('LOG:')
   private async unwrapEOA(props: CommonWrapProps): Promise<TxResult> {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     const { value: stringValue, callback = () => {}, account } = props;
@@ -356,10 +354,9 @@ export class LidoSDKWrap {
       account,
     });
 
-    callback({ stage: TransactionCallbackStage.SIGN });
-
     const { maxFeePerGas, maxPriorityFeePerGas } = await this.core.getFeeData();
 
+    callback({ stage: TransactionCallbackStage.SIGN });
     const transaction = await contract.write.unwrap([value], {
       chain: this.core.chain,
       gas: gasLimit,
@@ -371,6 +368,7 @@ export class LidoSDKWrap {
     return this.waitTransactionLifecycle(transaction, callback);
   }
 
+  @Logger('LOG:')
   private async unwrapMultisig(props: CommonWrapProps): Promise<TxResult> {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     const { value: stringValue, callback = () => {}, account } = props;
@@ -390,6 +388,7 @@ export class LidoSDKWrap {
     return { hash: transaction };
   }
 
+  @Logger('Utils:')
   public async unwrapPopulateTx(props: CommonWrapProps): Promise<PopulatedTx> {
     const { value: stringValue, account } = props;
     const value = parseEther(stringValue);
@@ -475,5 +474,21 @@ export class LidoSDKWrap {
     callback({ stage: TransactionCallbackStage.DONE, payload: confirmations });
 
     return { hash: transaction, receipt: transactionReceipt, confirmations };
+  }
+
+  /// VIEWS
+
+  @Logger('Views:')
+  public async convertStethToWsteth(steth_value: string): Promise<bigint> {
+    const value = parseEther(steth_value);
+    const contract = await this.getContractWstETH();
+    return contract.read.getWstETHByStETH([value]);
+  }
+
+  @Logger('Views:')
+  public async convertWstethToSteth(wsteth_value: string): Promise<bigint> {
+    const value = parseEther(wsteth_value);
+    const contract = await this.getContractWstETH();
+    return contract.read.getStETHByWstETH([value]);
   }
 }
