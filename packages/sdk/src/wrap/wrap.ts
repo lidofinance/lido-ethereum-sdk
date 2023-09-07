@@ -16,6 +16,7 @@ import {
   CommonWrapProps,
   TxResult,
   PopulatedTx,
+  IMethodProps,
 } from './types.js';
 import { version } from '../version.js';
 
@@ -421,7 +422,7 @@ export class LidoSDKWrap {
     }
   }
 
-  private async methodWrapper<TProps extends CommonWrapProps, TResult>(
+  private async methodWrapper<TProps extends IMethodProps, TResult>(
     props: TProps,
     EOAMethod: (props: TProps) => Promise<TResult>,
     multisigMethod: (props: TProps) => Promise<TResult>,

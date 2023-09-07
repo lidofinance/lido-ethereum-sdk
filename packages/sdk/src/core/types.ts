@@ -36,17 +36,24 @@ export enum TransactionCallbackStage {
 }
 
 export type TransactionCallbackProps =
-  | { stage: TransactionCallbackStage.SIGN; payload?: undefined }
+  | { stage: TransactionCallbackStage.SIGN }
   | { stage: TransactionCallbackStage.RECEIPT; payload: Hash }
   | {
       stage: TransactionCallbackStage.CONFIRMATION;
       payload: TransactionReceipt;
     }
   | { stage: TransactionCallbackStage.DONE; payload: bigint }
-  | { stage: TransactionCallbackStage.MULTISIG_DONE; payload?: undefined }
+  | { stage: TransactionCallbackStage.MULTISIG_DONE }
   | { stage: TransactionCallbackStage.ERROR; payload: SDKError };
 
 export type TransactionCallback = (props: TransactionCallbackProps) => void;
+
+export type PermitCallbackProps =
+  | { stage: TransactionCallbackStage.SIGN }
+  | { stage: TransactionCallbackStage.DONE }
+  | { stage: TransactionCallbackStage.ERROR; payload: SDKError };
+
+export type PermitCallback = (props: PermitCallbackProps) => void;
 
 export type PermitSignature = {
   v: number;
