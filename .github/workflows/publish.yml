@@ -5,7 +5,9 @@ on:
       - 'main'
 
 permissions:
-  contents: write
+  contents: write # to be able to publish a GitHub release
+  issues: write # to be able to comment on released issues
+  id-token: write # to enable use of OIDC for npm provenance
 
 jobs:
   publish:
@@ -29,10 +31,14 @@ jobs:
       - name: Build
         run: yarn build:packages
 
+      - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
+        run: yarn npm audit
+
       - name: Authenticate in npm
         run: |
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
           echo "workspaces-update = false" >> .npmrc
+          echo "provenance = true" >> .npmrc
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
