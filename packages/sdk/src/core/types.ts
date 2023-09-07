@@ -1,6 +1,12 @@
-import { WalletClient, PublicClient, Hash, TransactionReceipt } from 'viem';
+import {
+  WalletClient,
+  PublicClient,
+  Hash,
+  TransactionReceipt,
+  Address,
+} from 'viem';
 
-import { SUPPORTED_CHAINS } from '../common/constants.js';
+import { LIDO_CONTRACT_NAMES, SUPPORTED_CHAINS } from '../common/constants.js';
 import { SDKError } from '../index.js';
 
 type LidoSDKCorePropsRpcUrls = {
@@ -41,3 +47,23 @@ export type TransactionCallbackProps =
   | { stage: TransactionCallbackStage.ERROR; payload: SDKError };
 
 export type TransactionCallback = (props: TransactionCallbackProps) => void;
+
+export type PermitSignature = {
+  v: number;
+  r: `0x${string}`;
+  s: `0x${string}`;
+  value: bigint;
+  deadline: bigint;
+  chainId: bigint;
+  nonce: `0x${string}`;
+  owner: Address;
+  spender: Address;
+};
+
+export type SignPermitProps = {
+  token: LIDO_CONTRACT_NAMES.lido | LIDO_CONTRACT_NAMES.wsteth;
+  amount: bigint;
+  account: Address;
+  spender: Address;
+  deadline?: bigint;
+};

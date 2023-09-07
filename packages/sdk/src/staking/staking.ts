@@ -1,8 +1,5 @@
+import { zeroAddress, parseEther, getContract, encodeFunctionData } from 'viem';
 import {
-  zeroAddress,
-  parseEther,
-  getContract,
-  encodeFunctionData,
   type Address,
   type Account,
   type GetContractReturnType,
@@ -22,7 +19,7 @@ import {
 } from '../common/constants.js';
 import { version } from '../version.js';
 
-import { abi } from './abi/steth.js';
+import { StethAbi } from './abi/steth.js';
 import {
   LidoSDKStakingProps,
   StakeProps,
@@ -64,13 +61,13 @@ export class LidoSDKStaking {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
   public async getContractStETH(): Promise<
-    GetContractReturnType<typeof abi, PublicClient, WalletClient>
+    GetContractReturnType<typeof StethAbi, PublicClient, WalletClient>
   > {
     const address = await this.contractAddressStETH();
 
     return getContract({
       address,
-      abi: abi,
+      abi: StethAbi,
       publicClient: this.core.rpcProvider,
       walletClient: this.core.web3Provider,
     });
@@ -182,7 +179,7 @@ export class LidoSDKStaking {
     const address = await this.contractAddressStETH();
     const { request } = await this.core.rpcProvider.simulateContract({
       address,
-      abi,
+      abi: StethAbi,
       functionName: 'submit',
       account,
       args: [referralAddress],
@@ -263,7 +260,7 @@ export class LidoSDKStaking {
     const { referralAddress = zeroAddress } = props;
 
     return encodeFunctionData({
-      abi,
+      abi: StethAbi,
       functionName: 'submit',
       args: [referralAddress],
     });
