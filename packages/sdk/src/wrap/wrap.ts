@@ -85,7 +85,7 @@ export class LidoSDKWrap {
 
   @Logger('Balances:')
   @Cache(10 * 1000, ['core.chain.id'])
-  public async balanceStETH(address: Address): Promise<bigint> {
+  public async balanceWstETH(address: Address): Promise<bigint> {
     const contract = await this.getContractWstETH();
     return contract.read.balanceOf([address]);
   }
@@ -247,12 +247,10 @@ export class LidoSDKWrap {
   }
 
   @Logger('Utils:')
-  public async getStethForWrapAllowance(
-    props: CommonWrapProps,
-  ): Promise<bigint> {
+  public async getStethForWrapAllowance(account: Address): Promise<bigint> {
     const stethContract = await this.getStethPartialContract();
     const wstethAddress = await this.contractAddressWstETH();
-    return stethContract.read.allowance([props.account, wstethAddress]);
+    return stethContract.read.allowance([account, wstethAddress]);
   }
 
   @Logger('LOG:')

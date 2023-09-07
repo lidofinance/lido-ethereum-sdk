@@ -1,4 +1,4 @@
-import { parseEther, type Address } from 'viem';
+import { parseEther, type Address, maxUint256 } from 'viem';
 import invariant from 'tiny-invariant';
 
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
@@ -15,6 +15,7 @@ import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
 import { PermitSignature } from '../core/types.js';
 
 export class LidoSDKWithdrawals extends Bus {
+  public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
   constructor(props: LidoSDKWithdrawalsProps) {
     super(props, version);
   }
@@ -171,7 +172,7 @@ export class LidoSDKWithdrawals extends Bus {
     const signature = await this.core.signPermit({
       account,
       spender: contract.address,
-      deadline: INFINITY_DEADLINE_VALUE,
+      deadline: LidoSDKWithdrawals.INFINITY_DEADLINE_VALUE,
       amount: parseEther(amount),
       token:
         token === 'stETH'

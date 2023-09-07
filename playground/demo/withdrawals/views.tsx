@@ -1,6 +1,6 @@
 import { Accordion } from '@lidofinance/lido-ui';
 import { useWeb3 } from '@reef-knot/web3-react';
-import { Action } from 'components/action';
+import { Action, renderTokenResult } from 'components/action';
 import { useLidoSDK } from 'providers/sdk';
 
 export const WithdrawalsViewsDemo = () => {
@@ -22,14 +22,17 @@ export const WithdrawalsViewsDemo = () => {
       <Action
         title="Get unfinalized stETH"
         action={() => withdrawals.views.getUnfinalizedStETH()}
+        renderResult={renderTokenResult('stETH')}
       />
       <Action
         title="Get MIN stETH withdrawal amount"
         action={() => withdrawals.views.minStethWithdrawalAmount()}
+        renderResult={renderTokenResult('stETH')}
       />
       <Action
         title="Get MAX stETH withdrawal amount"
         action={() => withdrawals.views.maxStethWithdrawalAmount()}
+        renderResult={renderTokenResult('stETH')}
       />
       <Action title="Is paused" action={() => withdrawals.views.isPaused()} />
       <Action
