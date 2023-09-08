@@ -1,2 +1,2 @@
 export { LidoSDKStaking } from './staking.js';
-export { StakeProps } from './types.js';
+export { type StakeProps } from './types.js';

@@ -21,10 +21,10 @@ import { version } from '../version.js';
 
 import { StethAbi } from './abi/steth.js';
 import {
-  LidoSDKStakingProps,
-  StakeProps,
-  StakeResult,
-  StakeEncodeDataProps,
+  type LidoSDKStakingProps,
+  type StakeProps,
+  type StakeResult,
+  type StakeEncodeDataProps,
 } from './types.js';
 import { TransactionCallbackStage } from '../core/types.js';
 
@@ -100,20 +100,26 @@ export class LidoSDKStaking {
 
   @Logger('LOG:')
   private async stakeEOA(props: StakeProps): Promise<StakeResult> {
-    const { value, callback, referralAddress = zeroAddress, account } = props;
+    const {
+      value,
+      callback = () => {},
+      referralAddress = zeroAddress,
+      account,
+    } = props;
 
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     // Checking the daily protocol staking limit
     await this.validateStakeLimit(value);
 
+    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
     const { gasLimit, overrides } = await this.submitGasLimit(
       account,
       value,
       referralAddress,
     );
 
-    callback?.({ stage: TransactionCallbackStage.SIGN });
+    callback({ stage: TransactionCallbackStage.SIGN });
 
     const contract = await this.getContractStETH();
     const transaction = await contract.write.submit([referralAddress], {
@@ -124,7 +130,7 @@ export class LidoSDKStaking {
       account,
     });
 
-    callback?.({
+    callback({
       stage: TransactionCallbackStage.RECEIPT,
       payload: transaction,
     });
@@ -134,7 +140,7 @@ export class LidoSDKStaking {
         hash: transaction,
       });
 
-    callback?.({
+    callback({
       stage: TransactionCallbackStage.CONFIRMATION,
       payload: transactionReceipt,
     });
@@ -144,7 +150,7 @@ export class LidoSDKStaking {
         hash: transactionReceipt.transactionHash,
       });
 
-    callback?.({
+    callback({
       stage: TransactionCallbackStage.DONE,
       payload: confirmations,
     });

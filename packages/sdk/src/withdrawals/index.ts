@@ -1,9 +1,9 @@
 export { LidoSDKWithdrawals } from './withdrawals.js';
 export {
-  RequestCallbackStages,
-  RequestStageCallback,
-  RequestProps,
-  RequestWithPermitProps,
-  ApproveCallbackStages,
-  ApproveStageCallback,
+  type RequestCallbackStages,
+  type RequestStageCallback,
+  type RequestProps,
+  type RequestWithPermitProps,
+  type ApproveCallbackStages,
+  type ApproveStageCallback,
 } from './types.js';

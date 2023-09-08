@@ -1,7 +1,9 @@
+export { LIDO_TOKENS, CHAINS } from '../common/constants.js';
+
 export { default as LidoSDKCore } from './core.js';
 export {
-  LidoSDKCoreProps,
-  TransactionCallback,
-  TransactionCallbackStage,
-  TransactionCallbackProps,
+  type LidoSDKCoreProps,
+  type TransactionCallback,
+  type TransactionCallbackStage,
+  type TransactionCallbackProps,
 } from './types.js';

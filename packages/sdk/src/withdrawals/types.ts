@@ -2,12 +2,15 @@ import { type Address, type Hash, type TransactionReceipt } from 'viem';
 
 import { type LidoSDKCoreProps, type LidoSDKCore } from '../core/index.js';
 import { type SDKError } from '../common/utils/index.js';
+import { LIDO_TOKENS } from '../common/constants.js';
 
 export type LidoSDKWithdrawalsProps = LidoSDKCoreProps & {
   core?: LidoSDKCore;
 };
 
-export type WithdrawableTokens = 'stETH' | 'wstETH';
+export type WithdrawableTokens =
+  | (typeof LIDO_TOKENS)['steth']
+  | (typeof LIDO_TOKENS)['wsteth'];
 
 export type RequestStatus = {
   amountOfStETH: bigint;

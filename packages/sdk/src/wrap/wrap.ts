@@ -110,6 +110,7 @@ export class LidoSDKWrap {
     this.validateStakeLimit(value);
 
     const contract = await this.getContractWstETH();
+    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
     const gasLimit = await this.core.rpcProvider.estimateGas({
       account,
       to: contract.address,
@@ -179,6 +180,8 @@ export class LidoSDKWrap {
     const { value: stringValue, callback = () => {}, account } = props;
     const value = parseEther(stringValue);
     const contract = await this.getContractWstETH();
+
+    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
     const gasLimit = await contract.estimateGas.wrap([value], {
       account,
     });
@@ -263,6 +266,7 @@ export class LidoSDKWrap {
     const stethContract = await this.getStethPartialContract();
     const wstethContractAddress = await this.contractAddressWstETH();
 
+    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
     const gasLimit = await stethContract.estimateGas.approve(
       [wstethContractAddress, value],
       {
@@ -348,6 +352,7 @@ export class LidoSDKWrap {
 
     const contract = await this.getContractWstETH();
 
+    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
     const gasLimit = await contract.estimateGas.unwrap([value], {
       account,
     });

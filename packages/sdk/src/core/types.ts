@@ -6,7 +6,7 @@ import {
   Address,
 } from 'viem';
 
-import { LIDO_CONTRACT_NAMES, SUPPORTED_CHAINS } from '../common/constants.js';
+import { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
 import { SDKError } from '../index.js';
 
 type LidoSDKCorePropsRpcUrls = {
@@ -27,6 +27,7 @@ export type LidoSDKCoreProps =
   | LidoSDKCorePropsRpcProvider;
 
 export enum TransactionCallbackStage {
+  'GAS_LIMIT' = 'gas_limit',
   'SIGN' = 'sign',
   'RECEIPT' = 'receipt',
   'CONFIRMATION' = 'confirmation',
@@ -36,6 +37,7 @@ export enum TransactionCallbackStage {
 }
 
 export type TransactionCallbackProps =
+  | { stage: TransactionCallbackStage.GAS_LIMIT; payload?: undefined }
   | { stage: TransactionCallbackStage.SIGN; payload?: undefined }
   | { stage: TransactionCallbackStage.RECEIPT; payload: Hash }
   | {
@@ -68,7 +70,7 @@ export type PermitSignature = {
 };
 
 export type SignPermitProps = {
-  token: LIDO_CONTRACT_NAMES.lido | LIDO_CONTRACT_NAMES.wsteth;
+  token: (typeof LIDO_TOKENS)['steth'] | (typeof LIDO_TOKENS)['wsteth'];
   amount: bigint;
   account: Address;
   spender: Address;

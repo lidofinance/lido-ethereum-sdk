@@ -34,11 +34,17 @@ import {
   LIDO_LOCATOR_BY_CHAIN,
   type CHAINS,
   LIDO_CONTRACT_NAMES,
+  CONTRACTS_BY_TOKENS,
+  LIDO_TOKENS,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
 import { wqAbi } from './abi/wq.js';
-import { LidoSDKCoreProps, PermitSignature, SignPermitProps } from './types.js';
+import {
+  type LidoSDKCoreProps,
+  type PermitSignature,
+  type SignPermitProps,
+} from './types.js';
 import { permitAbi } from './abi/permit.js';
 
 const EIP2612_TYPE = [
@@ -66,6 +72,7 @@ const TYPES = {
 };
 
 export default class LidoSDKCore {
+  public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
   readonly chainId: CHAINS;
   readonly rpcUrls: string[] | undefined;
   readonly chain: Chain;
@@ -202,7 +209,13 @@ export default class LidoSDKCore {
   // PERMIT
   @Logger('Permit:')
   public async signPermit(props: SignPermitProps): Promise<PermitSignature> {
-    const { token, amount, account, spender, deadline = maxUint256 } = props;
+    const {
+      token,
+      amount,
+      account,
+      spender,
+      deadline = LidoSDKCore.INFINITY_DEADLINE_VALUE,
+    } = props;
     invariant(this.web3Provider, 'Web3 provider is not defined');
 
     const { contract, domain } = await this.getPermitContractData(token);
@@ -244,7 +257,9 @@ export default class LidoSDKCore {
   @Logger('Utils:')
   @Cache(30 * 60 * 1000, ['chain.id'])
   private async getPermitContractData(token: SignPermitProps['token']) {
-    const tokenAddress = await this.getContractAddress(token);
+    const tokenAddress = await this.getContractAddress(
+      CONTRACTS_BY_TOKENS[token],
+    );
     const contract = getContract({
       address: tokenAddress,
       abi: permitAbi,
@@ -258,7 +273,7 @@ export default class LidoSDKCore {
       chainId: this.chain.id,
       verifyingContract: tokenAddress,
     };
-    if (token === LIDO_CONTRACT_NAMES.lido) {
+    if (token === LIDO_TOKENS.steth) {
       const [name, version, chainId, verifyingContract] =
         await contract.read.eip712Domain();
       domain = {
