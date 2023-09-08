@@ -1,12 +1,13 @@
 import {
   getContract,
+  encodeFunctionData,
+  parseEther,
   type Address,
   type GetContractReturnType,
   type PublicClient,
   type WalletClient,
-  encodeFunctionData,
-  parseEther,
-  FormattedTransactionRequest,
+  type FormattedTransactionRequest,
+  type WriteContractParameters,
 } from 'viem';
 import invariant from 'tiny-invariant';
 import { LidoSDKCore } from '../core/index.js';
@@ -167,6 +168,22 @@ export class LidoSDKWrap {
     };
   }
 
+  @Logger('Call:')
+  public async wrapEthSimulateTx(
+    props: Omit<CommonWrapProps, 'callback'>,
+  ): Promise<{ gasLimit: bigint }> {
+    const { value, account } = props;
+
+    const address = await this.contractAddressWstETH();
+    const gasLimit = await this.core.rpcProvider.estimateGas({
+      account,
+      to: address,
+      value: parseEther(value),
+    });
+
+    return { gasLimit };
+  }
+
   /// WRAP STETH
 
   @Logger('Call:')
@@ -236,6 +253,25 @@ export class LidoSDKWrap {
         args: [value],
       }),
     };
+  }
+
+  @Logger('Call:')
+  public async wrapStethSimulateTx(
+    props: Omit<CommonWrapProps, 'callback'>,
+  ): Promise<WriteContractParameters> {
+    const { value, account } = props;
+
+    const address = await this.contractAddressWstETH();
+    const { request } = await this.core.rpcProvider.simulateContract({
+      address,
+      abi,
+      account,
+
+      functionName: 'wrap',
+      args: [parseEther(value)],
+    });
+
+    return request;
   }
 
   /// APPROVE
@@ -337,6 +373,27 @@ export class LidoSDKWrap {
     };
   }
 
+  @Logger('Call:')
+  public async approveStethForWrapSimulateTx(
+    props: Omit<CommonWrapProps, 'callback'>,
+  ): Promise<WriteContractParameters> {
+    const { value: stringValue, account } = props;
+    const value = parseEther(stringValue);
+
+    const stethContract = await this.getStethPartialContract();
+    const wstethContractAddress = await this.contractAddressWstETH();
+
+    const { request } = await this.core.rpcProvider.simulateContract({
+      address: stethContract.address,
+      abi: stethPartialAbi,
+      account,
+      functionName: 'approve',
+      args: [wstethContractAddress, value],
+    });
+
+    return request;
+  }
+
   /// UNWRAP
 
   @Logger('Call:')
@@ -406,6 +463,26 @@ export class LidoSDKWrap {
         args: [value],
       }),
     };
+  }
+
+  @Logger('Call:')
+  public async unwrapSimulateTx(
+    props: Omit<CommonWrapProps, 'callback'>,
+  ): Promise<WriteContractParameters> {
+    const { value: stringValue, account } = props;
+    const value = parseEther(stringValue);
+=
+    const wstethContractAddress = await this.contractAddressWstETH();
+
+    const { request } = await this.core.rpcProvider.simulateContract({
+      address: wstethContractAddress,
+      abi,
+      account,
+      functionName: 'unwrap',
+      args: [value],
+    });
+
+    return request;
   }
 
   /// UTILS
