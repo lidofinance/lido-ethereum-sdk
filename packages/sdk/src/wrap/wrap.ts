@@ -471,7 +471,7 @@ export class LidoSDKWrap {
   ): Promise<WriteContractParameters> {
     const { value: stringValue, account } = props;
     const value = parseEther(stringValue);
-=
+
     const wstethContractAddress = await this.contractAddressWstETH();
 
     const { request } = await this.core.rpcProvider.simulateContract({
