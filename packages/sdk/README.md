@@ -175,7 +175,7 @@ Callback stages:
 import {
   LidoSDK,
   StakeStageCallback,
-  StakeCallbackStages,
+  TransactionCallbackStage,
   SDKError,
 } from '@lidofinance/lido-ethereum-sdk';
 
@@ -189,22 +189,22 @@ lidoSDK.core.defineWeb3Provider();
 
 const callback: StakeStageCallback = ({ stage, payload }) => {
   switch (stage) {
-    case StakeCallbackStages.SIGN:
+    case TransactionCallbackStage.SIGN:
       console.log('wait for sign');
       break;
-    case StakeCallbackStages.RECEIPT:
+    case TransactionCallbackStage.RECEIPT:
       console.log('wait for receipt');
       console.log(payload, 'transaction hash');
       break;
-    case StakeCallbackStages.CONFIRMATION:
+    case TransactionCallbackStage.CONFIRMATION:
       console.log('wait for confirmation');
       console.log(payload, 'transaction receipt');
       break;
-    case StakeCallbackStages.DONE:
+    case TransactionCallbackStage.DONE:
       console.log('done');
       console.log(payload, 'transaction confirmations');
       break;
-    case StakeCallbackStages.ERROR:
+    case TransactionCallbackStage.ERROR:
       console.log('error');
       console.log(payload, 'error object with code and message');
       break;
@@ -266,6 +266,121 @@ const simulateResult = await lidoSDK.staking.stakeSimulateTx({
   account,
 });
 ```
+
+## Wrap
+
+### Wrap ETH
+
+Arguments:
+
+- `value`: _string_ - amount of ETH to wrap to wstETH (staking ETH and then wrapping stETH to wstETH in a single tx)
+- `callback`: _StageCallback_ - callback function that will be on each _stage_ of the transaction
+
+```ts
+import {
+  LidoSDK,
+  TransactionCallback,
+  TransactionCallbackStage,
+  SDKError,
+} from '@lidofinance/lido-ethereum-sdk';
+
+const lidoSDK = new LidoSDK({
+  rpcUrls: ['https://rpc-url'],
+  chainId: 5,
+});
+
+// Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
+lidoSDK.core.defineWeb3Provider();
+
+const callback: TransactionCallback = ({ stage, payload }) => {
+  switch (stage) {
+    case TransactionCallbackStage.SIGN:
+      console.log('wait for sign');
+      break;
+    case TransactionCallbackStage.RECEIPT:
+      console.log('wait for receipt');
+      console.log(payload, 'transaction hash');
+      break;
+    case TransactionCallbackStage.CONFIRMATION:
+      console.log('wait for confirmation');
+      console.log(payload, 'transaction receipt');
+      break;
+    case TransactionCallbackStage.DONE:
+      console.log('done');
+      console.log(payload, 'transaction confirmations');
+      break;
+    case TransactionCallbackStage.ERROR:
+      console.log('error');
+      console.log(payload, 'error object with code and message');
+      break;
+    default:
+  }
+};
+
+try {
+  const wrapResult = await lidoSDK.staking.wrapETH({
+    value,
+    callback,
+    account,
+  });
+
+  console.log(
+    stakeResult,
+    'transaction hash, transaction receipt, confirmations',
+  );
+} catch (error) {
+  console.log((error as SDKError).errorMessage, (error as SDKError).code);
+}
+```
+
+### Wrap stETH
+
+To wrap stETH you first need to approve stETH to wrap contract:
+
+```ts
+import {
+  LidoSDK,
+  TransactionCallback,
+  TransactionCallbackStage,
+  SDKError,
+} from '@lidofinance/lido-ethereum-sdk';
+
+const lidoSDK = new LidoSDK({
+  rpcUrls: ['https://rpc-url'],
+  chainId: 5,
+});
+
+// get existing allowance
+const allowance = await lidoSDK.wrap.getStethForWrapAllowance(account);
+
+// if value is more than perform approve
+const approveResult = await lidoSDK.wrap.approveStethForWrap({
+  value,
+  account,
+  callback,
+});
+
+// wrap stETH
+const wrapResult = await lidoSDK.wrap.wrapSteth({ value, account, callback });
+```
+
+### Unwrap
+
+```ts
+// unwrap wstETH to receive stETH
+const unwrapResult = await lidoSDK.wrap.unwrap({
+  value: unwrapAmount,
+  account,
+  callback,
+});
+```
+
+### Utilities
+
+For all transaction methods helper methods are available similar to `stake` module:
+
+- `...populateTX`: returns ready to sign transaction object with all data encoded
+- `...simulateTX`: performs dry-ran of the transaction to see if it will execute on the network
 
 ## Withdrawal
 
