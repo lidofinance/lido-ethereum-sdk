@@ -5,6 +5,7 @@ import TokenInput from 'components/tokenInput/tokenInput';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
 import { parseEther } from '@ethersproject/units';
+import { transactionToast } from 'utils/transaction-toast';
 
 export const WithdrawalsRequestDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
@@ -15,31 +16,55 @@ export const WithdrawalsRequestDemo = () => {
 
   return (
     <Accordion summary="Withdrawals requests">
+      <TokenInput
+        label="value"
+        value={requestValue}
+        placeholder="0.0"
+        onChange={(e) => setRequestValue(e.currentTarget.value)}
+      />
       <Action
         title="Request stETH"
         action={() =>
-          withdrawals.request({
+          withdrawals.request.requestByToken({
             account,
             amount: requestValue,
             requests: [BigInt(parseEther(requestValue).toString())],
             token: 'stETH',
+            callback: transactionToast,
           })
         }
-      >
-        <TokenInput
-          label="value"
-          value={requestValue}
-          placeholder="0.0"
-          onChange={(e) => setRequestValue(e.currentTarget.value)}
-        />
-      </Action>
+      />
       <Action
-        title="Request Without Permit"
+        title="Request wstETH"
         action={() =>
-          withdrawals.requestWithoutPermit({
+          withdrawals.request.requestByToken({
+            account,
+            amount: requestValue,
+            requests: [BigInt(parseEther(requestValue).toString())],
+            token: 'wstETH',
+            callback: transactionToast,
+          })
+        }
+      />
+      <Action
+        title="Request stETH Without Permit"
+        action={() =>
+          withdrawals.request.requestWithoutPermit({
             account,
             requests: [BigInt(parseEther(requestValue).toString())],
             token: 'stETH',
+            callback: transactionToast,
+          })
+        }
+      />
+      <Action
+        title="Request wstETH Without Permit"
+        action={() =>
+          withdrawals.request.requestWithoutPermit({
+            account,
+            requests: [BigInt(parseEther(requestValue).toString())],
+            token: 'wstETH',
+            callback: transactionToast,
           })
         }
       />

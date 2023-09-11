@@ -6,6 +6,10 @@ import { toast } from '@lidofinance/lido-ui';
 
 export const transactionToast: TransactionCallback = ({ stage, payload }) => {
   switch (stage) {
+    case TransactionCallbackStage.PERMIT:
+      return toast('Permit', { type: 'info' });
+    case TransactionCallbackStage.GAS_LIMIT:
+      return toast('Gas limit', { type: 'info' });
     case TransactionCallbackStage.SIGN:
       return toast('Signing', { type: 'info' });
     case TransactionCallbackStage.RECEIPT:
