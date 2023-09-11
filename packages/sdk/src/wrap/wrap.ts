@@ -8,16 +8,17 @@ import {
   type WalletClient,
   type FormattedTransactionRequest,
   type WriteContractParameters,
+  type Hash,
 } from 'viem';
 import invariant from 'tiny-invariant';
 import { LidoSDKCore } from '../core/index.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import {
   LidoSDKWrapProps,
-  CommonWrapProps,
+  WrapProps,
   TxResult,
   PopulatedTx,
-  IMethodProps as ITxMethodProps,
+  TxMethodProps,
 } from './types.js';
 import { version } from '../version.js';
 
@@ -93,18 +94,16 @@ export class LidoSDKWrap {
 
   // Calls
 
-  //// WRAP ETH
-
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async wrapEth(props: CommonWrapProps): Promise<TxResult> {
+  public async wrapEth(props: WrapProps): Promise<TxResult> {
     return this.executeTxMethod(props, this.wrapEthEOA, this.wrapEthMultisig);
   }
 
   @Logger('LOG:')
-  private async wrapEthEOA(props: CommonWrapProps): Promise<TxResult> {
+  private async wrapEthEOA(props: WrapProps): Promise<TxResult> {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
-    const { value: stringValue, callback = () => {}, account } = props;
+    const { value: stringValue, callback, account } = props;
     const value = parseEther(stringValue);
 
     // Checking the daily protocol staking limit
@@ -112,7 +111,7 @@ export class LidoSDKWrap {
     this.validateStakeLimit(value);
 
     const contract = await this.getContractWstETH();
-    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
+    callback?.({ stage: TransactionCallbackStage.GAS_LIMIT });
     const gasLimit = await this.core.rpcProvider.estimateGas({
       account,
       to: contract.address,
@@ -121,7 +120,7 @@ export class LidoSDKWrap {
 
     const { maxFeePerGas, maxPriorityFeePerGas } = await this.core.getFeeData();
 
-    callback({ stage: TransactionCallbackStage.SIGN });
+    callback?.({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
     const transaction = await this.core.web3Provider.sendTransaction({
       value,
       account,
@@ -136,14 +135,14 @@ export class LidoSDKWrap {
   }
 
   @Logger('LOG:')
-  private async wrapEthMultisig(props: CommonWrapProps): Promise<TxResult> {
+  private async wrapEthMultisig(props: WrapProps): Promise<TxResult> {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
 
-    const { value: stringValue, callback = () => {}, account } = props;
+    const { value: stringValue, callback, account } = props;
     const value = parseEther(stringValue);
     const contract = await this.getContractWstETH();
 
-    callback({ stage: TransactionCallbackStage.SIGN });
+    callback?.({ stage: TransactionCallbackStage.SIGN });
     const hash = await this.core.web3Provider.sendTransaction({
       value,
       chain: this.core.chain,
@@ -151,13 +150,13 @@ export class LidoSDKWrap {
       to: contract.address,
     });
 
-    callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
+    callback?.({ stage: TransactionCallbackStage.MULTISIG_DONE });
 
     return { hash };
   }
 
   @Logger('Utils:')
-  public async wrapEthPopulateTx(props: CommonWrapProps): Promise<PopulatedTx> {
+  public async wrapEthPopulateTx(props: WrapProps): Promise<PopulatedTx> {
     const { value, account } = props;
 
     const address = await this.contractAddressWstETH();
@@ -172,7 +171,7 @@ export class LidoSDKWrap {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async wrapEthEstimateGas(
-    props: Omit<CommonWrapProps, 'callback'>,
+    props: Omit<WrapProps, 'callback'>,
   ): Promise<bigint> {
     const { value, account } = props;
 
@@ -184,11 +183,11 @@ export class LidoSDKWrap {
     });
   }
 
-  /// WRAP STETH
+  /// Wrap stETH
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async wrapSteth(props: CommonWrapProps): Promise<TxResult> {
+  public async wrapSteth(props: WrapProps): Promise<TxResult> {
     return this.executeTxMethod(
       props,
       this.wrapStethEOA,
@@ -197,20 +196,20 @@ export class LidoSDKWrap {
   }
 
   @Logger('LOG:')
-  private async wrapStethEOA(props: CommonWrapProps): Promise<TxResult> {
+  private async wrapStethEOA(props: WrapProps): Promise<TxResult> {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
-    const { value: stringValue, callback = () => {}, account } = props;
+    const { value: stringValue, callback, account } = props;
     const value = parseEther(stringValue);
     const contract = await this.getContractWstETH();
 
-    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
+    callback?.({ stage: TransactionCallbackStage.GAS_LIMIT });
     const gasLimit = await contract.estimateGas.wrap([value], {
       account,
     });
 
     const { maxFeePerGas, maxPriorityFeePerGas } = await this.core.getFeeData();
 
-    callback({ stage: TransactionCallbackStage.SIGN });
+    callback?.({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
     const transaction = await contract.write.wrap([value], {
       chain: this.core.chain,
       gas: gasLimit,
@@ -223,14 +222,14 @@ export class LidoSDKWrap {
   }
 
   @Logger('LOG:')
-  private async wrapStethMultisig(props: CommonWrapProps): Promise<TxResult> {
+  private async wrapStethMultisig(props: WrapProps): Promise<TxResult> {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
 
-    const { value: stringValue, callback = () => {}, account } = props;
+    const { value: stringValue, callback, account } = props;
     const value = parseEther(stringValue);
     const contract = await this.getContractWstETH();
 
-    callback({ stage: TransactionCallbackStage.SIGN });
+    callback?.({ stage: TransactionCallbackStage.SIGN });
     const transaction = await contract.write.wrap([value], {
       chain: this.core.chain,
       account,
@@ -242,9 +241,7 @@ export class LidoSDKWrap {
   }
 
   @Logger('Utils:')
-  public async wrapStethPopulateTx(
-    props: CommonWrapProps,
-  ): Promise<PopulatedTx> {
+  public async wrapStethPopulateTx(props: WrapProps): Promise<PopulatedTx> {
     const { value: stringValue, account } = props;
     const value = parseEther(stringValue);
     const address = await this.contractAddressWstETH();
@@ -263,7 +260,7 @@ export class LidoSDKWrap {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async wrapStethSimulateTx(
-    props: Omit<CommonWrapProps, 'callback'>,
+    props: Omit<WrapProps, 'callback'>,
   ): Promise<WriteContractParameters> {
     const { value, account } = props;
 
@@ -280,11 +277,11 @@ export class LidoSDKWrap {
     return request;
   }
 
-  /// APPROVE
+  /// Approve
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async approveStethForWrap(props: CommonWrapProps): Promise<TxResult> {
+  public async approveStethForWrap(props: WrapProps): Promise<TxResult> {
     return this.executeTxMethod(
       props,
       this.approveStethForWrapEOA,
@@ -301,16 +298,14 @@ export class LidoSDKWrap {
   }
 
   @Logger('LOG:')
-  private async approveStethForWrapEOA(
-    props: CommonWrapProps,
-  ): Promise<TxResult> {
-    const { account, value: stringValue, callback = () => {} } = props;
+  private async approveStethForWrapEOA(props: WrapProps): Promise<TxResult> {
+    const { account, value: stringValue, callback } = props;
     const value = parseEther(stringValue);
 
     const stethContract = await this.getPartialContractSteth();
     const wstethContractAddress = await this.contractAddressWstETH();
 
-    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
+    callback?.({ stage: TransactionCallbackStage.GAS_LIMIT });
     const gasLimit = await stethContract.estimateGas.approve(
       [wstethContractAddress, value],
       {
@@ -320,7 +315,7 @@ export class LidoSDKWrap {
 
     const { maxFeePerGas, maxPriorityFeePerGas } = await this.core.getFeeData();
 
-    callback({ stage: TransactionCallbackStage.SIGN });
+    callback?.({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
     const transaction = await stethContract.write.approve(
       [wstethContractAddress, value],
       {
@@ -337,15 +332,15 @@ export class LidoSDKWrap {
 
   @Logger('LOG:')
   private async approveStethForWrapMultisig(
-    props: CommonWrapProps,
+    props: WrapProps,
   ): Promise<TxResult> {
-    const { account, value: stringValue, callback = () => {} } = props;
+    const { account, value: stringValue, callback } = props;
     const value = parseEther(stringValue);
 
     const stethContract = await this.getPartialContractSteth();
     const wstethContractAddress = await this.contractAddressWstETH();
 
-    callback({ stage: TransactionCallbackStage.SIGN });
+    callback?.({ stage: TransactionCallbackStage.SIGN });
 
     const transaction = await stethContract.write.approve(
       [wstethContractAddress, value],
@@ -355,14 +350,14 @@ export class LidoSDKWrap {
       },
     );
 
-    callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
+    callback?.({ stage: TransactionCallbackStage.MULTISIG_DONE });
 
     return { hash: transaction };
   }
 
   @Logger('Utils:')
   public async approveStethForWrapPopulateTx(
-    props: CommonWrapProps,
+    props: WrapProps,
   ): Promise<Omit<FormattedTransactionRequest, 'type'>> {
     const { value: stringValue, account } = props;
     const value = parseEther(stringValue);
@@ -384,7 +379,7 @@ export class LidoSDKWrap {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async approveStethForWrapSimulateTx(
-    props: Omit<CommonWrapProps, 'callback'>,
+    props: Omit<WrapProps, 'callback'>,
   ): Promise<WriteContractParameters> {
     const { value: stringValue, account } = props;
     const value = parseEther(stringValue);
@@ -403,30 +398,30 @@ export class LidoSDKWrap {
     return request;
   }
 
-  /// UNWRAP
+  /// Unwrap
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async unwrap(props: CommonWrapProps): Promise<TxResult> {
+  public async unwrap(props: WrapProps): Promise<TxResult> {
     return this.executeTxMethod(props, this.unwrapEOA, this.unwrapMultisig);
   }
 
   @Logger('LOG:')
-  private async unwrapEOA(props: CommonWrapProps): Promise<TxResult> {
+  private async unwrapEOA(props: WrapProps): Promise<TxResult> {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
-    const { value: stringValue, callback = () => {}, account } = props;
+    const { value: stringValue, callback, account } = props;
     const value = parseEther(stringValue);
 
     const contract = await this.getContractWstETH();
 
-    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
+    callback?.({ stage: TransactionCallbackStage.GAS_LIMIT });
     const gasLimit = await contract.estimateGas.unwrap([value], {
       account,
     });
 
     const { maxFeePerGas, maxPriorityFeePerGas } = await this.core.getFeeData();
 
-    callback({ stage: TransactionCallbackStage.SIGN });
+    callback?.({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
     const transaction = await contract.write.unwrap([value], {
       chain: this.core.chain,
       gas: gasLimit,
@@ -439,27 +434,27 @@ export class LidoSDKWrap {
   }
 
   @Logger('LOG:')
-  private async unwrapMultisig(props: CommonWrapProps): Promise<TxResult> {
+  private async unwrapMultisig(props: WrapProps): Promise<TxResult> {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
-    const { value: stringValue, callback = () => {}, account } = props;
+    const { value: stringValue, callback, account } = props;
     const value = parseEther(stringValue);
 
     const contract = await this.getContractWstETH();
 
-    callback({ stage: TransactionCallbackStage.SIGN });
+    callback?.({ stage: TransactionCallbackStage.SIGN });
 
     const transaction = await contract.write.unwrap([value], {
       chain: this.core.chain,
       account,
     });
 
-    callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
+    callback?.({ stage: TransactionCallbackStage.MULTISIG_DONE });
 
     return { hash: transaction };
   }
 
   @Logger('Utils:')
-  public async unwrapPopulateTx(props: CommonWrapProps): Promise<PopulatedTx> {
+  public async unwrapPopulateTx(props: WrapProps): Promise<PopulatedTx> {
     const { value: stringValue, account } = props;
     const value = parseEther(stringValue);
     const to = await this.contractAddressWstETH();
@@ -478,7 +473,7 @@ export class LidoSDKWrap {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async unwrapSimulateTx(
-    props: Omit<CommonWrapProps, 'callback'>,
+    props: Omit<WrapProps, 'callback'>,
   ): Promise<WriteContractParameters> {
     const { value: stringValue, account } = props;
     const value = parseEther(stringValue);
@@ -496,7 +491,7 @@ export class LidoSDKWrap {
     return request;
   }
 
-  /// UTILS
+  /// Utils
 
   @Logger('Utils:')
   private async validateStakeLimit(value: bigint): Promise<void> {
@@ -512,7 +507,7 @@ export class LidoSDKWrap {
     }
   }
 
-  private async executeTxMethod<TProps extends ITxMethodProps, TResult>(
+  private async executeTxMethod<TProps extends TxMethodProps, TResult>(
     props: TProps,
     EOAMethod: (props: TProps) => Promise<TResult>,
     multisigMethod: (props: TProps) => Promise<TResult>,
@@ -527,17 +522,20 @@ export class LidoSDKWrap {
 
   @Logger('Utils:')
   private async waitTransactionLifecycle(
-    transaction: `0x${string}`,
-    callback: TransactionCallback,
+    transaction: Hash,
+    callback?: TransactionCallback,
   ) {
-    callback({ stage: TransactionCallbackStage.RECEIPT, payload: transaction });
+    callback?.({
+      stage: TransactionCallbackStage.RECEIPT,
+      payload: transaction,
+    });
 
     const transactionReceipt =
       await this.core.rpcProvider.waitForTransactionReceipt({
         hash: transaction,
       });
 
-    callback({
+    callback?.({
       stage: TransactionCallbackStage.CONFIRMATION,
       payload: transactionReceipt,
     });
@@ -547,12 +545,15 @@ export class LidoSDKWrap {
         hash: transactionReceipt.transactionHash,
       });
 
-    callback({ stage: TransactionCallbackStage.DONE, payload: confirmations });
+    callback?.({
+      stage: TransactionCallbackStage.DONE,
+      payload: confirmations,
+    });
 
     return { hash: transaction, receipt: transactionReceipt, confirmations };
   }
 
-  /// VIEWS
+  /// Views
 
   @Logger('Views:')
   @ErrorHandler('Error:')

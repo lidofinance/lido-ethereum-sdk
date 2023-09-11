@@ -1,11 +1,11 @@
 import { parseEther, type Address } from 'viem';
 import invariant from 'tiny-invariant';
 
-import { type LidoSDKCoreProps } from '../core/index.js';
-import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
-import { version } from '../version.js';
+import { type LidoSDKCoreProps } from '../../core/index.js';
+import { Logger, Cache, ErrorHandler } from '../../common/decorators/index.js';
+import { version } from '../../version.js';
 
-import { Bus } from './bus.js';
+import { Bus } from '../bus.js';
 import { type ApproveProps, ApproveCallbackStages } from './types.js';
 
 export class LidoSDKWithdrawalsApprove {

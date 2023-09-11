@@ -27,6 +27,7 @@ export type LidoSDKCoreProps =
   | LidoSDKCorePropsRpcProvider;
 
 export enum TransactionCallbackStage {
+  'PERMIT' = 'permit',
   'GAS_LIMIT' = 'gas_limit',
   'SIGN' = 'sign',
   'RECEIPT' = 'receipt',
@@ -37,8 +38,9 @@ export enum TransactionCallbackStage {
 }
 
 export type TransactionCallbackProps =
+  | { stage: TransactionCallbackStage.PERMIT; payload?: undefined }
   | { stage: TransactionCallbackStage.GAS_LIMIT; payload?: undefined }
-  | { stage: TransactionCallbackStage.SIGN; payload?: undefined }
+  | { stage: TransactionCallbackStage.SIGN; payload?: bigint }
   | { stage: TransactionCallbackStage.RECEIPT; payload: Hash }
   | {
       stage: TransactionCallbackStage.CONFIRMATION;

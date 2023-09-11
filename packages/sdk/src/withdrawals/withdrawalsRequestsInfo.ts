@@ -71,7 +71,11 @@ export class LidoSDKWithdrawalsRequestsInfo {
   @Logger('Utils:')
   public async getClaimableRequestsETH(props: {
     claimableRequestsIds: (bigint | RequestStatusWithId)[];
-  }): Promise<{ ethByRequests: readonly bigint[]; ethSum: bigint }> {
+  }): Promise<{
+    ethByRequests: readonly bigint[];
+    ethSum: bigint;
+    hints: readonly bigint[];
+  }> {
     const sortedIds = props.claimableRequestsIds
       .sort((aReq, bReq) => {
         if (isBigint(aReq) && isBigint(bReq)) {
@@ -96,7 +100,7 @@ export class LidoSDKWithdrawalsRequestsInfo {
     });
     const ethSum = ethByRequests.reduce((acc, eth) => acc + eth, BigInt(0));
 
-    return { ethByRequests, ethSum };
+    return { ethByRequests, ethSum, hints };
   }
 
   @Logger('Utils:')
