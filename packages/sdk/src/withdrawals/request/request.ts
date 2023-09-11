@@ -1,4 +1,4 @@
-import { parseEther, type Address } from 'viem';
+import { parseEther, type Address, Hash } from 'viem';
 import invariant from 'tiny-invariant';
 
 import { Logger, Cache, ErrorHandler } from '../../common/decorators/index.js';
@@ -7,6 +7,7 @@ import { type LidoSDKCoreProps } from '../../core/index.js';
 import {
   type PermitSignature,
   TransactionCallbackStage,
+  TransactionCallback,
 } from '../../core/types.js';
 import { version } from '../../version.js';
 
@@ -130,32 +131,7 @@ export class LidoSDKWithdrawalsRequest {
       chain: this.bus.core.chain,
     });
 
-    callback?.({
-      stage: TransactionCallbackStage.RECEIPT,
-      payload: transaction,
-    });
-
-    const transactionReceipt =
-      await this.bus.core.rpcProvider.waitForTransactionReceipt({
-        hash: transaction,
-      });
-
-    callback?.({
-      stage: TransactionCallbackStage.CONFIRMATION,
-      payload: transactionReceipt,
-    });
-
-    const confirmations =
-      await this.bus.core.rpcProvider.getTransactionConfirmations({
-        hash: transactionReceipt.transactionHash,
-      });
-
-    callback?.({
-      stage: TransactionCallbackStage.DONE,
-      payload: confirmations,
-    });
-
-    return { hash: transaction, receipt: transactionReceipt, confirmations };
+    return this.waitTransactionLifecycle(transaction, callback);
   }
 
   @Logger('Call:')
@@ -221,32 +197,7 @@ export class LidoSDKWithdrawalsRequest {
       ...overrides,
     });
 
-    callback?.({
-      stage: TransactionCallbackStage.RECEIPT,
-      payload: transaction,
-    });
-
-    const transactionReceipt =
-      await this.bus.core.rpcProvider.waitForTransactionReceipt({
-        hash: transaction,
-      });
-
-    callback?.({
-      stage: TransactionCallbackStage.CONFIRMATION,
-      payload: transactionReceipt,
-    });
-
-    const confirmations =
-      await this.bus.core.rpcProvider.getTransactionConfirmations({
-        hash: transactionReceipt.transactionHash,
-      });
-
-    callback?.({
-      stage: TransactionCallbackStage.DONE,
-      payload: confirmations,
-    });
-
-    return { hash: transaction, receipt: transactionReceipt, confirmations };
+    return this.waitTransactionLifecycle(transaction, callback);
   }
 
   @Logger('Call:')
@@ -341,5 +292,38 @@ export class LidoSDKWithdrawalsRequest {
     });
 
     return gasLimit;
+  }
+
+  @Logger('Utils:')
+  private async waitTransactionLifecycle(
+    transaction: Hash,
+    callback?: TransactionCallback,
+  ) {
+    callback?.({
+      stage: TransactionCallbackStage.RECEIPT,
+      payload: transaction,
+    });
+
+    const transactionReceipt =
+      await this.bus.core.rpcProvider.waitForTransactionReceipt({
+        hash: transaction,
+      });
+
+    callback?.({
+      stage: TransactionCallbackStage.CONFIRMATION,
+      payload: transactionReceipt,
+    });
+
+    const confirmations =
+      await this.bus.core.rpcProvider.getTransactionConfirmations({
+        hash: transactionReceipt.transactionHash,
+      });
+
+    callback?.({
+      stage: TransactionCallbackStage.DONE,
+      payload: confirmations,
+    });
+
+    return { hash: transaction, receipt: transactionReceipt, confirmations };
   }
 }
