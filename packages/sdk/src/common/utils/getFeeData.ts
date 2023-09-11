@@ -1,10 +1,10 @@
-import { PublicClient } from "viem";
+import { PublicClient } from 'viem';
 
 export type FeeData = {
-  lastBaseFeePerGas: null | bigint;
-  maxFeePerGas: null | bigint;
-  maxPriorityFeePerGas: null | bigint;
-  gasPrice: null | bigint;
+  lastBaseFeePerGas: bigint;
+  maxFeePerGas: bigint;
+  maxPriorityFeePerGas: bigint;
+  gasPrice: bigint;
 };
 
 export const getFeeData = async (provider: PublicClient): Promise<FeeData> => {
@@ -12,7 +12,7 @@ export const getFeeData = async (provider: PublicClient): Promise<FeeData> => {
   // if you want to increase maxPriorityFee output increase percentile
   const feeHistory = await provider.getFeeHistory({
     blockCount: 5,
-    blockTag: "pending",
+    blockTag: 'pending',
     rewardPercentiles: [25],
   });
 

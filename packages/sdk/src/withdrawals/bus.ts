@@ -3,7 +3,6 @@ import { LidoSDKCore } from '../core/index.js';
 import { LidoSDKWithdrawalsContract } from './withdrawalsContract.js';
 import { LidoSDKWithdrawalsViews } from './withdrawalsViews.js';
 import { LidoSDKWithdrawalsRequestsInfo } from './withdrawalsRequestsInfo.js';
-import { LidoSDKWithdrawalsPermit } from './withdrawalsPermit.js';
 import { LidoSDKWithdrawalsApprove } from './withdrawalsApprove.js';
 import { type LidoSDKWithdrawalsProps } from './types.js';
 
@@ -15,7 +14,6 @@ export class Bus {
   private contractInstance: LidoSDKWithdrawalsContract | undefined;
   private viewsInstance: LidoSDKWithdrawalsViews | undefined;
   private requestsInfoInstance: LidoSDKWithdrawalsRequestsInfo | undefined;
-  private permitInstance: LidoSDKWithdrawalsPermit | undefined;
   private approvalInstance: LidoSDKWithdrawalsApprove | undefined;
 
   constructor(props: LidoSDKWithdrawalsProps, version?: string) {
@@ -88,25 +86,6 @@ export class Bus {
 
   set requestsInfo(requestsInfo: LidoSDKWithdrawalsRequestsInfo) {
     this.requestsInfoInstance = requestsInfo;
-  }
-
-  // Permit
-
-  get permit(): LidoSDKWithdrawalsPermit {
-    if (!this.permitInstance) {
-      this.permitInstance = new LidoSDKWithdrawalsPermit({
-        ...this.props,
-        bus: this,
-      });
-
-      return this.permitInstance;
-    }
-
-    return this.permitInstance;
-  }
-
-  set permit(permit: LidoSDKWithdrawalsPermit) {
-    this.permitInstance = permit;
   }
 
   // Approval

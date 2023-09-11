@@ -21,12 +21,12 @@ import { version } from '../version.js';
 
 import { StethAbi } from './abi/steth.js';
 import {
-  LidoSDKStakingProps,
-  StakeCallbackStages,
-  StakeProps,
-  StakeResult,
-  StakeEncodeDataProps,
+  type LidoSDKStakingProps,
+  type StakeProps,
+  type StakeResult,
+  type StakeEncodeDataProps,
 } from './types.js';
+import { TransactionCallbackStage } from '../core/types.js';
 
 export class LidoSDKStaking {
   readonly core: LidoSDKCore;
@@ -92,7 +92,7 @@ export class LidoSDKStaking {
         error,
         code,
       });
-      callback?.({ stage: StakeCallbackStages.ERROR, payload: txError });
+      callback?.({ stage: TransactionCallbackStage.ERROR, payload: txError });
 
       throw txError;
     }
@@ -100,20 +100,26 @@ export class LidoSDKStaking {
 
   @Logger('LOG:')
   private async stakeEOA(props: StakeProps): Promise<StakeResult> {
-    const { value, callback, referralAddress = zeroAddress, account } = props;
+    const {
+      value,
+      callback = () => {},
+      referralAddress = zeroAddress,
+      account,
+    } = props;
 
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     // Checking the daily protocol staking limit
     await this.validateStakeLimit(value);
 
+    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
     const { gasLimit, overrides } = await this.submitGasLimit(
       account,
       value,
       referralAddress,
     );
 
-    callback?.({ stage: StakeCallbackStages.SIGN });
+    callback({ stage: TransactionCallbackStage.SIGN });
 
     const contract = await this.getContractStETH();
     const transaction = await contract.write.submit([referralAddress], {
@@ -124,15 +130,18 @@ export class LidoSDKStaking {
       account,
     });
 
-    callback?.({ stage: StakeCallbackStages.RECEIPT, payload: transaction });
+    callback({
+      stage: TransactionCallbackStage.RECEIPT,
+      payload: transaction,
+    });
 
     const transactionReceipt =
       await this.core.rpcProvider.waitForTransactionReceipt({
         hash: transaction,
       });
 
-    callback?.({
-      stage: StakeCallbackStages.CONFIRMATION,
+    callback({
+      stage: TransactionCallbackStage.CONFIRMATION,
       payload: transactionReceipt,
     });
 
@@ -141,7 +150,10 @@ export class LidoSDKStaking {
         hash: transactionReceipt.transactionHash,
       });
 
-    callback?.({ stage: StakeCallbackStages.DONE, payload: confirmations });
+    callback({
+      stage: TransactionCallbackStage.DONE,
+      payload: confirmations,
+    });
 
     return { hash: transaction, receipt: transactionReceipt, confirmations };
   }
@@ -150,7 +162,7 @@ export class LidoSDKStaking {
   private async stakeMultisig(props: StakeProps): Promise<StakeResult> {
     const { value, callback, referralAddress = zeroAddress, account } = props;
 
-    callback?.({ stage: StakeCallbackStages.SIGN });
+    callback?.({ stage: TransactionCallbackStage.SIGN });
 
     const contract = await this.getContractStETH();
     const transaction = await contract.write.submit([referralAddress], {
@@ -159,7 +171,7 @@ export class LidoSDKStaking {
       account,
     });
 
-    callback?.({ stage: StakeCallbackStages.MULTISIG_DONE });
+    callback?.({ stage: TransactionCallbackStage.MULTISIG_DONE });
 
     return { hash: transaction };
   }

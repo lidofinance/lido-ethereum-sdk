@@ -1,5 +1,2 @@
-export class LidoSDKWrap {
-  constructor() {
-    console.log("LidoSDKWrap");
-  }
-}
+export { LidoSDKWrap } from './wrap.js';
+export { type CommonWrapProps, type LidoSDKWrapProps } from './types.js';
