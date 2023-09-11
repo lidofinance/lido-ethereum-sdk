@@ -382,6 +382,8 @@ For all transaction methods helper methods are available similar to `stake` modu
 - `...populateTX`: returns ready to sign transaction object with all data encoded
 - `...simulateTX`: performs dry-ran of the transaction to see if it will execute on the network
 
+For `wrapEth` only `wrapEthEstimateGas` is available instead of `simulateTx` but you can use it all the same for checking transaction validity.
+
 ## Withdrawal
 
 ### Call
