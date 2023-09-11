@@ -1,5 +1,5 @@
 import { callConsoleMessage } from './utils.js';
-import { HeadMessage } from './types.js';
+import { type HeadMessage } from './types.js';
 
 export const Logger = function (headMessage: HeadMessage = 'LOG:') {
   return function LoggerMethod<This, Args extends any[], Return>(

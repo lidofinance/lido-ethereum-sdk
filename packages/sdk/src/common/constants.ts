@@ -17,7 +17,14 @@ export const LIDO_LOCATOR_BY_CHAIN: {
   [CHAINS.Goerli]: '0x1eDf09b5023DC86737b59dE68a8130De878984f5',
 };
 
-export enum LIDO_CONTRACT_NAMES {
+export const LIDO_TOKENS = {
+  steth: 'stETH',
+  wsteth: 'wstETH',
+  eth: 'ETH',
+  unsteth: 'unstETH',
+} as const;
+
+export const enum LIDO_CONTRACT_NAMES {
   accountingOracle = 'accountingOracle',
   depositSecurityModule = 'depositSecurityModule',
   elRewardsVault = 'elRewardsVault',
@@ -34,3 +41,9 @@ export enum LIDO_CONTRACT_NAMES {
   oracleDaemonConfig = 'oracleDaemonConfig',
   wsteth = 'wsteth',
 }
+
+export const CONTRACTS_BY_TOKENS = {
+  [LIDO_TOKENS.steth]: LIDO_CONTRACT_NAMES.lido,
+  [LIDO_TOKENS.wsteth]: LIDO_CONTRACT_NAMES.wsteth,
+  [LIDO_TOKENS.unsteth]: LIDO_CONTRACT_NAMES.withdrawalQueue,
+} as const;

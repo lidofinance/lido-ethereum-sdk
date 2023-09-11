@@ -1,6 +1,6 @@
 import { Accordion } from '@lidofinance/lido-ui';
 import { useWeb3 } from '@reef-knot/web3-react';
-import { Action } from 'components/action';
+import { Action, renderTokenResult } from 'components/action';
 import TokenInput from 'components/tokenInput/tokenInput';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
@@ -63,6 +63,7 @@ export const WithdrawalsRequestDemo = () => {
       />
       <Action
         title="Get allowance stETH"
+        renderResult={renderTokenResult('stETH')}
         action={() =>
           withdrawals.approval.getAllowanceByToken({ account, token: 'stETH' })
         }
@@ -72,6 +73,7 @@ export const WithdrawalsRequestDemo = () => {
         action={() =>
           withdrawals.approval.getAllowanceByToken({ account, token: 'wstETH' })
         }
+        renderResult={renderTokenResult('wstETH')}
       />
       <Action
         title="Check stETH allowance by amount"

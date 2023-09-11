@@ -1,6 +1,6 @@
 import { type LidoSDKCore } from '../../core/index.js';
 import { callConsoleMessage } from './utils.js';
-import { HeadMessage } from './types.js';
+import { type HeadMessage } from './types.js';
 
 const isBus = function (
   value: unknown,

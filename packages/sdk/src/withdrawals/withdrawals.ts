@@ -1,4 +1,4 @@
-import { maxUint256, parseEther, type Address } from 'viem';
+import { parseEther, type Address } from 'viem';
 import invariant from 'tiny-invariant';
 
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
@@ -9,11 +9,10 @@ import {
   type LidoSDKWithdrawalsProps,
   type RequestWithPermitProps,
   type RequestProps,
-  type Signature,
   RequestCallbackStages,
 } from './types.js';
-
-const INFINITY_DEADLINE_VALUE = maxUint256;
+import { PermitSignature } from '../core/types.js';
+import { LIDO_TOKENS } from '../common/constants.js';
 
 export class LidoSDKWithdrawals extends Bus {
   constructor(props: LidoSDKWithdrawalsProps) {
@@ -51,7 +50,7 @@ export class LidoSDKWithdrawals extends Bus {
   public async requestStethWithPermit(
     props: Omit<RequestWithPermitProps, 'token'>,
   ) {
-    this.requestWithPermitByToken({ ...props, token: 'stETH' });
+    this.requestWithPermitByToken({ ...props, token: LIDO_TOKENS.steth });
   }
 
   @Logger('Call:')
@@ -59,31 +58,31 @@ export class LidoSDKWithdrawals extends Bus {
   public async requestWstethWithPermit(
     props: Omit<RequestWithPermitProps, 'token'>,
   ) {
-    this.requestWithPermitByToken({ ...props, token: 'stETH' });
+    this.requestWithPermitByToken({ ...props, token: LIDO_TOKENS.steth });
   }
 
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async requestStethWithoutPermit(props: Omit<RequestProps, 'token'>) {
-    this.requestWithoutPermitByToken({ ...props, token: 'stETH' });
+    this.requestWithoutPermitByToken({ ...props, token: LIDO_TOKENS.steth });
   }
 
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async requestWstethWithoutPermit(props: Omit<RequestProps, 'token'>) {
-    this.requestWithoutPermitByToken({ ...props, token: 'wstETH' });
+    this.requestWithoutPermitByToken({ ...props, token: LIDO_TOKENS.steth });
   }
 
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async requestStethMultisig(props: Omit<RequestProps, 'token'>) {
-    return this.requestMultisigByToken({ ...props, token: 'stETH' });
+    return this.requestMultisigByToken({ ...props, token: LIDO_TOKENS.steth });
   }
 
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async requestWstethMultisig(props: Omit<RequestProps, 'token'>) {
-    return this.requestMultisigByToken({ ...props, token: 'wstETH' });
+    return this.requestMultisigByToken({ ...props, token: LIDO_TOKENS.wsteth });
   }
 
   @Logger('Call:')
@@ -153,12 +152,13 @@ export class LidoSDKWithdrawals extends Bus {
   @ErrorHandler('Error:')
   public async requestWithPermitByToken(props: RequestWithPermitProps) {
     const { account, amount, requests, callback, token } = props;
+
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
 
     const contract = await this.contract.getContractWithdrawalsQueue();
 
-    const isSteth = token === 'stETH';
+    const isSteth = token === LIDO_TOKENS.steth;
     let tokenRequestMethod;
 
     if (isSteth) {
@@ -169,10 +169,9 @@ export class LidoSDKWithdrawals extends Bus {
 
     callback?.({ stage: RequestCallbackStages.PERMIT });
 
-    const signature = await this.permit.permitSignature({
+    const signature = await this.core.signPermit({
       account,
       spender: contract.address,
-      deadline: INFINITY_DEADLINE_VALUE,
       amount: parseEther(amount),
       token,
     });
@@ -269,7 +268,7 @@ export class LidoSDKWithdrawals extends Bus {
   @Cache(30 * 1000, ['core.chain.id'])
   private async requestWithPermitGasLimitByToken(
     account: Address,
-    signature: Signature,
+    signature: PermitSignature,
     requests: readonly bigint[],
     token: 'stETH' | 'wstETH',
   ): Promise<bigint> {

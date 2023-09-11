@@ -10,9 +10,14 @@ import {
   http,
   custom,
   getContract,
+  isHex,
+  numberToHex,
+  stringify,
+  maxUint256,
 } from 'viem';
 import { goerli, mainnet } from 'viem/chains';
 import invariant from 'tiny-invariant';
+import { splitSignature } from '@ethersproject/bytes';
 
 import {
   getFeeData,
@@ -28,14 +33,46 @@ import {
   SUPPORTED_CHAINS,
   LIDO_LOCATOR_BY_CHAIN,
   type CHAINS,
-  type LIDO_CONTRACT_NAMES,
+  LIDO_CONTRACT_NAMES,
+  CONTRACTS_BY_TOKENS,
+  LIDO_TOKENS,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
 import { wqAbi } from './abi/wq.js';
-import { LidoSDKCoreProps } from './types.js';
+import {
+  type LidoSDKCoreProps,
+  type PermitSignature,
+  type SignPermitProps,
+} from './types.js';
+import { permitAbi } from './abi/permit.js';
+
+const EIP2612_TYPE = [
+  { name: 'owner', type: 'address' },
+  { name: 'spender', type: 'address' },
+  { name: 'value', type: 'uint256' },
+  { name: 'nonce', type: 'uint256' },
+  { name: 'deadline', type: 'uint256' },
+];
+
+const TYPES = {
+  EIP712Domain: [
+    { name: 'name', type: 'string' },
+    { name: 'version', type: 'string' },
+    {
+      name: 'chainId',
+      type: 'uint256',
+    },
+    {
+      name: 'verifyingContract',
+      type: 'address',
+    },
+  ],
+  Permit: EIP2612_TYPE,
+};
 
 export default class LidoSDKCore {
+  public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
   readonly chainId: CHAINS;
   readonly rpcUrls: string[] | undefined;
   readonly chain: Chain;
@@ -169,12 +206,92 @@ export default class LidoSDKCore {
     });
   }
 
+  // PERMIT
+  @Logger('Permit:')
+  public async signPermit(props: SignPermitProps): Promise<PermitSignature> {
+    const {
+      token,
+      amount,
+      account,
+      spender,
+      deadline = LidoSDKCore.INFINITY_DEADLINE_VALUE,
+    } = props;
+    invariant(this.web3Provider, 'Web3 provider is not defined');
+
+    const { contract, domain } = await this.getPermitContractData(token);
+    const nonce = await contract.read.nonces([account]);
+
+    const message = {
+      owner: account,
+      spender,
+      value: amount.toString(),
+      nonce: numberToHex(nonce),
+      deadline: numberToHex(deadline),
+    };
+    const typedData = stringify(
+      { domain, primaryType: 'Permit', types: TYPES, message },
+      (_, value) => (isHex(value) ? value.toLowerCase() : value),
+    );
+
+    const signature = await this.web3Provider.request({
+      method: 'eth_signTypedData_v4',
+      params: [account, typedData],
+    });
+    const { s, r, v } = splitSignature(signature);
+
+    return {
+      v,
+      r: r as `0x${string}`,
+      s: s as `0x${string}`,
+      value: amount,
+      deadline,
+      chainId: BigInt(this.chain.id),
+      nonce: message.nonce,
+      owner: account,
+      spender,
+    };
+  }
+
   // Utils
+
+  @Logger('Utils:')
+  @Cache(30 * 60 * 1000, ['chain.id'])
+  private async getPermitContractData(token: SignPermitProps['token']) {
+    const tokenAddress = await this.getContractAddress(
+      CONTRACTS_BY_TOKENS[token],
+    );
+    const contract = getContract({
+      address: tokenAddress,
+      abi: permitAbi,
+      publicClient: this.rpcProvider,
+      walletClient: this.web3Provider,
+    });
+
+    let domain = {
+      name: 'Wrapped liquid staked Ether 2.0',
+      version: '1',
+      chainId: this.chain.id,
+      verifyingContract: tokenAddress,
+    };
+    if (token === LIDO_TOKENS.steth) {
+      const [name, version, chainId, verifyingContract] =
+        await contract.read.eip712Domain();
+      domain = {
+        name,
+        version,
+        chainId: Number(chainId),
+        verifyingContract,
+      };
+    }
+    return {
+      contract,
+      domain,
+    };
+  }
 
   @Logger('Utils:')
   public async getFeeData(): Promise<FeeData> {
     invariant(this.rpcProvider, 'RPC provider is not defined');
-
     return getFeeData(this.rpcProvider);
   }
 

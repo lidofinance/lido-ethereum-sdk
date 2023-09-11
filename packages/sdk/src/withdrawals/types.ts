@@ -2,10 +2,15 @@ import { type Address, type Hash, type TransactionReceipt } from 'viem';
 
 import { type LidoSDKCoreProps, type LidoSDKCore } from '../core/index.js';
 import { type SDKError } from '../common/utils/index.js';
+import { LIDO_TOKENS } from '../common/constants.js';
 
 export type LidoSDKWithdrawalsProps = LidoSDKCoreProps & {
   core?: LidoSDKCore;
 };
+
+export type WithdrawableTokens =
+  | (typeof LIDO_TOKENS)['steth']
+  | (typeof LIDO_TOKENS)['wsteth'];
 
 export type RequestStatus = {
   amountOfStETH: bigint;
@@ -35,21 +40,21 @@ export type PermitWstETHStETHProps = {
 };
 
 export type PermitProps = PermitWstETHStETHProps & {
-  token: 'stETH' | 'wstETH';
+  token: WithdrawableTokens;
 };
 
 export type RequestWithPermitProps = {
   account: Address;
   amount: string;
   requests: readonly bigint[];
-  token: 'stETH' | 'wstETH';
+  token: WithdrawableTokens;
   callback?: RequestStageCallback;
 };
 
 export type RequestProps = {
   account: Address;
   requests: readonly bigint[];
-  token: 'stETH' | 'wstETH';
+  token: WithdrawableTokens;
   callback?: RequestStageCallback;
 };
 
@@ -77,18 +82,6 @@ export type RequestCallbackProps =
   | { stage: RequestCallbackStages.ERROR; payload: SDKError };
 
 export type RequestStageCallback = (props: RequestCallbackProps) => void;
-
-export type Signature = {
-  v: number;
-  r: `0x${string}`;
-  s: `0x${string}`;
-  value: bigint;
-  deadline: bigint;
-  chainId: bigint | number;
-  nonce: `0x${string}`;
-  owner: Address;
-  spender: Address;
-};
 
 export enum ApproveCallbackStages {
   'GAS_LIMIT' = 'gas_limit',
