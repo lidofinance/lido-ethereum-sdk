@@ -444,7 +444,7 @@ const callback: RequestStageCallback = ({ stage, payload }) => {
 };
 
 try {
-  const requestResult = await lidoSDK.withdrawals.request({
+  const requestResult = await lidoSDK.withdrawals.request.requestByToken({
     amount,
     requests,
     token, // 'stETH' | 'wstETH'
@@ -510,7 +510,7 @@ const callback: RequestStageCallback = ({ stage, payload }) => {
 };
 
 try {
-  const requestResult = await lidoSDK.withdrawals.requestWithoutPermit({
+  const requestResult = await lidoSDK.withdrawals.request.requestWithoutPermit({
     requests,
     token, // 'stETH' | 'wstETH'
     callback,
