@@ -13,8 +13,8 @@
   "scripts": {
     "dev": "yarn playground:dev",
     "w-info": "yarn workspaces info",
-    "build": "yarn workspaces foreach -pt  run build",
-    "build:packages": "yarn workspaces foreach  --no-private run build",
+    "build": "yarn workspaces foreach -pt run build",
+    "build:packages": "yarn workspaces foreach --no-private run build",
     "types": "yarn workspaces foreach -pt run types",
     "test": "yarn workspaces foreach -pt run test",
     "prepare": "husky install"

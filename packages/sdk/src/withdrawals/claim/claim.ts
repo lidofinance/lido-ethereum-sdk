@@ -8,7 +8,7 @@ import { Bus } from '../bus.js';
 
 import { ClaimRequestsProps } from './types.js';
 
-export class Claim {
+export class LidoSDKWithdrawalsClaim {
   private readonly bus: Bus;
 
   constructor(props: LidoSDKCoreProps & { bus?: Bus }) {

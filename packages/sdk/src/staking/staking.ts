@@ -11,7 +11,7 @@ import {
 } from 'viem';
 import invariant from 'tiny-invariant';
 import { LidoSDKCore } from '../core/index.js';
-import { Logger, Cache } from '../common/decorators/index.js';
+import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 
 import {
   SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
@@ -76,26 +76,15 @@ export class LidoSDKStaking {
   // Calls
 
   @Logger('Call:')
+  @ErrorHandler('Error:')
   public async stake(props: StakeProps): Promise<StakeResult> {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
+    const { account } = props;
 
-    const { callback, account } = props;
-    try {
-      const isContract = await this.core.isContract(account);
+    const isContract = await this.core.isContract(account);
 
-      if (isContract) return await this.stakeMultisig(props);
-      else return await this.stakeEOA(props);
-    } catch (error) {
-      const { message, code } = this.core.getErrorMessage(error);
-      const txError = this.core.error({
-        message,
-        error,
-        code,
-      });
-      callback?.({ stage: TransactionCallbackStage.ERROR, payload: txError });
-
-      throw txError;
-    }
+    if (isContract) return await this.stakeMultisig(props);
+    else return await this.stakeEOA(props);
   }
 
   @Logger('LOG:')
@@ -119,7 +108,7 @@ export class LidoSDKStaking {
       referralAddress,
     );
 
-    callback({ stage: TransactionCallbackStage.SIGN });
+    callback({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
 
     const contract = await this.getContractStETH();
     const transaction = await contract.write.submit([referralAddress], {
@@ -177,6 +166,7 @@ export class LidoSDKStaking {
   }
 
   @Logger('Call:')
+  @ErrorHandler('Error:')
   public async stakeSimulateTx(
     props: StakeProps,
   ): Promise<WriteContractParameters> {
@@ -199,6 +189,7 @@ export class LidoSDKStaking {
 
   @Logger('Views:')
   @Cache(30 * 1000, ['core.chain.id'])
+  @ErrorHandler('Error:')
   public async getStakeLimitInfo() {
     const contract = await this.getContractStETH();
 

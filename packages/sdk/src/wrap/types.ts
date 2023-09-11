@@ -16,7 +16,7 @@ export type LidoSDKWrapProps = LidoSDKCoreProps & {
   core?: LidoSDKCore;
 };
 
-export type CommonWrapProps = {
+export type WrapProps = {
   value: string;
   account: Address;
   callback?: TransactionCallback;
@@ -30,7 +30,7 @@ export type TxResult = {
 
 export type PopulatedTx = Omit<FormattedTransactionRequest, 'type'>;
 
-export interface IMethodProps {
+export interface TxMethodProps {
   account: Address;
   callback?: (props: {
     stage: TransactionCallbackStage.ERROR;
