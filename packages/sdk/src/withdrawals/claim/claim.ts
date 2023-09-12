@@ -11,7 +11,7 @@ import {
   ClaimRequestsProps,
   ClaimRequestsPropsWithoutCallback,
 } from './types.js';
-import { noop } from '../../common/constants.js';
+import { NOOP } from '../../common/constants.js';
 
 export class LidoSDKWithdrawalsClaim {
   private readonly bus: Bus;
@@ -38,7 +38,7 @@ export class LidoSDKWithdrawalsClaim {
 
   @Logger('Call:')
   private async claimRequestsEOA(props: ClaimRequestsProps) {
-    const { account, requestsIds, hints, callback = noop } = props;
+    const { account, requestsIds, hints, callback = NOOP } = props;
 
     const contract = await this.bus.contract.getContractWithdrawalsQueue();
 
@@ -91,7 +91,7 @@ export class LidoSDKWithdrawalsClaim {
 
   @Logger('Call:')
   private async claimRequestsMultisig(props: ClaimRequestsProps) {
-    const { account, requestsIds, hints, callback = noop } = props;
+    const { account, requestsIds, hints, callback = NOOP } = props;
 
     const contract = await this.bus.contract.getContractWithdrawalsQueue();
 

@@ -16,7 +16,7 @@ import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import {
   SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
   LIDO_CONTRACT_NAMES,
-  noop,
+  NOOP,
 } from '../common/constants.js';
 import { version } from '../version.js';
 
@@ -282,7 +282,7 @@ export class LidoSDKStaking {
       ...props,
       referralAddress: props.referralAddress ?? zeroAddress,
       value: parseValue(props.value),
-      callback: props.callback ?? noop,
+      callback: props.callback ?? NOOP,
     };
   }
 }

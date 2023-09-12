@@ -20,8 +20,6 @@ const TokenInput: TokenInputComponent = ({
     value ? formatEther(value) : '',
   );
 
-  console.log(value, stringValue);
-
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       // Support for devices where inputMode="decimal" showing keyboard with comma as decimal delimiter

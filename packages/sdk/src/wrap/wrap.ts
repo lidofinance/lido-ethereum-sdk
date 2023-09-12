@@ -26,7 +26,7 @@ import { version } from '../version.js';
 import { abi } from './abi/wsteth.js';
 import { stethPartialAbi } from './abi/steth-partial.js';
 
-import { LIDO_CONTRACT_NAMES, noop } from '../common/constants.js';
+import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
 import {
   EtherValue,
   TransactionCallback,
@@ -579,7 +579,7 @@ export class LidoSDKWrap {
     return {
       ...props,
       value: parseValue(props.value),
-      callback: props.callback ?? noop,
+      callback: props.callback ?? NOOP,
     };
   }
 }

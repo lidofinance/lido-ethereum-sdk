@@ -7,7 +7,7 @@ import { version } from '../../version.js';
 
 import { Bus } from '../bus.js';
 import { type ApproveProps, ApproveCallbackStages } from './types.js';
-import { noop } from '../../common/constants.js';
+import { NOOP } from '../../common/constants.js';
 import { parseValue } from '../../common/utils/parse-value.js';
 
 export class LidoSDKWithdrawalsApprove {
@@ -63,7 +63,7 @@ export class LidoSDKWithdrawalsApprove {
   @Logger('Call:')
   @ErrorHandler('Error:')
   private async approveByToken(props: ApproveProps) {
-    const { account, amount: _amount, callback = noop, token } = props;
+    const { account, amount: _amount, callback = NOOP, token } = props;
     const amount = parseValue(_amount);
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
@@ -145,7 +145,7 @@ export class LidoSDKWithdrawalsApprove {
   @Logger('Call:')
   @ErrorHandler('Error:')
   private async approveMultisigByToken(props: ApproveProps) {
-    const { account, amount: _amount, callback = noop, token } = props;
+    const { account, amount: _amount, callback = NOOP, token } = props;
     const amount = parseValue(_amount);
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
 

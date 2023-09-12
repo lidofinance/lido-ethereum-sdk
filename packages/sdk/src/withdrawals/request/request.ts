@@ -2,7 +2,7 @@ import { type Address, Hash } from 'viem';
 import invariant from 'tiny-invariant';
 
 import { Logger, Cache, ErrorHandler } from '../../common/decorators/index.js';
-import { LIDO_TOKENS, noop } from '../../common/constants.js';
+import { LIDO_TOKENS, NOOP } from '../../common/constants.js';
 import { type LidoSDKCoreProps } from '../../core/index.js';
 import {
   type PermitSignature,
@@ -92,7 +92,7 @@ export class LidoSDKWithdrawalsRequest {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async requestWithoutPermitByToken(props: RequestProps) {
-    const { account, requests, callback = noop, token } = props;
+    const { account, requests, callback = NOOP, token } = props;
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
@@ -138,7 +138,7 @@ export class LidoSDKWithdrawalsRequest {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async requestWithPermitByToken(props: RequestWithPermitProps) {
-    const { account, requests, callback = noop, token } = props;
+    const { account, requests, callback = NOOP, token } = props;
 
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
@@ -205,7 +205,7 @@ export class LidoSDKWithdrawalsRequest {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async requestMultisigByToken(props: RequestProps) {
-    const { account, requests, callback = noop, token } = props;
+    const { account, requests, callback = NOOP, token } = props;
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
@@ -299,7 +299,7 @@ export class LidoSDKWithdrawalsRequest {
   @Logger('Utils:')
   private async waitTransactionLifecycle(
     transaction: Hash,
-    callback: TransactionCallback = noop,
+    callback: TransactionCallback = NOOP,
   ) {
     callback({
       stage: TransactionCallbackStage.RECEIPT,
