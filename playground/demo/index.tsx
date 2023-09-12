@@ -1,7 +1,11 @@
 import { CoreDemo } from './core';
 import { StakeDemo } from './stake';
 import { WrapDemo } from './wrap';
-import { WithdrawalsRequestDemo, WithdrawalsViewsDemo } from './withdrawals';
+import {
+  WithdrawalsRequestDemo,
+  WithdrawalsViewsDemo,
+  WithdrawalsClaimDemo,
+} from './withdrawals';
 
 export const Demo = () => {
   return (
@@ -10,6 +14,7 @@ export const Demo = () => {
       <WrapDemo />
       <CoreDemo />
       <WithdrawalsRequestDemo />
+      <WithdrawalsClaimDemo />
       <WithdrawalsViewsDemo />
     </>
   );
