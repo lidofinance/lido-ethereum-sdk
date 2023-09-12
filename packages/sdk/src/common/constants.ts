@@ -34,3 +34,5 @@ export enum LIDO_CONTRACT_NAMES {
   oracleDaemonConfig = 'oracleDaemonConfig',
   wsteth = 'wsteth',
 }
+
+export const noop = () => {};

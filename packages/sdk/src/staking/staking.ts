@@ -1,4 +1,4 @@
-import { zeroAddress, parseEther, getContract, encodeFunctionData } from 'viem';
+import { zeroAddress, getContract, encodeFunctionData } from 'viem';
 import {
   type Address,
   type Account,
@@ -16,6 +16,7 @@ import { Logger, Cache } from '../common/decorators/index.js';
 import {
   SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
   LIDO_CONTRACT_NAMES,
+  noop,
 } from '../common/constants.js';
 import { version } from '../version.js';
 
@@ -26,7 +27,9 @@ import {
   StakeProps,
   StakeResult,
   StakeEncodeDataProps,
+  StakeInnerProps,
 } from './types.js';
+import { parseValue } from '../common/utils/parse-value.js';
 
 export class LidoSDKStaking {
   readonly core: LidoSDKCore;
@@ -78,13 +81,12 @@ export class LidoSDKStaking {
   @Logger('Call:')
   public async stake(props: StakeProps): Promise<StakeResult> {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
-
-    const { callback, account } = props;
+    const parsedProps = this.parseProps(props);
     try {
-      const isContract = await this.core.isContract(account);
+      const isContract = await this.core.isContract(parsedProps.account);
 
-      if (isContract) return await this.stakeMultisig(props);
-      else return await this.stakeEOA(props);
+      if (isContract) return await this.stakeMultisig(parsedProps);
+      else return await this.stakeEOA(parsedProps);
     } catch (error) {
       const { message, code } = this.core.getErrorMessage(error);
       const txError = this.core.error({
@@ -92,16 +94,22 @@ export class LidoSDKStaking {
         error,
         code,
       });
-      callback?.({ stage: StakeCallbackStages.ERROR, payload: txError });
+      parsedProps.callback({
+        stage: StakeCallbackStages.ERROR,
+        payload: txError,
+      });
 
       throw txError;
     }
   }
 
   @Logger('LOG:')
-  private async stakeEOA(props: StakeProps): Promise<StakeResult> {
-    const { value, callback, referralAddress = zeroAddress, account } = props;
-
+  private async stakeEOA({
+    account,
+    callback,
+    referralAddress,
+    value,
+  }: StakeInnerProps): Promise<StakeResult> {
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     // Checking the daily protocol staking limit
@@ -113,25 +121,25 @@ export class LidoSDKStaking {
       referralAddress,
     );
 
-    callback?.({ stage: StakeCallbackStages.SIGN });
+    callback({ stage: StakeCallbackStages.SIGN });
 
     const contract = await this.getContractStETH();
     const transaction = await contract.write.submit([referralAddress], {
       ...overrides,
-      value: parseEther(value),
+      value,
       chain: this.core.chain,
       gas: gasLimit,
       account,
     });
 
-    callback?.({ stage: StakeCallbackStages.RECEIPT, payload: transaction });
+    callback({ stage: StakeCallbackStages.RECEIPT, payload: transaction });
 
     const transactionReceipt =
       await this.core.rpcProvider.waitForTransactionReceipt({
         hash: transaction,
       });
 
-    callback?.({
+    callback({
       stage: StakeCallbackStages.CONFIRMATION,
       payload: transactionReceipt,
     });
@@ -141,20 +149,23 @@ export class LidoSDKStaking {
         hash: transactionReceipt.transactionHash,
       });
 
-    callback?.({ stage: StakeCallbackStages.DONE, payload: confirmations });
+    callback({ stage: StakeCallbackStages.DONE, payload: confirmations });
 
     return { hash: transaction, receipt: transactionReceipt, confirmations };
   }
 
   @Logger('LOG:')
-  private async stakeMultisig(props: StakeProps): Promise<StakeResult> {
-    const { value, callback, referralAddress = zeroAddress, account } = props;
-
-    callback?.({ stage: StakeCallbackStages.SIGN });
+  private async stakeMultisig({
+    value,
+    callback,
+    referralAddress,
+    account,
+  }: StakeInnerProps): Promise<StakeResult> {
+    callback({ stage: StakeCallbackStages.SIGN });
 
     const contract = await this.getContractStETH();
     const transaction = await contract.write.submit([referralAddress], {
-      value: parseEther(value),
+      value,
       chain: this.core.chain,
       account,
     });
@@ -168,7 +179,7 @@ export class LidoSDKStaking {
   public async stakeSimulateTx(
     props: StakeProps,
   ): Promise<WriteContractParameters> {
-    const { referralAddress = zeroAddress, value, account } = props;
+    const { referralAddress, value, account } = this.parseProps(props);
 
     const address = await this.contractAddressStETH();
     const { request } = await this.core.rpcProvider.simulateContract({
@@ -177,7 +188,7 @@ export class LidoSDKStaking {
       functionName: 'submit',
       account,
       args: [referralAddress],
-      value: parseEther(value),
+      value: value,
     });
 
     return request;
@@ -199,8 +210,8 @@ export class LidoSDKStaking {
   @Cache(30 * 1000, ['core.chain.id'])
   private async submitGasLimit(
     account: Address,
-    value: string,
-    referralAddress: Address = zeroAddress,
+    value: bigint,
+    referralAddress: Address,
   ): Promise<{
     gasLimit: bigint | undefined;
     overrides: {
@@ -212,13 +223,13 @@ export class LidoSDKStaking {
   }> {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
 
-    const feeData = await this.core.getFeeData();
+    const { maxPriorityFeePerGas, maxFeePerGas } = await this.core.getFeeData();
 
     const overrides = {
       account,
-      value: parseEther(value),
-      maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? undefined,
-      maxFeePerGas: feeData.maxFeePerGas ?? undefined,
+      value,
+      maxPriorityFeePerGas,
+      maxFeePerGas,
     };
 
     const contract = await this.getContractStETH();
@@ -238,11 +249,10 @@ export class LidoSDKStaking {
   }
 
   @Logger('Utils:')
-  private async validateStakeLimit(value: string): Promise<void> {
+  private async validateStakeLimit(value: bigint): Promise<void> {
     const currentStakeLimit = (await this.getStakeLimitInfo())[3];
-    const parsedValue = parseEther(value);
 
-    if (parsedValue > currentStakeLimit) {
+    if (value > currentStakeLimit) {
       throw this.core.error({
         message: `Stake value is greater than daily protocol staking limit (${currentStakeLimit})`,
       });
@@ -264,16 +274,24 @@ export class LidoSDKStaking {
   public async stakePopulateTx(
     props: StakeProps,
   ): Promise<Omit<FormattedTransactionRequest, 'type'>> {
-    const { referralAddress = zeroAddress, value, account } = props;
-
+    const { referralAddress, value, account } = this.parseProps(props);
     const data = this.stakeEncodeData({ referralAddress });
     const address = await this.contractAddressStETH();
 
     return {
       to: address,
       from: account,
-      value: parseEther(value),
+      value,
       data,
+    };
+  }
+
+  private parseProps(props: StakeProps): StakeInnerProps {
+    return {
+      ...props,
+      referralAddress: props.referralAddress ?? zeroAddress,
+      value: parseValue(props.value),
+      callback: props.callback ?? noop,
     };
   }
 }

@@ -1,6 +1,6 @@
-import { WalletClient, PublicClient } from "viem";
+import { WalletClient, PublicClient } from 'viem';
 
-import { SUPPORTED_CHAINS } from "../common/constants.js";
+import { SUPPORTED_CHAINS } from '../common/constants.js';
 
 type LidoSDKCorePropsRpcUrls = {
   chainId: (typeof SUPPORTED_CHAINS)[number];
@@ -18,3 +18,5 @@ type LidoSDKCorePropsRpcProvider = {
 export type LidoSDKCoreProps =
   | LidoSDKCorePropsRpcUrls
   | LidoSDKCorePropsRpcProvider;
+
+export type EtherValue = string | bigint;

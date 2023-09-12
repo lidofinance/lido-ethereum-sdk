@@ -1,6 +1,7 @@
 import { type Address, type Hash, type TransactionReceipt } from 'viem';
 import { type LidoSDKCoreProps, type LidoSDKCore } from '../core/index.js';
 import { type SDKError } from '../common/utils/index.js';
+import { EtherValue } from '../core/types.js';
 
 export type LidoSDKStakingProps = LidoSDKCoreProps & {
   core?: LidoSDKCore;
@@ -26,10 +27,17 @@ export type StakeCallbackProps =
 export type StakeStageCallback = (props: StakeCallbackProps) => void;
 
 export type StakeProps = {
-  value: string;
+  value: EtherValue;
   account: Address;
   callback?: StakeStageCallback;
   referralAddress?: Address;
+};
+
+export type StakeInnerProps = {
+  value: bigint;
+  account: Address;
+  callback: StakeStageCallback;
+  referralAddress: Address;
 };
 
 export type StakeResult = {
