@@ -107,7 +107,7 @@ export class LidoSDKWithdrawalsClaim {
   }
 
   @Logger('Utils:')
-  @Cache(30 * 1000, ['core.chain.id'])
+  @Cache(30 * 1000, ['bus.core.chain.id'])
   private async claimGasLimit(props: ClaimRequestsProps): Promise<bigint> {
     const { account, requestsIds, hints } = props;
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');

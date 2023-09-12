@@ -1,6 +1,6 @@
 import { type Address } from 'viem';
 
-import { Logger } from '../common/decorators/index.js';
+import { Logger, ErrorHandler } from '../common/decorators/index.js';
 import { isBigint } from '../common/utils/index.js';
 import { version } from '../version.js';
 import { type LidoSDKCoreProps } from '../core/index.js';
@@ -19,14 +19,11 @@ export class LidoSDKWithdrawalsRequestsInfo {
   // Utils
 
   @Logger('Utils:')
+  @ErrorHandler('Error:')
   public async getWithdrawalRequestsInfo(props: { account: Address }) {
-    const { account } = props;
-
-    const claimableInfo = await this.getClaimableRequestsInfo({ account });
-    const claimableETH = await this.getClaimableRequestsETH({
-      claimableRequestsIds: claimableInfo.claimableRequests,
-    });
-    const pendingInfo = await this.getPendingRequestsInfo({ account });
+    const claimableInfo = await this.getClaimableRequestsInfo(props);
+    const claimableETH = await this.getClaimableRequestsETHByAccount(props);
+    const pendingInfo = await this.getPendingRequestsInfo(props);
 
     return {
       claimableInfo,
@@ -36,6 +33,7 @@ export class LidoSDKWithdrawalsRequestsInfo {
   }
 
   @Logger('Utils:')
+  @ErrorHandler('Error:')
   public async getWithdrawalRequestsStatus(props: {
     account: Address;
   }): Promise<readonly RequestStatusWithId[]> {
@@ -47,6 +45,7 @@ export class LidoSDKWithdrawalsRequestsInfo {
   }
 
   @Logger('Utils:')
+  @ErrorHandler('Error:')
   public async getClaimableRequestsInfo(props: { account: Address }): Promise<{
     claimableRequests: RequestStatusWithId[];
     claimableAmountStETH: bigint;
@@ -69,7 +68,8 @@ export class LidoSDKWithdrawalsRequestsInfo {
   }
 
   @Logger('Utils:')
-  public async getClaimableRequestsETH(props: {
+  @ErrorHandler('Error:')
+  public async getClaimableRequestsETHByIds(props: {
     claimableRequestsIds: (bigint | RequestStatusWithId)[];
   }): Promise<{
     ethByRequests: readonly bigint[];
@@ -104,6 +104,38 @@ export class LidoSDKWithdrawalsRequestsInfo {
   }
 
   @Logger('Utils:')
+  @ErrorHandler('Error:')
+  public async getClaimableRequestsETHByAccount(props: {
+    account: Address;
+  }): Promise<{
+    ethByRequests: readonly bigint[];
+    ethSum: bigint;
+    hints: readonly bigint[];
+    requests: readonly RequestStatusWithId[];
+    sortedIds: readonly bigint[];
+  }> {
+    const requests = await this.getWithdrawalRequestsStatus(props);
+
+    const sortedIds = requests
+      .map((req) => req.id)
+      .sort((aReq, bReq) => (aReq > bReq ? 1 : -1));
+
+    const hints = await this.bus.views.findCheckpointHints({
+      sortedIds,
+      lastIndex: await this.bus.views.getLastCheckpointIndex(),
+    });
+
+    const ethByRequests = await this.bus.views.getClaimableEther({
+      sortedIds,
+      hints,
+    });
+    const ethSum = ethByRequests.reduce((acc, eth) => acc + eth, BigInt(0));
+
+    return { ethByRequests, ethSum, hints, requests, sortedIds };
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler('Error:')
   public async getPendingRequestsInfo(props: { account: Address }): Promise<{
     pendingRequests: RequestStatusWithId[];
     pendingAmountStETH: bigint;
