@@ -165,7 +165,6 @@ export default class LidoSDKCore {
   // Balances
 
   @Logger('Balances:')
-  @Cache(10 * 1000, ['chain.id'])
   public async balanceETH(address: Address): Promise<bigint> {
     invariant(this.rpcProvider, 'RPC provider is not defined');
 
