@@ -1,4 +1,4 @@
-import { parseEther, type Address } from 'viem';
+import { type Address } from 'viem';
 import invariant from 'tiny-invariant';
 
 import { EtherValue, type LidoSDKCoreProps } from '../../core/index.js';
@@ -224,13 +224,13 @@ export class LidoSDKWithdrawalsApprove {
 
   @Logger('Utils:')
   @ErrorHandler('Error:')
-  public async checkAllowanceSteth(amount: string, account: Address) {
+  public async checkAllowanceSteth(amount: EtherValue, account: Address) {
     return this.checkAllowanceByToken({ amount, account, token: 'wstETH' });
   }
 
   @Logger('Utils:')
   @ErrorHandler('Error:')
-  public async checkAllowanceWsteth(amount: string, account: Address) {
+  public async checkAllowanceWsteth(amount: EtherValue, account: Address) {
     return this.checkAllowanceByToken({ amount, account, token: 'wstETH' });
   }
 
@@ -270,16 +270,16 @@ export class LidoSDKWithdrawalsApprove {
   @Logger('Utils:')
   @ErrorHandler('Error:')
   public async checkAllowanceByToken({
-    amount,
+    amount: _amount,
     account,
     token,
   }: {
-    amount: string;
+    amount: EtherValue;
     account: Address;
     token: 'stETH' | 'wstETH';
   }) {
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
-
+    const amount = parseValue(_amount);
     const isSteth = token === 'stETH';
     let allowanceMethod;
 
@@ -298,7 +298,7 @@ export class LidoSDKWithdrawalsApprove {
       [account, addressWithdrawalsQueue],
       { account },
     );
-    const isNeedApprove = allowance < parseEther(amount);
+    const isNeedApprove = allowance < amount;
 
     return { allowance, isNeedApprove };
   }
