@@ -12,17 +12,26 @@ export const Logger = function (headMessage: HeadMessage = 'LOG:') {
     const methodName = String(context.name);
 
     const replacementMethod = function (this: This, ...args: Args): Return {
-      callConsoleMessage(headMessage, `Entering method '${methodName}'.`);
+      callConsoleMessage.call(
+        this,
+        headMessage,
+        `Entering method '${methodName}'.`,
+      );
       const result = originalMethod.call(this, ...args);
 
       if (result instanceof Promise) {
         return result
           .then((resolvedResult) => {
-            callConsoleMessage(headMessage, `Exiting method '${methodName}'.`);
+            callConsoleMessage.call(
+              this,
+              headMessage,
+              `Exiting method '${methodName}'.`,
+            );
             return resolvedResult;
           })
           .catch((error) => {
-            callConsoleMessage(
+            callConsoleMessage.call(
+              this,
               headMessage,
               `Exiting method '${methodName}' with error.`,
               'Error:',
@@ -30,7 +39,11 @@ export const Logger = function (headMessage: HeadMessage = 'LOG:') {
             throw error;
           }) as Return;
       } else {
-        callConsoleMessage(headMessage, `Exiting method '${methodName}'.`);
+        callConsoleMessage.call(
+          this,
+          headMessage,
+          `Exiting method '${methodName}'.`,
+        );
         return result;
       }
     };
