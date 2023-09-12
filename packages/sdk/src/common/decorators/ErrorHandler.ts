@@ -49,7 +49,7 @@ export const ErrorHandler = function (headMessage: HeadMessage = 'Error:') {
   ) {
     const methodName = String(context.name);
     const replacementMethod = function (this: This, ...args: Args): Return {
-      const callback = args[0].callback;
+      const callback = args[0]?.callback;
 
       try {
         const result = originalMethod.call(this, ...args);
