@@ -1,7 +1,6 @@
 import {
   getContract,
   encodeFunctionData,
-  parseEther,
   type Address,
   type GetContractReturnType,
   type PublicClient,
