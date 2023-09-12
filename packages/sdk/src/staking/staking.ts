@@ -11,7 +11,7 @@ import {
 } from 'viem';
 import invariant from 'tiny-invariant';
 import { LidoSDKCore } from '../core/index.js';
-import { Logger, Cache } from '../common/decorators/index.js';
+import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 
 import {
   SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
@@ -22,13 +22,13 @@ import { version } from '../version.js';
 
 import { StethAbi } from './abi/steth.js';
 import {
-  LidoSDKStakingProps,
-  StakeCallbackStages,
-  StakeProps,
-  StakeResult,
-  StakeEncodeDataProps,
+  type LidoSDKStakingProps,
+  type StakeProps,
+  type StakeResult,
+  type StakeEncodeDataProps,
   StakeInnerProps,
 } from './types.js';
+import { TransactionCallbackStage } from '../core/types.js';
 import { parseValue } from '../common/utils/parse-value.js';
 
 export class LidoSDKStaking {
@@ -79,49 +79,40 @@ export class LidoSDKStaking {
   // Calls
 
   @Logger('Call:')
+  @ErrorHandler('Error:')
   public async stake(props: StakeProps): Promise<StakeResult> {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     const parsedProps = this.parseProps(props);
-    try {
-      const isContract = await this.core.isContract(parsedProps.account);
+    const { account } = props;
 
-      if (isContract) return await this.stakeMultisig(parsedProps);
-      else return await this.stakeEOA(parsedProps);
-    } catch (error) {
-      const { message, code } = this.core.getErrorMessage(error);
-      const txError = this.core.error({
-        message,
-        error,
-        code,
-      });
-      parsedProps.callback({
-        stage: StakeCallbackStages.ERROR,
-        payload: txError,
-      });
+    const isContract = await this.core.isContract(account);
 
-      throw txError;
-    }
+    if (isContract) return await this.stakeMultisig(parsedProps);
+    else return await this.stakeEOA(parsedProps);
   }
 
   @Logger('LOG:')
-  private async stakeEOA({
-    account,
-    callback,
-    referralAddress,
-    value,
-  }: StakeInnerProps): Promise<StakeResult> {
+  private async stakeEOA(props: StakeInnerProps): Promise<StakeResult> {
+    const {
+      value,
+      callback = () => {},
+      referralAddress = zeroAddress,
+      account,
+    } = props;
+
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     // Checking the daily protocol staking limit
     await this.validateStakeLimit(value);
 
+    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
     const { gasLimit, overrides } = await this.submitGasLimit(
       account,
       value,
       referralAddress,
     );
 
-    callback({ stage: StakeCallbackStages.SIGN });
+    callback({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
 
     const contract = await this.getContractStETH();
     const transaction = await contract.write.submit([referralAddress], {
@@ -132,7 +123,10 @@ export class LidoSDKStaking {
       account,
     });
 
-    callback({ stage: StakeCallbackStages.RECEIPT, payload: transaction });
+    callback({
+      stage: TransactionCallbackStage.RECEIPT,
+      payload: transaction,
+    });
 
     const transactionReceipt =
       await this.core.rpcProvider.waitForTransactionReceipt({
@@ -140,7 +134,7 @@ export class LidoSDKStaking {
       });
 
     callback({
-      stage: StakeCallbackStages.CONFIRMATION,
+      stage: TransactionCallbackStage.CONFIRMATION,
       payload: transactionReceipt,
     });
 
@@ -149,19 +143,19 @@ export class LidoSDKStaking {
         hash: transactionReceipt.transactionHash,
       });
 
-    callback({ stage: StakeCallbackStages.DONE, payload: confirmations });
+    callback({
+      stage: TransactionCallbackStage.DONE,
+      payload: confirmations,
+    });
 
     return { hash: transaction, receipt: transactionReceipt, confirmations };
   }
 
   @Logger('LOG:')
-  private async stakeMultisig({
-    value,
-    callback,
-    referralAddress,
-    account,
-  }: StakeInnerProps): Promise<StakeResult> {
-    callback({ stage: StakeCallbackStages.SIGN });
+  private async stakeMultisig(props: StakeInnerProps): Promise<StakeResult> {
+    const { value, callback, referralAddress = zeroAddress, account } = props;
+
+    callback({ stage: TransactionCallbackStage.SIGN });
 
     const contract = await this.getContractStETH();
     const transaction = await contract.write.submit([referralAddress], {
@@ -170,12 +164,13 @@ export class LidoSDKStaking {
       account,
     });
 
-    callback?.({ stage: StakeCallbackStages.MULTISIG_DONE });
+    callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
 
     return { hash: transaction };
   }
 
   @Logger('Call:')
+  @ErrorHandler('Error:')
   public async stakeSimulateTx(
     props: StakeProps,
   ): Promise<WriteContractParameters> {
@@ -198,6 +193,7 @@ export class LidoSDKStaking {
 
   @Logger('Views:')
   @Cache(30 * 1000, ['core.chain.id'])
+  @ErrorHandler('Error:')
   public async getStakeLimitInfo() {
     const contract = await this.getContractStETH();
 

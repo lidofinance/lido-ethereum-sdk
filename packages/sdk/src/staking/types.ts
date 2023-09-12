@@ -1,42 +1,23 @@
 import { type Address, type Hash, type TransactionReceipt } from 'viem';
 import { type LidoSDKCoreProps, type LidoSDKCore } from '../core/index.js';
-import { type SDKError } from '../common/utils/index.js';
+import { TransactionCallback } from '../core/types.js';
 import { EtherValue } from '../core/types.js';
 
 export type LidoSDKStakingProps = LidoSDKCoreProps & {
   core?: LidoSDKCore;
 };
 
-export enum StakeCallbackStages {
-  'SIGN' = 'sign',
-  'RECEIPT' = 'receipt',
-  'CONFIRMATION' = 'confirmation',
-  'DONE' = 'done',
-  'MULTISIG_DONE' = 'multisig_done',
-  'ERROR' = 'error',
-}
-
-export type StakeCallbackProps =
-  | { stage: StakeCallbackStages.SIGN; payload?: undefined }
-  | { stage: StakeCallbackStages.RECEIPT; payload: Hash }
-  | { stage: StakeCallbackStages.CONFIRMATION; payload: TransactionReceipt }
-  | { stage: StakeCallbackStages.DONE; payload: bigint }
-  | { stage: StakeCallbackStages.MULTISIG_DONE; payload?: undefined }
-  | { stage: StakeCallbackStages.ERROR; payload: SDKError };
-
-export type StakeStageCallback = (props: StakeCallbackProps) => void;
-
 export type StakeProps = {
   value: EtherValue;
   account: Address;
-  callback?: StakeStageCallback;
+  callback?: TransactionCallback;
   referralAddress?: Address;
 };
 
 export type StakeInnerProps = {
   value: bigint;
   account: Address;
-  callback: StakeStageCallback;
+  callback: TransactionCallback;
   referralAddress: Address;
 };
 

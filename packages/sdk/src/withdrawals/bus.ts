@@ -3,8 +3,9 @@ import { LidoSDKCore } from '../core/index.js';
 import { LidoSDKWithdrawalsContract } from './withdrawalsContract.js';
 import { LidoSDKWithdrawalsViews } from './withdrawalsViews.js';
 import { LidoSDKWithdrawalsRequestsInfo } from './withdrawalsRequestsInfo.js';
-import { LidoSDKWithdrawalsPermit } from './withdrawalsPermit.js';
-import { LidoSDKWithdrawalsApprove } from './withdrawalsApprove.js';
+import { LidoSDKWithdrawalsApprove } from './request/approve.js';
+import { LidoSDKWithdrawalsClaim } from './claim/claim.js';
+import { LidoSDKWithdrawalsRequest } from './request/request.js';
 import { type LidoSDKWithdrawalsProps } from './types.js';
 
 export class Bus {
@@ -15,8 +16,9 @@ export class Bus {
   private contractInstance: LidoSDKWithdrawalsContract | undefined;
   private viewsInstance: LidoSDKWithdrawalsViews | undefined;
   private requestsInfoInstance: LidoSDKWithdrawalsRequestsInfo | undefined;
-  private permitInstance: LidoSDKWithdrawalsPermit | undefined;
   private approvalInstance: LidoSDKWithdrawalsApprove | undefined;
+  private claimInstance: LidoSDKWithdrawalsClaim | undefined;
+  private requestInstance: LidoSDKWithdrawalsRequest | undefined;
 
   constructor(props: LidoSDKWithdrawalsProps, version?: string) {
     this.props = props;
@@ -90,25 +92,6 @@ export class Bus {
     this.requestsInfoInstance = requestsInfo;
   }
 
-  // Permit
-
-  get permit(): LidoSDKWithdrawalsPermit {
-    if (!this.permitInstance) {
-      this.permitInstance = new LidoSDKWithdrawalsPermit({
-        ...this.props,
-        bus: this,
-      });
-
-      return this.permitInstance;
-    }
-
-    return this.permitInstance;
-  }
-
-  set permit(permit: LidoSDKWithdrawalsPermit) {
-    this.permitInstance = permit;
-  }
-
   // Approval
 
   get approval(): LidoSDKWithdrawalsApprove {
@@ -124,5 +107,39 @@ export class Bus {
 
   set approval(approve: LidoSDKWithdrawalsApprove) {
     this.approvalInstance = approve;
+  }
+
+  // Claim
+
+  get claim(): LidoSDKWithdrawalsClaim {
+    if (!this.claimInstance) {
+      this.claimInstance = new LidoSDKWithdrawalsClaim({
+        ...this.props,
+        bus: this,
+      });
+      return this.claimInstance;
+    }
+    return this.claimInstance;
+  }
+
+  set claim(approve: LidoSDKWithdrawalsClaim) {
+    this.claimInstance = approve;
+  }
+
+  // Request
+
+  get request(): LidoSDKWithdrawalsRequest {
+    if (!this.requestInstance) {
+      this.requestInstance = new LidoSDKWithdrawalsRequest({
+        ...this.props,
+        bus: this,
+      });
+      return this.requestInstance;
+    }
+    return this.requestInstance;
+  }
+
+  set request(approve: LidoSDKWithdrawalsRequest) {
+    this.requestInstance = approve;
   }
 }
