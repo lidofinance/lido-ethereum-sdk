@@ -1,20 +1,24 @@
 import { Accordion } from '@lidofinance/lido-ui';
 import { useWeb3 } from '@reef-knot/web3-react';
 import { Action, renderTokenResult } from 'components/action';
+import { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
 import TokenInput from 'components/tokenInput/tokenInput';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
 import { transactionToast } from 'utils/transaction-toast';
 
+const ZERO = BigInt(0);
+
 export const WrapDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
-  const [wrapValue, setWrapValue] = useState('0.001');
-  const [approveValue, setApproveValue] = useState('0.001');
-  const [wrapStethValue, setWrapStethValue] = useState('0.001');
-  const [unwrapValue, setUnwrapValue] = useState('0.001');
+  const [wrapValue, setWrapValue] = useState<ValueType>(DEFAULT_VALUE);
+  const [approveValue, setApproveValue] = useState<ValueType>(DEFAULT_VALUE);
+  const [wrapStethValue, setWrapStethValue] =
+    useState<ValueType>(DEFAULT_VALUE);
+  const [unwrapValue, setUnwrapValue] = useState<ValueType>(DEFAULT_VALUE);
 
-  const [stethValue, setStethValue] = useState('0.001');
-  const [wstethValue, setWstethValue] = useState('0.001');
+  const [stethValue, setStethValue] = useState<ValueType>(DEFAULT_VALUE);
+  const [wstethValue, setWstethValue] = useState<ValueType>(DEFAULT_VALUE);
 
   const { wrap } = useLidoSDK();
 
@@ -41,7 +45,7 @@ export const WrapDemo = () => {
           label="value"
           value={wrapValue}
           placeholder="0.0"
-          onChange={(e) => setWrapValue(e.currentTarget.value)}
+          onChange={setWrapValue}
         />
       </Action>
       <Action
@@ -53,7 +57,7 @@ export const WrapDemo = () => {
         title="Approve Steth For Wrap"
         action={() =>
           wrap.approveStethForWrap({
-            value: approveValue,
+            value: approveValue ?? ZERO,
             account,
             callback: transactionToast,
           })
@@ -63,14 +67,14 @@ export const WrapDemo = () => {
           label="value"
           value={approveValue}
           placeholder="0.0"
-          onChange={(e) => setApproveValue(e.currentTarget.value)}
+          onChange={setApproveValue}
         />
       </Action>
       <Action
         title="Wrap stETH"
         action={() =>
           wrap.wrapSteth({
-            value: wrapStethValue,
+            value: wrapStethValue ?? ZERO,
             account,
             callback: transactionToast,
           })
@@ -80,14 +84,14 @@ export const WrapDemo = () => {
           label="value"
           value={wrapStethValue}
           placeholder="0.0"
-          onChange={(e) => setWrapStethValue(e.currentTarget.value)}
+          onChange={setWrapStethValue}
         />
       </Action>
       <Action
         title="Unwrap wstETH"
         action={() =>
           wrap.wrapSteth({
-            value: unwrapValue,
+            value: unwrapValue ?? ZERO,
             account,
             callback: transactionToast,
           })
@@ -97,31 +101,31 @@ export const WrapDemo = () => {
           label="value"
           value={unwrapValue}
           placeholder="0.0"
-          onChange={(e) => setUnwrapValue(e.currentTarget.value)}
+          onChange={setUnwrapValue}
         />
       </Action>
       <Action
         title="Convert wstETH->stETH"
-        action={() => wrap.convertWstethToSteth(wstethValue)}
+        action={() => wrap.convertWstethToSteth(wstethValue ?? ZERO)}
         renderResult={renderTokenResult('stETH')}
       >
         <TokenInput
           label="wsteth"
           value={wstethValue}
           placeholder="0.0"
-          onChange={(e) => setWstethValue(e.currentTarget.value)}
+          onChange={setWstethValue}
         />
       </Action>
       <Action
         title="Convert stETH->wstETH"
-        action={() => wrap.convertStethToWsteth(stethValue)}
+        action={() => wrap.convertStethToWsteth(stethValue ?? ZERO)}
         renderResult={renderTokenResult('wstETH')}
       >
         <TokenInput
-          label="ssteth"
+          label="steth"
           value={stethValue}
           placeholder="0.0"
-          onChange={(e) => setStethValue(e.currentTarget.value)}
+          onChange={setStethValue}
         />
       </Action>
     </Accordion>

@@ -4,12 +4,14 @@ import { Action, renderTokenResult } from 'components/action';
 import TokenInput from 'components/tokenInput/tokenInput';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
-import { parseEther } from '@ethersproject/units';
 import { transactionToast } from 'utils/transaction-toast';
+import { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
+
+const ZERO = BigInt(0);
 
 export const WithdrawalsRequestDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
-  const [requestValue, setRequestValue] = useState('0.001');
+  const [requestValue, setRequestValue] = useState<ValueType>(DEFAULT_VALUE);
   const { withdrawals } = useLidoSDK();
 
   const account = web3account as `0x{string}`;
@@ -20,15 +22,14 @@ export const WithdrawalsRequestDemo = () => {
         label="value"
         value={requestValue}
         placeholder="0.0"
-        onChange={(e) => setRequestValue(e.currentTarget.value)}
+        onChange={setRequestValue}
       />
       <Action
         title="Request stETH"
         action={() =>
           withdrawals.request.requestByToken({
             account,
-            amount: requestValue,
-            requests: [BigInt(parseEther(requestValue).toString())],
+            requests: [requestValue ?? ZERO],
             token: 'stETH',
             callback: transactionToast,
           })
@@ -39,8 +40,7 @@ export const WithdrawalsRequestDemo = () => {
         action={() =>
           withdrawals.request.requestByToken({
             account,
-            amount: requestValue,
-            requests: [BigInt(parseEther(requestValue).toString())],
+            requests: [requestValue ?? ZERO],
             token: 'wstETH',
             callback: transactionToast,
           })
@@ -51,7 +51,7 @@ export const WithdrawalsRequestDemo = () => {
         action={() =>
           withdrawals.request.requestWithoutPermit({
             account,
-            requests: [BigInt(parseEther(requestValue).toString())],
+            requests: [requestValue ?? ZERO],
             token: 'stETH',
             callback: transactionToast,
           })
@@ -62,7 +62,7 @@ export const WithdrawalsRequestDemo = () => {
         action={() =>
           withdrawals.request.requestWithoutPermit({
             account,
-            requests: [BigInt(parseEther(requestValue).toString())],
+            requests: [requestValue ?? ZERO],
             token: 'wstETH',
             callback: transactionToast,
           })
@@ -73,7 +73,7 @@ export const WithdrawalsRequestDemo = () => {
         action={() =>
           withdrawals.approval.approveSteth({
             account,
-            amount: requestValue,
+            amount: requestValue ?? ZERO,
           })
         }
       />
@@ -82,7 +82,7 @@ export const WithdrawalsRequestDemo = () => {
         action={() =>
           withdrawals.approval.approveWsteth({
             account,
-            amount: requestValue,
+            amount: requestValue ?? ZERO,
           })
         }
       />
@@ -103,13 +103,19 @@ export const WithdrawalsRequestDemo = () => {
       <Action
         title="Check stETH allowance by amount"
         action={() =>
-          withdrawals.approval.checkAllowanceSteth(requestValue, account)
+          withdrawals.approval.checkAllowanceSteth(
+            requestValue ?? ZERO,
+            account,
+          )
         }
       />
       <Action
         title="Check wstETH allowance by amount"
         action={() =>
-          withdrawals.approval.checkAllowanceWsteth(requestValue, account)
+          withdrawals.approval.checkAllowanceWsteth(
+            requestValue ?? ZERO,
+            account,
+          )
         }
       />
     </Accordion>
