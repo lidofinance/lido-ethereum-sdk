@@ -1,2 +1,6 @@
 export { LidoSDKWrap } from './wrap.js';
-export { type WrapProps, type LidoSDKWrapProps } from './types.js';
+export {
+  type LidoSDKWrapProps,
+  type WrapProps,
+  type WrapPropsWithoutCallback,
+} from './types.js';
