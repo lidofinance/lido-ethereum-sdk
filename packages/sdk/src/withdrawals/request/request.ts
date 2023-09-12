@@ -1,8 +1,8 @@
-import { parseEther, type Address, Hash } from 'viem';
+import { type Address, Hash } from 'viem';
 import invariant from 'tiny-invariant';
 
 import { Logger, Cache, ErrorHandler } from '../../common/decorators/index.js';
-import { LIDO_TOKENS } from '../../common/constants.js';
+import { LIDO_TOKENS, noop } from '../../common/constants.js';
 import { type LidoSDKCoreProps } from '../../core/index.js';
 import {
   type PermitSignature,
@@ -92,7 +92,7 @@ export class LidoSDKWithdrawalsRequest {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async requestWithoutPermitByToken(props: RequestProps) {
-    const { account, requests, callback, token } = props;
+    const { account, requests, callback = noop, token } = props;
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
@@ -109,21 +109,22 @@ export class LidoSDKWithdrawalsRequest {
 
     const params = [requests, account] as const;
 
-    callback?.({ stage: TransactionCallbackStage.GAS_LIMIT });
+    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
 
     const gasLimit = await this.requestGasLimitByToken(
       account,
       requests,
       token,
     );
-    const feeData = await this.bus.core.getFeeData();
+    const { maxFeePerGas, maxPriorityFeePerGas } =
+      await this.bus.core.getFeeData();
     const overrides = {
       account,
-      maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? undefined,
-      maxFeePerGas: feeData.maxFeePerGas ?? undefined,
+      maxPriorityFeePerGas,
+      maxFeePerGas,
     };
 
-    callback?.({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
+    callback({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
 
     const transaction = await tokenRequestMethod.call(this, params, {
       ...overrides,
@@ -137,7 +138,7 @@ export class LidoSDKWithdrawalsRequest {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async requestWithPermitByToken(props: RequestWithPermitProps) {
-    const { account, amount, requests, callback, token } = props;
+    const { account, requests, callback = noop, token } = props;
 
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
@@ -153,12 +154,13 @@ export class LidoSDKWithdrawalsRequest {
       tokenRequestMethod = contract.write.requestWithdrawalsWstETHWithPermit;
     }
 
-    callback?.({ stage: TransactionCallbackStage.PERMIT });
+    callback({ stage: TransactionCallbackStage.PERMIT });
 
+    const amount = requests.reduce((sum, request) => sum + request);
     const signature = await this.bus.core.signPermit({
       account,
       spender: contract.address,
-      amount: parseEther(amount),
+      amount,
       token,
     });
 
@@ -174,7 +176,7 @@ export class LidoSDKWithdrawalsRequest {
       },
     ] as const;
 
-    callback?.({ stage: TransactionCallbackStage.GAS_LIMIT });
+    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
 
     const gasLimit = await this.requestWithPermitGasLimitByToken(
       account,
@@ -189,7 +191,7 @@ export class LidoSDKWithdrawalsRequest {
       maxFeePerGas: feeData.maxFeePerGas ?? undefined,
     };
 
-    callback?.({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
+    callback({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
 
     const transaction = await tokenRequestMethod.call(this, params, {
       chain: this.bus.core.chain,
@@ -203,7 +205,7 @@ export class LidoSDKWithdrawalsRequest {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async requestMultisigByToken(props: RequestProps) {
-    const { account, requests, callback, token } = props;
+    const { account, requests, callback = noop, token } = props;
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
@@ -215,7 +217,7 @@ export class LidoSDKWithdrawalsRequest {
     if (isSteth) tokenRequestMethod = contract.write.requestWithdrawals;
     else tokenRequestMethod = contract.write.requestWithdrawalsWstETH;
 
-    callback?.({ stage: TransactionCallbackStage.SIGN });
+    callback({ stage: TransactionCallbackStage.SIGN });
 
     const params = [requests, account] as const;
     const transaction = await tokenRequestMethod.call(this, params, {
@@ -223,7 +225,7 @@ export class LidoSDKWithdrawalsRequest {
       chain: this.bus.core.chain,
     });
 
-    callback?.({ stage: TransactionCallbackStage.MULTISIG_DONE });
+    callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
 
     return { hash: transaction };
   }
@@ -297,9 +299,9 @@ export class LidoSDKWithdrawalsRequest {
   @Logger('Utils:')
   private async waitTransactionLifecycle(
     transaction: Hash,
-    callback?: TransactionCallback,
+    callback: TransactionCallback = noop,
   ) {
-    callback?.({
+    callback({
       stage: TransactionCallbackStage.RECEIPT,
       payload: transaction,
     });
@@ -309,7 +311,7 @@ export class LidoSDKWithdrawalsRequest {
         hash: transaction,
       });
 
-    callback?.({
+    callback({
       stage: TransactionCallbackStage.CONFIRMATION,
       payload: transactionReceipt,
     });
@@ -319,7 +321,7 @@ export class LidoSDKWithdrawalsRequest {
         hash: transactionReceipt.transactionHash,
       });
 
-    callback?.({
+    callback({
       stage: TransactionCallbackStage.DONE,
       payload: confirmations,
     });

@@ -545,9 +545,9 @@ export class LidoSDKWrap {
   @Logger('Utils:')
   private async waitTransactionLifecycle(
     transaction: Hash,
-    callback?: TransactionCallback,
+    callback: TransactionCallback,
   ) {
-    callback?.({
+    callback({
       stage: TransactionCallbackStage.RECEIPT,
       payload: transaction,
     });
@@ -557,7 +557,7 @@ export class LidoSDKWrap {
         hash: transaction,
       });
 
-    callback?.({
+    callback({
       stage: TransactionCallbackStage.CONFIRMATION,
       payload: transactionReceipt,
     });
@@ -567,7 +567,7 @@ export class LidoSDKWrap {
         hash: transactionReceipt.transactionHash,
       });
 
-    callback?.({
+    callback({
       stage: TransactionCallbackStage.DONE,
       payload: confirmations,
     });
