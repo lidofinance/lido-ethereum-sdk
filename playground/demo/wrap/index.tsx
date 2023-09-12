@@ -35,7 +35,7 @@ export const WrapDemo = () => {
         title="Wrap ETH"
         action={() =>
           wrap.wrapEth({
-            value: wrapValue,
+            value: wrapValue ?? ZERO,
             account,
             callback: transactionToast,
           })
