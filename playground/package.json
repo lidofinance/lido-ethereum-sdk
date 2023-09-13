@@ -6,6 +6,7 @@
     "dev": "next dev",
     "playground:dev": "yarn dev",
     "build": "next build",
+    "build:export": "next export",
     "analyze:build": "ANALYZE_BUNDLE=true yarn build",
     "start": "NODE_OPTIONS='-r next-logger' next start",
     "lint": "eslint --ext ts,tsx .",
