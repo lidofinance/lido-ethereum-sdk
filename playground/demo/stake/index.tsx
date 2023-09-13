@@ -1,6 +1,7 @@
 import { Input, Accordion } from '@lidofinance/lido-ui';
 import { useWeb3 } from '@reef-knot/web3-react';
 import { Action, renderTokenResult } from 'components/action';
+import { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
 import TokenInput from 'components/tokenInput/tokenInput';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
@@ -8,7 +9,9 @@ import { transactionToast } from 'utils/transaction-toast';
 
 export const StakeDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
-  const [stakingValue, setStakingValue] = useState('0.001');
+  const [stakingValueState, setStakingValue] =
+    useState<ValueType>(DEFAULT_VALUE);
+  const stakingValue = stakingValueState ?? BigInt(0);
   const [referralAddressState, setReferralAddress] = useState('');
   const { staking } = useLidoSDK();
 
@@ -33,7 +36,7 @@ export const StakeDemo = () => {
           label="value"
           value={stakingValue}
           placeholder="0.0"
-          onChange={(e) => setStakingValue(e.currentTarget.value)}
+          onChange={setStakingValue}
         />
         <Input
           label="referral address"

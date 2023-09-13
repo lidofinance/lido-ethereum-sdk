@@ -1,12 +1,14 @@
-import { parseEther, type Address } from 'viem';
+import { type Address } from 'viem';
 import invariant from 'tiny-invariant';
 
-import { type LidoSDKCoreProps } from '../../core/index.js';
+import { EtherValue, type LidoSDKCoreProps } from '../../core/index.js';
 import { Logger, Cache, ErrorHandler } from '../../common/decorators/index.js';
 import { version } from '../../version.js';
 
 import { Bus } from '../bus.js';
 import { type ApproveProps, ApproveCallbackStages } from './types.js';
+import { NOOP } from '../../common/constants.js';
+import { parseValue } from '../../common/utils/parse-value.js';
 
 export class LidoSDKWithdrawalsApprove {
   private readonly bus: Bus;
@@ -61,7 +63,8 @@ export class LidoSDKWithdrawalsApprove {
   @Logger('Call:')
   @ErrorHandler('Error:')
   private async approveByToken(props: ApproveProps) {
-    const { account, amount, callback, token } = props;
+    const { account, amount: _amount, callback = NOOP, token } = props;
+    const amount = parseValue(_amount);
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
@@ -81,7 +84,7 @@ export class LidoSDKWithdrawalsApprove {
       gasLimitMethod = this.approveWstethGasLimit;
     }
 
-    callback?.({ stage: ApproveCallbackStages.GAS_LIMIT });
+    callback({ stage: ApproveCallbackStages.GAS_LIMIT });
 
     const gasLimit = await gasLimitMethod.call(this, amount, account);
     const feeData = await this.bus.core.getFeeData();
@@ -91,15 +94,15 @@ export class LidoSDKWithdrawalsApprove {
       maxFeePerGas: feeData.maxFeePerGas ?? undefined,
     };
 
-    callback?.({ stage: ApproveCallbackStages.SIGN, payload: gasLimit });
+    callback({ stage: ApproveCallbackStages.SIGN, payload: gasLimit });
 
     const transaction = await tokenApproveMethod.call(
       this,
-      [addressWithdrawalsQueue, parseEther(amount)],
+      [addressWithdrawalsQueue, amount],
       { chain: this.bus.core.chain, ...overrides, gas: gasLimit },
     );
 
-    callback?.({
+    callback({
       stage: ApproveCallbackStages.RECEIPT,
       payload: transaction,
     });
@@ -109,7 +112,7 @@ export class LidoSDKWithdrawalsApprove {
         hash: transaction,
       });
 
-    callback?.({
+    callback({
       stage: ApproveCallbackStages.CONFIRMATION,
       payload: transactionReceipt,
     });
@@ -119,7 +122,7 @@ export class LidoSDKWithdrawalsApprove {
         hash: transactionReceipt.transactionHash,
       });
 
-    callback?.({
+    callback({
       stage: ApproveCallbackStages.DONE,
       payload: confirmations,
     });
@@ -142,7 +145,8 @@ export class LidoSDKWithdrawalsApprove {
   @Logger('Call:')
   @ErrorHandler('Error:')
   private async approveMultisigByToken(props: ApproveProps) {
-    const { account, amount, callback, token } = props;
+    const { account, amount: _amount, callback = NOOP, token } = props;
+    const amount = parseValue(_amount);
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
 
     const isSteth = token === 'stETH';
@@ -158,15 +162,15 @@ export class LidoSDKWithdrawalsApprove {
     const addressWithdrawalsQueue =
       await this.bus.contract.contractAddressWithdrawalsQueue();
 
-    callback?.({ stage: ApproveCallbackStages.SIGN });
+    callback({ stage: ApproveCallbackStages.SIGN });
 
     const transaction = await tokenApproveMethod.call(
       this,
-      [addressWithdrawalsQueue, parseEther(amount)],
+      [addressWithdrawalsQueue, amount],
       { chain: this.bus.core.chain, account },
     );
 
-    callback?.({
+    callback({
       stage: ApproveCallbackStages.MULTISIG_DONE,
     });
 
@@ -177,25 +181,25 @@ export class LidoSDKWithdrawalsApprove {
 
   @Logger('Utils:')
   @ErrorHandler('Error:')
-  public async approveStethGasLimit(amount: string, account: Address) {
+  public async approveStethGasLimit(amount: EtherValue, account: Address) {
     return this.approveGasLimitByToken(amount, account, 'stETH');
   }
 
   @Logger('Utils:')
   @ErrorHandler('Error:')
-  public async approveWstethGasLimit(amount: string, account: Address) {
+  public async approveWstethGasLimit(amount: EtherValue, account: Address) {
     return this.approveGasLimitByToken(amount, account, 'stETH');
   }
 
   @Logger('Utils:')
   @Cache(30 * 1000, ['bus.core.chain.id'])
   private async approveGasLimitByToken(
-    amount: string,
+    amount: EtherValue,
     account: Address,
     token: 'stETH' | 'wstETH',
   ) {
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
-
+    const value = parseValue(amount);
     const isSteth = token === 'stETH';
     let estimateGasMethod;
 
@@ -211,7 +215,7 @@ export class LidoSDKWithdrawalsApprove {
 
     const gasLimit = await estimateGasMethod.call(
       this,
-      [addressWithdrawalsQueue, parseEther(amount)],
+      [addressWithdrawalsQueue, value],
       { account },
     );
 
@@ -220,13 +224,13 @@ export class LidoSDKWithdrawalsApprove {
 
   @Logger('Utils:')
   @ErrorHandler('Error:')
-  public async checkAllowanceSteth(amount: string, account: Address) {
+  public async checkAllowanceSteth(amount: EtherValue, account: Address) {
     return this.checkAllowanceByToken({ amount, account, token: 'wstETH' });
   }
 
   @Logger('Utils:')
   @ErrorHandler('Error:')
-  public async checkAllowanceWsteth(amount: string, account: Address) {
+  public async checkAllowanceWsteth(amount: EtherValue, account: Address) {
     return this.checkAllowanceByToken({ amount, account, token: 'wstETH' });
   }
 
@@ -266,16 +270,16 @@ export class LidoSDKWithdrawalsApprove {
   @Logger('Utils:')
   @ErrorHandler('Error:')
   public async checkAllowanceByToken({
-    amount,
+    amount: _amount,
     account,
     token,
   }: {
-    amount: string;
+    amount: EtherValue;
     account: Address;
     token: 'stETH' | 'wstETH';
   }) {
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
-
+    const amount = parseValue(_amount);
     const isSteth = token === 'stETH';
     let allowanceMethod;
 
@@ -294,7 +298,7 @@ export class LidoSDKWithdrawalsApprove {
       [account, addressWithdrawalsQueue],
       { account },
     );
-    const isNeedApprove = allowance < parseEther(amount);
+    const isNeedApprove = allowance < amount;
 
     return { allowance, isNeedApprove };
   }

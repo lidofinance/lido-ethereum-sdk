@@ -1,6 +1,6 @@
 import { type Address, type Hash, type TransactionReceipt } from 'viem';
 
-import { TransactionCallback } from '../../core/index.js';
+import { EtherValue, TransactionCallback } from '../../core/index.js';
 import { type SDKError } from '../../common/utils/index.js';
 import { LIDO_TOKENS } from '../../common/constants.js';
 
@@ -21,7 +21,6 @@ export type PermitProps = PermitWstETHStETHProps & {
 
 export type RequestWithPermitProps = {
   account: Address;
-  amount: string;
   requests: readonly bigint[];
   token: WithdrawableTokens;
   callback?: TransactionCallback;
@@ -61,7 +60,7 @@ export type ApproveStageCallback = (props: ApproveCallbackProps) => void;
 
 export type ApproveProps = {
   account: Address;
-  amount: string;
+  amount: EtherValue;
   token: 'stETH' | 'wstETH';
   callback?: ApproveStageCallback;
 };

@@ -47,3 +47,5 @@ export const CONTRACTS_BY_TOKENS = {
   [LIDO_TOKENS.wsteth]: LIDO_CONTRACT_NAMES.wsteth,
   [LIDO_TOKENS.unsteth]: LIDO_CONTRACT_NAMES.withdrawalQueue,
 } as const;
+
+export const NOOP = () => {};

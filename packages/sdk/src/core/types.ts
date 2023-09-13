@@ -26,6 +26,8 @@ export type LidoSDKCoreProps =
   | LidoSDKCorePropsRpcUrls
   | LidoSDKCorePropsRpcProvider;
 
+export type EtherValue = string | bigint;
+
 export enum TransactionCallbackStage {
   'PERMIT' = 'permit',
   'GAS_LIMIT' = 'gas_limit',

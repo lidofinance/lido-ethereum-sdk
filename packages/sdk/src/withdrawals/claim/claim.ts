@@ -7,7 +7,11 @@ import { version } from '../../version.js';
 
 import { Bus } from '../bus.js';
 
-import { ClaimRequestsProps } from './types.js';
+import {
+  ClaimRequestsProps,
+  ClaimRequestsPropsWithoutCallback,
+} from './types.js';
+import { NOOP } from '../../common/constants.js';
 
 export class LidoSDKWithdrawalsClaim {
   private readonly bus: Bus;
@@ -33,13 +37,12 @@ export class LidoSDKWithdrawalsClaim {
   }
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async claimRequestsEOA(props: ClaimRequestsProps) {
-    const { account, requestsIds, hints, callback } = props;
+  private async claimRequestsEOA(props: ClaimRequestsProps) {
+    const { account, requestsIds, hints, callback = NOOP } = props;
 
     const contract = await this.bus.contract.getContractWithdrawalsQueue();
 
-    callback?.({ stage: TransactionCallbackStage.GAS_LIMIT });
+    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
 
     const feeData = await this.bus.core.getFeeData();
     const gasLimit = await this.claimGasLimit(props);
@@ -49,7 +52,7 @@ export class LidoSDKWithdrawalsClaim {
       maxFeePerGas: feeData.maxFeePerGas ?? undefined,
     };
 
-    callback?.({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
+    callback({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
 
     const params = [requestsIds, hints] as const;
     const transaction = await contract.write.claimWithdrawals(params, {
@@ -58,7 +61,7 @@ export class LidoSDKWithdrawalsClaim {
       chain: this.bus.core.chain,
     });
 
-    callback?.({
+    callback({
       stage: TransactionCallbackStage.RECEIPT,
       payload: transaction,
     });
@@ -68,7 +71,7 @@ export class LidoSDKWithdrawalsClaim {
         hash: transaction,
       });
 
-    callback?.({
+    callback({
       stage: TransactionCallbackStage.CONFIRMATION,
       payload: transactionReceipt,
     });
@@ -78,7 +81,7 @@ export class LidoSDKWithdrawalsClaim {
         hash: transactionReceipt.transactionHash,
       });
 
-    callback?.({
+    callback({
       stage: TransactionCallbackStage.DONE,
       payload: confirmations,
     });
@@ -87,13 +90,12 @@ export class LidoSDKWithdrawalsClaim {
   }
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async claimRequestsMultisig(props: ClaimRequestsProps) {
-    const { account, requestsIds, hints, callback } = props;
+  private async claimRequestsMultisig(props: ClaimRequestsProps) {
+    const { account, requestsIds, hints, callback = NOOP } = props;
 
     const contract = await this.bus.contract.getContractWithdrawalsQueue();
 
-    callback?.({ stage: TransactionCallbackStage.SIGN });
+    callback({ stage: TransactionCallbackStage.SIGN });
 
     const params = [requestsIds, hints] as const;
     const transaction = await contract.write.claimWithdrawals(params, {
@@ -101,14 +103,16 @@ export class LidoSDKWithdrawalsClaim {
       chain: this.bus.core.chain,
     });
 
-    callback?.({ stage: TransactionCallbackStage.MULTISIG_DONE });
+    callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
 
     return { hash: transaction };
   }
 
   @Logger('Utils:')
   @Cache(30 * 1000, ['bus.core.chain.id'])
-  private async claimGasLimit(props: ClaimRequestsProps): Promise<bigint> {
+  private async claimGasLimit(
+    props: ClaimRequestsPropsWithoutCallback,
+  ): Promise<bigint> {
     const { account, requestsIds, hints } = props;
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 

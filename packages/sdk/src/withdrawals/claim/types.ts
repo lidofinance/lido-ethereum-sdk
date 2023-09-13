@@ -8,3 +8,8 @@ export type ClaimRequestsProps = {
   hints: bigint[];
   callback?: TransactionCallback;
 };
+
+export type ClaimRequestsPropsWithoutCallback = Omit<
+  ClaimRequestsProps,
+  'callback'
+>;

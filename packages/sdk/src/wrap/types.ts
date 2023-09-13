@@ -6,20 +6,27 @@ import {
 } from 'viem';
 import LidoSDKCore from '../core/core.js';
 import {
-  LidoSDKCoreProps,
-  TransactionCallback,
-  TransactionCallbackStage,
+  type EtherValue,
+  type LidoSDKCoreProps,
+  type TransactionCallback,
 } from '../core/types.js';
-import { SDKError } from '../common/utils/SDKError.js';
 
 export type LidoSDKWrapProps = LidoSDKCoreProps & {
   core?: LidoSDKCore;
 };
 
 export type WrapProps = {
-  value: string;
+  value: EtherValue;
   account: Address;
   callback?: TransactionCallback;
+};
+
+export type WrapPropsWithoutCallback = Omit<WrapProps, 'callback'>;
+
+export type WrapInnerProps = {
+  value: bigint;
+  account: Address;
+  callback: TransactionCallback;
 };
 
 export type TxResult = {
@@ -32,8 +39,4 @@ export type PopulatedTx = Omit<FormattedTransactionRequest, 'type'>;
 
 export interface TxMethodProps {
   account: Address;
-  callback?: (props: {
-    stage: TransactionCallbackStage.ERROR;
-    payload: SDKError;
-  }) => void;
 }
