@@ -34,15 +34,8 @@ jobs:
           node-version: 16
           cache: 'yarn'
       - name: Setup Pages
+        id: config_pages
         uses: actions/configure-pages@v3
-        with:
-          # Automatically inject basePath in your Next.js configuration file and disable
-          # server side image optimization (https://nextjs.org/docs/api-reference/next/image#unoptimized).
-          #
-          # You may remove this line if you want to manage the configuration yourself.
-          static_site_generator: next
-          generator_config_file: './playground/next.config.js'
-
       - name: Restore cache
         uses: actions/cache@v3
         with:
@@ -62,6 +55,7 @@ jobs:
           RPC_PROVIDER_URL_1: ${{ vars.RPC_PROVIDER_URL_1 }}
           RPC_PROVIDER_URL_5: ${{ vars.RPC_PROVIDER_URL_5 }}
           WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
+          BASE_PATH: ${{ steps.config_pages.outputs.base_path }}
       - name: Export
         run: yarn build:export
       - name: Upload artifact
