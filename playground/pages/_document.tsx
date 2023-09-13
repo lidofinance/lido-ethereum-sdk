@@ -8,7 +8,7 @@ import Document, {
 } from 'next/document';
 import { Fonts, LidoUIHead } from '@lidofinance/lido-ui';
 import { ServerStyleSheet } from 'styled-components';
-import { dynamics } from '../config';
+import { dynamics, serverRuntimeConfig } from '../config';
 
 // for prod and dev use https and real domain
 let host = 'http://localhost';
@@ -45,6 +45,11 @@ export default class MyDocument extends Document {
     } finally {
       sheet.seal();
     }
+  }
+
+  get basePath(): string {
+    const { basePath } = serverRuntimeConfig;
+    return basePath;
   }
 
   get metaTitle(): string {
@@ -96,7 +101,7 @@ export default class MyDocument extends Document {
           <meta name="currentChain" content={String(dynamics.defaultChain)} />
           <Fonts />
           <LidoUIHead />
-          <script src="/runtime/window-env.js" />
+          <script src={`${this.basePath}/runtime/window-env.js`} />
         </Head>
         <body>
           <Main />
