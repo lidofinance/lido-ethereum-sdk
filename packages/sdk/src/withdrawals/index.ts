@@ -1,8 +1,5 @@
 export { LidoSDKWithdrawals } from './withdrawals.js';
-export {
-  type ClaimRequestsProps,
-  type ClaimRequestsPropsWithoutCallback,
-} from './claim/types.js';
+export { type ClaimRequestsProps } from './claim/types.js';
 export {
   type RequestProps,
   type RequestWithPermitProps,
