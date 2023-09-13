@@ -706,7 +706,7 @@ try {
   - `claimableRequests` (Type: Array[RequestStatusWithId]): A list of requests that can be claimed.
   - `claimableAmountStETH` (Type: bigint): The amount of ETH available for claiming.
 
-###### `getClaimableRequestsETH`
+###### `getClaimableRequestsETHByIds`
 
 ###### Input Parameters:
 
@@ -720,8 +720,25 @@ try {
 
   - `ethByRequests` (Type: Array of bigint): A list of ETH amounts for each request.
   - `ethSum` (Type: bigint): The sum of all ETH amounts in the list.
+  - `hints` (Type: Array of bigint): A list of hints for each request.
 
-- getPendingRequestsInfo
+###### `getClaimableRequestsETHByAccount`
+
+###### Input Parameters:
+
+- `props: { account: Address }`
+  - `account` (Type: Address): The account address.
+
+###### Output Parameters:
+
+- Type: Object
+- Structure:
+
+  - `ethByRequests` (Type: Array of bigint): A list of ETH amounts for each request.
+  - `ethSum` (Type: bigint): The sum of all ETH amounts in the list.
+  - `hints` (Type: Array of bigint): A list of hints for each request.
+  - `requests` (Type: Array of RequestStatusWithId): A list of requests with their statuses and identifiers.
+  - `sortedIds` (Type: Array of bigint): A list of request identifiers sorted by id.
 
 ###### `getPendingRequestsInfo`
 

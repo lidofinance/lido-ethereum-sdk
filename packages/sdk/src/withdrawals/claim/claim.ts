@@ -109,7 +109,7 @@ export class LidoSDKWithdrawalsClaim {
   }
 
   @Logger('Utils:')
-  @Cache(30 * 1000, ['core.chain.id'])
+  @Cache(30 * 1000, ['bus.core.chain.id'])
   private async claimGasLimit(
     props: ClaimRequestsPropsWithoutCallback,
   ): Promise<bigint> {

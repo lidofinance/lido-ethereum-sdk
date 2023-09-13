@@ -9,3 +9,4 @@ export {
   type ApproveCallbackStages,
   type ApproveStageCallback,
 } from './request/types.js';
+export { type RequestStatusWithId } from './types.js';
