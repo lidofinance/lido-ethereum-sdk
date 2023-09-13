@@ -92,6 +92,7 @@ const sdk = new LidoSDK({
   chainId: 5,
   rpcProvider: ownRpcProvider,
   web3Provider: provider, // optional
+  logMode: 'debug', // optional 'debug' | 'info'. Default: 'info'
 });
 
 // With RPC urls (without own rpc provider)
@@ -102,6 +103,7 @@ const sdk = new LidoSDK({
     'https://fallback-provider',
   ],
   web3Provider: provider, // optional
+  logMode: 'debug', // optional 'debug' | 'info'. Default: 'info'
 });
 ```
 

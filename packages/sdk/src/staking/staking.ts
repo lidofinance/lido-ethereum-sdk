@@ -44,7 +44,6 @@ export class LidoSDKStaking {
   // Balances
 
   @Logger('Balances:')
-  @Cache(10 * 1000, ['core.chain.id'])
   public async balanceStETH(address: Address): Promise<bigint> {
     const contract = await this.getContractStETH();
 
@@ -187,7 +186,6 @@ export class LidoSDKStaking {
   // Views
 
   @Logger('Views:')
-  @Cache(30 * 1000, ['core.chain.id'])
   @ErrorHandler('Error:')
   public async getStakeLimitInfo() {
     const contract = await this.getContractStETH();

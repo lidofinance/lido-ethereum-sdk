@@ -9,17 +9,21 @@ import {
 import { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
 import { SDKError } from '../index.js';
 
+export type LOG_MODE = 'info' | 'debug';
+
 type LidoSDKCorePropsRpcUrls = {
   chainId: (typeof SUPPORTED_CHAINS)[number];
   rpcUrls: string[];
   web3Provider?: WalletClient;
   rpcProvider?: undefined;
+  logMode?: LOG_MODE;
 };
 type LidoSDKCorePropsRpcProvider = {
   chainId: (typeof SUPPORTED_CHAINS)[number];
   rpcUrls: undefined;
   web3Provider?: WalletClient;
   rpcProvider: PublicClient;
+  logMode?: LOG_MODE;
 };
 
 export type LidoSDKCoreProps =

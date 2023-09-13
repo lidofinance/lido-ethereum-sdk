@@ -38,7 +38,7 @@ export const WithdrawalsClaimDemo = () => {
         }}
       />
       <Action
-        title="Claim first request in array"
+        title="Claim selected requests"
         action={() =>
           withdrawals.claim.claimRequests({
             account,

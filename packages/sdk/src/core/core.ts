@@ -44,6 +44,7 @@ import {
   type LidoSDKCoreProps,
   type PermitSignature,
   type SignPermitProps,
+  type LOG_MODE,
 } from './types.js';
 import { permitAbi } from './abi/permit.js';
 
@@ -78,6 +79,7 @@ export default class LidoSDKCore {
   readonly chain: Chain;
   readonly rpcProvider: PublicClient;
   public web3Provider: WalletClient | undefined;
+  readonly logMode: LOG_MODE;
 
   constructor(props: LidoSDKCoreProps, version?: string) {
     const { chain, rpcProvider, web3Provider } = this.init(props, version);
@@ -87,6 +89,7 @@ export default class LidoSDKCore {
     this.rpcUrls = props.rpcUrls;
     this.rpcProvider = rpcProvider;
     this.web3Provider = web3Provider;
+    this.logMode = props.logMode ?? 'info';
   }
 
   @Initialize('Init:')
@@ -162,7 +165,6 @@ export default class LidoSDKCore {
   // Balances
 
   @Logger('Balances:')
-  @Cache(10 * 1000, ['chain.id'])
   public async balanceETH(address: Address): Promise<bigint> {
     invariant(this.rpcProvider, 'RPC provider is not defined');
 

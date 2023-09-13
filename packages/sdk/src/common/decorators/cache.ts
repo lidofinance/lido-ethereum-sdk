@@ -1,17 +1,17 @@
-import { callConsoleMessage } from "./utils.js";
+import { callConsoleMessage } from './utils.js';
 
 const serializeArgs = (...args: any[]) =>
-  args.map((arg: any) => arg.toString()).join(":");
+  args.map((arg: any) => JSON.stringify(arg)).join(':');
 
 const getDecoratorArgsString = function <This>(this: This, args?: string[]) {
-  if (!args) return "";
+  if (!args) return '';
 
   const argsString = args.map((arg) => {
     const field = arg
-      .split(".")
+      .split('.')
       .reduce((a, b) => (a as { [key: string]: any })[b], this);
 
-    return arg && typeof field === "function" ? field.call(this) : field;
+    return arg && typeof field === 'function' ? field.call(this) : field;
   });
 
   return serializeArgs(argsString);
@@ -38,21 +38,27 @@ export const Cache = function (timeMs = 0, cacheArgs?: string[]) {
         const currentTime = Date.now();
 
         if (cachedEntry && currentTime - cachedEntry.timestamp <= timeMs) {
-          callConsoleMessage(
-            "Cache:",
+          callConsoleMessage.call(
+            this,
+            'Cache:',
             `Using cache for method '${methodName}'.`,
           );
           return cachedEntry.data;
         } else {
-          callConsoleMessage(
-            "Cache:",
+          callConsoleMessage.call(
+            this,
+            'Cache:',
             `Cache for method '${methodName}' has expired.`,
           );
           cache.delete(cacheKey);
         }
       }
 
-      callConsoleMessage("Cache:", `Cache for method '${methodName}' set.`);
+      callConsoleMessage.call(
+        this,
+        'Cache:',
+        `Cache for method '${methodName}' set.`,
+      );
       const result = originalMethod.call(this, ...args);
       cache.set(cacheKey, { data: result, timestamp: Date.now() });
       return result;

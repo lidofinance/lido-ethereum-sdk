@@ -28,6 +28,7 @@ export const LidoSDKProvider: React.FC<PropsWithChildren> = ({ children }) => {
       chainId: chainId as any,
       rpcUrls: [getBackendRPCPath(chainId)],
       web3Provider: client as any,
+      logMode: 'debug',
     });
   }, [providerRpc, providerWeb3, chainId]);
 
