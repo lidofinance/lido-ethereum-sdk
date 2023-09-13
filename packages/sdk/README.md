@@ -158,7 +158,7 @@ console.log(stakeResult, 'stake result');
 
 Arguments:
 
-- `value`: _string_ - amount of ETH to stake (in ETH)
+- `value`: _string_ | _bigint_ - amount of ETH to stake (in wei)
 - `callback`: _StageCallback_ - callback function that will be on each _stage_ of the transaction
 - `referralAddress`: _string_ - referral address (optional)
 
@@ -273,7 +273,7 @@ const simulateResult = await lidoSDK.staking.stakeSimulateTx({
 
 Arguments:
 
-- `value`: _string_ - amount of ETH to wrap to wstETH (staking ETH and then wrapping stETH to wstETH in a single tx)
+- `value`: _string_ | _bigint_ - amount of ETH to wrap to wstETH (staking ETH and then wrapping stETH to wstETH in a single tx)
 - `callback`: _StageCallback_ - callback function that will be on each _stage_ of the transaction
 
 ```ts
@@ -353,7 +353,7 @@ const lidoSDK = new LidoSDK({
 // get existing allowance
 const allowance = await lidoSDK.wrap.getStethForWrapAllowance(account);
 
-// if value is more than perform approve
+// if value is more than allowance perform approve
 const approveResult = await lidoSDK.wrap.approveStethForWrap({
   value,
   account,
@@ -445,7 +445,6 @@ const callback: RequestStageCallback = ({ stage, payload }) => {
 
 try {
   const requestResult = await lidoSDK.withdrawals.request.requestByToken({
-    amount,
     requests,
     token, // 'stETH' | 'wstETH'
     callback,
