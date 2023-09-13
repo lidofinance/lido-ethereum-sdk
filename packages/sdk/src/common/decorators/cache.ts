@@ -1,7 +1,7 @@
 import { callConsoleMessage } from './utils.js';
 
 const serializeArgs = (...args: any[]) =>
-  args.map((arg: any) => arg.toString()).join(':');
+  args.map((arg: any) => JSON.stringify(arg)).join(':');
 
 const getDecoratorArgsString = function <This>(this: This, args?: string[]) {
   if (!args) return '';
