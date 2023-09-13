@@ -58,6 +58,8 @@ jobs:
           BASE_PATH: ${{ steps.config_pages.outputs.base_path }}
       - name: Export
         run: yarn build:export
+        env:
+          NODE_NO_BUILD_DYNAMICS: true
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
