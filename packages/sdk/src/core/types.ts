@@ -92,7 +92,7 @@ export type PermitSignature = {
   value: bigint;
   deadline: bigint;
   chainId: bigint;
-  nonce: `0x${string}`;
+  nonce: bigint;
   owner: Address;
   spender: Address;
 };

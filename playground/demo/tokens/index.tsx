@@ -39,6 +39,12 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
   const approveAmount = approveAmountState ?? BigInt(0);
   const [toApprove, setToApprove] = useState<Address>('0x0' as Address);
 
+  // Permit
+  const [permitAmountState, setPermitAmount] =
+    useState<ValueType>(DEFAULT_VALUE);
+  const permitAmount = permitAmountState ?? BigInt(0);
+  const [toPermit, setToPermit] = useState<Address>('0x0' as Address);
+
   return (
     <Accordion summary={name}>
       <Action
@@ -101,14 +107,38 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
         action={() => instance.allowance({ account, to: toApprove })}
         renderResult={renderTokenResult(name)}
       />
+      <Action title="ERC 721 Domain" action={() => instance.erc721Domain()} />
       <Action title="Permit nonces" action={() => instance.nonces(account)} />
+      <Action
+        title="Permit"
+        action={() =>
+          instance.signPermit({
+            account,
+            amount: permitAmount,
+            spender: toPermit,
+          })
+        }
+      >
+        <TokenInput
+          label="permit amount"
+          value={permitAmountState}
+          placeholder="0.0"
+          onChange={setPermitAmount}
+        />
+        <Input
+          label="To address"
+          placeholder="0x0000000"
+          value={toPermit}
+          onChange={(e) => setToPermit(e.currentTarget.value as Address)}
+        />
+      </Action>
       <Action title="Token Metadata" action={() => instance.erc20Metadata()} />
       <Action
         title="Total Supply"
         action={() => instance.totalSupply()}
         renderResult={renderTokenResult(name)}
       />
-      <Action title="ERC 721 Domain" action={() => instance.erc721Domain()} />
+
       <Action
         title="Contract Address"
         action={() => instance.contractAddress()}

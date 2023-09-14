@@ -37,6 +37,7 @@ import {
   LIDO_CONTRACT_NAMES,
   CONTRACTS_BY_TOKENS,
   LIDO_TOKENS,
+  PERMIT_MESSAGE_TYPES,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
@@ -52,30 +53,6 @@ import {
   TransactionCallbackStage,
 } from './types.js';
 import { permitAbi } from './abi/permit.js';
-
-const EIP2612_TYPE = [
-  { name: 'owner', type: 'address' },
-  { name: 'spender', type: 'address' },
-  { name: 'value', type: 'uint256' },
-  { name: 'nonce', type: 'uint256' },
-  { name: 'deadline', type: 'uint256' },
-];
-
-const TYPES = {
-  EIP712Domain: [
-    { name: 'name', type: 'string' },
-    { name: 'version', type: 'string' },
-    {
-      name: 'chainId',
-      type: 'uint256',
-    },
-    {
-      name: 'verifyingContract',
-      type: 'address',
-    },
-  ],
-  Permit: EIP2612_TYPE,
-};
 
 export default class LidoSDKCore {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
@@ -236,7 +213,7 @@ export default class LidoSDKCore {
       deadline: numberToHex(deadline),
     };
     const typedData = stringify(
-      { domain, primaryType: 'Permit', types: TYPES, message },
+      { domain, primaryType: 'Permit', types: PERMIT_MESSAGE_TYPES, message },
       (_, value) => (isHex(value) ? value.toLowerCase() : value),
     );
 
@@ -253,7 +230,7 @@ export default class LidoSDKCore {
       value: amount,
       deadline,
       chainId: BigInt(this.chain.id),
-      nonce: message.nonce,
+      nonce,
       owner: account,
       spender,
     };

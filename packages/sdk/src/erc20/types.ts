@@ -5,6 +5,7 @@ import {
   type TransactionCallback,
   type EtherValue,
 } from '../core/index.js';
+import { SignPermitProps } from '../core/types.js';
 
 export type LidoSDKErc20Props = LidoSDKCoreProps & {
   core?: LidoSDKCore;
@@ -39,3 +40,5 @@ export type AllowanceProps = {
   account: Address;
   to: Address;
 };
+
+export type SignTokenPermitProps = Omit<SignPermitProps, 'token'>;

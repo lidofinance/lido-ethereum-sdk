@@ -5,6 +5,7 @@ import {
   ApproveProps,
   LidoSDKErc20Props,
   ParsedTransactionProps,
+  SignTokenPermitProps,
   TransactionProps,
   TransferProps,
 } from './types.js';
@@ -18,9 +19,11 @@ import {
   WalletClient,
   getContract,
 } from 'viem';
-import { NOOP } from '../common/constants.js';
+import { NOOP, PERMIT_MESSAGE_TYPES } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
-import { TransactionResult } from '../core/types.js';
+import { PermitSignature, TransactionResult } from '../core/types.js';
+import invariant from 'tiny-invariant';
+import { splitSignature } from '@ethersproject/bytes';
 
 export abstract class AbstractLidoSDKErc20 {
   readonly core: LidoSDKCore;
@@ -81,6 +84,53 @@ export abstract class AbstractLidoSDKErc20 {
           : contract.write.transfer([to, amount], overrides);
       },
     );
+  }
+
+  // PERMIT
+  @Logger('Permit:')
+  @ErrorHandler('Error:')
+  public async signPermit(
+    props: SignTokenPermitProps,
+  ): Promise<PermitSignature> {
+    const {
+      amount,
+      account,
+      spender,
+      deadline = LidoSDKCore.INFINITY_DEADLINE_VALUE,
+    } = props;
+    invariant(this.core.web3Provider, 'Web3 provider is not defined');
+    const contract = await this.getContract();
+    const domain = await this.erc721Domain();
+    const nonce = await contract.read.nonces([account]);
+
+    const message = {
+      owner: account,
+      spender,
+      value: amount,
+      nonce,
+      deadline,
+    };
+
+    const signature = await this.core.web3Provider.signTypedData({
+      account,
+      domain,
+      types: PERMIT_MESSAGE_TYPES,
+      primaryType: 'Permit',
+      message,
+    });
+    const { s, r, v } = splitSignature(signature);
+
+    return {
+      v,
+      r: r as `0x${string}`,
+      s: s as `0x${string}`,
+      value: amount,
+      deadline,
+      nonce,
+      chainId: BigInt(this.core.chain.id),
+      owner: account,
+      spender,
+    };
   }
 
   // Allowance
