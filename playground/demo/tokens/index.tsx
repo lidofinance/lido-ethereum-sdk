@@ -15,8 +15,8 @@ type TokenDemoProps = {
 };
 
 export const StethDemo = () => {
-  const { wsteth } = useLidoSDK();
-  return <TokenDemo name="stETH" instance={wsteth} />;
+  const { steth } = useLidoSDK();
+  return <TokenDemo name="stETH" instance={steth} />;
 };
 
 export const WstethDemo = () => {
