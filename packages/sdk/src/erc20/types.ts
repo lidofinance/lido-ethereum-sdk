@@ -1,9 +1,9 @@
-import { Address, Chain, Hash, TransactionReceipt } from 'viem';
+import { Address } from 'viem';
 import {
   type LidoSDKCoreProps,
   type LidoSDKCore,
-  TransactionCallback,
-  EtherValue,
+  type TransactionCallback,
+  type EtherValue,
 } from '../core/index.js';
 
 export type LidoSDKErc20Props = LidoSDKCoreProps & {
