@@ -4,7 +4,7 @@ import { Logger, Cache } from '../common/decorators/index.js';
 import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
 import invariant from 'tiny-invariant';
 
-export class LidoSDKEwstETH extends AbstractLidoSDKErc20 {
+export class LidoSDKwstETH extends AbstractLidoSDKErc20 {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public override contractAddress(): Promise<Address> {
