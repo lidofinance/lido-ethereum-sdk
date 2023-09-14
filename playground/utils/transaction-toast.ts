@@ -1,5 +1,5 @@
 import {
-  TransactionCallback,
+  type TransactionCallback,
   TransactionCallbackStage,
 } from '@lidofinance/lido-ethereum-sdk/core';
 import { toast } from '@lidofinance/lido-ui';

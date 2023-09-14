@@ -150,12 +150,12 @@ export abstract class AbstractLidoSDKErc20 {
 
   @Logger('Views:')
   @ErrorHandler('Error:')
-  public async totalSupply(): Promise<BigInt> {
+  public async totalSupply(): Promise<bigint> {
     return (await this.getContract()).read.totalSupply();
   }
   @Logger('Views:')
   @ErrorHandler('Error:')
-  public async nonces(address: Address): Promise<BigInt> {
+  public async nonces(address: Address): Promise<bigint> {
     return (await this.getContract()).read.nonces([address]);
   }
 
