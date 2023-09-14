@@ -4,6 +4,7 @@ import {
   Hash,
   TransactionReceipt,
   Address,
+  Chain,
 } from 'viem';
 
 import { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
@@ -42,6 +43,25 @@ export enum TransactionCallbackStage {
   'MULTISIG_DONE' = 'multisig_done',
   'ERROR' = 'error',
 }
+
+export type PerformTransactionOptions = {
+  callback: TransactionCallback;
+  account: Address;
+};
+
+export type TransactionOptions = {
+  account: Address;
+  chain: Chain;
+  gas?: bigint;
+  maxFeePerGas?: bigint;
+  maxPriorityFeePerGas?: bigint;
+};
+
+export type TransactionResult = {
+  hash: Hash;
+  receipt?: TransactionReceipt;
+  confirmations?: bigint;
+};
 
 export type TransactionCallbackProps =
   | { stage: TransactionCallbackStage.PERMIT; payload?: undefined }

@@ -14,6 +14,7 @@ import {
   numberToHex,
   stringify,
   maxUint256,
+  Hash,
 } from 'viem';
 import { goerli, mainnet } from 'viem/chains';
 import invariant from 'tiny-invariant';
@@ -45,6 +46,10 @@ import {
   type PermitSignature,
   type SignPermitProps,
   type LOG_MODE,
+  PerformTransactionOptions as PerformTransactionProps,
+  TransactionOptions,
+  TransactionResult,
+  TransactionCallbackStage,
 } from './types.js';
 import { permitAbi } from './abi/permit.js';
 
@@ -367,5 +372,70 @@ export default class LidoSDKCore {
 
       return lidoLocator.read[contract]();
     }
+  }
+
+  public async performTransaction(
+    props: PerformTransactionProps,
+    getGasLimit: (overrides: TransactionOptions) => Promise<bigint>,
+    sendTransaction: (override: TransactionOptions) => Promise<Hash>,
+  ): Promise<TransactionResult> {
+    invariant(this.web3Provider, 'Web3 provider is not defined');
+    const { account, callback } = props;
+    const isContract = await this.isContract(account);
+
+    const overrides: TransactionOptions = {
+      account,
+      chain: this.chain,
+      gas: undefined,
+      maxFeePerGas: undefined,
+      maxPriorityFeePerGas: undefined,
+    };
+
+    if (!isContract) {
+      callback({ stage: TransactionCallbackStage.GAS_LIMIT });
+      overrides.gas = await getGasLimit(overrides);
+      const feeData = await this.getFeeData();
+      overrides.maxFeePerGas = feeData.maxFeePerGas;
+      overrides.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
+    }
+
+    callback({ stage: TransactionCallbackStage.SIGN, payload: overrides.gas });
+    const transactionHash = await sendTransaction(overrides);
+
+    if (isContract) {
+      callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
+      return { hash: transactionHash };
+    }
+
+    callback({
+      stage: TransactionCallbackStage.RECEIPT,
+      payload: transactionHash,
+    });
+
+    const transactionReceipt = await this.rpcProvider.waitForTransactionReceipt(
+      {
+        hash: transactionHash,
+      },
+    );
+
+    callback({
+      stage: TransactionCallbackStage.CONFIRMATION,
+      payload: transactionReceipt,
+    });
+
+    const confirmations = await this.rpcProvider.getTransactionConfirmations({
+      hash: transactionReceipt.transactionHash,
+    });
+
+    callback({
+      stage: TransactionCallbackStage.DONE,
+      payload: confirmations,
+    });
+
+    return {
+      hash: transactionHash,
+      receipt: transactionReceipt,
+      confirmations,
+    };
   }
 }

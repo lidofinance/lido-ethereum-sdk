@@ -86,15 +86,6 @@ export class LidoSDKWrap {
     });
   }
 
-  // Balances
-
-  @Logger('Balances:')
-  @Cache(10 * 1000, ['core.chain.id'])
-  public async balanceWstETH(address: Address): Promise<bigint> {
-    const contract = await this.getContractWstETH();
-    return contract.read.balanceOf([address]);
-  }
-
   // Calls
 
   @Logger('Call:')

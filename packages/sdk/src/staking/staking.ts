@@ -41,15 +41,6 @@ export class LidoSDKStaking {
     else this.core = new LidoSDKCore(rest, version);
   }
 
-  // Balances
-
-  @Logger('Balances:')
-  public async balanceStETH(address: Address): Promise<bigint> {
-    const contract = await this.getContractStETH();
-
-    return contract.read.balanceOf([address]);
-  }
-
   // Contracts
 
   @Logger('Contracts:')
