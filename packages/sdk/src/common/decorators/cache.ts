@@ -5,11 +5,9 @@ import { callConsoleMessage } from './utils.js';
 const serializeArgs = (args: any[]) =>
   args
     .map((arg: any) =>
-      isBigint(arg)
-        ? arg.toString()
-        : JSON.stringify(arg, (_key, value) => {
-            return isBigint(value) ? value.toString() : value;
-          }),
+      JSON.stringify(arg, (_key, value) => {
+        return isBigint(value) ? value.toString() : value;
+      }),
     )
     .join(':');
 
