@@ -4,7 +4,13 @@ import { callConsoleMessage } from './utils.js';
 
 const serializeArgs = (args: any[]) =>
   args
-    .map((arg: any) => (isBigint(arg) ? arg.toString() : JSON.stringify(arg)))
+    .map((arg: any) =>
+      isBigint(arg)
+        ? arg.toString()
+        : JSON.stringify(arg, (_key, value) => {
+            return isBigint(value) ? value.toString() : value;
+          }),
+    )
     .join(':');
 
 const getDecoratorArgsString = function <This>(this: This, args?: string[]) {
