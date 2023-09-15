@@ -1,12 +1,16 @@
+import { isBigint } from '../utils/index.js';
+
 import { callConsoleMessage } from './utils.js';
 
-const serializeArgs = (...args: any[]) =>
-  args.map((arg: any) => JSON.stringify(arg)).join(':');
+const serializeArgs = (args: any[]) =>
+  args
+    .map((arg: any) => (isBigint(arg) ? arg.toString() : JSON.stringify(arg)))
+    .join(':');
 
 const getDecoratorArgsString = function <This>(this: This, args?: string[]) {
   if (!args) return '';
 
-  const argsString = args.map((arg) => {
+  const argsStringArr = args.map((arg) => {
     const field = arg
       .split('.')
       .reduce((a, b) => (a as { [key: string]: any })[b], this);
@@ -14,7 +18,7 @@ const getDecoratorArgsString = function <This>(this: This, args?: string[]) {
     return arg && typeof field === 'function' ? field.call(this) : field;
   });
 
-  return serializeArgs(argsString);
+  return serializeArgs(argsStringArr);
 };
 
 export const Cache = function (timeMs = 0, cacheArgs?: string[]) {
@@ -60,7 +64,12 @@ export const Cache = function (timeMs = 0, cacheArgs?: string[]) {
         `Cache for method '${methodName}' set.`,
       );
       const result = originalMethod.call(this, ...args);
-      cache.set(cacheKey, { data: result, timestamp: Date.now() });
+      if (result instanceof Promise) {
+        result.then((resolvedResult) =>
+          cache.set(cacheKey, { data: resolvedResult, timestamp: Date.now() }),
+        );
+      } else cache.set(cacheKey, { data: result, timestamp: Date.now() });
+
       return result;
     };
     return replacementMethod;
