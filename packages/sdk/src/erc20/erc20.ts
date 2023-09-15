@@ -4,6 +4,7 @@ import {
   AllowanceProps,
   ApproveProps,
   LidoSDKErc20Props,
+  NoCallback,
   ParsedTransactionProps,
   SignTokenPermitProps,
   TransactionProps,
@@ -17,6 +18,7 @@ import {
   Hash,
   PublicClient,
   WalletClient,
+  encodeFunctionData,
   getContract,
 } from 'viem';
 import { NOOP, PERMIT_MESSAGE_TYPES } from '../common/constants.js';
@@ -67,9 +69,8 @@ export abstract class AbstractLidoSDKErc20 {
   @ErrorHandler('Error:')
   public async transfer(props: TransferProps): Promise<TransactionResult> {
     const parsedProps = this.parseProps(props);
-    const isTransferFrom =
-      !!parsedProps.from && parsedProps.from !== parsedProps.account;
     const { account, amount, to, from = account } = parsedProps;
+    const isTransferFrom = from !== account;
     const contract = await this.getContract();
     return this.core.performTransaction(
       parsedProps,
@@ -86,19 +87,84 @@ export abstract class AbstractLidoSDKErc20 {
     );
   }
 
+  @Logger('Utils:')
+  @ErrorHandler('Error:')
+  public async populateTransfer(props: NoCallback<TransferProps>) {
+    const {
+      account,
+      amount,
+      to,
+      from = props.account,
+    } = this.parseProps(props);
+    const isTransferFrom = from !== account;
+    const address = await this.contractAddress();
+
+    return {
+      to: address,
+      from: account,
+      data: isTransferFrom
+        ? encodeFunctionData({
+            abi: erc20abi,
+            functionName: 'transferFrom',
+            args: [from, to, amount],
+          })
+        : encodeFunctionData({
+            abi: erc20abi,
+            functionName: 'transfer',
+            args: [to, amount],
+          }),
+    };
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler('Error:')
+  public async simulateTransfer(props: NoCallback<TransferProps>) {
+    const {
+      account,
+      amount,
+      to,
+      from = props.account,
+    } = this.parseProps(props);
+    const isTransferFrom = from !== account;
+    const contract = await this.getContract();
+    return isTransferFrom
+      ? contract.simulate.transferFrom([from, to, amount], { account })
+      : contract.simulate.transfer([to, amount], { account });
+  }
+
   // PERMIT
   @Logger('Permit:')
   @ErrorHandler('Error:')
   public async signPermit(
     props: SignTokenPermitProps,
   ): Promise<PermitSignature> {
+    const payload = await this.populatePermit(props);
+    invariant(this.core.web3Provider, 'Web3 provider is not defined');
+    const signature = await this.core.web3Provider.signTypedData(payload);
+    const { s, r, v } = splitSignature(signature);
+
+    return {
+      v,
+      r: r as `0x${string}`,
+      s: s as `0x${string}`,
+      value: props.amount,
+      deadline: payload.message.deadline,
+      nonce: payload.message.nonce,
+      chainId: BigInt(this.core.chain.id),
+      owner: payload.message.owner,
+      spender: payload.message.spender,
+    };
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler('Error:')
+  public async populatePermit(props: SignTokenPermitProps) {
     const {
       amount,
       account,
       spender,
       deadline = LidoSDKCore.INFINITY_DEADLINE_VALUE,
     } = props;
-    invariant(this.core.web3Provider, 'Web3 provider is not defined');
     const contract = await this.getContract();
     const domain = await this.erc721Domain();
     const nonce = await contract.read.nonces([account]);
@@ -111,26 +177,13 @@ export abstract class AbstractLidoSDKErc20 {
       deadline,
     };
 
-    const signature = await this.core.web3Provider.signTypedData({
+    return {
       account,
       domain,
       types: PERMIT_MESSAGE_TYPES,
       primaryType: 'Permit',
       message,
-    });
-    const { s, r, v } = splitSignature(signature);
-
-    return {
-      v,
-      r: r as `0x${string}`,
-      s: s as `0x${string}`,
-      value: amount,
-      deadline,
-      nonce,
-      chainId: BigInt(this.core.chain.id),
-      owner: account,
-      spender,
-    };
+    } as const;
   }
 
   // Allowance
@@ -150,6 +203,32 @@ export abstract class AbstractLidoSDKErc20 {
         return contract.write.approve(txArguments, overrides);
       },
     );
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler('Error:')
+  public async populateApprove(props: NoCallback<ApproveProps>) {
+    const { account, amount, to } = this.parseProps(props);
+    const address = await this.contractAddress();
+
+    return {
+      to: address,
+      from: account,
+      data: encodeFunctionData({
+        abi: erc20abi,
+        functionName: 'approve',
+        args: [to, amount],
+      }),
+    };
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler('Error:')
+  public async simulateApprove(props: NoCallback<ApproveProps>) {
+    const { account, amount, to } = this.parseProps(props);
+
+    const contract = await this.getContract();
+    return contract.simulate.approve([to, amount], { account });
   }
 
   @Logger('Views:')

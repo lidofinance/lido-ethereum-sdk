@@ -84,6 +84,28 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
         />
       </Action>
       <Action
+        title="Simulate Transfer"
+        action={() =>
+          instance.simulateTransfer({
+            account,
+            amount: transferAmount,
+            to: toTransfer,
+            from: fromTransfer ? fromTransfer : undefined,
+          })
+        }
+      />
+      <Action
+        title="Populate Transfer"
+        action={() =>
+          instance.populateTransfer({
+            account,
+            amount: transferAmount,
+            to: toTransfer,
+            from: fromTransfer ? fromTransfer : undefined,
+          })
+        }
+      />
+      <Action
         title="Approve"
         action={() =>
           instance.approve({ account, amount: approveAmount, to: toApprove })
@@ -102,6 +124,26 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
           onChange={(e) => setToApprove(e.currentTarget.value as Address)}
         />
       </Action>
+      <Action
+        title="Simulate Approve"
+        action={() =>
+          instance.simulateApprove({
+            account,
+            amount: approveAmount,
+            to: toApprove,
+          })
+        }
+      />
+      <Action
+        title="Populate Approve"
+        action={() =>
+          instance.populateApprove({
+            account,
+            amount: approveAmount,
+            to: toApprove,
+          })
+        }
+      />
       <Action
         title="Allowance"
         action={() => instance.allowance({ account, to: toApprove })}
@@ -132,6 +174,16 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
           onChange={(e) => setToPermit(e.currentTarget.value as Address)}
         />
       </Action>
+      <Action
+        title="Populate Permit"
+        action={() =>
+          instance.populatePermit({
+            account,
+            amount: permitAmount,
+            spender: toPermit,
+          })
+        }
+      />
       <Action title="Token Metadata" action={() => instance.erc20Metadata()} />
       <Action
         title="Total Supply"
