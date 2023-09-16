@@ -58,6 +58,7 @@ export abstract class AbstractLidoSDKErc20 {
   // Balance
 
   @Logger('Balances:')
+  @ErrorHandler('Error:')
   public async balance(address: Address): Promise<bigint> {
     const contract = await this.getContract();
     return contract.read.balanceOf([address]);
