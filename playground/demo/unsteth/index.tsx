@@ -54,7 +54,7 @@ export const UnstethDemo = () => {
       <Action
         title="Metadata URI of Token"
         renderResult={(uri) => (
-          <a target="_blank" ref="noreferrer" href={uri}>
+          <a target="_blank" rel="noopener noreferrer" href={uri}>
             NFT #{nftId} metadata
           </a>
         )}
