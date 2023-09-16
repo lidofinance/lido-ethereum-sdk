@@ -4,6 +4,7 @@ import { useWeb3 } from '@reef-knot/web3-react';
 import { Action, renderTokenResult } from 'components/action';
 import { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
 import TokenInput from 'components/tokenInput/tokenInput';
+import { useAddressState } from 'hooks/useAddressState';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
 import { transactionToast } from 'utils/transaction-toast';
@@ -29,21 +30,21 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
   const [transferAmountState, setTransferAmount] =
     useState<ValueType>(DEFAULT_VALUE);
   const transferAmount = transferAmountState ?? BigInt(0);
-  const [toTransfer, setToTransfer] = useState<Address>('0x0' as Address);
-  const [fromTransfer, setFromTransfer] = useState<Address>('' as Address);
+  const [toTransfer, setToTransfer] = useAddressState();
+  const [fromTransfer, setFromTransfer] = useAddressState('' as Address);
   const account = web3account as Address;
 
   // Approve
   const [approveAmountState, setApproveAmount] =
     useState<ValueType>(DEFAULT_VALUE);
   const approveAmount = approveAmountState ?? BigInt(0);
-  const [toApprove, setToApprove] = useState<Address>('0x0' as Address);
+  const [toApprove, setToApprove] = useAddressState();
 
   // Permit
   const [permitAmountState, setPermitAmount] =
     useState<ValueType>(DEFAULT_VALUE);
   const permitAmount = permitAmountState ?? BigInt(0);
-  const [toPermit, setToPermit] = useState<Address>('0x0' as Address);
+  const [toPermit, setToPermit] = useAddressState();
 
   return (
     <Accordion summary={name}>
