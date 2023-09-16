@@ -31,6 +31,26 @@
       "default": "./dist/cjs/staking/index.js",
       "types": "./dist/types/staking/index.d.ts"
     },
+    "./wrap": {
+      "import": "./dist/esm/wrap/index.js",
+      "default": "./dist/cjs/wrap/index.js",
+      "types": "./dist/types/wrap/index.d.ts"
+    },
+    "./withdrawals": {
+      "import": "./dist/esm/withdrawals/index.js",
+      "default": "./dist/cjs/withdrawals/index.js",
+      "types": "./dist/types/withdrawals/index.d.ts"
+    },
+    "./erc20": {
+      "import": "./dist/esm/erc20/index.js",
+      "default": "./dist/cjs/erc20/index.js",
+      "types": "./dist/types/erc20/index.d.ts"
+    },
+    "./unsteth": {
+      "import": "./dist/esm/unsteth/index.js",
+      "default": "./dist/cjs/unsteth/index.js",
+      "types": "./dist/types/unsteth/index.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {

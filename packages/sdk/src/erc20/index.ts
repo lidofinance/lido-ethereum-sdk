@@ -6,4 +6,6 @@ export {
   type AllowanceProps,
   type ApproveProps,
   type TransferProps,
+  type SignTokenPermitProps,
+  type TransactionProps,
 } from './types.js';
