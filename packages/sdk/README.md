@@ -19,6 +19,7 @@ The project is currently under development and may change in the future.
   - [Call](#call)
   - [Populate transaction](#populate-transaction)
   - [Simulate transaction](#simulate-transaction)
+- [Wrap](#wrap)
 - [Withdrawal](#withdrawal)
 
   - [Call](#call-1)
@@ -37,6 +38,8 @@ The project is currently under development and may change in the future.
     - [Constants](#constants)
     - [Requests info](#requests-info)
 
+- [(w)stETH](<#(w)steth>)
+- [unstETH NFT](#unsteth-nft)
 - [Lido contract addresses](#lido-contract-addresses)
 
 ## Installation
@@ -133,9 +136,6 @@ const lidoSDK = new LidoSDK({
   rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
 });
 
-// Views
-const balanceStETH = await lidoSDK.staking.balanceStETH(address);
-
 // Contracts
 const addressStETH = await lidoSDK.staking.contractAddressStETH();
 const contractStETH = await lidoSDK.staking.getContractStETH();
@@ -148,7 +148,6 @@ const stakeResult = await lidoSDK.staking.stake({
   account,
 });
 
-console.log(balanceStETH.toString(), 'stETH balance');
 console.log(addressStETH, 'stETH contract address');
 console.log(contractStETH, 'stETH contract');
 console.log(stakeResult, 'stake result');
@@ -756,6 +755,127 @@ try {
 
   - `pendingRequests` (Type: Array[RequestStatusWithId]): A list of requests pending finalization.
   - `pendingAmountStETH` (Type: bigint): The amount of ETH pending claiming.
+
+## (w)stETH
+
+stETH and wstETH tokens functionality is presented trough modules with same ERC20 interface that exposes balances, allowances, transfers and ERC2612 permits signing.
+
+```ts
+const lidoSDK = new LidoSDK({
+  chainId: 5,
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+});
+
+// Views
+const balanceStETH = await lidoSDK.steth.balance(address);
+const balanceWStETH = await lidoSDK.wsteth.balance(address);
+
+// Contracts
+const contractStETH = await lidoSDK.steth.getContract();
+const addressStETH = await lidoSDK.steth.contractAddress();
+
+const contractWStETH = await lidoSDK.wsteth.getContract();
+const addressWStETH = await lidoSDK.wsteth.contractAddress();
+
+// Calls
+const transfer = await lidoSDK.steth.transfer({
+  amount,
+  to,
+  account,
+  callback,
+});
+```
+
+### Transfer
+
+```ts
+const transferTx = await lidoSDK.steth.transfer({
+  amount,
+  to,
+  from, // pass from to call transferFrom method
+  account,
+  callback,
+});
+```
+
+### Allowance
+
+```ts
+const approveTx = await lidoSDK.steth.approve({
+  amount,
+  to,
+  account,
+  callback,
+});
+
+const allowance = await lidoSDK.steth.allowance({ to, account });
+// bigint representing how much stETH is `to` address allowed to spend from `account` address
+console.log(allowance);
+```
+
+### Permit
+
+```ts
+// initiate permit signing for stETH
+const permit = await lidoSDK.steth.signPermit({
+  amount,
+  spender,
+  account,
+  deadline, // optional, leave empty for infinite deadline
+});
+```
+
+### Token Metadata
+
+Other helpful functions are exposed
+
+- `erc20Metadata` returns token name, symbol, decimals and ERC2612 Domain separator.
+- `nonces` returns current permit nonce for account
+- `totalSupply` returns total supply of the token, for (w)stETH tokens this is a variable that changes over time
+- `erc721Domain` return unhashed ERC2612 domain, used for signing permits
+
+### Utility methods
+
+For all transaction methods helper methods are available similar to `stake` module:
+
+- `...populate`: returns ready to sign transaction object with all data encoded
+- `...simulate`: performs dry-ran of the transaction to see if it will execute on the network
+
+For permit signing `...populate` helpers requests and fills out all needed data for `signTypedData` RPC call
+
+### Custom token
+
+Both token classes inherit from the same abstract class `AbstractLidoSDKErc20` which is exposed from `erc20` SDK module. Extend from this class by implementing`contractAddress` method. Consult with`steth` or `wsteth` sdk module implementation to get started. Be aware that ABI used may not fit your custom token fully or correctly.
+
+## unstETH NFT
+
+⚒️ Work In Progress ⚒️
+
+This modules exposes NFT functionality of Lido Withdrawal Request NFT.
+
+```ts
+const lidoSDK = new LidoSDK({
+  chainId: 5,
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+});
+
+// Contracts
+const addressUnstETH = await lidoSDK.unsteth.contractAddress();
+const contractUnstETH = await lidoSDK.unsteth.getContract();
+
+// views
+const nfts = await lidoSDK.unsteth.getNFTsByAccount(account);
+const owner = await lidoSDK.unsteth.getAccountByNFT(tokenId);
+
+// Calls
+const transfer = await lidoSDK.unsteth.transfer({
+  id,
+  to,
+  from, // optional to call transferFrom
+  account,
+  callback,
+});
+```
 
 ## Lido contract addresses
 
