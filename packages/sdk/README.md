@@ -843,9 +843,10 @@ For all transaction methods helper methods are available similar to `stake` modu
 
 For permit signing `...populate` helpers requests and fills out all needed data for `signTypedData` RPC call
 
-### Custom token
+### Custom token (experimental)
 
-Both token classes inherit from the same abstract class `AbstractLidoSDKErc20` which is exposed from `erc20` SDK module. Extend from this class by implementing`contractAddress` method. Consult with`steth` or `wsteth` sdk module implementation to get started. Be aware that ABI used may not fit your custom token fully or correctly.
+Both token classes inherit from the same abstract class `AbstractLidoSDKErc20` which is exposed from `erc20` SDK module.
+If you want to use this with other token extend from this abstract class and implementing`contractAddress` method that returns address of the token contract on current chain from `this.core`. Consult with source code of this sdk module to get started. Use at your own risk, be aware that this is experimental feature and ABI used may not fit your custom token fully or correctly.
 
 ## unstETH NFT
 

@@ -23,7 +23,11 @@ import {
 } from 'viem';
 import { NOOP, PERMIT_MESSAGE_TYPES } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
-import { PermitSignature, TransactionResult } from '../core/types.js';
+import {
+  PermitSignature,
+  TransactionOptions,
+  TransactionResult,
+} from '../core/types.js';
 import invariant from 'tiny-invariant';
 import { splitSignature } from '@ethersproject/bytes';
 
@@ -73,19 +77,18 @@ export abstract class AbstractLidoSDKErc20 {
     const { account, amount, to, from = account } = parsedProps;
     const isTransferFrom = from !== account;
     const contract = await this.getContract();
-    return this.core.performTransaction(
-      parsedProps,
-      async (overrides) => {
-        return isTransferFrom
-          ? contract.estimateGas.transferFrom([from, to, amount], overrides)
-          : contract.estimateGas.transfer([to, amount], overrides);
-      },
-      (overrides) => {
-        return isTransferFrom
-          ? contract.write.transferFrom([from, to, amount], overrides)
-          : contract.write.transfer([to, amount], overrides);
-      },
-    );
+
+    const estimateGas = async (overrides: TransactionOptions) =>
+      isTransferFrom
+        ? contract.estimateGas.transferFrom([from, to, amount], overrides)
+        : contract.estimateGas.transfer([to, amount], overrides);
+
+    const sendTx = async (overrides: TransactionOptions) =>
+      isTransferFrom
+        ? contract.write.transferFrom([from, to, amount], overrides)
+        : contract.write.transfer([to, amount], overrides);
+
+    return this.core.performTransaction(parsedProps, estimateGas, sendTx);
   }
 
   @Logger('Utils:')
