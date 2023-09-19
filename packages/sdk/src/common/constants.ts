@@ -49,3 +49,27 @@ export const CONTRACTS_BY_TOKENS = {
 } as const;
 
 export const NOOP = () => {};
+
+export const EIP2612_TYPE = [
+  { name: 'owner', type: 'address' },
+  { name: 'spender', type: 'address' },
+  { name: 'value', type: 'uint256' },
+  { name: 'nonce', type: 'uint256' },
+  { name: 'deadline', type: 'uint256' },
+] as const;
+
+export const PERMIT_MESSAGE_TYPES = {
+  EIP712Domain: [
+    { name: 'name', type: 'string' },
+    { name: 'version', type: 'string' },
+    {
+      name: 'chainId',
+      type: 'uint256',
+    },
+    {
+      name: 'verifyingContract',
+      type: 'address',
+    },
+  ],
+  Permit: EIP2612_TYPE,
+} as const;

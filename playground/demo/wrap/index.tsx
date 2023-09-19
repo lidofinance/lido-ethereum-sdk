@@ -27,11 +27,6 @@ export const WrapDemo = () => {
   return (
     <Accordion summary="Wrap">
       <Action
-        title="Wsteth Balance"
-        renderResult={renderTokenResult('wstETH')}
-        action={() => wrap.balanceWstETH(account)}
-      />
-      <Action
         title="Wrap ETH"
         action={() =>
           wrap.wrapEth({

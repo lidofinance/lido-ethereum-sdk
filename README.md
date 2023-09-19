@@ -24,10 +24,10 @@ yarn add @lidofinance/lido-ethereum-sdk
 To get started with the Lido Ethereum SDK, you need to import the necessary modules:
 
 ```ts
-const { LidoSDK } = require("@lidofinance/lido-ethereum-sdk");
+const { LidoSDK } = require('@lidofinance/lido-ethereum-sdk');
 
 // Or, if you are using ES6+:
-import { LidoSDK } from "@lidofinance/lido-ethereum-sdk";
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 ```
 
 ## Initialization
@@ -45,7 +45,7 @@ const sdk = new LidoSDK({
 // With RPC urls (without own rpc provider)
 const sdk = new LidoSDK({
   chainId: 5,
-  rpcUrls: ["https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}"],
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
   web3Provider: provider, // optional
 });
 ```
@@ -57,7 +57,7 @@ Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address
 ```ts
 const lidoSDK = new LidoSDK({
   chainId: 5,
-  rpcUrls: ["https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}"],
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
 });
 
 // Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
@@ -65,7 +65,6 @@ lidoSDK.core.defineWeb3Provider();
 
 // Views
 const balanceETH = await lidoSDK.core.balanceETH(address);
-const balanceStETH = await lidoSDK.staking.balanceStETH(address);
 
 // Calls
 const stakeResult = await lidoSDK.staking.stake({
@@ -75,9 +74,8 @@ const stakeResult = await lidoSDK.staking.stake({
   account,
 });
 
-console.log(balanceETH.toString(), "ETH balance");
-console.log(balanceStETH.toString(), "stETH balance");
-console.log(stakeResult, "stake result");
+console.log(balanceETH.toString(), 'ETH balance');
+console.log(stakeResult, 'stake result');
 ```
 
 ## Documentation

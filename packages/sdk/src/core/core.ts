@@ -14,6 +14,7 @@ import {
   numberToHex,
   stringify,
   maxUint256,
+  Hash,
 } from 'viem';
 import { goerli, mainnet } from 'viem/chains';
 import invariant from 'tiny-invariant';
@@ -36,6 +37,7 @@ import {
   LIDO_CONTRACT_NAMES,
   CONTRACTS_BY_TOKENS,
   LIDO_TOKENS,
+  PERMIT_MESSAGE_TYPES,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
@@ -45,32 +47,12 @@ import {
   type PermitSignature,
   type SignPermitProps,
   type LOG_MODE,
+  PerformTransactionOptions as PerformTransactionProps,
+  TransactionOptions,
+  TransactionResult,
+  TransactionCallbackStage,
 } from './types.js';
 import { permitAbi } from './abi/permit.js';
-
-const EIP2612_TYPE = [
-  { name: 'owner', type: 'address' },
-  { name: 'spender', type: 'address' },
-  { name: 'value', type: 'uint256' },
-  { name: 'nonce', type: 'uint256' },
-  { name: 'deadline', type: 'uint256' },
-];
-
-const TYPES = {
-  EIP712Domain: [
-    { name: 'name', type: 'string' },
-    { name: 'version', type: 'string' },
-    {
-      name: 'chainId',
-      type: 'uint256',
-    },
-    {
-      name: 'verifyingContract',
-      type: 'address',
-    },
-  ],
-  Permit: EIP2612_TYPE,
-};
 
 export default class LidoSDKCore {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
@@ -231,7 +213,7 @@ export default class LidoSDKCore {
       deadline: numberToHex(deadline),
     };
     const typedData = stringify(
-      { domain, primaryType: 'Permit', types: TYPES, message },
+      { domain, primaryType: 'Permit', types: PERMIT_MESSAGE_TYPES, message },
       (_, value) => (isHex(value) ? value.toLowerCase() : value),
     );
 
@@ -248,7 +230,7 @@ export default class LidoSDKCore {
       value: amount,
       deadline,
       chainId: BigInt(this.chain.id),
-      nonce: message.nonce,
+      nonce,
       owner: account,
       spender,
     };
@@ -367,5 +349,70 @@ export default class LidoSDKCore {
 
       return lidoLocator.read[contract]();
     }
+  }
+
+  public async performTransaction(
+    props: PerformTransactionProps,
+    getGasLimit: (overrides: TransactionOptions) => Promise<bigint>,
+    sendTransaction: (override: TransactionOptions) => Promise<Hash>,
+  ): Promise<TransactionResult> {
+    invariant(this.web3Provider, 'Web3 provider is not defined');
+    const { account, callback } = props;
+    const isContract = await this.isContract(account);
+
+    const overrides: TransactionOptions = {
+      account,
+      chain: this.chain,
+      gas: undefined,
+      maxFeePerGas: undefined,
+      maxPriorityFeePerGas: undefined,
+    };
+
+    if (!isContract) {
+      callback({ stage: TransactionCallbackStage.GAS_LIMIT });
+      overrides.gas = await getGasLimit(overrides);
+      const feeData = await this.getFeeData();
+      overrides.maxFeePerGas = feeData.maxFeePerGas;
+      overrides.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
+    }
+
+    callback({ stage: TransactionCallbackStage.SIGN, payload: overrides.gas });
+    const transactionHash = await sendTransaction(overrides);
+
+    if (isContract) {
+      callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
+      return { hash: transactionHash };
+    }
+
+    callback({
+      stage: TransactionCallbackStage.RECEIPT,
+      payload: transactionHash,
+    });
+
+    const transactionReceipt = await this.rpcProvider.waitForTransactionReceipt(
+      {
+        hash: transactionHash,
+      },
+    );
+
+    callback({
+      stage: TransactionCallbackStage.CONFIRMATION,
+      payload: transactionReceipt,
+    });
+
+    const confirmations = await this.rpcProvider.getTransactionConfirmations({
+      hash: transactionReceipt.transactionHash,
+    });
+
+    callback({
+      stage: TransactionCallbackStage.DONE,
+      payload: confirmations,
+    });
+
+    return {
+      hash: transactionHash,
+      receipt: transactionReceipt,
+      confirmations,
+    };
   }
 }

@@ -1,6 +1,6 @@
 import { Input, Accordion } from '@lidofinance/lido-ui';
 import { useWeb3 } from '@reef-knot/web3-react';
-import { Action, renderTokenResult } from 'components/action';
+import { Action } from 'components/action';
 import { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
 import TokenInput from 'components/tokenInput/tokenInput';
 import { useLidoSDK } from 'providers/sdk';
@@ -64,11 +64,6 @@ export const StakeDemo = () => {
             referralAddress,
           })
         }
-      />
-      <Action
-        title="Balance StETH"
-        action={() => staking.balanceStETH(account)}
-        renderResult={renderTokenResult('stETH')}
       />
       <Action title="Stake Limit" action={() => staking.getStakeLimitInfo()} />
       <Action
