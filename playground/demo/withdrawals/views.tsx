@@ -5,7 +5,7 @@ import { useLidoSDK } from 'providers/sdk';
 
 export const WithdrawalsViewsDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
-  const { withdrawals } = useLidoSDK();
+  const { withdraw } = useLidoSDK();
 
   const account = web3account as `0x{string}`;
 
@@ -13,35 +13,35 @@ export const WithdrawalsViewsDemo = () => {
     <Accordion summary="Withdrawals views">
       <Action
         title="Get request ids"
-        action={() => withdrawals.views.getWithdrawalRequestsIds({ account })}
+        action={() => withdraw.views.getWithdrawalRequestsIds({ account })}
       />
       <Action
         title="Get last checkpoint index"
-        action={() => withdrawals.views.getLastCheckpointIndex()}
+        action={() => withdraw.views.getLastCheckpointIndex()}
       />
       <Action
         title="Get unfinalized stETH"
-        action={() => withdrawals.views.getUnfinalizedStETH()}
+        action={() => withdraw.views.getUnfinalizedStETH()}
         renderResult={renderTokenResult('stETH')}
       />
       <Action
         title="Get MIN stETH withdrawal amount"
-        action={() => withdrawals.views.minStethWithdrawalAmount()}
+        action={() => withdraw.views.minStethWithdrawalAmount()}
         renderResult={renderTokenResult('stETH')}
       />
       <Action
         title="Get MAX stETH withdrawal amount"
-        action={() => withdrawals.views.maxStethWithdrawalAmount()}
+        action={() => withdraw.views.maxStethWithdrawalAmount()}
         renderResult={renderTokenResult('stETH')}
       />
-      <Action title="Is paused" action={() => withdrawals.views.isPaused()} />
+      <Action title="Is paused" action={() => withdraw.views.isPaused()} />
       <Action
         title="Is Bunker mode"
-        action={() => withdrawals.views.isBunkerModeActive()}
+        action={() => withdraw.views.isBunkerModeActive()}
       />
       <Action
         title="Is Turbo mode"
-        action={() => withdrawals.views.isTurboModeActive()}
+        action={() => withdraw.views.isTurboModeActive()}
       />
     </Accordion>
   );

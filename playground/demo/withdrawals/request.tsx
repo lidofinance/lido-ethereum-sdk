@@ -12,12 +12,12 @@ const ZERO = BigInt(0);
 export const WithdrawalsRequestDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
   const [requestValue, setRequestValue] = useState<ValueType>(DEFAULT_VALUE);
-  const { withdrawals } = useLidoSDK();
+  const { withdraw } = useLidoSDK();
 
   const account = web3account as `0x{string}`;
 
   return (
-    <Accordion summary="Withdrawals requests">
+    <Accordion summary="Withdraw requests">
       <TokenInput
         label="value"
         value={requestValue}
@@ -27,7 +27,7 @@ export const WithdrawalsRequestDemo = () => {
       <Action
         title="Request stETH"
         action={() =>
-          withdrawals.request.requestByToken({
+          withdraw.request.requestByToken({
             account,
             requests: [requestValue ?? ZERO],
             token: 'stETH',
@@ -38,7 +38,7 @@ export const WithdrawalsRequestDemo = () => {
       <Action
         title="Request wstETH"
         action={() =>
-          withdrawals.request.requestByToken({
+          withdraw.request.requestByToken({
             account,
             requests: [requestValue ?? ZERO],
             token: 'wstETH',
@@ -49,7 +49,7 @@ export const WithdrawalsRequestDemo = () => {
       <Action
         title="Request stETH Without Permit"
         action={() =>
-          withdrawals.request.requestWithoutPermit({
+          withdraw.request.requestWithoutPermit({
             account,
             requests: [requestValue ?? ZERO],
             token: 'stETH',
@@ -60,7 +60,7 @@ export const WithdrawalsRequestDemo = () => {
       <Action
         title="Request wstETH Without Permit"
         action={() =>
-          withdrawals.request.requestWithoutPermit({
+          withdraw.request.requestWithoutPermit({
             account,
             requests: [requestValue ?? ZERO],
             token: 'wstETH',
@@ -71,7 +71,7 @@ export const WithdrawalsRequestDemo = () => {
       <Action
         title="Approve stETH"
         action={() =>
-          withdrawals.approval.approveSteth({
+          withdraw.approval.approveSteth({
             account,
             amount: requestValue ?? ZERO,
           })
@@ -80,7 +80,7 @@ export const WithdrawalsRequestDemo = () => {
       <Action
         title="Approve wstETH"
         action={() =>
-          withdrawals.approval.approveWsteth({
+          withdraw.approval.approveWsteth({
             account,
             amount: requestValue ?? ZERO,
           })
@@ -90,32 +90,26 @@ export const WithdrawalsRequestDemo = () => {
         title="Get allowance stETH"
         renderResult={renderTokenResult('stETH')}
         action={() =>
-          withdrawals.approval.getAllowanceByToken({ account, token: 'stETH' })
+          withdraw.approval.getAllowanceByToken({ account, token: 'stETH' })
         }
       />
       <Action
         title="Get allowance wsStETH"
         action={() =>
-          withdrawals.approval.getAllowanceByToken({ account, token: 'wstETH' })
+          withdraw.approval.getAllowanceByToken({ account, token: 'wstETH' })
         }
         renderResult={renderTokenResult('wstETH')}
       />
       <Action
         title="Check stETH allowance by amount"
         action={() =>
-          withdrawals.approval.checkAllowanceSteth(
-            requestValue ?? ZERO,
-            account,
-          )
+          withdraw.approval.checkAllowanceSteth(requestValue ?? ZERO, account)
         }
       />
       <Action
         title="Check wstETH allowance by amount"
         action={() =>
-          withdrawals.approval.checkAllowanceWsteth(
-            requestValue ?? ZERO,
-            account,
-          )
+          withdraw.approval.checkAllowanceWsteth(requestValue ?? ZERO, account)
         }
       />
     </Accordion>
