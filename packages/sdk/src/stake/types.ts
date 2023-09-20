@@ -3,7 +3,7 @@ import { type LidoSDKCoreProps, type LidoSDKCore } from '../core/index.js';
 import { TransactionCallback } from '../core/types.js';
 import { EtherValue } from '../core/types.js';
 
-export type LidoSDKStakingProps = LidoSDKCoreProps & {
+export type LidoSDKStakeProps = LidoSDKCoreProps & {
   core?: LidoSDKCore;
 };
 

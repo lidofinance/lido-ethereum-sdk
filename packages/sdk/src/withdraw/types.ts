@@ -2,7 +2,7 @@ import { type Address } from 'viem';
 
 import { type LidoSDKCoreProps, type LidoSDKCore } from '../core/index.js';
 
-export type LidoSDKWithdrawalsProps = LidoSDKCoreProps & {
+export type LidoSDKWithdrawProps = LidoSDKCoreProps & {
   core?: LidoSDKCore;
 };
 

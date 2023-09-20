@@ -5,7 +5,7 @@ export {
   TransactionCallbackStage,
   type TransactionCallback,
 } from './core/index.js';
-export { type StakeProps } from './staking/index.js';
+export { type StakeProps } from './stake/index.js';
 export {
   type ClaimRequestsProps,
   type RequestProps,
@@ -13,6 +13,6 @@ export {
   type ApproveCallbackStages,
   type ApproveStageCallback,
   type RequestStatusWithId,
-} from './withdrawals/index.js';
+} from './withdraw/index.js';
 export { LIDO_CONTRACT_NAMES } from './common/constants.js';
 export { type WrapProps } from './wrap/index.js';

@@ -13,22 +13,33 @@ The project is currently under development and may change in the future.
 - [Usage](#usage)
 - [Initialization](#initialization)
 - [Examples](#examples)
-  - [Core](#core)
-  - [Staking](#staking)
+
+  - [Core](#core-example)
+  - [Stake](#stake-example)
+  - [Withdraw](#withdraw-example)
+  - [Wrap](#wrap-example)
+
 - [Stake](#stake)
   - [Call](#call)
   - [Populate transaction](#populate-transaction)
   - [Simulate transaction](#simulate-transaction)
 - [Wrap](#wrap)
-- [Withdrawal](#withdrawal)
+  - [Calls](#calls)
+    - [Wrap ETH](#wrap-eth)
+    - [Wrap stETH](#wrap-steth)
+    - [Unwrap](#unwrap)
+  - [Wrap utilities](#wrap-utilities)
+- [Withdraw](#withdraw)
 
   - [Call](#call-1)
 
     - [Send request withdrawal with Permit](#send-request-withdrawal-with-permit)
     - [Send request withdrawal with preallocated allowance](#send-request-withdrawal-with-preallocated-allowance)
     - [`Request` other methods](#request-other-methods)
+    - [Claim requests](#claim-requests)
+    - [`Claim` other methods](#claim-other-methods)
 
-  - [Utils](#utils)
+  - [Withdraw utilities](#withdraw-utilities)
 
     - [Set allowance of WithdrawalQueue contract](#set-allowance-of-withdrawalqueue-contract)
     - [`Allowance` other methods](#allowance-other-methods)
@@ -38,7 +49,7 @@ The project is currently under development and may change in the future.
     - [Constants](#constants)
     - [Requests info](#requests-info)
 
-- [(w)stETH](<#(w)steth>)
+- [(w)stETH](#wsteth)
 - [unstETH NFT](#unsteth-nft)
 - [Lido contract addresses](#lido-contract-addresses)
 
@@ -63,8 +74,11 @@ npm install @lidofinance/lido-ethereum-sdk
 The Lido Ethereum SDK consists of several modules:
 
 - **Core** - provides access to the SDK core functionality
-- **Staking** - provides access to the Lido staking functionality
-  TODO: add more modules
+- **Stake** - provides access to the Lido staking functionality
+- **Withdraw** - provides access to the Lido withdrawals functionality
+- **Wrap** - provides access to the Lido wrap functionality
+- **(w)stETH** - provides access to the stETH and wstETH tokens functionality
+- **unstETH NFT** - provides access to the unstETH NFT functionality
 
 ## Usage
 
@@ -73,16 +87,36 @@ To get started with the Lido Ethereum SDK, you need to import the necessary modu
 ```ts
 const { LidoSDK } = require('@lidofinance/lido-ethereum-sdk');
 // or
-const { LidoSDKStaking } = require('@lidofinance/lido-ethereum-sdk/staking');
+const { LidoSDKStake } = require('@lidofinance/lido-ethereum-sdk/stake');
+// or
+const { LidoSDKWithdraw } = require('@lidofinance/lido-ethereum-sdk/withdraw');
+// or
+const { LidoSDKWrap } = require('@lidofinance/lido-ethereum-sdk/wrap');
 // or
 const { LidoSDKCore } = require('@lidofinance/lido-ethereum-sdk/core');
+// or
+const { LidoSDKstETH } = require('@lidofinance/lido-ethereum-sdk/erc20');
+// or
+const { LidoSDKwstETH } = require('@lidofinance/lido-ethereum-sdk/erc20');
+// or
+const { LidoSDKUnstETH } = require('@lidofinance/lido-ethereum-sdk/unsteth');
 
 // Or, if you are using ES6+:
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 // or
-import { LidoSDKStaking } from '@lidofinance/lido-ethereum-sdk/staking';
+import { LidoSDKStake } from '@lidofinance/lido-ethereum-sdk/stake';
+// or
+import { LidoSDKWithdraw } from '@lidofinance/lido-ethereum-sdk/withdraw';
+// or
+import { LidoSDKWrap } from '@lidofinance/lido-ethereum-sdk/wrap';
 // or
 import { LidoSDKCore } from '@lidofinance/lido-ethereum-sdk/core';
+// or
+import { LidoSDKstETH } from '@lidofinance/lido-ethereum-sdk/erc20';
+// or
+import { LidoSDKwstETH } from '@lidofinance/lido-ethereum-sdk/erc20';
+// or
+import { LidoSDKUnstETH } from '@lidofinance/lido-ethereum-sdk/unsteth';
 ```
 
 ## Initialization
@@ -114,7 +148,7 @@ Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address
 
 ## Examples
 
-### Core
+### Core example
 
 ```ts
 const lidoSDK = new LidoSDK({
@@ -128,7 +162,7 @@ const balanceETH = await lidoSDK.core.balanceETH(address);
 console.log(balanceETH.toString(), 'ETH balance');
 ```
 
-### Staking
+### Stake example
 
 ```ts
 const lidoSDK = new LidoSDK({
@@ -137,11 +171,11 @@ const lidoSDK = new LidoSDK({
 });
 
 // Contracts
-const addressStETH = await lidoSDK.staking.contractAddressStETH();
-const contractStETH = await lidoSDK.staking.getContractStETH();
+const addressStETH = await lidoSDK.stake.contractAddressStETH();
+const contractStETH = await lidoSDK.stake.getContractStETH();
 
 // Calls
-const stakeResult = await lidoSDK.staking.stake({
+const stakeResult = await lidoSDK.stake.stakeEth({
   value,
   callback,
   referralAddress,
@@ -151,6 +185,57 @@ const stakeResult = await lidoSDK.staking.stake({
 console.log(addressStETH, 'stETH contract address');
 console.log(contractStETH, 'stETH contract');
 console.log(stakeResult, 'stake result');
+```
+
+### Withdraw example
+
+```ts
+const lidoSDK = new LidoSDK({
+  chainId: 5,
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+});
+
+// Contracts
+const addressWithdrawalQueue =
+  await lidoSDK.withdraw.contract.contractAddressWithdrawalQueue();
+const contractWithdrawalQueue =
+  await lidoSDK.withdraw.contract.getContractWithdrawalQueue();
+
+// Calls
+const requestResult = await lidoSDK.withdraw.request.requestByToken({
+  account,
+  requests: requestsArray,
+  token: 'stETH',
+  callback,
+});
+
+console.log(addressWithdrawalQueue, 'Withdrawal Queue contract address');
+console.log(contractWithdrawalQueue, 'Withdrawal Queue contract');
+console.log(requestResult, 'request result');
+```
+
+### Wrap example
+
+```ts
+const lidoSDK = new LidoSDK({
+  chainId: 5,
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+});
+
+// Contracts
+const addressWstETH = await lidoSDK.wrap.contractAddressWstETH();
+const contractWstETH = await lidoSDK.withdraw.getContractWstETH();
+
+// Calls
+const wrapResult = await lidoSDK.wrap.wrapEth({
+  value,
+  account,
+  callback,
+});
+
+console.log(addressWstETH, 'wstETH contract address');
+console.log(contractWstETH, 'wstETH contract');
+console.log(wrapResult, 'wrap result');
 ```
 
 ## Stake
@@ -214,7 +299,7 @@ const callback: StakeStageCallback = ({ stage, payload }) => {
 };
 
 try {
-  const stakeResult = await lidoSDK.staking.stake({
+  const stakeResult = await lidoSDK.stake.stakeEth({
     value,
     callback,
     referralAddress,
@@ -240,7 +325,7 @@ const lidoSDK = new LidoSDK({
   chainId: 5,
 });
 
-const populateResult = await lidoSDK.staking.stakePopulateTx({
+const populateResult = await lidoSDK.stake.stakeEthPopulateTx({
   value,
   callback,
   referralAddress,
@@ -260,7 +345,7 @@ const lidoSDK = new LidoSDK({
   chainId: 5,
 });
 
-const simulateResult = await lidoSDK.staking.stakeSimulateTx({
+const simulateResult = await lidoSDK.staking.stakeEthSimulateTx({
   value,
   callback,
   referralAddress,
@@ -270,7 +355,9 @@ const simulateResult = await lidoSDK.staking.stakeSimulateTx({
 
 ## Wrap
 
-### Wrap ETH
+### Calls
+
+#### Wrap ETH
 
 Arguments:
 
@@ -334,7 +421,7 @@ try {
 }
 ```
 
-### Wrap stETH
+#### Wrap stETH
 
 To wrap stETH you first need to approve stETH to wrap contract:
 
@@ -365,7 +452,7 @@ const approveResult = await lidoSDK.wrap.approveStethForWrap({
 const wrapResult = await lidoSDK.wrap.wrapSteth({ value, account, callback });
 ```
 
-### Unwrap
+#### Unwrap
 
 ```ts
 // unwrap wstETH to receive stETH
@@ -376,7 +463,7 @@ const unwrapResult = await lidoSDK.wrap.unwrap({
 });
 ```
 
-### Utilities
+### Wrap utilities
 
 For all transaction methods helper methods are available similar to `stake` module:
 
@@ -385,7 +472,7 @@ For all transaction methods helper methods are available similar to `stake` modu
 
 For `wrapEth` only `wrapEthEstimateGas` is available instead of `simulateTx` but you can use it all the same for checking transaction validity.
 
-## Withdrawal
+## Withdraw
 
 ### Call
 
@@ -393,11 +480,18 @@ For `wrapEth` only `wrapEthEstimateGas` is available instead of `simulateTx` but
 
 `Supports EOA and Multisig`
 
+Arguments:
+
+- `requests`: (Type: bigint[] ) - array of requests ids
+- `token`: (Type: string) - token name ('stETH' | 'wstETH')
+- `callback`: (Type: TransactionCallback) - callback function that will be on each stage of the transaction
+- `account` (Type: Address): The account address.
+
 ```ts
 import {
   LidoSDK,
-  RequestStageCallback,
-  RequestCallbackStages,
+  TransactionCallback,
+  TransactionCallbackStage,
   SDKError,
 } from '@lidofinance/lido-ethereum-sdk';
 
@@ -409,34 +503,34 @@ const lidoSDK = new LidoSDK({
 // Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
 lidoSDK.core.defineWeb3Provider();
 
-const callback: RequestStageCallback = ({ stage, payload }) => {
+const callback: TransactionCallback = ({ stage, payload }) => {
   switch (stage) {
-    case RequestCallbackStages.PERMIT:
+    case TransactionCallbackStage.PERMIT:
       console.log('wait for permit');
       break;
-    case RequestCallbackStages.GAS_LIMIT:
+    case TransactionCallbackStage.GAS_LIMIT:
       console.log('wait for gas limit');
       break;
-    case RequestCallbackStages.SIGN:
+    case TransactionCallbackStage.SIGN:
       console.log('wait for sign');
       break;
-    case RequestCallbackStages.RECEIPT:
+    case TransactionCallbackStage.RECEIPT:
       console.log('wait for receipt');
       console.log(payload, 'transaction hash');
       break;
-    case RequestCallbackStages.CONFIRMATION:
+    case TransactionCallbackStage.CONFIRMATION:
       console.log('wait for confirmation');
       console.log(payload, 'transaction receipt');
       break;
-    case RequestCallbackStages.DONE:
+    case TransactionCallbackStage.DONE:
       console.log('done');
       console.log(payload, 'transaction confirmations');
       break;
-    case RequestCallbackStages.MULTISIG_DONE:
+    case TransactionCallbackStage.MULTISIG_DONE:
       console.log('multisig_done');
       console.log(payload, 'transaction confirmations');
       break;
-    case RequestCallbackStages.ERROR:
+    case TransactionCallbackStage.ERROR:
       console.log('error');
       console.log(payload, 'error object with code and message');
       break;
@@ -465,11 +559,18 @@ try {
 
 `Supports EOA and Multisig`
 
+Arguments:
+
+- `requests`: (Type: bigint[] ) - array of requests ids
+- `token`: (Type: string) - token name ('stETH' | 'wstETH')
+- `callback`: (Type: TransactionCallback) - callback function that will be on each stage of the transaction
+- `account` (Type: Address): The account address.
+
 ```ts
 import {
   LidoSDK,
-  RequestStageCallback,
-  RequestCallbackStages,
+  TransactionCallback,
+  TransactionCallbackStage,
   SDKError,
 } from '@lidofinance/lido-ethereum-sdk';
 
@@ -481,27 +582,27 @@ const lidoSDK = new LidoSDK({
 // Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
 lidoSDK.core.defineWeb3Provider();
 
-const callback: RequestStageCallback = ({ stage, payload }) => {
+const callback: TransactionCallback = ({ stage, payload }) => {
   switch (stage) {
-    case RequestCallbackStages.GAS_LIMIT:
+    case TransactionCallbackStage.GAS_LIMIT:
       console.log('wait for gas limit');
       break;
-    case RequestCallbackStages.SIGN:
+    case TransactionCallbackStage.SIGN:
       console.log('wait for sign');
       break;
-    case RequestCallbackStages.RECEIPT:
+    case TransactionCallbackStage.RECEIPT:
       console.log('wait for receipt');
       console.log(payload, 'transaction hash');
       break;
-    case RequestCallbackStages.CONFIRMATION:
+    case TransactionCallbackStage.CONFIRMATION:
       console.log('wait for confirmation');
       console.log(payload, 'transaction receipt');
       break;
-    case RequestCallbackStages.DONE:
+    case TransactionCallbackStage.DONE:
       console.log('done');
       console.log(payload, 'transaction confirmations');
       break;
-    case RequestCallbackStages.ERROR:
+    case TransactionCallbackStage.ERROR:
       console.log('error');
       console.log(payload, 'error object with code and message');
       break;
@@ -543,7 +644,87 @@ try {
 - requestWstethMultisig
 - requestMultisigByToken
 
-### Utils
+#### Claim requests
+
+Arguments:
+
+- `account`: (Type: Address ): The account address.
+- `requestsIds`: (Type: bigint[]): An array of request ids.
+- `hints` (Type: bigint[]): An array of hints for each request.
+- `callback`: (Type: TransactionCallback): callback function that will be on each stage of the transaction
+
+```ts
+import {
+  LidoSDK,
+  TransactionCallback,
+  TransactionCallbackStage,
+  SDKError,
+} from '@lidofinance/lido-ethereum-sdk';
+
+const lidoSDK = new LidoSDK({
+  rpcUrls: ['https://rpc-url'],
+  chainId: 5,
+});
+
+// Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
+lidoSDK.core.defineWeb3Provider();
+
+const callback: TransactionCallback = ({ stage, payload }) => {
+  switch (stage) {
+    case TransactionCallbackStage.GAS_LIMIT:
+      console.log('wait for gas limit');
+      break;
+    case TransactionCallbackStage.SIGN:
+      console.log('wait for sign');
+      break;
+    case TransactionCallbackStage.RECEIPT:
+      console.log('wait for receipt');
+      console.log(payload, 'transaction hash');
+      break;
+    case TransactionCallbackStage.CONFIRMATION:
+      console.log('wait for confirmation');
+      console.log(payload, 'transaction receipt');
+      break;
+    case TransactionCallbackStage.DONE:
+      console.log('done');
+      console.log(payload, 'transaction confirmations');
+      break;
+    case TransactionCallbackStage.ERROR:
+      console.log('error');
+      console.log(payload, 'error object with code and message');
+      break;
+    default:
+  }
+};
+
+try {
+  const claimResult = await lidoSDK.withdrawals.claim.claimRequests({
+    account,
+    requestsIds,
+    hints,
+    callback,
+  });
+
+  console.log(
+    claimResult,
+    'transaction hash, transaction receipt, confirmations',
+  );
+} catch (error) {
+  console.log((error as SDKError).errorMessage, (error as SDKError).code);
+}
+```
+
+#### `Claim` other methods
+
+##### EOA
+
+- claimRequestsEOA
+
+##### Multisig
+
+- claimRequestsMultisig
+
+### Withdraw utilities
 
 #### Set allowance of WithdrawalQueue contract
 

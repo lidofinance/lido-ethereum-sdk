@@ -8,7 +8,7 @@ import { type LidoSDKCoreProps } from '../core/index.js';
 import { Bus } from './bus.js';
 import { type RequestStatusWithId } from './types.js';
 
-export class LidoSDKWithdrawalsRequestsInfo {
+export class LidoSDKWithdrawRequestsInfo {
   private readonly bus: Bus;
 
   constructor(props: LidoSDKCoreProps & { bus?: Bus }) {

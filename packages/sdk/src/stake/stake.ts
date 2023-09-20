@@ -22,7 +22,7 @@ import { version } from '../version.js';
 
 import { StethAbi } from './abi/steth.js';
 import {
-  type LidoSDKStakingProps,
+  type LidoSDKStakeProps,
   type StakeProps,
   type StakeResult,
   type StakeEncodeDataProps,
@@ -31,10 +31,10 @@ import {
 import { TransactionCallbackStage } from '../core/types.js';
 import { parseValue } from '../common/utils/parse-value.js';
 
-export class LidoSDKStaking {
+export class LidoSDKStake {
   readonly core: LidoSDKCore;
 
-  constructor(props: LidoSDKStakingProps) {
+  constructor(props: LidoSDKStakeProps) {
     const { core, ...rest } = props;
 
     if (core) this.core = core;
@@ -70,19 +70,19 @@ export class LidoSDKStaking {
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async stake(props: StakeProps): Promise<StakeResult> {
+  public async stakeEth(props: StakeProps): Promise<StakeResult> {
     invariant(this.core.web3Provider, 'Web3 provider is not defined');
     const parsedProps = this.parseProps(props);
     const { account } = props;
 
     const isContract = await this.core.isContract(account);
 
-    if (isContract) return await this.stakeMultisig(parsedProps);
-    else return await this.stakeEOA(parsedProps);
+    if (isContract) return await this.stakeEthMultisig(parsedProps);
+    else return await this.stakeEthEOA(parsedProps);
   }
 
   @Logger('LOG:')
-  private async stakeEOA(props: StakeInnerProps): Promise<StakeResult> {
+  private async stakeEthEOA(props: StakeInnerProps): Promise<StakeResult> {
     const { value, callback, referralAddress, account } = props;
 
     invariant(this.core.rpcProvider, 'RPC provider is not defined');
@@ -137,7 +137,7 @@ export class LidoSDKStaking {
   }
 
   @Logger('LOG:')
-  private async stakeMultisig(props: StakeInnerProps): Promise<StakeResult> {
+  private async stakeEthMultisig(props: StakeInnerProps): Promise<StakeResult> {
     const { value, callback, referralAddress, account } = props;
 
     callback({ stage: TransactionCallbackStage.SIGN });
@@ -156,7 +156,7 @@ export class LidoSDKStaking {
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async stakeSimulateTx(
+  public async stakeEthSimulateTx(
     props: StakeProps,
   ): Promise<WriteContractParameters> {
     const { referralAddress, value, account } = this.parseProps(props);
@@ -240,7 +240,7 @@ export class LidoSDKStaking {
   }
 
   @Logger('Utils:')
-  private stakeEncodeData(props: StakeEncodeDataProps): Hash {
+  private stakeEthEncodeData(props: StakeEncodeDataProps): Hash {
     const { referralAddress = zeroAddress } = props;
 
     return encodeFunctionData({
@@ -251,11 +251,11 @@ export class LidoSDKStaking {
   }
 
   @Logger('Utils:')
-  public async stakePopulateTx(
+  public async stakeEthPopulateTx(
     props: StakeProps,
   ): Promise<Omit<FormattedTransactionRequest, 'type'>> {
     const { referralAddress, value, account } = this.parseProps(props);
-    const data = this.stakeEncodeData({ referralAddress });
+    const data = this.stakeEthEncodeData({ referralAddress });
     const address = await this.contractAddressStETH();
 
     return {

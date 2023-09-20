@@ -13,7 +13,7 @@ import {
 } from './types.js';
 import { NOOP } from '../../common/constants.js';
 
-export class LidoSDKWithdrawalsClaim {
+export class LidoSDKWithdrawClaim {
   private readonly bus: Bus;
 
   constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
@@ -40,7 +40,7 @@ export class LidoSDKWithdrawalsClaim {
   private async claimRequestsEOA(props: ClaimRequestsProps) {
     const { account, requestsIds, hints, callback = NOOP } = props;
 
-    const contract = await this.bus.contract.getContractWithdrawalsQueue();
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     callback({ stage: TransactionCallbackStage.GAS_LIMIT });
 
@@ -93,7 +93,7 @@ export class LidoSDKWithdrawalsClaim {
   private async claimRequestsMultisig(props: ClaimRequestsProps) {
     const { account, requestsIds, hints, callback = NOOP } = props;
 
-    const contract = await this.bus.contract.getContractWithdrawalsQueue();
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     callback({ stage: TransactionCallbackStage.SIGN });
 
@@ -116,7 +116,7 @@ export class LidoSDKWithdrawalsClaim {
     const { account, requestsIds, hints } = props;
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
-    const contract = await this.bus.contract.getContractWithdrawalsQueue();
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     const params = [requestsIds, hints] as const;
     const gasLimit = await contract.estimateGas.claimWithdrawals(params, {
