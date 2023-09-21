@@ -40,7 +40,7 @@ export class LidoSDKWithdrawContract {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, [
     'bus.core.chain.id',
-    'contractAddressWithdrawalsQueue',
+    'contractAddressWithdrawalQueue',
   ])
   public async getContractWithdrawalQueue(): Promise<
     GetContractReturnType<typeof WithdrawalQueueAbi, PublicClient, WalletClient>
