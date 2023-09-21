@@ -5,6 +5,7 @@ import {
   WithdrawalsRequestDemo,
   WithdrawalsViewsDemo,
   WithdrawalsClaimDemo,
+  WithdrawalsContractDemo,
 } from './withdrawals';
 import { StethDemo, WstethDemo } from './tokens';
 import { UnstethDemo } from './unsteth';
@@ -18,6 +19,7 @@ export const Demo = () => {
       <WithdrawalsRequestDemo />
       <WithdrawalsClaimDemo />
       <WithdrawalsViewsDemo />
+      <WithdrawalsContractDemo />
       <StethDemo />
       <WstethDemo />
       <UnstethDemo />

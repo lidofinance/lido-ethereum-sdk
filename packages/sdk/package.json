@@ -26,20 +26,20 @@
       "default": "./dist/cjs/core/index.js",
       "types": "./dist/types/core/index.d.ts"
     },
-    "./staking": {
-      "import": "./dist/esm/staking/index.js",
-      "default": "./dist/cjs/staking/index.js",
-      "types": "./dist/types/staking/index.d.ts"
+    "./stake": {
+      "import": "./dist/esm/stake/index.js",
+      "default": "./dist/cjs/stake/index.js",
+      "types": "./dist/types/stake/index.d.ts"
     },
     "./wrap": {
       "import": "./dist/esm/wrap/index.js",
       "default": "./dist/cjs/wrap/index.js",
       "types": "./dist/types/wrap/index.d.ts"
     },
-    "./withdrawals": {
-      "import": "./dist/esm/withdrawals/index.js",
-      "default": "./dist/cjs/withdrawals/index.js",
-      "types": "./dist/types/withdrawals/index.d.ts"
+    "./withdraw": {
+      "import": "./dist/esm/withdraw/index.js",
+      "default": "./dist/cjs/withdraw/index.js",
+      "types": "./dist/types/withdraw/index.d.ts"
     },
     "./erc20": {
       "import": "./dist/esm/erc20/index.js",

@@ -13,7 +13,7 @@ export const StakeDemo = () => {
     useState<ValueType>(DEFAULT_VALUE);
   const stakingValue = stakingValueState ?? BigInt(0);
   const [referralAddressState, setReferralAddress] = useState('');
-  const { staking } = useLidoSDK();
+  const { stake } = useLidoSDK();
 
   const account = web3account as `0x{string}`;
   const referralAddress = referralAddressState
@@ -25,7 +25,7 @@ export const StakeDemo = () => {
       <Action
         title="Stake"
         action={() =>
-          staking.stake({
+          stake.stakeEth({
             value: stakingValue,
             account,
             callback: transactionToast,
@@ -48,7 +48,7 @@ export const StakeDemo = () => {
       <Action
         title="Stake Populate TX"
         action={() =>
-          staking.stakePopulateTx({
+          stake.stakeEthPopulateTx({
             account,
             value: stakingValue,
             referralAddress,
@@ -58,21 +58,21 @@ export const StakeDemo = () => {
       <Action
         title="Stake Simulate Tx"
         action={() =>
-          staking.stakeSimulateTx({
+          stake.stakeEthSimulateTx({
             account,
             value: stakingValue,
             referralAddress,
           })
         }
       />
-      <Action title="Stake Limit" action={() => staking.getStakeLimitInfo()} />
+      <Action title="Stake Limit" action={() => stake.getStakeLimitInfo()} />
       <Action
         title="Address Steth"
-        action={() => staking.contractAddressStETH()}
+        action={() => stake.contractAddressStETH()}
       />
       <Action
         title="Get Contract Steth ABI"
-        action={async () => (await staking.getContractStETH()).abi}
+        action={async () => (await stake.getContractStETH()).abi}
       />
     </Accordion>
   );

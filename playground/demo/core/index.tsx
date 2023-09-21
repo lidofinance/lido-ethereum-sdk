@@ -5,14 +5,14 @@ import { Action } from 'components/action';
 import { useLidoSDK } from 'providers/sdk';
 
 export const CoreDemo = () => {
-  const { core, staking } = useLidoSDK();
+  const { core, stake } = useLidoSDK();
   const { account: web3account = '0x0' } = useWeb3();
   const [contractAddress, setContractAddress] = useState<string>('');
 
   const getStethContract = useCallback(async () => {
-    const address = await staking.contractAddressStETH();
+    const address = await stake.contractAddressStETH();
     setContractAddress(address);
-  }, [staking]);
+  }, [stake]);
 
   useEffect(() => {
     getStethContract();

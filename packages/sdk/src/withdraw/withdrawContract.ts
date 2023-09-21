@@ -12,12 +12,12 @@ import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
 import { version } from '../version.js';
 import { type LidoSDKCoreProps } from '../core/index.js';
 
-import { WithdrawalsQueueAbi } from './abi/withdrawalsQueue.js';
+import { WithdrawalQueueAbi } from './abi/withdrawalQueue.js';
 import { PartStethAbi } from './abi/partStETH.js';
 import { PartWstethAbi } from './abi/partWstETH.js';
 import { Bus } from './bus.js';
 
-export class LidoSDKWithdrawalsContract {
+export class LidoSDKWithdrawContract {
   private readonly bus: Bus;
 
   constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
@@ -29,7 +29,7 @@ export class LidoSDKWithdrawalsContract {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
-  public async contractAddressWithdrawalsQueue(): Promise<Address> {
+  public async contractAddressWithdrawalQueue(): Promise<Address> {
     invariant(this.bus.core.chain, 'Chain is not defined');
 
     return await this.bus.core.getContractAddress(
@@ -40,20 +40,16 @@ export class LidoSDKWithdrawalsContract {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, [
     'bus.core.chain.id',
-    'contractAddressWithdrawalsQueue',
+    'contractAddressWithdrawalQueue',
   ])
-  public async getContractWithdrawalsQueue(): Promise<
-    GetContractReturnType<
-      typeof WithdrawalsQueueAbi,
-      PublicClient,
-      WalletClient
-    >
+  public async getContractWithdrawalQueue(): Promise<
+    GetContractReturnType<typeof WithdrawalQueueAbi, PublicClient, WalletClient>
   > {
-    const address = await this.contractAddressWithdrawalsQueue();
+    const address = await this.contractAddressWithdrawalQueue();
 
     return getContract({
       address,
-      abi: WithdrawalsQueueAbi,
+      abi: WithdrawalQueueAbi,
       publicClient: this.bus.core.rpcProvider,
       walletClient: this.bus.core.web3Provider,
     });

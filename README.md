@@ -54,6 +54,8 @@ Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address
 
 ## Examples
 
+All examples and usage instructions can be found in the [Docs SDK package](./packages/sdk/README.md).
+
 ```ts
 const lidoSDK = new LidoSDK({
   chainId: 5,
@@ -67,7 +69,7 @@ lidoSDK.core.defineWeb3Provider();
 const balanceETH = await lidoSDK.core.balanceETH(address);
 
 // Calls
-const stakeResult = await lidoSDK.staking.stake({
+const stakeResult = await lidoSDK.stake.stakeEth({
   value,
   callback,
   referralAddress,

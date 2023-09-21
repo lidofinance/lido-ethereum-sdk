@@ -1,8 +1,8 @@
 import { LidoSDKCore, LidoSDKCoreProps } from './core/index.js';
 
-import { LidoSDKStaking } from './staking/index.js';
+import { LidoSDKStake } from './stake/index.js';
 import { LidoSDKWrap } from './wrap/index.js';
-import { LidoSDKWithdrawals } from './withdrawals/index.js';
+import { LidoSDKWithdraw } from './withdraw/index.js';
 import { LidoSDKstETH, LidoSDKwstETH } from './erc20/index.js';
 import { LidoSDKUnstETH } from './unsteth/unsteth.js';
 
@@ -10,9 +10,9 @@ import { version } from './version.js';
 
 export class LidoSDK {
   readonly core: LidoSDKCore;
-  readonly staking: LidoSDKStaking;
+  readonly stake: LidoSDKStake;
   readonly wrap: LidoSDKWrap;
-  readonly withdrawals: LidoSDKWithdrawals;
+  readonly withdraw: LidoSDKWithdraw;
   readonly steth: LidoSDKstETH;
   readonly wsteth: LidoSDKwstETH;
   readonly unsteth: LidoSDKUnstETH;
@@ -22,11 +22,11 @@ export class LidoSDK {
     this.core = new LidoSDKCore(props, version);
     const core = this.core;
     // Staking functionality
-    this.staking = new LidoSDKStaking({ ...props, core });
+    this.stake = new LidoSDKStake({ ...props, core });
     // Wrap functionality
     this.wrap = new LidoSDKWrap({ ...props, core });
     // Withdrawals functionality
-    this.withdrawals = new LidoSDKWithdrawals({ ...props, core });
+    this.withdraw = new LidoSDKWithdraw({ ...props, core });
     // Tokens functionality
     this.steth = new LidoSDKstETH({ ...props, core });
     this.wsteth = new LidoSDKwstETH({ ...props, core });

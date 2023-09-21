@@ -18,7 +18,7 @@ export const WithdrawalsClaimDemo = () => {
     sortedIds: readonly bigint[];
   }>();
   const [selectedIds, setSelectedIds] = useState<bigint[]>();
-  const { withdrawals } = useLidoSDK();
+  const { withdraw } = useLidoSDK();
 
   const account = web3account as `0x{string}`;
 
@@ -28,7 +28,7 @@ export const WithdrawalsClaimDemo = () => {
         title="Get claimable request info"
         action={async () => {
           const result =
-            await withdrawals.requestsInfo.getClaimableRequestsETHByAccount({
+            await withdraw.requestsInfo.getClaimableRequestsETHByAccount({
               account,
             });
 
@@ -40,7 +40,7 @@ export const WithdrawalsClaimDemo = () => {
       <Action
         title="Claim selected requests"
         action={() =>
-          withdrawals.claim.claimRequests({
+          withdraw.claim.claimRequests({
             account,
             requestsIds: selectedIds ?? [],
             hints:

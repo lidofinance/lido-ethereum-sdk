@@ -15,7 +15,7 @@ import { Bus } from '../bus.js';
 
 import { type RequestWithPermitProps, type RequestProps } from './types.js';
 
-export class LidoSDKWithdrawalsRequest {
+export class LidoSDKWithdrawRequest {
   private readonly bus: Bus;
 
   constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
@@ -96,7 +96,7 @@ export class LidoSDKWithdrawalsRequest {
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
-    const contract = await this.bus.contract.getContractWithdrawalsQueue();
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     const isSteth = token === 'stETH';
     let tokenRequestMethod;
@@ -143,7 +143,7 @@ export class LidoSDKWithdrawalsRequest {
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
-    const contract = await this.bus.contract.getContractWithdrawalsQueue();
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     const isSteth = token === LIDO_TOKENS.steth;
     let tokenRequestMethod;
@@ -209,7 +209,7 @@ export class LidoSDKWithdrawalsRequest {
     invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
-    const contract = await this.bus.contract.getContractWithdrawalsQueue();
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     const isSteth = token === 'stETH';
     let tokenRequestMethod;
@@ -242,7 +242,7 @@ export class LidoSDKWithdrawalsRequest {
   ): Promise<bigint> {
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
-    const contract = await this.bus.contract.getContractWithdrawalsQueue();
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     const isSteth = token === 'stETH';
     let tokenRequestMethod;
@@ -281,7 +281,7 @@ export class LidoSDKWithdrawalsRequest {
   ): Promise<bigint> {
     invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
 
-    const contract = await this.bus.contract.getContractWithdrawalsQueue();
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     const isSteth = token === 'stETH';
     let tokenRequestMethod;

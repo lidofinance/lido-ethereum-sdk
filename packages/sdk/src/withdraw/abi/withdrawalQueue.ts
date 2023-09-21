@@ -1,4 +1,4 @@
-export const WithdrawalsQueueAbi = [
+export const WithdrawalQueueAbi = [
   { inputs: [], name: 'AdminZeroAddress', type: 'error' },
   { inputs: [], name: 'ApprovalToOwner', type: 'error' },
   { inputs: [], name: 'ApproveToCaller', type: 'error' },

@@ -10,7 +10,7 @@ import { type ApproveProps, ApproveCallbackStages } from './types.js';
 import { NOOP } from '../../common/constants.js';
 import { parseValue } from '../../common/utils/parse-value.js';
 
-export class LidoSDKWithdrawalsApprove {
+export class LidoSDKWithdrawApprove {
   private readonly bus: Bus;
 
   constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
@@ -73,7 +73,7 @@ export class LidoSDKWithdrawalsApprove {
     let gasLimitMethod;
 
     const addressWithdrawalsQueue =
-      await this.bus.contract.contractAddressWithdrawalsQueue();
+      await this.bus.contract.contractAddressWithdrawalQueue();
     if (isSteth) {
       tokenApproveMethod = (await this.bus.contract.getContractStETH()).write
         .approve;
@@ -160,7 +160,7 @@ export class LidoSDKWithdrawalsApprove {
         .approve;
 
     const addressWithdrawalsQueue =
-      await this.bus.contract.contractAddressWithdrawalsQueue();
+      await this.bus.contract.contractAddressWithdrawalQueue();
 
     callback({ stage: ApproveCallbackStages.SIGN });
 
@@ -211,7 +211,7 @@ export class LidoSDKWithdrawalsApprove {
         .estimateGas.approve;
 
     const addressWithdrawalsQueue =
-      await this.bus.contract.contractAddressWithdrawalsQueue();
+      await this.bus.contract.contractAddressWithdrawalQueue();
 
     const gasLimit = await estimateGasMethod.call(
       this,
@@ -256,7 +256,7 @@ export class LidoSDKWithdrawalsApprove {
         .allowance;
 
     const addressWithdrawalsQueue =
-      await this.bus.contract.contractAddressWithdrawalsQueue();
+      await this.bus.contract.contractAddressWithdrawalQueue();
 
     const allowance = await allowanceMethod.call(
       this,
@@ -291,7 +291,7 @@ export class LidoSDKWithdrawalsApprove {
         .allowance;
 
     const addressWithdrawalsQueue =
-      await this.bus.contract.contractAddressWithdrawalsQueue();
+      await this.bus.contract.contractAddressWithdrawalQueue();
 
     const allowance = await allowanceMethod.call(
       this,
