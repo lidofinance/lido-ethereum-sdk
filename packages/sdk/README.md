@@ -1115,7 +1115,10 @@ const lidoSDK = new LidoSDK({
 const lastRebaseEvent = await lidoSDK.events.stethEvents.getLastRebaseEvent();
 const lastRebaseEventsByCount =
   await lidoSDK.events.stethEvents.getRebaseEvents({ count: 10 });
+const lastRebaseEventsByDays =
+  await lidoSDK.events.stethEvents.getRebaseEventByDays({ days: 10 });
 
 console.log(lastRebaseEvent, 'last rebase event');
 console.log(lastRebaseEventsByCount, 'last rebase events by count');
+console.log(lastRebaseEventsByDays, 'last rebase events by days');
 ```
