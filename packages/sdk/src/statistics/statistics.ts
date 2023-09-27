@@ -1,9 +1,8 @@
 import { LidoSDKCore } from '../core/index.js';
-
 import { version } from '../version.js';
 
 import { LidoSDKApr } from './apr.js';
-import { type LidoSDKStatisticsProps } from './types.js';
+import type { LidoSDKStatisticsProps } from './types.js';
 
 export class LidoSDKStatistics {
   readonly core: LidoSDKCore;

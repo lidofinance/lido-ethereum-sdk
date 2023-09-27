@@ -16,6 +16,7 @@ import { StethEventsAbi } from './abi/stethEvents.js';
 import { type LidoSDKEventsProps } from './types.js';
 
 const BLOCKS_BY_DAY = 7800n;
+const REBASE_EVENT_ABI_INDEX = 8;
 
 export class LidoSDKStethEvents {
   readonly core: LidoSDKCore;
@@ -60,7 +61,7 @@ export class LidoSDKStethEvents {
     const dayAgoBlock = await this.getBlockByDays({ days: 1 });
     const logs = await this.core.rpcProvider.getLogs({
       address: contract.address,
-      event: StethEventsAbi[8],
+      event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
       fromBlock: dayAgoBlock.number,
       toBlock: 'latest',
     });
@@ -81,10 +82,9 @@ export class LidoSDKStethEvents {
     const targetTimestamp = lastEventTimestamp - BigInt(days * 24 * 60 * 60);
     const block = await this.getBlockByDays({ days: 7 });
 
-    const RebaseEventAbiIndex = 8;
     const logs = await this.core.rpcProvider.getLogs({
       address: contract.address,
-      event: StethEventsAbi[RebaseEventAbiIndex],
+      event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
       fromBlock: block.number,
       toBlock: 'latest',
     });
@@ -128,6 +128,7 @@ export class LidoSDKStethEvents {
   }
 
   @Logger('Utils:')
+  @Cache(60 * 1000, ['core.chain.id'])
   private async getBlockByDays(props: { days: number }) {
     const { days } = props;
 
