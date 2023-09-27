@@ -40,7 +40,7 @@ export class LidoSDKApr {
     const aprs = events.map((event) => this.calculateApr(event.args));
     const sum = aprs.reduce((acc, apr) => apr + acc, 0);
 
-    return { aprs, smaApr: sum / aprs.length };
+    return { aprs, smaApr: Number((sum / aprs.length).toFixed(1)) };
   }
 
   private calculateApr(props: {
