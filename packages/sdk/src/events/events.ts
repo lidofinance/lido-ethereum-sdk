@@ -1,9 +1,8 @@
 import { LidoSDKCore } from '../core/index.js';
-
 import { version } from '../version.js';
 
 import { LidoSDKStethEvents } from './stethEvents.js';
-import { type LidoSDKEventsProps } from './types.js';
+import type { LidoSDKEventsProps } from './types.js';
 
 export class LidoSDKEvents {
   readonly core: LidoSDKCore;

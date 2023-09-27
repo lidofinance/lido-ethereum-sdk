@@ -5,7 +5,7 @@ import { LidoSDKEvents } from '../events/index.js';
 import { Logger, ErrorHandler } from '../common/decorators/index.js';
 import { version } from '../version.js';
 
-import { type LidoSDKStatisticsProps } from './types.js';
+import type { LidoSDKStatisticsProps } from './types.js';
 
 export class LidoSDKApr {
   readonly core: LidoSDKCore;

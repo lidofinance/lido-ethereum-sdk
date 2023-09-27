@@ -1,9 +1,9 @@
 import { getContract } from 'viem';
-import {
-  type Address,
-  type GetContractReturnType,
-  type PublicClient,
-  type WalletClient,
+import type {
+  Address,
+  GetContractReturnType,
+  PublicClient,
+  WalletClient,
 } from 'viem';
 import invariant from 'tiny-invariant';
 
@@ -81,9 +81,10 @@ export class LidoSDKStethEvents {
     const targetTimestamp = lastEventTimestamp - BigInt(days * 24 * 60 * 60);
     const block = await this.getBlockByDays({ days: 7 });
 
+    const RebaseEventAbiIndex = 8;
     const logs = await this.core.rpcProvider.getLogs({
       address: contract.address,
-      event: StethEventsAbi[8],
+      event: StethEventsAbi[RebaseEventAbiIndex],
       fromBlock: block.number,
       toBlock: 'latest',
     });
