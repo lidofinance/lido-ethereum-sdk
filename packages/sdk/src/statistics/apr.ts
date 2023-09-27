@@ -34,7 +34,7 @@ export class LidoSDKApr {
   @Logger('Statistic:')
   @ErrorHandler()
   public async getSmaApr(): Promise<{ aprs: number[]; smaApr: number }> {
-    const events = await this.events.stethEvents.getRebaseEvents({ count: 10 });
+    const events = await this.events.stethEvents.getRebaseEvents({ count: 7 });
     invariant(events.length, 'Events is not defined');
 
     const aprs = events.map((event) => this.calculateApr(event.args));
