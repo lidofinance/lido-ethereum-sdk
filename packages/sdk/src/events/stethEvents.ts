@@ -15,7 +15,7 @@ import { version } from '../version.js';
 import { StethEventsAbi } from './abi/stethEvents.js';
 import { type LidoSDKEventsProps } from './types.js';
 
-const BLOCKS_BY_DAY = 8000n;
+const BLOCKS_BY_DAY = 7800n;
 
 export class LidoSDKStethEvents {
   readonly core: LidoSDKCore;
@@ -70,6 +70,37 @@ export class LidoSDKStethEvents {
 
   @Logger('Events:')
   @ErrorHandler()
+  public async getRebaseEventByDays(props: { days: number }) {
+    const { days } = props;
+
+    const contract = await this.getContractStETH();
+    const lastEvent = await this.getLastRebaseEvent();
+    const lastEventTimestamp = lastEvent?.args.reportTimestamp;
+    invariant(lastEventTimestamp, 'lastEventTimestamp is not defined');
+
+    const targetTimestamp = lastEventTimestamp - BigInt(days * 24 * 60 * 60);
+    const block = await this.getBlockByDays({ days: 7 });
+
+    const logs = await this.core.rpcProvider.getLogs({
+      address: contract.address,
+      event: StethEventsAbi[8],
+      fromBlock: block.number,
+      toBlock: 'latest',
+    });
+
+    const logsByDays = logs.filter((log) => {
+      const timestamp = log.args.reportTimestamp;
+
+      const diff = lastEventTimestamp - (timestamp || 0n);
+
+      return diff < targetTimestamp;
+    });
+
+    return logsByDays;
+  }
+
+  @Logger('Events:')
+  @ErrorHandler()
   public async getRebaseEvents(props: { count: number }) {
     const { count } = props;
     const contract = await this.getContractStETH();
@@ -96,7 +127,7 @@ export class LidoSDKStethEvents {
   }
 
   @Logger('Utils:')
-  public async getBlockByDays(props: { days: number }) {
+  private async getBlockByDays(props: { days: number }) {
     const { days } = props;
 
     const lastBlock = await this.getLastBlock();
