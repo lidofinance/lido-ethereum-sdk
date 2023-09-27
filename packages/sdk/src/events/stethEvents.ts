@@ -13,9 +13,9 @@ import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
 import { version } from '../version.js';
 
 import { StethEventsAbi } from './abi/stethEvents.js';
-import { type LidoSDKEventsProps } from './types.js';
+import { type LidoSDKEventsProps, RebaseEvent } from './types.js';
 
-const BLOCKS_BY_DAY = 7800n;
+const BLOCKS_BY_DAY = 7600n;
 const REBASE_EVENT_ABI_INDEX = 8;
 
 export class LidoSDKStethEvents {
@@ -56,9 +56,9 @@ export class LidoSDKStethEvents {
 
   @Logger('Events:')
   @ErrorHandler()
-  public async getLastRebaseEvent() {
+  public async getLastRebaseEvent(days = 1): Promise<RebaseEvent | undefined> {
     const contract = await this.getContractStETH();
-    const dayAgoBlock = await this.getBlockByDays({ days: 1 });
+    const dayAgoBlock = await this.getBlockByDays({ days });
     const logs = await this.core.rpcProvider.getLogs({
       address: contract.address,
       event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
@@ -66,12 +66,17 @@ export class LidoSDKStethEvents {
       toBlock: 'latest',
     });
 
+    if (logs.length === 0) return this.getLastRebaseEvent(days + 1);
+    if (days > 3) return undefined;
+
     return logs[logs.length - 1];
   }
 
   @Logger('Events:')
   @ErrorHandler()
-  public async getRebaseEventByDays(props: { days: number }) {
+  public async getRebaseEventByDays(props: {
+    days: number;
+  }): Promise<RebaseEvent[]> {
     const { days } = props;
 
     const contract = await this.getContractStETH();
@@ -102,7 +107,9 @@ export class LidoSDKStethEvents {
 
   @Logger('Events:')
   @ErrorHandler()
-  public async getRebaseEvents(props: { count: number }) {
+  public async getRebaseEvents(props: {
+    count: number;
+  }): Promise<RebaseEvent[]> {
     const { count } = props;
     const contract = await this.getContractStETH();
     const block = await this.getBlockByDays({ days: count });
@@ -128,6 +135,7 @@ export class LidoSDKStethEvents {
   }
 
   @Logger('Utils:')
+  @ErrorHandler()
   @Cache(60 * 1000, ['core.chain.id'])
   private async getBlockByDays(props: { days: number }) {
     const { days } = props;
