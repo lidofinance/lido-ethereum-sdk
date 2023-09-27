@@ -52,6 +52,10 @@ The project is currently under development and may change in the future.
 - [(w)stETH](#wsteth)
 - [unstETH NFT](#unsteth-nft)
 - [Lido contract addresses](#lido-contract-addresses)
+- [Lido statistics](#lido-statistics)
+  - [APR](#apr)
+- [Lido events](#lido-events)
+  - [Rebase](#rebase)
 
 ## Installation
 
@@ -1075,4 +1079,43 @@ const stethAddress = await lidoSDK.core.getContractAddress(
 const wsteth = await lidoSDK.core.getContractAddress(
   LIDO_CONTRACT_NAMES.wsteth,
 );
+```
+
+## Lido statistics
+
+### APR
+
+```ts
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+
+const lidoSDK = new LidoSDK({
+  rpcUrls: ['https://rpc-url'],
+  chainId: 5,
+});
+
+const lastApr = await lidoSDK.statistics.apr.getLastApr();
+const smaApr = await lidoSDK.statistics.apr.getSmaApr();
+
+console.log(lastApr, 'last apr');
+console.log(smaApr, 'sma apr');
+```
+
+## Lido events
+
+### Rebase
+
+```ts
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+
+const lidoSDK = new LidoSDK({
+  rpcUrls: ['https://rpc-url'],
+  chainId: 5,
+});
+
+const lastRebaseEvent = await lidoSDK.events.stethEvents.getLastRebaseEvent();
+const lastRebaseEventsByCount =
+  await lidoSDK.events.stethEvents.getRebaseEvents({ count: 10 });
+
+console.log(lastRebaseEvent, 'last rebase event');
+console.log(lastRebaseEventsByCount, 'last rebase events by count');
 ```
