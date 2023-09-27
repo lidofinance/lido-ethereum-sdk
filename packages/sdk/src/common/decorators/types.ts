@@ -9,4 +9,6 @@ export type HeadMessage =
   | 'LOG:'
   | 'Cache:'
   | 'Init:'
-  | 'Permit:';
+  | 'Permit:'
+  | 'Events:'
+  | 'Statistic:';

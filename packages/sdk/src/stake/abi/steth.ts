@@ -8,7 +8,6 @@ export const StethAbi = [
     stateMutability: 'pure',
     type: 'function',
   },
-
   {
     constant: true,
     inputs: [{ name: '_ethAmount', type: 'uint256' }],
