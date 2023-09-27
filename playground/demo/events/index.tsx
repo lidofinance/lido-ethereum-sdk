@@ -16,6 +16,10 @@ export const EventsDemo = () => {
         title="Last 10 Rebase events"
         action={() => events.stethEvents.getRebaseEvents({ count: 10 })}
       />
+      <Action
+        title="Last Rebase events by 7 days"
+        action={() => events.stethEvents.getRebaseEventByDays({ days: 7 })}
+      />
     </Accordion>
   );
 };
