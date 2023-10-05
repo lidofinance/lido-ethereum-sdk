@@ -18,7 +18,7 @@ export const EventsDemo = () => {
       />
       <Action
         title="Last Rebase events by 7 days"
-        action={() => events.stethEvents.getRebaseEventByDays({ days: 7 })}
+        action={() => events.stethEvents.getRebaseEventsByDays({ days: 7 })}
       />
     </Accordion>
   );
