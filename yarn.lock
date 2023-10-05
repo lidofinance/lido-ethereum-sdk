@@ -2519,16 +2519,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lido-sdk/constants@npm:3.1.0, @lido-sdk/constants@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "@lido-sdk/constants@npm:3.1.0"
-  dependencies:
-    tiny-invariant: ^1.1.0
-  checksum: 0c8cdda2cfe0f70303eabb90768e176692c74f0a6630c7408a688d03915a935c8be5a28f5f150e99d5de14d36ae38cdccc6eaf4e2cb99b48802ede251cc7aec6
-  languageName: node
-  linkType: hard
-
-"@lido-sdk/constants@npm:^3.2.1":
+"@lido-sdk/constants@npm:3.2.1, @lido-sdk/constants@npm:^3.2.1":
   version: 3.2.1
   resolution: "@lido-sdk/constants@npm:3.2.1"
   dependencies:
@@ -2537,54 +2528,54 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lido-sdk/contracts@npm:3.0.2":
-  version: 3.0.2
-  resolution: "@lido-sdk/contracts@npm:3.0.2"
+"@lido-sdk/contracts@npm:3.0.4":
+  version: 3.0.4
+  resolution: "@lido-sdk/contracts@npm:3.0.4"
   dependencies:
-    "@lido-sdk/constants": 3.1.0
+    "@lido-sdk/constants": 3.2.1
     tiny-invariant: ^1.1.0
   peerDependencies:
     "@ethersproject/abstract-signer": 5
     "@ethersproject/contracts": 5
     "@ethersproject/providers": 5
     ethers: 5
-  checksum: e733e9778b20587b6e61c1e9b03c8b7e9bed56908a791eea6be3f59ef216dd1443af0b448dea80887439fca78b11126f8d6e30dd35bbf0c18e93111f9030e90e
+  checksum: ec6d6d907fb7adf7ed9ba70611967661b2d8793c8a959394a05950fa704ff58f92d4a341ac29d823f3ca107d8202e832788f3fc41cc8411d9d668564b312a9a0
   languageName: node
   linkType: hard
 
-"@lido-sdk/helpers@npm:1.4.11":
-  version: 1.4.11
-  resolution: "@lido-sdk/helpers@npm:1.4.11"
+"@lido-sdk/helpers@npm:1.5.1":
+  version: 1.5.1
+  resolution: "@lido-sdk/helpers@npm:1.5.1"
   dependencies:
-    "@lido-sdk/constants": 3.1.0
+    "@lido-sdk/constants": 3.2.1
     tiny-invariant: ^1.1.0
   peerDependencies:
     "@ethersproject/bignumber": 5
-  checksum: 98cb0881b5c1c858278b6d8995e700ed09871ed028c2d7b8d78cfda6af2ab5ba8eea9e6140506023f9996c4f85f1acfa7a3161a917981be11ac19586ecb5d2ce
+  checksum: 1207e57e3b072fdf87c7f414dffca0099e0a884410079fef7d631082c8734f3e4420b347409cf8c04eda7d01b6532c638b5598b978ddc612931bed33940edb65
   languageName: node
   linkType: hard
 
-"@lido-sdk/providers@npm:^1.4.12":
-  version: 1.4.12
-  resolution: "@lido-sdk/providers@npm:1.4.12"
+"@lido-sdk/providers@npm:^1.4.14":
+  version: 1.4.14
+  resolution: "@lido-sdk/providers@npm:1.4.14"
   dependencies:
-    "@lido-sdk/constants": 3.1.0
+    "@lido-sdk/constants": 3.2.1
   peerDependencies:
     "@ethersproject/logger": 5
     "@ethersproject/networks": 5
     "@ethersproject/properties": 5
     "@ethersproject/providers": 5
-  checksum: b1e6a6d27b650493dd050ffe612a9a43d7f27f56994e2a9370dc4b6c533c3af709f2ed578ed4f6b9a93e8445559fbb55f099a79fdff935b3904c2d0c76b1939a
+  checksum: 701646bc5ac5bb82419aafc8499d841f3aa6babbefd8d9979621f985c2f5ea1ea1667210d8ff0a04f010534a16e7e494cce35516ed16caaf9046c4e227f0baf2
   languageName: node
   linkType: hard
 
-"@lido-sdk/react@npm:^2.0.0":
-  version: 2.0.1
-  resolution: "@lido-sdk/react@npm:2.0.1"
+"@lido-sdk/react@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "@lido-sdk/react@npm:2.0.3"
   dependencies:
-    "@lido-sdk/constants": 3.1.0
-    "@lido-sdk/contracts": 3.0.2
-    "@lido-sdk/helpers": 1.4.11
+    "@lido-sdk/constants": 3.2.1
+    "@lido-sdk/contracts": 3.0.4
+    "@lido-sdk/helpers": 1.5.1
     swr: ^1.0.1
     tiny-invariant: ^1.1.0
     tiny-warning: ^1.0.3
@@ -2596,7 +2587,7 @@ __metadata:
     "@ethersproject/providers": 5
     react: ">=16"
     react-dom: ">=16"
-  checksum: 16a22ffb3ff2a283a88e8952be19546d17c2714bb802f694a8b70e81c1b18a2ba1a8b8333201b3b5364aeb85147ea29e2d0de3ae9724a955de64a8ec2f522864
+  checksum: 37ff85cb27dea73e4dc24a54471c60fa8a272ea285931596d91862c88fcd43a60a2088c53bd5ee3069b6151722ef4f7f7401c23edf775ce5cc2f84b14bb2ea29
   languageName: node
   linkType: hard
 
@@ -3347,16 +3338,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reef-knot/core-react@npm:1.5.1":
-  version: 1.5.1
-  resolution: "@reef-knot/core-react@npm:1.5.1"
+"@reef-knot/core-react@npm:1.6.0":
+  version: 1.6.0
+  resolution: "@reef-knot/core-react@npm:1.6.0"
   peerDependencies:
     "@reef-knot/types": ^1.2.1
     "@reef-knot/ui-react": ^1.0.4
     "@reef-knot/wallets-list": ^1.4.1
     react: ">=17"
     wagmi: ^0.12.19
-  checksum: aa79d24858e766ac4add92df00afd1ecf4a48c24872d8d9af7cce6496d6af1104e6d6d0c007d6d77b7f0db7f98760da86392dbd5e453ea875b50aa226f1e1fc0
+  checksum: 6e43dd4301eedc68051ff7e90d663b49fc0aeb4fed7c8d5948e41e1f1c7381b007a10554f81d9ae289140d70a394bc5844de22b00ef5acb0a36f1e8b8bb4539b
   languageName: node
   linkType: hard
 
@@ -3419,13 +3410,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-bitkeep@npm:1.0.1":
-  version: 1.0.1
-  resolution: "@reef-knot/wallet-adapter-bitkeep@npm:1.0.1"
+"@reef-knot/wallet-adapter-bitkeep@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@reef-knot/wallet-adapter-bitkeep@npm:1.1.0"
   peerDependencies:
     "@reef-knot/types": ^1.2.1
     wagmi: ^0.12.19
-  checksum: 7fc243ef50aabb1b6a5261f0c1fd2d3dfb238de87df111a04bdb7d252bb34ec8245caa6d7f1c48a1262391322ddfd7c73842c3db001fae0f27c30098f67be38c
+  checksum: a26c4b4b148b2bc52d6e81509be1ea642f5096a362995a763d9ae0058d2ac9092d2373fd94610a69d3dd2c5381b5651a92f83988fe6b114a42022f2526576e01
   languageName: node
   linkType: hard
 
@@ -3533,12 +3524,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reef-knot/wallets-list@npm:1.4.4":
-  version: 1.4.4
-  resolution: "@reef-knot/wallets-list@npm:1.4.4"
+"@reef-knot/wallets-list@npm:1.4.5":
+  version: 1.4.5
+  resolution: "@reef-knot/wallets-list@npm:1.4.5"
   dependencies:
     "@reef-knot/wallet-adapter-ambire": 1.2.4
-    "@reef-knot/wallet-adapter-bitkeep": 1.0.1
+    "@reef-knot/wallet-adapter-bitkeep": 1.1.0
     "@reef-knot/wallet-adapter-blockchaincom": 1.2.4
     "@reef-knot/wallet-adapter-exodus": 1.2.3
     "@reef-knot/wallet-adapter-okx": 1.3.0
@@ -3550,19 +3541,16 @@ __metadata:
   peerDependencies:
     "@reef-knot/types": ^1.2.1
     react: ">=17"
-  checksum: d19a626c3ae08f2fe927a6ab9fa6d10691658521f8c2af14a7769d81e373a961ef9f17b82511a1ee4cbd8a18832ac8b868bd28f4ae9ffa548d860b9f1efe5ac9
+  checksum: ca6143671354a55eae48407dc87c99481191bf93c66c6723ec23b00269def3af5fd51270f7d6947f3b88c84b2a20fb12ab094833c544a237eafff7feed27ea60
   languageName: node
   linkType: hard
 
-"@reef-knot/web3-react@npm:1.4.2":
-  version: 1.4.2
-  resolution: "@reef-knot/web3-react@npm:1.4.2"
+"@reef-knot/web3-react@npm:1.5.0":
+  version: 1.5.0
+  resolution: "@reef-knot/web3-react@npm:1.5.0"
   dependencies:
     "@gnosis.pm/safe-apps-web3-react": 0.6.8
     "@ledgerhq/iframe-provider": 0.4.2
-    "@lido-sdk/constants": ^3.1.0
-    "@lido-sdk/providers": ^1.4.12
-    "@lido-sdk/react": ^2.0.0
     "@web3-react/abstract-connector": 6.0.7
     "@web3-react/core": 6.1.9
     "@web3-react/injected-connector": 6.0.7
@@ -3572,12 +3560,15 @@ __metadata:
     tiny-warning: ^1.0.3
   peerDependencies:
     "@ethersproject/providers": 5
+    "@lido-sdk/constants": ^3.2.0
+    "@lido-sdk/providers": ^1.4.13
+    "@lido-sdk/react": ^2.0.2
     "@reef-knot/core-react": ^1.4.3
     "@reef-knot/ledger-connector": ^1.0.0
     react: ">=17"
     ua-parser-js: ^1.0.33
     wagmi: ^0.12.19
-  checksum: 1fc8507135af31ff0e80052351c370d2be029f8f1709e8a1a0753d8a4afe4fe1a675839a8199a9d9fcf1fc489b54949d7e0051d460ed8d1bc940ca8a604d83ff
+  checksum: 778a9cead15aefa02faba8989b6a43eb77b26819ae3e6a7db0d7028a1125ea3486609b915644fe712c4d8c0c17d70730ab222e594af267b9a16e92a4835ae799
   languageName: node
   linkType: hard
 
@@ -9642,19 +9633,21 @@ __metadata:
     "@ethersproject/constants": ^5.5.0
     "@ethersproject/units": ^5.6.1
     "@lido-sdk/constants": ^3.2.1
+    "@lido-sdk/providers": ^1.4.14
+    "@lido-sdk/react": ^2.0.3
     "@lidofinance/lido-ethereum-sdk": "workspace:*"
     "@lidofinance/lido-ui": ^3.10.1
     "@lidofinance/next-cache-files-middleware": ^0.35.0
     "@next/bundle-analyzer": ^13.4.19
     "@reef-knot/connect-wallet-modal": 1.6.2
-    "@reef-knot/core-react": 1.5.1
+    "@reef-knot/core-react": 1.6.0
     "@reef-knot/ledger-connector": 1.0.1
     "@reef-knot/types": 1.3.0
     "@reef-knot/ui-react": 1.0.7
     "@reef-knot/wallets-helpers": 1.1.5
     "@reef-knot/wallets-icons": 1.0.0
-    "@reef-knot/wallets-list": 1.4.4
-    "@reef-knot/web3-react": 1.4.2
+    "@reef-knot/wallets-list": 1.4.5
+    "@reef-knot/web3-react": 1.5.0
     "@svgr/webpack": ^6.5.1
     "@types/node": ^18.11.9
     "@types/react": ^18.0.25
