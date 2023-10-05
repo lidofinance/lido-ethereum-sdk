@@ -66,15 +66,15 @@ export class LidoSDKStethEvents {
       toBlock: 'latest',
     });
 
-    if (logs.length === 0) return this.getLastRebaseEvent(days + 1);
     if (days > 3) return undefined;
+    if (logs.length === 0) return this.getLastRebaseEvent(days + 1);
 
     return logs[logs.length - 1];
   }
 
   @Logger('Events:')
   @ErrorHandler()
-  public async getRebaseEventByDays(props: {
+  public async getRebaseEventsByDays(props: {
     days: number;
   }): Promise<RebaseEvent[]> {
     const { days } = props;
