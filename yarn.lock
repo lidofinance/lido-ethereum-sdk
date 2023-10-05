@@ -2627,7 +2627,7 @@ __metadata:
     rimraf: ^5.0.1
     tiny-invariant: ^1.3.1
     typescript: 5.1.6
-    viem: ^1.10.9
+    viem: ^1.15.3
   languageName: unknown
   linkType: soft
 
@@ -13823,7 +13823,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:^1.10.3, viem@npm:^1.10.9":
+"viem@npm:^1.10.3":
   version: 1.10.9
   resolution: "viem@npm:1.10.9"
   dependencies:
@@ -13842,6 +13842,28 @@ __metadata:
     typescript:
       optional: true
   checksum: 7bf53044abff4ff703d518227921d9a56907be744a30750873231a442dcfdee485d9928f337e22ad698a4d0cf25a57194aee9e636a09233169721bf2a6f2eea0
+  languageName: node
+  linkType: hard
+
+"viem@npm:^1.15.3":
+  version: 1.15.3
+  resolution: "viem@npm:1.15.3"
+  dependencies:
+    "@adraffy/ens-normalize": 1.9.4
+    "@noble/curves": 1.2.0
+    "@noble/hashes": 1.3.2
+    "@scure/bip32": 1.3.2
+    "@scure/bip39": 1.2.1
+    "@types/ws": ^8.5.5
+    abitype: 0.9.8
+    isomorphic-ws: 5.0.0
+    ws: 8.13.0
+  peerDependencies:
+    typescript: ">=5.0.4"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 61d573158de32896f9f7957ae2ff943953838385f9b04414a55e6041f0e070827e4c5cfc6196485e0b0101c3dcbfdfd262fb54040817b257b38216a7f50e3384
   languageName: node
   linkType: hard
 

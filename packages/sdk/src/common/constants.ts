@@ -1,5 +1,5 @@
 import { type Address, type Chain } from 'viem';
-import { goerli, mainnet } from 'viem/chains';
+import { goerli, mainnet, holesky } from 'viem/chains';
 
 export enum CHAINS {
   Goerli = 5,
@@ -79,23 +79,6 @@ export const PERMIT_MESSAGE_TYPES = {
     },
   ],
   Permit: EIP2612_TYPE,
-} as const;
-
-export const holesky: Chain = {
-  id: 17000,
-  network: 'holesky',
-  name: 'Holesky',
-  nativeCurrency: { name: 'Holesky Ether', symbol: 'ETH', decimals: 18 },
-  rpcUrls: {
-    default: {
-      http: ['https://rpc.holesky.ethpandaops.io'],
-    },
-    public: {
-      http: ['https://rpc.holesky.ethpandaops.io'],
-    },
-  },
-  contracts: {},
-  testnet: true,
 } as const;
 
 export const VIEM_CHAINS: { [key in CHAINS]: Chain } = {
