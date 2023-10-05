@@ -16,7 +16,6 @@ import {
   maxUint256,
   Hash,
 } from 'viem';
-import { goerli, mainnet } from 'viem/chains';
 import invariant from 'tiny-invariant';
 import { splitSignature } from '@ethersproject/bytes';
 
@@ -38,6 +37,7 @@ import {
   CONTRACTS_BY_TOKENS,
   LIDO_TOKENS,
   PERMIT_MESSAGE_TYPES,
+  VIEM_CHAINS,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
@@ -91,7 +91,7 @@ export default class LidoSDKCore {
       throw new Error('rpcUrls or rpcProvider is required');
     }
 
-    const chain = chainId === 1 ? mainnet : goerli;
+    const chain = VIEM_CHAINS[chainId];
     const currentRpcProvider =
       rpcProvider ?? this.createRpcProvider(chain, rpcUrls);
     const currentWeb3Provider = web3Provider;

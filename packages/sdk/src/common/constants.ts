@@ -1,11 +1,17 @@
-import { type Address } from 'viem';
+import { type Address, type Chain } from 'viem';
+import { goerli, mainnet } from 'viem/chains';
 
 export enum CHAINS {
   Goerli = 5,
   Mainnet = 1,
+  Holesky = 17000,
 }
 
-export const SUPPORTED_CHAINS: CHAINS[] = [CHAINS.Goerli, CHAINS.Mainnet];
+export const SUPPORTED_CHAINS: CHAINS[] = [
+  CHAINS.Goerli,
+  CHAINS.Mainnet,
+  CHAINS.Holesky,
+];
 
 export const SUBMIT_EXTRA_GAS_TRANSACTION_RATIO = 1.05;
 export const ESTIMATE_ACCOUNT = '0x87c0e047F4e4D3e289A56a36570D4CB957A37Ef1';
@@ -15,6 +21,7 @@ export const LIDO_LOCATOR_BY_CHAIN: {
 } = {
   [CHAINS.Mainnet]: '0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb',
   [CHAINS.Goerli]: '0x1eDf09b5023DC86737b59dE68a8130De878984f5',
+  [CHAINS.Holesky]: '0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8',
 };
 
 export const LIDO_TOKENS = {
@@ -73,3 +80,26 @@ export const PERMIT_MESSAGE_TYPES = {
   ],
   Permit: EIP2612_TYPE,
 } as const;
+
+export const holesky: Chain = {
+  id: 17000,
+  network: 'holesky',
+  name: 'Holesky',
+  nativeCurrency: { name: 'Holesky Ether', symbol: 'ETH', decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: ['https://rpc.holesky.ethpandaops.io'],
+    },
+    public: {
+      http: ['https://rpc.holesky.ethpandaops.io'],
+    },
+  },
+  contracts: {},
+  testnet: true,
+} as const;
+
+export const VIEM_CHAINS: { [key in CHAINS]: Chain } = {
+  [CHAINS.Mainnet]: mainnet,
+  [CHAINS.Goerli]: goerli,
+  [CHAINS.Holesky]: holesky,
+};
