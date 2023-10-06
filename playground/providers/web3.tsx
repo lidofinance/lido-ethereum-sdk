@@ -1,14 +1,14 @@
 import { FC, PropsWithChildren } from 'react';
 import { ProviderWeb3 } from '@reef-knot/web3-react';
-import { getConnectors } from '@reef-knot/core-react';
+import { getConnectors, holesky } from '@reef-knot/core-react';
 import { backendRPC, getBackendRPCPath, dynamics } from 'config';
 import { WagmiConfig, createClient, configureChains, Chain } from 'wagmi';
 import * as wagmiChains from 'wagmi/chains';
 import { getStaticRpcBatchProvider } from '@lido-sdk/providers';
 
-const wagmiChainsArray = Object.values(wagmiChains);
-const supportedChains = wagmiChainsArray.filter(
-  (chain) => dynamics.supportedChains.includes(chain.id),
+const wagmiChainsArray = Object.values({ ...wagmiChains, holesky });
+const supportedChains = wagmiChainsArray.filter((chain) =>
+  dynamics.supportedChains.includes(chain.id),
 );
 const defaultChain = wagmiChainsArray.find(
   (chain) => chain.id === dynamics.defaultChain,

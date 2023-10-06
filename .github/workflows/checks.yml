@@ -22,6 +22,7 @@ jobs:
         env:
           RPC_PROVIDER_URL_1: ${{ vars.RPC_PROVIDER_URL_1 }}
           RPC_PROVIDER_URL_5: ${{ vars.RPC_PROVIDER_URL_5 }}
+          RPC_PROVIDER_URL_17000: ${{ vars.RPC_PROVIDER_URL_17000 }}
           WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
       - name: Check types
         run: yarn types
