@@ -56,20 +56,23 @@ export class LidoSDKStethEvents {
 
   @Logger('Events:')
   @ErrorHandler()
-  public async getLastRebaseEvent(days = 1): Promise<RebaseEvent | undefined> {
+  public async getLastRebaseEvent(): Promise<RebaseEvent | undefined> {
     const contract = await this.getContractStETH();
-    const dayAgoBlock = await this.getBlockByDays({ days });
-    const logs = await this.core.rpcProvider.getLogs({
-      address: contract.address,
-      event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
-      fromBlock: dayAgoBlock.number,
-      toBlock: 'latest',
-    });
+    const DAYS_LIMIT = 3;
 
-    if (days > 3) return undefined;
-    if (logs.length === 0) return this.getLastRebaseEvent(days + 1);
+    for (let days = 1; days <= DAYS_LIMIT; days++) {
+      const dayAgoBlock = await this.getBlockByDays({ days });
+      const logs = await this.core.rpcProvider.getLogs({
+        address: contract.address,
+        event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
+        fromBlock: dayAgoBlock.number,
+        toBlock: 'latest',
+      });
 
-    return logs[logs.length - 1];
+      if (logs.length > 0) return logs[logs.length - 1];
+    }
+
+    return undefined;
   }
 
   @Logger('Events:')
