@@ -51,6 +51,16 @@
       "default": "./dist/cjs/unsteth/index.js",
       "types": "./dist/types/unsteth/index.d.ts"
     },
+    "./statistics": {
+      "import": "./dist/esm/statistics/index.js",
+      "default": "./dist/cjs/statistics/index.js",
+      "types": "./dist/types/statistics/index.d.ts"
+    },
+    "./events": {
+      "import": "./dist/esm/events/index.js",
+      "default": "./dist/cjs/events/index.js",
+      "types": "./dist/types/events/index.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {

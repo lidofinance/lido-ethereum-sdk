@@ -33,11 +33,6 @@ export const ErrorHandler = function (headMessage: HeadMessage = 'Error:') {
               throw txError;
             }) as Return;
         } else {
-          callConsoleMessage.call(
-            this,
-            headMessage,
-            `Exiting method '${methodName}'.`,
-          );
           return result;
         }
       } catch (error) {

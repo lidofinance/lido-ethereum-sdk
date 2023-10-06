@@ -5,6 +5,8 @@ import { LidoSDKWrap } from './wrap/index.js';
 import { LidoSDKWithdraw } from './withdraw/index.js';
 import { LidoSDKstETH, LidoSDKwstETH } from './erc20/index.js';
 import { LidoSDKUnstETH } from './unsteth/unsteth.js';
+import { LidoSDKEvents } from './events/index.js';
+import { LidoSDKStatistics } from './statistics/index.js';
 
 import { version } from './version.js';
 
@@ -16,6 +18,8 @@ export class LidoSDK {
   readonly steth: LidoSDKstETH;
   readonly wsteth: LidoSDKwstETH;
   readonly unsteth: LidoSDKUnstETH;
+  readonly events: LidoSDKEvents;
+  readonly statistics: LidoSDKStatistics;
 
   constructor(props: LidoSDKCoreProps) {
     // Core functionality
@@ -31,5 +35,9 @@ export class LidoSDK {
     this.steth = new LidoSDKstETH({ ...props, core });
     this.wsteth = new LidoSDKwstETH({ ...props, core });
     this.unsteth = new LidoSDKUnstETH({ ...props, core });
+    // Events functionality
+    this.events = new LidoSDKEvents({ ...props, core });
+    // Statistic functionality
+    this.statistics = new LidoSDKStatistics({ ...props, core });
   }
 }
