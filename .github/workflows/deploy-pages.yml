@@ -56,6 +56,8 @@ jobs:
           RPC_PROVIDER_URL_5: ${{ vars.RPC_PROVIDER_URL_5 }}
           RPC_PROVIDER_URL_17000: ${{ vars.RPC_PROVIDER_URL_17000 }}
           WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
+          SUPPORTED_CHAINS: ${{ vars.SUPPORTED_CHAINS }}
+          DEFAULT_CHAIN: ${{ vars.DEFAULT_CHAIN }}
           BASE_PATH: ${{ steps.config_pages.outputs.base_path }}
       - name: Export
         run: yarn build:export
