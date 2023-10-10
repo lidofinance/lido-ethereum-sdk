@@ -11,6 +11,7 @@ import { StethDemo, WstethDemo } from './tokens';
 import { UnstethDemo } from './unsteth';
 import { EventsDemo } from './events';
 import { StatisticsDemo } from './statistics';
+import { RewardsDemo } from './rewards';
 
 export const Demo = () => {
   return (
@@ -27,6 +28,7 @@ export const Demo = () => {
       <UnstethDemo />
       <EventsDemo />
       <StatisticsDemo />
+      <RewardsDemo />
     </>
   );
 };
