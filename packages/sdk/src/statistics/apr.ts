@@ -33,16 +33,32 @@ export class LidoSDKApr {
 
   @Logger('Statistic:')
   @ErrorHandler()
-  public async getSmaApr(): Promise<{ aprs: number[]; smaApr: number }> {
-    const events = await this.events.stethEvents.getRebaseEventsByDays({
-      days: 7,
-    });
-    invariant(events.length, 'Events is not defined');
+  public async getSmaApr(props: {
+    days: number;
+  }): Promise<number> {
+    const { days } = props;
 
-    const aprs = events.map((event) => this.calculateApr(event.args));
-    const sum = aprs.reduce((acc, apr) => apr + acc, 0);
+    const lastEvent = await this.events.stethEvents.getLastRebaseEvent()
+    invariant(lastEvent, 'Last event is not defined')
 
-    return { aprs, smaApr: Number((sum / aprs.length).toFixed(1)) };
+    const firstEvent = await this.events.stethEvents.getFirstRebaseEvent({
+      fromBlock: lastEvent.blockNumber, daysAgo: days
+    })
+    invariant(firstEvent, 'First event is not defined')
+
+    invariant(firstEvent.args.timeElapsed, 'time elapsed is not defined')
+    invariant(lastEvent.args.reportTimestamp, 'Last event reportTimestamp is not defined')
+    invariant(firstEvent.args.reportTimestamp, 'First event reportTimestamp is not defined')
+
+    const smaApr = this.calculateApr({
+      preTotalEther: firstEvent.args.preTotalEther,
+      preTotalShares: firstEvent.args.preTotalShares,
+      postTotalEther: lastEvent.args.postTotalEther,
+      postTotalShares: lastEvent.args.postTotalShares,
+      timeElapsed: firstEvent.args.timeElapsed + (lastEvent.args.reportTimestamp - firstEvent.args.reportTimestamp),
+    })
+
+    return smaApr;
   }
 
   private calculateApr(props: {

@@ -17,6 +17,7 @@ import { type LidoSDKEventsProps, RebaseEvent } from './types.js';
 
 const BLOCKS_BY_DAY = 7600n;
 const REBASE_EVENT_ABI_INDEX = 8;
+const DAYS_LIMIT = 7;
 
 export class LidoSDKStethEvents {
   readonly core: LidoSDKCore;
@@ -58,18 +59,45 @@ export class LidoSDKStethEvents {
   @ErrorHandler()
   public async getLastRebaseEvent(): Promise<RebaseEvent | undefined> {
     const contract = await this.getContractStETH();
-    const DAYS_LIMIT = 3;
+    const lastBlock = await this.getLastBlock()
 
     for (let days = 1; days <= DAYS_LIMIT; days++) {
-      const dayAgoBlock = await this.getBlockByDays({ days });
+      const fromBlock = lastBlock.number - BLOCKS_BY_DAY * BigInt(days)
       const logs = await this.core.rpcProvider.getLogs({
         address: contract.address,
         event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
-        fromBlock: dayAgoBlock.number,
-        toBlock: 'latest',
+        fromBlock: fromBlock,
+        toBlock: fromBlock + BLOCKS_BY_DAY,
       });
 
       if (logs.length > 0) return logs[logs.length - 1];
+    }
+
+    return undefined;
+  }
+
+  @Logger('Events:')
+  @ErrorHandler()
+  public async getFirstRebaseEvent(props: {
+    fromBlock: bigint;
+    daysAgo: number
+  }): Promise<RebaseEvent | undefined> {
+    const { fromBlock, daysAgo } = props;
+
+    const contract = await this.getContractStETH();
+
+    for (let days = 1; days <= DAYS_LIMIT; days++) {
+      const from = fromBlock + BigInt(days - 1 - daysAgo) * BLOCKS_BY_DAY
+      const to = from + BLOCKS_BY_DAY;
+
+      const logs = await this.core.rpcProvider.getLogs({
+        address: contract.address,
+        event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
+        fromBlock: from,
+        toBlock: to,
+      });
+
+      if (logs.length > 0) return logs[0];
     }
 
     return undefined;

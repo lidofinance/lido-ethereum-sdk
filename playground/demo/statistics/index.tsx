@@ -9,7 +9,7 @@ export const StatisticsDemo = () => {
   return (
     <Accordion summary="Statistic">
       <Action title="Last Apr" action={() => statistics.apr.getLastApr()} />
-      <Action title="SMA Apr" action={() => statistics.apr.getSmaApr()} />
+      <Action title="SMA Apr" action={() => statistics.apr.getSmaApr({ days: 7 })} />
     </Accordion>
   );
 };
