@@ -9,6 +9,7 @@ export type LidoSDKRewardsProps = LidoSDKCommonProps;
 
 export type GetRewardsOptions = {
   address: Address;
+  includeZeroRebases?: boolean;
   toBlock?: bigint | NonPendingBlockTag;
 } & (
   | {

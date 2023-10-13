@@ -97,7 +97,7 @@ export class LidoSDKRewards {
     props: GetRewardsOptions,
   ): Promise<GetRewardsFromChainResult> {
     const [
-      { address, fromBlock, toBlock },
+      { address, fromBlock, toBlock, includeZeroRebases = false },
       stethContract,
       withdrawalQueueAddress,
     ] = await Promise.all([
@@ -172,7 +172,7 @@ export class LidoSDKRewards {
     let shareRate = baseShareRate;
     let prevSharesBalance = baseBalanceShares;
     type RewardEntry = Reward<RewardsChainEvents>;
-    const rewards: Reward<RewardsChainEvents>[] = events.map((event) => {
+    let rewards: Reward<RewardsChainEvents>[] = events.map((event) => {
       if (event.eventName === 'TransferShares') {
         const { from, to, sharesValue } = event.args;
         let type: RewardEntry['type'],
@@ -219,6 +219,13 @@ export class LidoSDKRewards {
       }
       throw new Error('Impossible event type');
     });
+
+    if (!includeZeroRebases) {
+      rewards = rewards.filter(
+        (r) => !(r.type === 'rebase' && r.change === 0n),
+      );
+    }
+
     return {
       rewards,
       baseBalanceShares,
@@ -235,7 +242,14 @@ export class LidoSDKRewards {
     props: GetRewardsFromSubgraphOptions,
   ): Promise<GetRewardsFromSubgraphResult> {
     const [
-      { getSubgraphUrl, address, fromBlock, toBlock, step = 1000 },
+      {
+        getSubgraphUrl,
+        address,
+        fromBlock,
+        toBlock,
+        step = 1000,
+        includeZeroRebases = false,
+      },
       withdrawalQueueAddress,
     ] = await Promise.all([
       this.parseProps(props),
@@ -327,7 +341,7 @@ export class LidoSDKRewards {
 
     type RewardEntry = Reward<RewardsSubgraphEvents>;
 
-    const rewards: Reward<RewardsSubgraphEvents>[] = events.map((event) => {
+    let rewards: Reward<RewardsSubgraphEvents>[] = events.map((event) => {
       // it's a transfer
       if ('value' in event) {
         const {
@@ -406,6 +420,12 @@ export class LidoSDKRewards {
       }
       throw new Error('Impossible event');
     });
+
+    if (!includeZeroRebases) {
+      rewards = rewards.filter(
+        (r) => !(r.type === 'rebase' && r.change === 0n),
+      );
+    }
 
     return {
       rewards,

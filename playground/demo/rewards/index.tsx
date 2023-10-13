@@ -12,9 +12,11 @@ import {
   Td,
   Th,
   Container,
+  Button,
   DataTableRow,
 } from '@lidofinance/lido-ui';
 import { Action, renderTokenResult } from 'components/action';
+import { ToggleButton } from 'components/toggle-button/toggle-button';
 import { useAddressState } from 'hooks/useAddressState';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
@@ -25,7 +27,6 @@ const renderRewards = (
 ) => {
   const steth = renderTokenResult('stETH');
   const shares = renderTokenResult('shares');
-  console.log(result);
   return (
     <Container style={{ overflowX: 'scroll' }}>
       <DataTableRow title={'From Block:'}>
@@ -87,6 +88,7 @@ export const RewardsDemo = () => {
     useAccount: true,
   });
   const [blocksBack, setBlocksBack] = useState(100000);
+  const [includeZeroRebases, setIncludeZeroRebases] = useState(false);
   const { rewards } = useLidoSDK();
 
   return (
@@ -98,6 +100,7 @@ export const RewardsDemo = () => {
           return rewards.getRewardsFromChain({
             address: rewardsAddress,
             blocksBack: BigInt(blocksBack),
+            includeZeroRebases,
           });
         }}
       >
@@ -115,12 +118,18 @@ export const RewardsDemo = () => {
           value={blocksBack}
           onChange={(e) => setBlocksBack(e.currentTarget.valueAsNumber)}
         />
+        <ToggleButton
+          title="Include Zero Rebases"
+          value={includeZeroRebases}
+          onChange={setIncludeZeroRebases}
+        />
       </Action>
       <Action
         action={() => {
           return rewards.getRewardsFromSubgraph({
             address: rewardsAddress,
             blocksBack: BigInt(blocksBack),
+            includeZeroRebases,
             // Warning! these endpoints will be deprecated
             getSubgraphUrl(_, chainId) {
               switch (chainId) {
