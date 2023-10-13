@@ -61,6 +61,11 @@
       "default": "./dist/cjs/events/index.js",
       "types": "./dist/types/events/index.d.ts"
     },
+    "./rewards": {
+      "import": "./dist/esm/rewards/index.js",
+      "default": "./dist/cjs/rewards/index.js",
+      "types": "./dist/types/rewards/index.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {

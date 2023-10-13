@@ -12,7 +12,6 @@ import {
   Td,
   Th,
   Container,
-  Button,
   DataTableRow,
 } from '@lidofinance/lido-ui';
 import { Action, renderTokenResult } from 'components/action';
@@ -49,36 +48,40 @@ const renderRewards = (
       <DataTableRow title={'Initial Share Rate'}>
         {result.baseShareRate}
       </DataTableRow>
-      <Table>
-        <Thead>
-          <Tr>
-            <Th>Block</Th>
-            <Th>Type</Th>
-            <Th>Balance</Th>
-            <Th>Reward</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {result.rewards.map((r, index) => (
-            <Tr key={index}>
-              <Td>
-                {'block' in r.originalEvent
-                  ? r.originalEvent.block
-                  : r.originalEvent.blockNumber.toString()}
-              </Td>
-              <Td>{r.type}</Td>
-              <Td>
-                {steth(r.balance)}
-                <br />({shares(r.balanceShares)})
-              </Td>
-              <Td>
-                {steth(r.change)}
-                <br />({shares(r.changeShares)})
-              </Td>
+      {result.rewards.length > 0 ? (
+        <Table>
+          <Thead>
+            <Tr>
+              <Th>Block</Th>
+              <Th>Type</Th>
+              <Th>Balance</Th>
+              <Th>Reward</Th>
             </Tr>
-          ))}
-        </Tbody>
-      </Table>
+          </Thead>
+          <Tbody>
+            {result.rewards.map((r, index) => (
+              <Tr key={index}>
+                <Td>
+                  {'block' in r.originalEvent
+                    ? r.originalEvent.block
+                    : r.originalEvent.blockNumber.toString()}
+                </Td>
+                <Td>{r.type}</Td>
+                <Td>
+                  {steth(r.balance)}
+                  <br />({shares(r.balanceShares)})
+                </Td>
+                <Td>
+                  {steth(r.change)}
+                  <br />({shares(r.changeShares)})
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      ) : (
+        <DataTableRow title={'No Rewards for this range'}></DataTableRow>
+      )}
     </Container>
   );
 };
