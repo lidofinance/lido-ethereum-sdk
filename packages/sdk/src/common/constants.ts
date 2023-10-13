@@ -24,6 +24,14 @@ export const LIDO_LOCATOR_BY_CHAIN: {
   [CHAINS.Holesky]: '0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8',
 };
 
+export const SUBRGRAPH_ID_BY_CHAIN: {
+  [key in CHAINS]: string;
+} = {
+  [CHAINS.Mainnet]: 'HXfMc1jPHfFQoccWd7VMv66km75FoxVHDMvsJj5vG5vf',
+  [CHAINS.Goerli]: 'QmeDfGTuNbSoZ71zi3Ch4WNRbzALfiFPnJMYUFPinLiFNa',
+  [CHAINS.Holesky]: '',
+};
+
 export const LIDO_TOKENS = {
   steth: 'stETH',
   wsteth: 'wstETH',

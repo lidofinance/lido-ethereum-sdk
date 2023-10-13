@@ -1,4 +1,7 @@
-import { GetRewardsResult } from '@lidofinance/lido-ethereum-sdk/dist/types/rewards/types';
+import {
+  GetRewardsFromChainResults,
+  GetRewardsFromSubgraphResults,
+} from '@lidofinance/lido-ethereum-sdk/dist/types/rewards/types';
 import {
   Input,
   Accordion,
@@ -11,19 +14,18 @@ import {
   Container,
   DataTableRow,
 } from '@lidofinance/lido-ui';
-import { useWeb3 } from '@reef-knot/web3-react';
 import { Action, renderTokenResult } from 'components/action';
-import { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
-import TokenInput from 'components/tokenInput/tokenInput';
 import { useAddressState } from 'hooks/useAddressState';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
-import { transactionToast } from 'utils/transaction-toast';
 import { Address } from 'viem';
 
-const renderRewards = (result: GetRewardsResult) => {
+const renderRewards = (
+  result: GetRewardsFromChainResults | GetRewardsFromSubgraphResults,
+) => {
   const steth = renderTokenResult('stETH');
   const shares = renderTokenResult('shares');
+  console.log(result);
   return (
     <Container style={{ overflowX: 'scroll' }}>
       <DataTableRow title={'From Block:'}>
@@ -32,6 +34,11 @@ const renderRewards = (result: GetRewardsResult) => {
       <DataTableRow title={'To Block'}>
         {result.toBlock.toString()}
       </DataTableRow>
+      {'lastIndexedBlock' in result ? (
+        <DataTableRow title={'Last Indexed Block'}>
+          {result.lastIndexedBlock.toString()}
+        </DataTableRow>
+      ) : null}
       <DataTableRow title={'Initial Balance'}>
         {steth(result.baseBalance)}
       </DataTableRow>
@@ -53,7 +60,11 @@ const renderRewards = (result: GetRewardsResult) => {
         <Tbody>
           {result.rewards.map((r, index) => (
             <Tr key={index}>
-              <Td>{r.originalEvent.blockNumber.toString()}</Td>
+              <Td>
+                {'block' in r.originalEvent
+                  ? r.originalEvent.block
+                  : r.originalEvent.blockNumber.toString()}
+              </Td>
               <Td>{r.type}</Td>
               <Td>
                 {steth(r.balance)}
@@ -75,7 +86,7 @@ export const RewardsDemo = () => {
   const [rewardsAddress, setRewardsAddress] = useAddressState(undefined, {
     useAccount: true,
   });
-  const [blocksBack, setBlocksBack] = useState(10000);
+  const [blocksBack, setBlocksBack] = useState(100000);
   const { rewards } = useLidoSDK();
 
   return (
@@ -105,6 +116,27 @@ export const RewardsDemo = () => {
           onChange={(e) => setBlocksBack(e.currentTarget.valueAsNumber)}
         />
       </Action>
+      <Action
+        action={() => {
+          return rewards.getRewardsFromSubgraph({
+            address: rewardsAddress,
+            blocksBack: BigInt(blocksBack),
+            // Warning! these endpoints will be deprecated
+            getSubgraphUrl(_, chainId) {
+              switch (chainId) {
+                case 1:
+                  return 'https://api.thegraph.com/subgraphs/name/lidofinance/lido';
+                case 5:
+                  return 'https://api.thegraph.com/subgraphs/name/lidofinance/lido-testnet';
+                default:
+                  throw new Error('unsupported chain');
+              }
+            },
+          });
+        }}
+        renderResult={renderRewards}
+        title="Get Rewards From Subgraph"
+      ></Action>
     </Accordion>
   );
 };
