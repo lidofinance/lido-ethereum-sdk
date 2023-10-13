@@ -1,9 +1,11 @@
-import { Accordion } from '@lidofinance/lido-ui';
+import { Accordion, Input } from '@lidofinance/lido-ui';
 import { useWeb3 } from '@reef-knot/web3-react';
 import { Action } from 'components/action';
 import { useLidoSDK } from 'providers/sdk';
+import { useState } from 'react';
 
 export const EventsDemo = () => {
+  const [daysAgoValue, setDaysAgoValue] = useState<number>(0);
   const { events } = useLidoSDK();
 
   return (
@@ -12,6 +14,23 @@ export const EventsDemo = () => {
         title="Last Rebase event"
         action={() => events.stethEvents.getLastRebaseEvent()}
       />
+      <Action
+        title="First Rebase event"
+        action={() =>
+          events.stethEvents.getFirstRebaseEvent({
+            daysAgo: daysAgoValue
+          })
+        }
+      >
+        <Input
+          label="Days ago"
+          placeholder='7'
+          type="number"
+          min={0}
+          value={daysAgoValue}
+          onChange={(e) => setDaysAgoValue(e.target.valueAsNumber)}
+        />
+      </Action>
       <Action
         title="Last 10 Rebase events"
         action={() => events.stethEvents.getRebaseEvents({ count: 10 })}
