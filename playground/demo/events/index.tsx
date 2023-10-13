@@ -5,7 +5,7 @@ import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
 
 export const EventsDemo = () => {
-  const [daysAgoValue, setDaysAgoValue] = useState<number>(0);
+  const [daysAgoValue, setDaysAgoValue] = useState<number>(1);
   const { events } = useLidoSDK();
 
   return (
@@ -26,7 +26,7 @@ export const EventsDemo = () => {
           label="Days ago"
           placeholder='7'
           type="number"
-          min={0}
+          min={1}
           value={daysAgoValue}
           onChange={(e) => setDaysAgoValue(e.target.valueAsNumber)}
         />

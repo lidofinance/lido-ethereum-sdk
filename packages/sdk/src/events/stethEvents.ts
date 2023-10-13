@@ -83,9 +83,6 @@ export class LidoSDKStethEvents {
     goBackFromBlock?: bigint;
   }): Promise<RebaseEvent | undefined> {
     const { daysAgo } = props;
-
-    invariant(daysAgo > 0, 'Days ago must be positive')
-
     const goBackFromBlock = props.goBackFromBlock ?? (await this.getLastBlock()).number
 
     const contract = await this.getContractStETH();
