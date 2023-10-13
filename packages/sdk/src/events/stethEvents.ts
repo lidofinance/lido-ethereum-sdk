@@ -79,15 +79,19 @@ export class LidoSDKStethEvents {
   @Logger('Events:')
   @ErrorHandler()
   public async getFirstRebaseEvent(props: {
-    fromBlock: bigint;
-    daysAgo: number
+    daysAgo: number;
+    goBackFromBlock?: bigint;
   }): Promise<RebaseEvent | undefined> {
-    const { fromBlock, daysAgo } = props;
+    const { daysAgo } = props;
+
+    invariant(daysAgo > 0, 'Days ago must be positive')
+
+    const goBackFromBlock = props.goBackFromBlock ?? (await this.getLastBlock()).number
 
     const contract = await this.getContractStETH();
 
     for (let days = 1; days <= DAYS_LIMIT; days++) {
-      const from = fromBlock + BigInt(days - 1 - daysAgo) * BLOCKS_BY_DAY
+      const from = goBackFromBlock - BigInt(daysAgo + 1 - days) * BLOCKS_BY_DAY
       const to = from + BLOCKS_BY_DAY;
 
       const logs = await this.core.rpcProvider.getLogs({

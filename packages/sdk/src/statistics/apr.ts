@@ -42,7 +42,7 @@ export class LidoSDKApr {
     invariant(lastEvent, 'Last event is not defined')
 
     const firstEvent = await this.events.stethEvents.getFirstRebaseEvent({
-      fromBlock: lastEvent.blockNumber, daysAgo: days
+      daysAgo: days, goBackFromBlock: lastEvent.blockNumber,
     })
     invariant(firstEvent, 'First event is not defined')
 
@@ -50,12 +50,16 @@ export class LidoSDKApr {
     invariant(lastEvent.args.reportTimestamp, 'Last event reportTimestamp is not defined')
     invariant(firstEvent.args.reportTimestamp, 'First event reportTimestamp is not defined')
 
+    const timeElapsed = firstEvent.args.timeElapsed + (
+      lastEvent.args.reportTimestamp - firstEvent.args.reportTimestamp
+    );
+
     const smaApr = this.calculateApr({
       preTotalEther: firstEvent.args.preTotalEther,
       preTotalShares: firstEvent.args.preTotalShares,
       postTotalEther: lastEvent.args.postTotalEther,
       postTotalShares: lastEvent.args.postTotalShares,
-      timeElapsed: firstEvent.args.timeElapsed + (lastEvent.args.reportTimestamp - firstEvent.args.reportTimestamp),
+      timeElapsed,
     })
 
     return smaApr;
