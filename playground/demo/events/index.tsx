@@ -1,5 +1,4 @@
 import { Accordion, Input } from '@lidofinance/lido-ui';
-import { useWeb3 } from '@reef-knot/web3-react';
 import { Action } from 'components/action';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
@@ -18,13 +17,13 @@ export const EventsDemo = () => {
         title="First Rebase event"
         action={() =>
           events.stethEvents.getFirstRebaseEvent({
-            daysAgo: daysAgoValue
+            days: daysAgoValue,
           })
         }
       >
         <Input
           label="Days ago"
-          placeholder='7'
+          placeholder="7"
           type="number"
           min={1}
           value={daysAgoValue}
