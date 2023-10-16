@@ -33,26 +33,21 @@ export class LidoSDKApr {
 
   @Logger('Statistic:')
   @ErrorHandler()
-  public async getSmaApr(props: {
-    days: number;
-  }): Promise<number> {
+  public async getSmaApr(props: { days: number }): Promise<number> {
     const { days } = props;
 
-    const lastEvent = await this.events.stethEvents.getLastRebaseEvent()
-    invariant(lastEvent, 'Last event is not defined')
+    const lastEvent = await this.events.stethEvents.getLastRebaseEvent();
+    invariant(lastEvent, 'Last event is not defined');
 
     const firstEvent = await this.events.stethEvents.getFirstRebaseEvent({
-      daysAgo: days, goBackFromBlock: lastEvent.blockNumber,
-    })
-    invariant(firstEvent, 'First event is not defined')
+      daysAgo: days,
+      goBackFromBlock: lastEvent.blockNumber,
+    });
+    invariant(firstEvent, 'First event is not defined');
 
-    invariant(firstEvent.args.timeElapsed, 'time elapsed is not defined')
-    invariant(lastEvent.args.reportTimestamp, 'Last event reportTimestamp is not defined')
-    invariant(firstEvent.args.reportTimestamp, 'First event reportTimestamp is not defined')
-
-    const timeElapsed = firstEvent.args.timeElapsed + (
-      lastEvent.args.reportTimestamp - firstEvent.args.reportTimestamp
-    );
+    const timeElapsed =
+      firstEvent.args.timeElapsed +
+      (lastEvent.args.reportTimestamp - firstEvent.args.reportTimestamp);
 
     const smaApr = this.calculateApr({
       preTotalEther: firstEvent.args.preTotalEther,
@@ -60,17 +55,17 @@ export class LidoSDKApr {
       postTotalEther: lastEvent.args.postTotalEther,
       postTotalShares: lastEvent.args.postTotalShares,
       timeElapsed,
-    })
+    });
 
     return smaApr;
   }
 
   private calculateApr(props: {
-    preTotalEther?: bigint;
-    preTotalShares?: bigint;
-    postTotalEther?: bigint;
-    postTotalShares?: bigint;
-    timeElapsed?: bigint;
+    preTotalEther: bigint;
+    preTotalShares: bigint;
+    postTotalEther: bigint;
+    postTotalShares: bigint;
+    timeElapsed: bigint;
   }): number {
     const {
       preTotalEther,
@@ -79,12 +74,6 @@ export class LidoSDKApr {
       postTotalShares,
       timeElapsed,
     } = props;
-
-    invariant(preTotalEther, 'preTotalEther is not defined');
-    invariant(preTotalShares, 'preTotalShares is not defined');
-    invariant(postTotalEther, 'postTotalEther is not defined');
-    invariant(postTotalShares, 'postTotalShares is not defined');
-    invariant(timeElapsed, 'timeElapsed is not defined');
 
     const preShareRate = (preTotalEther * BigInt(10 ** 27)) / preTotalShares;
     const postShareRate = (postTotalEther * BigInt(10 ** 27)) / postTotalShares;
