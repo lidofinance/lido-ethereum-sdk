@@ -1,6 +1,6 @@
 import {
-  GetRewardsFromChainResults,
-  GetRewardsFromSubgraphResults,
+  GetRewardsFromChainResult,
+  GetRewardsFromSubgraphResult,
 } from '@lidofinance/lido-ethereum-sdk/dist/types/rewards/types';
 import {
   Input,
@@ -23,7 +23,7 @@ import { useState } from 'react';
 import { Address } from 'viem';
 
 const renderRewards = (
-  result: GetRewardsFromChainResults | GetRewardsFromSubgraphResults,
+  result: GetRewardsFromChainResult | GetRewardsFromSubgraphResult,
 ) => {
   const steth = renderTokenResult('stETH');
   const shares = renderTokenResult('shares');
