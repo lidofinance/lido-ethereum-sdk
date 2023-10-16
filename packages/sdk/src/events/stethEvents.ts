@@ -61,8 +61,8 @@ export class LidoSDKStethEvents {
     const contract = await this.getContractStETH();
     const lastBlock = await this.getLastBlock();
 
-    for (let days = 1; days <= DAYS_LIMIT; days++) {
-      const fromBlock = lastBlock.number - BLOCKS_BY_DAY * BigInt(days);
+    for (let day = 1; day <= DAYS_LIMIT; day++) {
+      const fromBlock = lastBlock.number - BLOCKS_BY_DAY * BigInt(day);
       const logs = await this.core.rpcProvider.getLogs({
         address: contract.address,
         event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
@@ -80,17 +80,17 @@ export class LidoSDKStethEvents {
   @Logger('Events:')
   @ErrorHandler()
   public async getFirstRebaseEvent(props: {
-    daysAgo: number;
-    goBackFromBlock?: bigint;
+    days: number;
+    fromBlockNumber?: bigint;
   }): Promise<RebaseEvent | undefined> {
-    const { daysAgo } = props;
-    const goBackFromBlock =
-      props.goBackFromBlock ?? (await this.getLastBlock()).number;
+    const { days } = props;
+    const fromBlockNumber =
+      props.fromBlockNumber ?? (await this.getLastBlock()).number;
 
     const contract = await this.getContractStETH();
 
-    for (let days = 1; days <= DAYS_LIMIT; days++) {
-      const from = goBackFromBlock - BigInt(daysAgo + 1 - days) * BLOCKS_BY_DAY;
+    for (let day = 1; day <= DAYS_LIMIT; day++) {
+      const from = fromBlockNumber - BigInt(days + 1 - day) * BLOCKS_BY_DAY;
       const to = from + BLOCKS_BY_DAY;
 
       const logs = await this.core.rpcProvider.getLogs({

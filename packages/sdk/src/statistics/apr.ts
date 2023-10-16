@@ -40,8 +40,8 @@ export class LidoSDKApr {
     invariant(lastEvent, 'Last event is not defined');
 
     const firstEvent = await this.events.stethEvents.getFirstRebaseEvent({
-      daysAgo: days,
-      goBackFromBlock: lastEvent.blockNumber,
+      days,
+      fromBlockNumber: lastEvent.blockNumber,
     });
     invariant(firstEvent, 'First event is not defined');
 

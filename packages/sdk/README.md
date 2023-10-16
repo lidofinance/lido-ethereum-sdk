@@ -1137,9 +1137,9 @@ console.log(smaApr, 'sma apr by 7 days');
 
 ###### Input Parameters:
 
-- `props: { daysAgo, goBackFromBlock }`
-  - `daysAgo` (Type: number): The number of days ago from which to start searching for the first rebase event.
-  - `goBackFromBlock` (Type: number | undefined): Block number from which to start the search.
+- `props: { days, fromBlockNumber }`
+  - `days` (Type: number): The number of days ago from which to start searching for the first rebase event.
+  - `fromBlockNumber` (Type: number | undefined): Block number from which to start the search.
 
 ###### Output Parameters:
 
@@ -1178,11 +1178,13 @@ const lidoSDK = new LidoSDK({
 });
 
 const lastRebaseEvent = await lidoSDK.events.stethEvents.getLastRebaseEvent();
-const firstRebaseEvent = await lidoSDK.events.stethEvents.getFirstRebaseEvent();
+const firstRebaseEvent = await lidoSDK.events.stethEvents.getFirstRebaseEvent({
+  days: 3,
+});
 const lastRebaseEventsByCount =
-  await lidoSDK.events.stethEvents.getRebaseEvents({ count: 10 });
+  await lidoSDK.events.stethEvents.getRebaseEvents({ count: 7 });
 const lastRebaseEventsByDays =
-  await lidoSDK.events.stethEvents.getRebaseEventsByDays({ days: 10 });
+  await lidoSDK.events.stethEvents.getRebaseEventsByDays({ days: 7 });
 
 console.log(lastRebaseEvent, 'last rebase event');
 console.log(firstRebaseEvent, 'first rebase event');
