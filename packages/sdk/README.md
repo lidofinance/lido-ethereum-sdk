@@ -1085,6 +1085,27 @@ const wsteth = await lidoSDK.core.getContractAddress(
 
 ### APR
 
+#### Methods
+
+##### `getLastApr`
+
+###### Output Parameters:
+
+- Type: number
+
+##### `getSmaApr`
+
+###### Input Parameters:
+
+- `props: { days }`
+  - `days` (Type: number): The number of days back to return sma apr.
+
+###### Output Parameters:
+
+- Type: number
+
+#### Examples
+
 ```ts
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 
@@ -1094,15 +1115,59 @@ const lidoSDK = new LidoSDK({
 });
 
 const lastApr = await lidoSDK.statistics.apr.getLastApr();
-const smaApr = await lidoSDK.statistics.apr.getSmaApr();
+const smaApr = await lidoSDK.statistics.apr.getSmaApr({ days: 7 });
 
 console.log(lastApr, 'last apr');
-console.log(smaApr, 'sma apr');
+console.log(smaApr, 'sma apr by 7 days');
 ```
 
 ## Lido events
 
 ### Rebase
+
+#### Methods
+
+##### `getLastRebaseEvent`
+
+###### Output Parameters:
+
+- Type: RebaseEvent
+
+##### `getFirstRebaseEvent`
+
+###### Input Parameters:
+
+- `props: { days, fromBlockNumber }`
+  - `days` (Type: number): The number of days ago from which to start searching for the first rebase event.
+  - `fromBlockNumber` (Type: number | undefined): Block number from which to start the search.
+
+###### Output Parameters:
+
+- Type: RebaseEvent
+
+##### `getRebaseEvents`
+
+###### Input Parameters:
+
+- `props: { count }`
+  - `count` (Type: number): The number of events to return.
+
+###### Output Parameters:
+
+- Type: Array of RebaseEvent objects
+
+##### `getRebaseEventsByDays`
+
+###### Input Parameters:
+
+- `props: { days }`
+  - `days` (Type: number): The number of days back to return rebase events.
+
+###### Output Parameters:
+
+- Type: Array of RebaseEvent objects
+
+#### Examples
 
 ```ts
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
@@ -1113,12 +1178,16 @@ const lidoSDK = new LidoSDK({
 });
 
 const lastRebaseEvent = await lidoSDK.events.stethEvents.getLastRebaseEvent();
+const firstRebaseEvent = await lidoSDK.events.stethEvents.getFirstRebaseEvent({
+  days: 3,
+});
 const lastRebaseEventsByCount =
-  await lidoSDK.events.stethEvents.getRebaseEvents({ count: 10 });
+  await lidoSDK.events.stethEvents.getRebaseEvents({ count: 7 });
 const lastRebaseEventsByDays =
-  await lidoSDK.events.stethEvents.getRebaseEventByDays({ days: 10 });
+  await lidoSDK.events.stethEvents.getRebaseEventsByDays({ days: 7 });
 
 console.log(lastRebaseEvent, 'last rebase event');
+console.log(firstRebaseEvent, 'first rebase event');
 console.log(lastRebaseEventsByCount, 'last rebase events by count');
 console.log(lastRebaseEventsByDays, 'last rebase events by days');
 ```

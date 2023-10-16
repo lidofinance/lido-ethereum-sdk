@@ -15,13 +15,13 @@ export type RebaseEvent = {
   transactionHash: string;
   transactionIndex: number;
   args: {
-    reportTimestamp?: bigint;
-    timeElapsed?: bigint;
-    preTotalShares?: bigint;
-    preTotalEther?: bigint;
-    postTotalShares?: bigint;
-    postTotalEther?: bigint;
-    sharesMintedAsFees?: bigint;
+    reportTimestamp: bigint;
+    timeElapsed: bigint;
+    preTotalShares: bigint;
+    preTotalEther: bigint;
+    postTotalShares: bigint;
+    postTotalEther: bigint;
+    sharesMintedAsFees: bigint;
   };
   eventName: 'TokenRebased';
 };

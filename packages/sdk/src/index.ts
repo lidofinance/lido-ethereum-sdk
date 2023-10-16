@@ -16,3 +16,5 @@ export {
 } from './withdraw/index.js';
 export { LIDO_CONTRACT_NAMES } from './common/constants.js';
 export { type WrapProps } from './wrap/index.js';
+export { LidoSDKEvents, RebaseEvent } from './events/index.js';
+export { LidoSDKStatistics } from './statistics/index.js';

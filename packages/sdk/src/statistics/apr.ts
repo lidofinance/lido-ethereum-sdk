@@ -33,24 +33,39 @@ export class LidoSDKApr {
 
   @Logger('Statistic:')
   @ErrorHandler()
-  public async getSmaApr(): Promise<{ aprs: number[]; smaApr: number }> {
-    const events = await this.events.stethEvents.getRebaseEventsByDays({
-      days: 7,
+  public async getSmaApr(props: { days: number }): Promise<number> {
+    const { days } = props;
+
+    const lastEvent = await this.events.stethEvents.getLastRebaseEvent();
+    invariant(lastEvent, 'Last event is not defined');
+
+    const firstEvent = await this.events.stethEvents.getFirstRebaseEvent({
+      days,
+      fromBlockNumber: lastEvent.blockNumber,
     });
-    invariant(events.length, 'Events is not defined');
+    invariant(firstEvent, 'First event is not defined');
 
-    const aprs = events.map((event) => this.calculateApr(event.args));
-    const sum = aprs.reduce((acc, apr) => apr + acc, 0);
+    const timeElapsed =
+      firstEvent.args.timeElapsed +
+      (lastEvent.args.reportTimestamp - firstEvent.args.reportTimestamp);
 
-    return { aprs, smaApr: Number((sum / aprs.length).toFixed(1)) };
+    const smaApr = this.calculateApr({
+      preTotalEther: firstEvent.args.preTotalEther,
+      preTotalShares: firstEvent.args.preTotalShares,
+      postTotalEther: lastEvent.args.postTotalEther,
+      postTotalShares: lastEvent.args.postTotalShares,
+      timeElapsed,
+    });
+
+    return smaApr;
   }
 
   private calculateApr(props: {
-    preTotalEther?: bigint;
-    preTotalShares?: bigint;
-    postTotalEther?: bigint;
-    postTotalShares?: bigint;
-    timeElapsed?: bigint;
+    preTotalEther: bigint;
+    preTotalShares: bigint;
+    postTotalEther: bigint;
+    postTotalShares: bigint;
+    timeElapsed: bigint;
   }): number {
     const {
       preTotalEther,
@@ -59,12 +74,6 @@ export class LidoSDKApr {
       postTotalShares,
       timeElapsed,
     } = props;
-
-    invariant(preTotalEther, 'preTotalEther is not defined');
-    invariant(preTotalShares, 'preTotalShares is not defined');
-    invariant(postTotalEther, 'postTotalEther is not defined');
-    invariant(postTotalShares, 'postTotalShares is not defined');
-    invariant(timeElapsed, 'timeElapsed is not defined');
 
     const preShareRate = (preTotalEther * BigInt(10 ** 27)) / preTotalShares;
     const postShareRate = (postTotalEther * BigInt(10 ** 27)) / postTotalShares;
