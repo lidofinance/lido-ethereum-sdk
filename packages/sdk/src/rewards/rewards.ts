@@ -1,8 +1,8 @@
 import invariant from 'tiny-invariant';
 import {
-  Address,
-  GetContractReturnType,
-  PublicClient,
+  type Address,
+  type GetContractReturnType,
+  type PublicClient,
   getContract,
   zeroAddress,
 } from 'viem';
@@ -11,18 +11,21 @@ import { Logger, ErrorHandler, Cache } from '../common/decorators/index.js';
 import { version } from '../version.js';
 import { rewardsEventsAbi } from './abi/rewardsEvents.js';
 import {
-  GetRewardsFromChainResults as GetRewardsFromChainResult,
-  GetRewardsFromSubgraphOptions,
-  GetRewardsFromSubgraphResults as GetRewardsFromSubgraphResult,
-  GetRewardsOptions,
-  LidoSDKRewardsProps,
-  NonPendingBlockTag,
-  Reward,
-  RewardsChainEvents,
-  RewardsSubgraphEvents,
+  type GetRewardsFromChainResult,
+  type GetRewardsFromSubgraphOptions,
+  type GetRewardsFromSubgraphResult,
+  type GetRewardsOptions,
+  type LidoSDKRewardsProps,
+  type NonPendingBlockTag,
+  type Reward,
+  type RewardsChainEvents,
+  type RewardsSubgraphEvents,
 } from './types.js';
 
-import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
+import {
+  EARLIEST_TOKEN_REBASED_EVENT,
+  LIDO_CONTRACT_NAMES,
+} from '../common/constants.js';
 import {
   TotalRewardEntity,
   TransferEventEntity,
@@ -31,27 +34,14 @@ import {
   getTransfers,
 } from './subgraph/index.js';
 import { addressEqual } from '../common/utils/address-equal.js';
-import { getInitialData } from './subgraph/subrgaph.js';
+import { getInitialData } from './subgraph/index.js';
+import { calcShareRate, requestWithBlockStep, sharesToSteth } from './utils.js';
 
 export class LidoSDKRewards {
-  readonly core: LidoSDKCore;
   private static readonly PRECISION = 10n ** 27n;
+  private static readonly DEFAULT_STEP = 1000;
 
-  private static calcShareRate = (
-    totalEther: bigint,
-    totalShares: bigint,
-  ): number =>
-    Number((totalEther * LidoSDKRewards.PRECISION) / totalShares) /
-    Number(LidoSDKRewards.PRECISION);
-
-  private static sharesToSteth = (
-    shares: bigint,
-    totalEther: bigint,
-    totalShares: bigint,
-  ): bigint =>
-    (shares * totalEther * LidoSDKRewards.PRECISION) /
-    totalShares /
-    LidoSDKRewards.PRECISION;
+  readonly core: LidoSDKCore;
 
   constructor(props: LidoSDKRewardsProps) {
     if (props.core) this.core = props.core;
@@ -78,6 +68,13 @@ export class LidoSDKRewards {
   }
 
   @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  private earliestRebaseEventBlock(): bigint {
+    invariant(this.core.chain, 'Chain is not defined');
+    return EARLIEST_TOKEN_REBASED_EVENT[this.core.chainId];
+  }
+
+  @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
   private async getContractStETH(): Promise<
     GetContractReturnType<typeof rewardsEventsAbi, PublicClient>
@@ -97,7 +94,7 @@ export class LidoSDKRewards {
     props: GetRewardsOptions,
   ): Promise<GetRewardsFromChainResult> {
     const [
-      { address, fromBlock, toBlock, includeZeroRebases = false },
+      { address, fromBlock, toBlock, includeZeroRebases, step },
       stethContract,
       withdrawalQueueAddress,
     ] = await Promise.all([
@@ -105,6 +102,12 @@ export class LidoSDKRewards {
       this.getContractStETH(),
       this.contractAddressWithdrawalQueue(),
     ]);
+
+    const lowerBound = this.earliestRebaseEventBlock();
+    if (fromBlock < lowerBound)
+      throw new Error(
+        `Cannot index events earlier than first TokenRebased event at block ${lowerBound.toString()}`,
+      );
 
     const preBlock = fromBlock === 0n ? 0n : fromBlock - 1n;
 
@@ -121,24 +124,31 @@ export class LidoSDKRewards {
       }),
       stethContract.read.getTotalPooledEther({ blockNumber: preBlock }),
       stethContract.read.getTotalShares({ blockNumber: preBlock }),
-      stethContract.getEvents.TransferShares(
-        { from: address },
-        { fromBlock, toBlock },
+      requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
+        stethContract.getEvents.TransferShares(
+          { from: address },
+          { fromBlock, toBlock },
+        ),
       ),
-      stethContract.getEvents.TransferShares(
-        { to: address },
-        { fromBlock, toBlock },
+      requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
+        stethContract.getEvents.TransferShares(
+          { to: address },
+          { fromBlock, toBlock },
+        ),
       ),
-      stethContract.getEvents.TokenRebased(
-        {},
-        {
-          fromBlock,
-          toBlock,
-        },
+      requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
+        stethContract.getEvents.TokenRebased(
+          {},
+          {
+            fromBlock,
+            toBlock,
+          },
+        ),
       ),
     ]);
 
-    const events = ([] as any).concat(
+    // concat types are broken
+    const events = ([] as any[]).concat(
       transferInEvents,
       transferOutEvents,
       rebaseEvents,
@@ -154,30 +164,33 @@ export class LidoSDKRewards {
     });
 
     // Converts to steth based on current share rate
-    // it's crucial to not cut corners here else computational error will be accumulated
     let currentTotalEther = baseTotalEther;
     let currentTotalShares = baseTotalShares;
-    const sharesToSteth = (shares: bigint): bigint =>
-      LidoSDKRewards.sharesToSteth(
+    const getCurrentStethFromShares = (shares: bigint): bigint =>
+      sharesToSteth(
         shares,
         currentTotalEther,
         currentTotalShares,
+        LidoSDKRewards.PRECISION,
       );
-    const getShareRate = () =>
-      LidoSDKRewards.calcShareRate(currentTotalEther, currentTotalShares);
+    const getCurrentShareRate = () =>
+      calcShareRate(
+        currentTotalEther,
+        currentTotalShares,
+        LidoSDKRewards.PRECISION,
+      );
 
-    let baseBalance = sharesToSteth(baseBalanceShares);
-    let baseShareRate = getShareRate();
+    const baseBalance = getCurrentStethFromShares(baseBalanceShares);
+    const baseShareRate = getCurrentShareRate();
 
     let shareRate = baseShareRate;
     let prevSharesBalance = baseBalanceShares;
-    type RewardEntry = Reward<RewardsChainEvents>;
     let rewards: Reward<RewardsChainEvents>[] = events.map((event) => {
       if (event.eventName === 'TransferShares') {
         const { from, to, sharesValue } = event.args;
-        let type: RewardEntry['type'],
-          changeShares: RewardEntry['changeShares'],
-          balanceShares: RewardEntry['balanceShares'];
+        let type: Reward<RewardsChainEvents>['type'],
+          changeShares: Reward<RewardsChainEvents>['changeShares'],
+          balanceShares: Reward<RewardsChainEvents>['balanceShares'];
 
         if (to === address) {
           type = from === zeroAddress ? 'submit' : 'transfer_in';
@@ -189,23 +202,24 @@ export class LidoSDKRewards {
           changeShares = -sharesValue;
         }
 
+        prevSharesBalance = balanceShares;
         return {
           type,
           balanceShares,
           changeShares,
-          change: sharesToSteth(changeShares),
-          balance: sharesToSteth(balanceShares),
+          change: getCurrentStethFromShares(changeShares),
+          balance: getCurrentStethFromShares(balanceShares),
           shareRate,
           originalEvent: event,
         };
       }
       if (event.eventName === 'TokenRebased') {
         const { postTotalEther, postTotalShares } = event.args;
-        const oldBalance = sharesToSteth(prevSharesBalance);
+        const oldBalance = getCurrentStethFromShares(prevSharesBalance);
         currentTotalEther = postTotalEther;
         currentTotalShares = postTotalShares;
-        const newBalance = sharesToSteth(prevSharesBalance);
-        shareRate = getShareRate();
+        const newBalance = getCurrentStethFromShares(prevSharesBalance);
+        shareRate = getCurrentShareRate();
 
         return {
           type: 'rebase',
@@ -242,14 +256,7 @@ export class LidoSDKRewards {
     props: GetRewardsFromSubgraphOptions,
   ): Promise<GetRewardsFromSubgraphResult> {
     const [
-      {
-        getSubgraphUrl,
-        address,
-        fromBlock,
-        toBlock,
-        step = 1000,
-        includeZeroRebases = false,
-      },
+      { getSubgraphUrl, address, fromBlock, toBlock, step, includeZeroRebases },
       withdrawalQueueAddress,
     ] = await Promise.all([
       this.parseProps(props),
@@ -282,6 +289,7 @@ export class LidoSDKRewards {
       getInitialData({ url, address, block: preBlock }),
     ]);
 
+    // concat types are broken
     const events = ([] as (TransferEventEntity | TotalRewardEntity)[]).concat(
       totalRewards,
       transfers,
@@ -325,21 +333,24 @@ export class LidoSDKRewards {
       const { totalPooledEtherAfter, totalSharesAfter } = initialRebase;
       const totalEther = BigInt(totalPooledEtherAfter);
       const totalShares = BigInt(totalSharesAfter);
-      baseShareRate = LidoSDKRewards.calcShareRate(totalEther, totalShares);
+      baseShareRate = calcShareRate(
+        totalEther,
+        totalShares,
+        LidoSDKRewards.PRECISION,
+      );
       // we recount initial balance in case this rebase was after transfer
       // in opposite case recount will be the same value anyway
-      prevBalance = LidoSDKRewards.sharesToSteth(
+      prevBalance = sharesToSteth(
         prevBalanceShares,
         totalEther,
         totalShares,
+        LidoSDKRewards.PRECISION,
       );
     }
 
     // fix values for return meta
     const baseBalance = prevBalance;
     const baseBalanceShares = prevBalanceShares;
-
-    type RewardEntry = Reward<RewardsSubgraphEvents>;
 
     let rewards: Reward<RewardsSubgraphEvents>[] = events.map((event) => {
       // it's a transfer
@@ -356,11 +367,11 @@ export class LidoSDKRewards {
           totalPooledEther,
           totalShares,
         } = event;
-        let type: RewardEntry['type'],
-          changeShares: RewardEntry['changeShares'],
-          balanceShares: RewardEntry['balanceShares'],
-          change: RewardEntry['change'],
-          balance: RewardEntry['balance'];
+        let type: Reward<RewardsSubgraphEvents>['type'],
+          changeShares: Reward<RewardsSubgraphEvents>['changeShares'],
+          balanceShares: Reward<RewardsSubgraphEvents>['balanceShares'],
+          change: Reward<RewardsSubgraphEvents>['change'],
+          balance: Reward<RewardsSubgraphEvents>['balance'];
 
         if (addressEqual(to, address)) {
           type = from === zeroAddress ? 'submit' : 'transfer_in';
@@ -378,9 +389,10 @@ export class LidoSDKRewards {
           balanceShares = BigInt(sharesAfterDecrease);
         }
 
-        const shareRate = LidoSDKRewards.calcShareRate(
+        const shareRate = calcShareRate(
           BigInt(totalPooledEther),
           BigInt(totalShares),
+          LidoSDKRewards.PRECISION,
         );
         prevBalance = balance;
         prevBalanceShares = balanceShares;
@@ -401,10 +413,11 @@ export class LidoSDKRewards {
 
         const totalEther = BigInt(totalPooledEtherAfter);
         const totalShares = BigInt(totalSharesAfter);
-        const newBalance = LidoSDKRewards.sharesToSteth(
+        const newBalance = sharesToSteth(
           prevBalanceShares,
           totalEther,
           totalShares,
+          LidoSDKRewards.PRECISION,
         );
         const change = newBalance - prevBalance;
         prevBalance = newBalance;
@@ -414,7 +427,11 @@ export class LidoSDKRewards {
           changeShares: 0n,
           balance: newBalance,
           balanceShares: prevBalanceShares,
-          shareRate: LidoSDKRewards.calcShareRate(totalEther, totalShares),
+          shareRate: calcShareRate(
+            totalEther,
+            totalShares,
+            LidoSDKRewards.PRECISION,
+          ),
           originalEvent: event,
         };
       }
@@ -441,9 +458,14 @@ export class LidoSDKRewards {
   private async parseProps<TRewardsProps extends GetRewardsOptions>(
     props: TRewardsProps,
   ): Promise<
-    Omit<TRewardsProps, 'toBlock' | 'fromBlock'> & {
+    Omit<
+      TRewardsProps,
+      'toBlock' | 'fromBlock' | 'includeZeroRebases' | 'step'
+    > & {
       toBlock: bigint;
       fromBlock: bigint;
+      step: number;
+      includeZeroRebases: boolean;
     }
   > {
     const toBlock = await this.toBlockNumber(props.toBlock ?? 'latest');
@@ -453,10 +475,19 @@ export class LidoSDKRewards {
     const fromBlock = await this.toBlockNumber(
       props.fromBlock ?? toBlock - props.blocksBack,
     );
-
     invariant(toBlock > fromBlock, 'toBlock is higher than fromBlock');
 
-    return { ...props, fromBlock, toBlock };
+    const { step = LidoSDKRewards.DEFAULT_STEP, includeZeroRebases = false } =
+      props;
+    invariant(step > 0, 'steps must be a positive integer');
+
+    return {
+      ...props,
+      fromBlock,
+      step,
+      includeZeroRebases,
+      toBlock,
+    };
   }
 
   @Logger('Utils:')

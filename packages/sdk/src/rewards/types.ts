@@ -11,6 +11,7 @@ export type GetRewardsOptions = {
   address: Address;
   includeZeroRebases?: boolean;
   toBlock?: bigint | NonPendingBlockTag;
+  step?: number;
 } & (
   | {
       fromBlock: bigint | NonPendingBlockTag;
@@ -21,25 +22,29 @@ export type GetRewardsOptions = {
     }
 );
 
+export type RewardChainEventTransfer = Log<
+  bigint,
+  number,
+  false,
+  undefined,
+  true,
+  typeof rewardsEventsAbi,
+  'TransferShares'
+>;
+
+export type RewardChainEventRebase = Log<
+  bigint,
+  number,
+  false,
+  undefined,
+  true,
+  typeof rewardsEventsAbi,
+  'TokenRebased'
+>;
+
 export type RewardsChainEvents =
-  | Log<
-      bigint,
-      number,
-      false,
-      undefined,
-      true,
-      typeof rewardsEventsAbi,
-      'TransferShares'
-    >
-  | Log<
-      bigint,
-      number,
-      false,
-      undefined,
-      true,
-      typeof rewardsEventsAbi,
-      'TokenRebased'
-    >;
+  | RewardChainEventTransfer
+  | RewardChainEventRebase;
 
 export type RewardsSubgraphEvents = TransferEventEntity | TotalRewardEntity;
 
@@ -70,16 +75,15 @@ type GetRewardsCommonResult = {
 
 export type GetRewardsFromSubgraphOptions = GetRewardsOptions & {
   getSubgraphUrl: (id: string, chainId: number) => string;
-  step?: number;
 };
 
-export type GetRewardsFromSubgraphResults = {
+export type GetRewardsFromSubgraphResult = {
   rewards: Reward<RewardsSubgraphEvents>[];
   lastIndexedBlock: bigint;
 } & GetRewardsCommonResult;
 
 export type GetRewardsFromChainOptions = GetRewardsOptions;
 
-export type GetRewardsFromChainResults = {
+export type GetRewardsFromChainResult = {
   rewards: Reward<RewardsChainEvents>[];
 } & GetRewardsCommonResult;

@@ -1134,6 +1134,7 @@ This module allows you to query historical rewards data for given address via ch
 - **toBlock** - **default**:`latest` block number or tag for upper bound for rewards. `pending` not allowed
 - **fromBlock** - block number or tag for lower bound for rewards. `pending` not allowed
 - **blocksBack** - alternative to **fromBlock**. Amount of blocks to look back to from **toBlock**.
+- **step** - **default**:`1000` step per one request for large queries. For chain method max amount of blocks per one request. For subgraph method max amount of entities returned per one requests.
 - **includeZeroRebases** - **default**:`false` include rebase events when users had no rewards(because of empty balance)
 
 ### Common Return

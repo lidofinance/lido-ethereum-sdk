@@ -16,12 +16,12 @@ import {
   type TotalRewardEntity,
   type GetTotalRewardsResult,
   type GetTransfersResult,
-  LidoTransfersQueryResult,
-  TotalRewardsQueryResult,
-  GetInitialDataOptions,
-  GetInitialDataResult,
-  InitialDataQueryVariables,
-  InitialDataQueryResult,
+  type LidoTransfersQueryResult,
+  type TotalRewardsQueryResult,
+  type GetInitialDataOptions,
+  type GetInitialDataResult,
+  type InitialDataQueryVariables,
+  type InitialDataQueryResult,
 } from './types.js';
 
 const requestAllWithStep = async <TResult, TResultEntry, TVariables>({
@@ -39,7 +39,7 @@ const requestAllWithStep = async <TResult, TResultEntry, TVariables>({
 } & SubgraphRequestOptions): Promise<Array<TResultEntry>> => {
   let skip = 0;
   const results: TResultEntry[] = [];
-  do {
+  while (true) {
     const partialResult = await request<TResult>({
       url,
       document,
@@ -56,8 +56,7 @@ const requestAllWithStep = async <TResult, TResultEntry, TVariables>({
     // break if we don't fetch more than step
     if (array.length < step) break;
     skip += step;
-    // maybe some sort of max iterations mechanism
-  } while (true);
+  }
   return results;
 };
 

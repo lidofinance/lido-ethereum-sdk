@@ -19,6 +19,7 @@ import { ToggleButton } from 'components/toggle-button/toggle-button';
 import { useAddressState } from 'hooks/useAddressState';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
+
 import { Address } from 'viem';
 
 const renderRewards = (
@@ -103,6 +104,7 @@ export const RewardsDemo = () => {
           return rewards.getRewardsFromChain({
             address: rewardsAddress,
             blocksBack: BigInt(blocksBack),
+            step: 25000,
             includeZeroRebases,
           });
         }}

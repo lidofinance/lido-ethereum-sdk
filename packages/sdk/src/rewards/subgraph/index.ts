@@ -2,7 +2,8 @@ export {
   getLastIndexedBlock,
   getTotalRewards,
   getTransfers,
-} from './subrgaph.js';
+  getInitialData,
+} from './subgraph.js';
 export {
   type GetLastIndexedBlockOptions,
   type GetLastIndexedBlockResult,

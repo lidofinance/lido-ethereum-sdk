@@ -32,6 +32,14 @@ export const SUBRGRAPH_ID_BY_CHAIN: {
   [CHAINS.Holesky]: '',
 };
 
+export const EARLIEST_TOKEN_REBASED_EVENT: {
+  [key in CHAINS]: bigint;
+} = {
+  [CHAINS.Mainnet]: 17272708n,
+  [CHAINS.Goerli]: 8712039n,
+  [CHAINS.Holesky]: 52174n,
+} as const;
+
 export const LIDO_TOKENS = {
   steth: 'stETH',
   wsteth: 'wstETH',
