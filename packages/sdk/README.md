@@ -1131,11 +1131,11 @@ This module allows you to query historical rewards data for given address via ch
 ### Common Options
 
 - **address** - address of an account you want to query rewards for
-- **toBlock** - **default**:`latest` block number or tag for upper bound for rewards. `pending` not allowed
+- **toBlock** [default: `latest` ] - block number or tag for upper bound for rewards. `pending` not allowed
 - **fromBlock** - block number or tag for lower bound for rewards. `pending` not allowed
-- **blocksBack** - alternative to **fromBlock**. Amount of blocks to look back to from **toBlock**.
-- **step** - **default**:`1000` step per one request for large queries. For chain method max amount of blocks per one request. For subgraph method max amount of entities returned per one requests.
-- **includeZeroRebases** - **default**:`false` include rebase events when users had no rewards(because of empty balance)
+- **blocksBack** - alternative to **fromBlock**. Amount of blocks to look back from **toBlock**.
+- **step** [default: `1000` ] - step per one request for large queries. For chain method max amount of blocks per one request. For subgraph method max amount of entities returned per one requests.
+- **includeZeroRebases** [default: `false` ] - include rebase events when users had no rewards(because of empty balance)
 
 ### Common Return
 
@@ -1185,7 +1185,7 @@ This method requires you to provide API URL to send subgraph requests to. It's b
 
 #### Important notes
 
-**toBlock** is capped by last index block in subgraph. Block number is available in result object by `lastIndexedBlock`.
+**toBlock** is capped by last indexed block in subgraph. Block number is available in result object by `lastIndexedBlock`.
 
 ```ts
 const lidoSDK = new LidoSDK({

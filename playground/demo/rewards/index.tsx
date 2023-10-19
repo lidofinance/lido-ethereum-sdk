@@ -113,7 +113,9 @@ export const RewardsDemo = () => {
           label="Rewards address"
           placeholder="0x0000000"
           value={rewardsAddress}
-          onChange={(e) => setRewardsAddress(e.currentTarget.value as Address)}
+          onChange={(event) =>
+            setRewardsAddress(event.currentTarget.value as Address)
+          }
         />
         <Input
           label="Blocks back"
@@ -121,7 +123,7 @@ export const RewardsDemo = () => {
           min="1"
           type="number"
           value={blocksBack}
-          onChange={(e) => setBlocksBack(e.currentTarget.valueAsNumber)}
+          onChange={(event) => setBlocksBack(event.currentTarget.valueAsNumber)}
         />
         <ToggleButton
           title="Include Zero Rebases"
