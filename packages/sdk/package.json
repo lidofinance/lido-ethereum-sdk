@@ -61,6 +61,11 @@
       "default": "./dist/cjs/events/index.js",
       "types": "./dist/types/events/index.d.ts"
     },
+    "./rewards": {
+      "import": "./dist/esm/rewards/index.js",
+      "default": "./dist/cjs/rewards/index.js",
+      "types": "./dist/types/rewards/index.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -111,6 +116,8 @@
   },
   "dependencies": {
     "@ethersproject/bytes": "^5.7.0",
+    "graphql": "^16.8.1",
+    "graphql-request": "^6.1.0",
     "tiny-invariant": "^1.3.1",
     "viem": "^1.15.3"
   },

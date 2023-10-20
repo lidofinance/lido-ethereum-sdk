@@ -38,6 +38,7 @@ import {
   LIDO_TOKENS,
   PERMIT_MESSAGE_TYPES,
   VIEM_CHAINS,
+  SUBRGRAPH_ID_BY_CHAIN,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
@@ -349,6 +350,14 @@ export default class LidoSDKCore {
 
       return lidoLocator.read[contract]();
     }
+  }
+
+  @Logger('Utils:')
+  @Cache(30 * 60 * 1000, ['chain.id'])
+  public getSubgraphId(): string {
+    const id = SUBRGRAPH_ID_BY_CHAIN[this.chainId];
+    invariant(id, `Subgraph is not supported for chain ${this.chainId}`);
+    return id;
   }
 
   public async performTransaction(
