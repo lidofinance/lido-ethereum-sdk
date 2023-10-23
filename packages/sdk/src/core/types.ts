@@ -9,6 +9,7 @@ import {
 
 import { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
 import { SDKError } from '../index.js';
+import type LidoSDKCore from './core.js';
 
 export type LOG_MODE = 'info' | 'debug';
 
@@ -30,6 +31,12 @@ type LidoSDKCorePropsRpcProvider = {
 export type LidoSDKCoreProps =
   | LidoSDKCorePropsRpcUrls
   | LidoSDKCorePropsRpcProvider;
+
+export type LidoSDKCommonProps =
+  | {
+      core: LidoSDKCore;
+    }
+  | ({ core: undefined } & LidoSDKCoreProps);
 
 export type EtherValue = string | bigint;
 

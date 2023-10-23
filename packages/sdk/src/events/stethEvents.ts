@@ -17,6 +17,7 @@ import { type LidoSDKEventsProps, RebaseEvent } from './types.js';
 
 const BLOCKS_BY_DAY = 7600n;
 const REBASE_EVENT_ABI_INDEX = 8;
+const DAYS_LIMIT = 7;
 
 export class LidoSDKStethEvents {
   readonly core: LidoSDKCore;
@@ -58,18 +59,49 @@ export class LidoSDKStethEvents {
   @ErrorHandler()
   public async getLastRebaseEvent(): Promise<RebaseEvent | undefined> {
     const contract = await this.getContractStETH();
-    const DAYS_LIMIT = 3;
+    const lastBlock = await this.getLastBlock();
 
-    for (let days = 1; days <= DAYS_LIMIT; days++) {
-      const dayAgoBlock = await this.getBlockByDays({ days });
+    for (let day = 1; day <= DAYS_LIMIT; day++) {
+      const fromBlock = lastBlock.number - BLOCKS_BY_DAY * BigInt(day);
       const logs = await this.core.rpcProvider.getLogs({
         address: contract.address,
         event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
-        fromBlock: dayAgoBlock.number,
-        toBlock: 'latest',
+        fromBlock: fromBlock,
+        toBlock: fromBlock + BLOCKS_BY_DAY,
+        strict: true,
       });
 
       if (logs.length > 0) return logs[logs.length - 1];
+    }
+
+    return undefined;
+  }
+
+  @Logger('Events:')
+  @ErrorHandler()
+  public async getFirstRebaseEvent(props: {
+    days: number;
+    fromBlockNumber?: bigint;
+  }): Promise<RebaseEvent | undefined> {
+    const { days } = props;
+    const fromBlockNumber =
+      props.fromBlockNumber ?? (await this.getLastBlock()).number;
+
+    const contract = await this.getContractStETH();
+
+    for (let day = 1; day <= DAYS_LIMIT; day++) {
+      const from = fromBlockNumber - BigInt(days + 1 - day) * BLOCKS_BY_DAY;
+      const to = from + BLOCKS_BY_DAY;
+
+      const logs = await this.core.rpcProvider.getLogs({
+        address: contract.address,
+        event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
+        fromBlock: from,
+        toBlock: to,
+        strict: true,
+      });
+
+      if (logs.length > 0) return logs[0];
     }
 
     return undefined;
@@ -95,6 +127,7 @@ export class LidoSDKStethEvents {
       event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
       fromBlock: block.number,
       toBlock: 'latest',
+      strict: true,
     });
 
     const logsByDays = logs.filter((log) => {
@@ -121,6 +154,7 @@ export class LidoSDKStethEvents {
       event: StethEventsAbi[8],
       fromBlock: block.number,
       toBlock: 'latest',
+      strict: true,
     });
 
     return logs.slice(logs.length - count);
