@@ -92,6 +92,7 @@ export const RewardsDemo = () => {
     useAccount: true,
   });
   const [blocksBack, setBlocksBack] = useState(100000);
+  const [step, setStep] = useState(1000);
   const [includeZeroRebases, setIncludeZeroRebases] = useState(false);
   const { rewards } = useLidoSDK();
 
@@ -104,7 +105,7 @@ export const RewardsDemo = () => {
           return rewards.getRewardsFromChain({
             address: rewardsAddress,
             blocksBack: BigInt(blocksBack),
-            step: 25000,
+            step,
             includeZeroRebases,
           });
         }}
@@ -125,6 +126,14 @@ export const RewardsDemo = () => {
           value={blocksBack}
           onChange={(event) => setBlocksBack(event.currentTarget.valueAsNumber)}
         />
+        <Input
+          label="Requests Steps"
+          placeholder="1000"
+          min="1"
+          type="number"
+          value={step}
+          onChange={(event) => setStep(event.currentTarget.valueAsNumber)}
+        />
         <ToggleButton
           title="Include Zero Rebases"
           value={includeZeroRebases}
@@ -136,6 +145,7 @@ export const RewardsDemo = () => {
           return rewards.getRewardsFromSubgraph({
             address: rewardsAddress,
             blocksBack: BigInt(blocksBack),
+            step,
             includeZeroRebases,
             // Warning! these endpoints will be deprecated
             getSubgraphUrl(_, chainId) {

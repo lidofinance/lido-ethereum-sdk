@@ -475,7 +475,7 @@ export class LidoSDKRewards {
     const fromBlock = await this.toBlockNumber(
       props.fromBlock ?? toBlock - props.blocksBack,
     );
-    invariant(toBlock > fromBlock, 'toBlock is higher than fromBlock');
+    invariant(toBlock >= fromBlock, 'toBlock is higher than fromBlock');
 
     const { step = LidoSDKRewards.DEFAULT_STEP, includeZeroRebases = false } =
       props;

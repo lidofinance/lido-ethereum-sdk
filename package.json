@@ -44,6 +44,9 @@
     "prettier": "^3.0.1",
     "typescript": "^5.1.6"
   },
+  "resolutions": {
+    "postcss": "8.4.31"
+  },
   "workspaces": [
     "packages/*",
     "playground"
