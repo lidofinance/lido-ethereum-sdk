@@ -9,11 +9,11 @@ export class LidoSDKStatistics {
   readonly apr: LidoSDKApr;
 
   constructor(props: LidoSDKStatisticsProps) {
-    const { core, ...rest } = props;
+    const { core } = props;
 
     if (core) this.core = core;
-    else this.core = new LidoSDKCore(rest, version);
+    else this.core = new LidoSDKCore(props, version);
 
-    this.apr = new LidoSDKApr({ ...rest, core: this.core });
+    this.apr = new LidoSDKApr({ ...props, core: this.core });
   }
 }

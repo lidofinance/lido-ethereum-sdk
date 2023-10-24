@@ -1,36 +1,36 @@
-import {
+import type {
   WalletClient,
   PublicClient,
   Hash,
   TransactionReceipt,
   Address,
   Chain,
+  FormattedTransactionRequest,
 } from 'viem';
 
 import { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
-import { SDKError } from '../index.js';
+import { SDKError } from '../common/utils/SDKError.js';
 import type LidoSDKCore from './core.js';
 
 export type LOG_MODE = 'info' | 'debug';
 
-type LidoSDKCorePropsRpcUrls = {
+type LidoSDKCorePropsRpcProps =
+  | {
+      rpcUrls: string[];
+      rpcProvider?: undefined;
+    }
+  | {
+      rpcUrls?: undefined;
+      rpcProvider: PublicClient;
+    };
+
+export type LidoSDKCoreProps = {
   chainId: (typeof SUPPORTED_CHAINS)[number];
   rpcUrls: string[];
   web3Provider?: WalletClient;
   rpcProvider?: undefined;
   logMode?: LOG_MODE;
-};
-type LidoSDKCorePropsRpcProvider = {
-  chainId: (typeof SUPPORTED_CHAINS)[number];
-  rpcUrls: undefined;
-  web3Provider?: WalletClient;
-  rpcProvider: PublicClient;
-  logMode?: LOG_MODE;
-};
-
-export type LidoSDKCoreProps =
-  | LidoSDKCorePropsRpcUrls
-  | LidoSDKCorePropsRpcProvider;
+} & LidoSDKCorePropsRpcProps;
 
 export type LidoSDKCommonProps =
   | {
@@ -56,6 +56,14 @@ export type PerformTransactionOptions = {
   account: Address;
 };
 
+export type PerformTransactionGasLimit = (
+  overrides: TransactionOptions,
+) => Promise<bigint>;
+
+export type PerformTransactionSendTransaction = (
+  override: TransactionOptions,
+) => Promise<Hash>;
+
 export type TransactionOptions = {
   account: Address;
   chain: Chain;
@@ -69,6 +77,8 @@ export type TransactionResult = {
   receipt?: TransactionReceipt;
   confirmations?: bigint;
 };
+
+export type PopulatedTransaction = Omit<FormattedTransactionRequest, 'type'>;
 
 export type TransactionCallbackProps =
   | { stage: TransactionCallbackStage.PERMIT; payload?: undefined }

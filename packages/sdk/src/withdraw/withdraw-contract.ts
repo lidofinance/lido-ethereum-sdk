@@ -9,22 +9,13 @@ import invariant from 'tiny-invariant';
 
 import { Logger, Cache } from '../common/decorators/index.js';
 import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
-import { version } from '../version.js';
-import { type LidoSDKCoreProps } from '../core/index.js';
 
 import { WithdrawalQueueAbi } from './abi/withdrawalQueue.js';
 import { PartStethAbi } from './abi/partStETH.js';
 import { PartWstethAbi } from './abi/partWstETH.js';
-import { Bus } from './bus.js';
+import { BusModule } from './bus-module.js';
 
-export class LidoSDKWithdrawContract {
-  private readonly bus: Bus;
-
-  constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
-    if (props.bus) this.bus = props.bus;
-    else this.bus = new Bus(props, version);
-  }
-
+export class LidoSDKWithdrawContract extends BusModule {
   // Contracts
 
   @Logger('Contracts:')

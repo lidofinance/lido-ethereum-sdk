@@ -3,15 +3,15 @@ import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import { version } from '../version.js';
 import {
   UnstethNFT,
-  type ApproveAllProps,
-  type ApproveProps,
-  type ApprovedForProps,
-  type IsApprovedForAllProps,
+  type UnstethApproveAllProps,
+  type UnstethApproveProps,
+  type UnstethApprovedForProps,
+  type UnstethIsApprovedForAllProps,
   type LidoSDKUnstETHProps,
   type ParsedProps,
   type SafeTransferFromArguments,
-  type TransactionProps,
-  type TransferProps,
+  type UnstethCommonTransactionProps,
+  type UnstethTransferProps,
 } from './types.js';
 import {
   type Address,
@@ -80,7 +80,7 @@ export class LidoSDKUnstETH {
   // Transfer
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async transfer(props: TransferProps) {
+  public async transfer(props: UnstethTransferProps) {
     const {
       account,
       callback,
@@ -106,7 +106,7 @@ export class LidoSDKUnstETH {
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async setApprovalFor(props: ApproveProps) {
+  public async setApprovalFor(props: UnstethApproveProps) {
     const { account, callback, to = zeroAddress, id } = this.parseProps(props);
     const args = [to, id] as const;
     const contract = await this.getContract();
@@ -119,14 +119,14 @@ export class LidoSDKUnstETH {
 
   @Logger('Views:')
   @ErrorHandler('Error:')
-  public async getTokenApprovedFor({ id, account }: ApprovedForProps) {
+  public async getTokenApprovedFor({ id, account }: UnstethApprovedForProps) {
     const contract = await this.getContract();
     return contract.read.getApproved([id], { account });
   }
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async setApprovalForAll(props: ApproveAllProps) {
+  public async setApprovalForAll(props: UnstethApproveAllProps) {
     const { account, callback, to, allow } = this.parseProps(props);
     const args = [to, allow] as const;
     const contract = await this.getContract();
@@ -139,7 +139,10 @@ export class LidoSDKUnstETH {
 
   @Logger('Views:')
   @ErrorHandler('Error:')
-  public async getIsApprovedForAll({ account, to }: IsApprovedForAllProps) {
+  public async getIsApprovedForAll({
+    account,
+    to,
+  }: UnstethIsApprovedForAllProps) {
     const contract = await this.getContract();
     return contract.read.isApprovedForAll([account, to]);
   }
@@ -189,7 +192,7 @@ export class LidoSDKUnstETH {
     return contract.read.tokenURI([id]);
   }
 
-  private parseProps<TProps extends TransactionProps>(
+  private parseProps<TProps extends UnstethCommonTransactionProps>(
     props: TProps,
   ): ParsedProps<TProps> {
     return {

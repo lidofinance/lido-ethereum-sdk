@@ -1,7 +1,10 @@
 import { type Address, type BlockTag, type Log } from 'viem';
 import { type rewardsEventsAbi } from './abi/rewardsEvents.js';
 import { type LidoSDKCommonProps } from '../core/types.js';
-import { TotalRewardEntity, TransferEventEntity } from './subgraph/types.js';
+import type {
+  TotalRewardEntity,
+  TransferEventEntity,
+} from './subgraph/types.js';
 
 export type NonPendingBlockTag = Exclude<BlockTag, 'pending'>;
 

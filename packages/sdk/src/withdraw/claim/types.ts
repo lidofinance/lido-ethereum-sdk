@@ -1,15 +1,9 @@
 import { type Address } from 'viem';
-
-import { TransactionCallback } from '../../core/index.js';
+import { type TransactionCallback } from '../../core/index.js';
 
 export type ClaimRequestsProps = {
   account: Address;
   requestsIds: bigint[];
-  hints: bigint[];
+  hints?: bigint[];
   callback?: TransactionCallback;
 };
-
-export type ClaimRequestsPropsWithoutCallback = Omit<
-  ClaimRequestsProps,
-  'callback'
->;

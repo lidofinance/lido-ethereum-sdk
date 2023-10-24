@@ -23,6 +23,10 @@ export const CoreDemo = () => {
   return (
     <Accordion summary="Core">
       <Action
+        title="Get Web3 Address"
+        action={async () => await core.getWeb3Address()}
+      />
+      <Action
         title="Get Fee Data"
         action={async () => await core.getFeeData()}
       />

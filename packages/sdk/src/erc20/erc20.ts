@@ -28,7 +28,6 @@ import {
   TransactionOptions,
   TransactionResult,
 } from '../core/types.js';
-import invariant from 'tiny-invariant';
 import { splitSignature } from '@ethersproject/bytes';
 
 export abstract class AbstractLidoSDKErc20 {
@@ -73,6 +72,7 @@ export abstract class AbstractLidoSDKErc20 {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async transfer(props: TransferProps): Promise<TransactionResult> {
+    this.core.useWeb3Provider();
     const parsedProps = this.parseProps(props);
     const { account, amount, to, from = account } = parsedProps;
     const isTransferFrom = from !== account;
@@ -142,9 +142,9 @@ export abstract class AbstractLidoSDKErc20 {
   public async signPermit(
     props: SignTokenPermitProps,
   ): Promise<PermitSignature> {
+    const web3Provider = this.core.useWeb3Provider();
     const payload = await this.populatePermit(props);
-    invariant(this.core.web3Provider, 'Web3 provider is not defined');
-    const signature = await this.core.web3Provider.signTypedData(payload);
+    const signature = await web3Provider.signTypedData(payload);
     const { s, r, v } = splitSignature(signature);
 
     return {
@@ -195,6 +195,7 @@ export abstract class AbstractLidoSDKErc20 {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async approve(props: ApproveProps): Promise<TransactionResult> {
+    this.core.useWeb3Provider();
     const parsedProps = this.parseProps(props);
     const contract = await this.getContract();
     const txArguments = [parsedProps.to, parsedProps.amount] as const;

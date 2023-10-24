@@ -14,45 +14,45 @@ export type UnstethNFTstatus = ContractFunctionResult<
 
 export type UnstethNFT = { id: bigint } & UnstethNFTstatus;
 
-export type TransactionProps = {
+export type UnstethCommonTransactionProps = {
   account: Address;
   callback?: TransactionCallback;
 };
 
-export type ParsedProps<TProps extends TransactionProps> = Omit<
+export type ParsedProps<TProps extends UnstethCommonTransactionProps> = Omit<
   TProps,
   'callback'
 > &
-  Required<TransactionProps>;
+  Required<UnstethCommonTransactionProps>;
 
-export type NoCallback<TProps extends TransactionProps> = Omit<
+export type NoCallback<TProps extends UnstethCommonTransactionProps> = Omit<
   TProps,
   'callback'
 >;
 
-export type TransferProps = {
+export type UnstethTransferProps = {
   to: Address;
   id: bigint;
   from?: Address;
   data?: Hash;
-} & TransactionProps;
+} & UnstethCommonTransactionProps;
 
-export type ApproveProps = {
+export type UnstethApproveProps = {
   to?: Address;
   id: bigint;
-} & TransactionProps;
+} & UnstethCommonTransactionProps;
 
-export type ApproveAllProps = {
+export type UnstethApproveAllProps = {
   to: Address;
   allow: boolean;
-} & TransactionProps;
+} & UnstethCommonTransactionProps;
 
-export type ApprovedForProps = {
+export type UnstethApprovedForProps = {
   account: Address;
   id: bigint;
 };
 
-export type IsApprovedForAllProps = {
+export type UnstethIsApprovedForAllProps = {
   account: Address;
   to: Address;
 };

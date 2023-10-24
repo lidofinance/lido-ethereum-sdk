@@ -5,7 +5,6 @@ import { Action } from 'components/action';
 import { RequestsWrapper } from 'components/requestsWrapper';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
-import { parseEther } from '@ethersproject/units';
 import { transactionToast } from 'utils/transaction-toast';
 
 export const WithdrawalsClaimDemo = () => {

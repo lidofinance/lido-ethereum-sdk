@@ -25,9 +25,9 @@ export const WithdrawalsRequestDemo = () => {
         onChange={setRequestValue}
       />
       <Action
-        title="Request stETH"
+        title="Request stETH (permit)"
         action={() =>
-          withdraw.request.requestByToken({
+          withdraw.request.requestWithPermit({
             account,
             requests: [requestValue ?? ZERO],
             token: 'stETH',
@@ -36,53 +36,13 @@ export const WithdrawalsRequestDemo = () => {
         }
       />
       <Action
-        title="Request wstETH"
+        title="Request wstETH (permit)"
         action={() =>
-          withdraw.request.requestByToken({
+          withdraw.request.requestWithPermit({
             account,
             requests: [requestValue ?? ZERO],
             token: 'wstETH',
             callback: transactionToast,
-          })
-        }
-      />
-      <Action
-        title="Request stETH Without Permit"
-        action={() =>
-          withdraw.request.requestWithoutPermit({
-            account,
-            requests: [requestValue ?? ZERO],
-            token: 'stETH',
-            callback: transactionToast,
-          })
-        }
-      />
-      <Action
-        title="Request wstETH Without Permit"
-        action={() =>
-          withdraw.request.requestWithoutPermit({
-            account,
-            requests: [requestValue ?? ZERO],
-            token: 'wstETH',
-            callback: transactionToast,
-          })
-        }
-      />
-      <Action
-        title="Approve stETH"
-        action={() =>
-          withdraw.approval.approveSteth({
-            account,
-            amount: requestValue ?? ZERO,
-          })
-        }
-      />
-      <Action
-        title="Approve wstETH"
-        action={() =>
-          withdraw.approval.approveWsteth({
-            account,
-            amount: requestValue ?? ZERO,
           })
         }
       />
@@ -90,26 +50,78 @@ export const WithdrawalsRequestDemo = () => {
         title="Get allowance stETH"
         renderResult={renderTokenResult('stETH')}
         action={() =>
-          withdraw.approval.getAllowanceByToken({ account, token: 'stETH' })
+          withdraw.approval.getAllowance({ account, token: 'stETH' })
         }
-      />
-      <Action
-        title="Get allowance wsStETH"
-        action={() =>
-          withdraw.approval.getAllowanceByToken({ account, token: 'wstETH' })
-        }
-        renderResult={renderTokenResult('wstETH')}
       />
       <Action
         title="Check stETH allowance by amount"
         action={() =>
-          withdraw.approval.checkAllowanceSteth(requestValue ?? ZERO, account)
+          withdraw.approval.checkAllowance({
+            amount: requestValue ?? ZERO,
+            account,
+            token: 'stETH',
+          })
+        }
+      />
+      <Action
+        title="Approve stETH"
+        action={() =>
+          withdraw.approval.approve({
+            account,
+            token: 'stETH',
+            amount: requestValue ?? ZERO,
+          })
+        }
+      />
+      <Action
+        title="Request stETH"
+        action={() =>
+          withdraw.request.request({
+            account,
+            requests: [requestValue ?? ZERO],
+            token: 'stETH',
+            callback: transactionToast,
+          })
         }
       />
       <Action
         title="Check wstETH allowance by amount"
         action={() =>
-          withdraw.approval.checkAllowanceWsteth(requestValue ?? ZERO, account)
+          withdraw.approval.checkAllowance({
+            account,
+            amount: requestValue ?? ZERO,
+            token: 'stETH',
+          })
+        }
+      />
+      <Action
+        title="Get allowance wsStETH"
+        action={() =>
+          withdraw.approval.getAllowance({ account, token: 'wstETH' })
+        }
+        renderResult={renderTokenResult('wstETH')}
+      />
+
+      <Action
+        title="Approve wstETH"
+        action={() =>
+          withdraw.approval.approve({
+            account,
+            token: 'wstETH',
+            amount: requestValue ?? ZERO,
+            callback: transactionToast,
+          })
+        }
+      />
+      <Action
+        title="Request wstETH Without Permit"
+        action={() =>
+          withdraw.request.request({
+            account,
+            requests: [requestValue ?? ZERO],
+            token: 'wstETH',
+            callback: transactionToast,
+          })
         }
       />
     </Accordion>

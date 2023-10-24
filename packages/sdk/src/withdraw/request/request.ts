@@ -1,331 +1,132 @@
-import { type Address, Hash } from 'viem';
 import invariant from 'tiny-invariant';
 
-import { Logger, Cache, ErrorHandler } from '../../common/decorators/index.js';
-import { LIDO_TOKENS, NOOP } from '../../common/constants.js';
-import { type LidoSDKCoreProps } from '../../core/index.js';
+import { Logger, ErrorHandler } from '../../common/decorators/index.js';
+import { NOOP } from '../../common/constants.js';
 import {
-  type PermitSignature,
   TransactionCallbackStage,
-  TransactionCallback,
+  type PerformTransactionGasLimit,
+  type PerformTransactionSendTransaction,
+  type TransactionResult,
 } from '../../core/types.js';
-import { version } from '../../version.js';
 
-import { Bus } from '../bus.js';
+import { BusModule } from '../bus-module.js';
 
-import { type RequestWithPermitProps, type RequestProps } from './types.js';
+import type {
+  RequestWithPermitProps,
+  RequestProps,
+  SignedPermit,
+} from './types.js';
 
-export class LidoSDKWithdrawRequest {
-  private readonly bus: Bus;
-
-  constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
-    if (props.bus) this.bus = props.bus;
-    else this.bus = new Bus(props, version);
-  }
-
+export class LidoSDKWithdrawRequest extends BusModule {
   // Calls
-
-  @Logger('Call:')
-  public async requestByToken(props: RequestWithPermitProps) {
-    const { account } = props;
-    invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
-    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
-
-    const isContract = await this.bus.core.isContract(account);
-
-    if (isContract) return this.requestMultisigByToken(props);
-    else return this.requestWithPermitByToken(props);
-  }
-
-  @Logger('Call:')
-  public async requestWithoutPermit(props: RequestProps) {
-    const { account } = props;
-    invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
-    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
-
-    const isContract = await this.bus.core.isContract(account);
-
-    if (isContract) return this.requestMultisigByToken(props);
-    else return this.requestWithoutPermitByToken(props);
-  }
-
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async requestStethWithPermit(
-    props: Omit<RequestWithPermitProps, 'token'>,
-  ) {
-    this.requestWithPermitByToken({ ...props, token: LIDO_TOKENS.steth });
-  }
-
-  @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async requestWstethWithPermit(
-    props: Omit<RequestWithPermitProps, 'token'>,
-  ) {
-    this.requestWithPermitByToken({ ...props, token: LIDO_TOKENS.steth });
-  }
-
-  @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async requestStethWithoutPermit(props: Omit<RequestProps, 'token'>) {
-    this.requestWithoutPermitByToken({ ...props, token: LIDO_TOKENS.steth });
-  }
-
-  @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async requestWstethWithoutPermit(props: Omit<RequestProps, 'token'>) {
-    this.requestWithoutPermitByToken({ ...props, token: LIDO_TOKENS.steth });
-  }
-
-  @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async requestStethMultisig(props: Omit<RequestProps, 'token'>) {
-    return this.requestMultisigByToken({ ...props, token: LIDO_TOKENS.steth });
-  }
-
-  @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async requestWstethMultisig(props: Omit<RequestProps, 'token'>) {
-    return this.requestMultisigByToken({ ...props, token: LIDO_TOKENS.wsteth });
-  }
-
-  @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async requestWithoutPermitByToken(props: RequestProps) {
-    const { account, requests, callback = NOOP, token } = props;
-    invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
-    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
-
+  public async request(props: RequestProps): Promise<TransactionResult> {
+    const {
+      account,
+      requests,
+      token,
+      receiver = account,
+      callback = NOOP,
+    } = props;
+    const isSteth = token === 'stETH';
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
-    const isSteth = token === 'stETH';
-    let tokenRequestMethod;
+    const getGasLimit: PerformTransactionGasLimit = (options) =>
+      isSteth
+        ? contract.estimateGas.requestWithdrawals([requests, receiver], options)
+        : contract.estimateGas.requestWithdrawalsWstETH(
+            [requests, receiver],
+            options,
+          );
+    const sendTransaction: PerformTransactionSendTransaction = (options) =>
+      isSteth
+        ? contract.write.requestWithdrawals([requests, receiver], options)
+        : contract.write.requestWithdrawalsWstETH(
+            [requests, receiver],
+            options,
+          );
 
-    if (isSteth) {
-      tokenRequestMethod = contract.write.requestWithdrawals;
+    return this.bus.core.performTransaction(
+      {
+        account,
+        callback,
+      },
+      getGasLimit,
+      sendTransaction,
+    );
+  }
+
+  @Logger('Call:')
+  @ErrorHandler('Error:')
+  public async requestWithPermit(
+    props: RequestWithPermitProps,
+  ): Promise<TransactionResult> {
+    const {
+      account,
+      requests,
+      token,
+      receiver = account,
+      callback = NOOP,
+      permit: permitProp,
+    } = props;
+    const isSteth = token === 'stETH';
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
+
+    let permit: SignedPermit;
+    if (permitProp) {
+      permit = permitProp;
     } else {
-      tokenRequestMethod = contract.write.requestWithdrawalsWstETH;
+      callback({ stage: TransactionCallbackStage.PERMIT });
+      const isContract = await this.bus.core.isContract(account);
+      invariant(!isContract, 'Cannot sign permit for contract');
+      const amount = requests.reduce((sum, request) => sum + request);
+      const signature = await this.bus.core.signPermit({
+        account,
+        spender: contract.address,
+        amount,
+        token,
+      });
+      permit = {
+        deadline: signature.deadline,
+        value: signature.value,
+        r: signature.r,
+        v: signature.v,
+        s: signature.s,
+      };
     }
 
-    const params = [requests, account] as const;
+    const getGasLimit: PerformTransactionGasLimit = (options) =>
+      isSteth
+        ? contract.estimateGas.requestWithdrawalsWithPermit(
+            [requests, receiver, permit],
+            options,
+          )
+        : contract.estimateGas.requestWithdrawalsWstETHWithPermit(
+            [requests, receiver, permit],
+            options,
+          );
+    const sendTransaction: PerformTransactionSendTransaction = (options) =>
+      isSteth
+        ? contract.write.requestWithdrawalsWithPermit(
+            [requests, receiver, permit],
+            options,
+          )
+        : contract.write.requestWithdrawalsWstETHWithPermit(
+            [requests, receiver, permit],
+            options,
+          );
 
-    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
-
-    const gasLimit = await this.requestGasLimitByToken(
-      account,
-      requests,
-      token,
-    );
-    const { maxFeePerGas, maxPriorityFeePerGas } =
-      await this.bus.core.getFeeData();
-    const overrides = {
-      account,
-      maxPriorityFeePerGas,
-      maxFeePerGas,
-    };
-
-    callback({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
-
-    const transaction = await tokenRequestMethod.call(this, params, {
-      ...overrides,
-      gas: gasLimit,
-      chain: this.bus.core.chain,
-    });
-
-    return this.waitTransactionLifecycle(transaction, callback);
-  }
-
-  @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async requestWithPermitByToken(props: RequestWithPermitProps) {
-    const { account, requests, callback = NOOP, token } = props;
-
-    invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
-    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
-
-    const contract = await this.bus.contract.getContractWithdrawalQueue();
-
-    const isSteth = token === LIDO_TOKENS.steth;
-    let tokenRequestMethod;
-
-    if (isSteth) {
-      tokenRequestMethod = contract.write.requestWithdrawalsWithPermit;
-    } else {
-      tokenRequestMethod = contract.write.requestWithdrawalsWstETHWithPermit;
-    }
-
-    callback({ stage: TransactionCallbackStage.PERMIT });
-
-    const amount = requests.reduce((sum, request) => sum + request);
-    const signature = await this.bus.core.signPermit({
-      account,
-      spender: contract.address,
-      amount,
-      token,
-    });
-
-    const params = [
-      requests,
-      signature.owner,
+    return this.bus.core.performTransaction(
       {
-        value: signature.value,
-        deadline: signature.deadline,
-        v: signature.v,
-        r: signature.r,
-        s: signature.s,
+        account,
+        callback,
       },
-    ] as const;
-
-    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
-
-    const gasLimit = await this.requestWithPermitGasLimitByToken(
-      account,
-      signature,
-      requests,
-      token,
+      getGasLimit,
+      sendTransaction,
     );
-    const feeData = await this.bus.core.getFeeData();
-    const overrides = {
-      account,
-      maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? undefined,
-      maxFeePerGas: feeData.maxFeePerGas ?? undefined,
-    };
-
-    callback({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
-
-    const transaction = await tokenRequestMethod.call(this, params, {
-      chain: this.bus.core.chain,
-      gas: gasLimit,
-      ...overrides,
-    });
-
-    return this.waitTransactionLifecycle(transaction, callback);
   }
 
-  @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async requestMultisigByToken(props: RequestProps) {
-    const { account, requests, callback = NOOP, token } = props;
-    invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
-    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
-
-    const contract = await this.bus.contract.getContractWithdrawalQueue();
-
-    const isSteth = token === 'stETH';
-    let tokenRequestMethod;
-
-    if (isSteth) tokenRequestMethod = contract.write.requestWithdrawals;
-    else tokenRequestMethod = contract.write.requestWithdrawalsWstETH;
-
-    callback({ stage: TransactionCallbackStage.SIGN });
-
-    const params = [requests, account] as const;
-    const transaction = await tokenRequestMethod.call(this, params, {
-      account,
-      chain: this.bus.core.chain,
-    });
-
-    callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
-
-    return { hash: transaction };
-  }
-
-  // Utils
-
-  @Logger('Utils:')
-  @Cache(30 * 1000, ['bus.core.chain.id'])
-  private async requestWithPermitGasLimitByToken(
-    account: Address,
-    signature: PermitSignature,
-    requests: readonly bigint[],
-    token: 'stETH' | 'wstETH',
-  ): Promise<bigint> {
-    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
-
-    const contract = await this.bus.contract.getContractWithdrawalQueue();
-
-    const isSteth = token === 'stETH';
-    let tokenRequestMethod;
-
-    if (isSteth)
-      tokenRequestMethod = contract.estimateGas.requestWithdrawalsWithPermit;
-    else
-      tokenRequestMethod =
-        contract.estimateGas.requestWithdrawalsWstETHWithPermit;
-
-    const params = [
-      requests,
-      signature.owner,
-      {
-        value: signature.value,
-        deadline: signature.deadline,
-        v: signature.v,
-        r: signature.r,
-        s: signature.s,
-      },
-    ] as const;
-
-    const gasLimit = await tokenRequestMethod.call(this, params, {
-      account,
-    });
-
-    return gasLimit;
-  }
-
-  @Logger('Utils:')
-  @Cache(30 * 1000, ['bus.core.chain.id'])
-  private async requestGasLimitByToken(
-    account: Address,
-    requests: readonly bigint[],
-    token: 'stETH' | 'wstETH',
-  ): Promise<bigint> {
-    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
-
-    const contract = await this.bus.contract.getContractWithdrawalQueue();
-
-    const isSteth = token === 'stETH';
-    let tokenRequestMethod;
-    if (isSteth) tokenRequestMethod = contract.estimateGas.requestWithdrawals;
-    else tokenRequestMethod = contract.estimateGas.requestWithdrawalsWstETH;
-
-    const params = [requests, account] as const;
-    const gasLimit = await tokenRequestMethod.call(this, params, {
-      account,
-    });
-
-    return gasLimit;
-  }
-
-  @Logger('Utils:')
-  private async waitTransactionLifecycle(
-    transaction: Hash,
-    callback: TransactionCallback = NOOP,
-  ) {
-    callback({
-      stage: TransactionCallbackStage.RECEIPT,
-      payload: transaction,
-    });
-
-    const transactionReceipt =
-      await this.bus.core.rpcProvider.waitForTransactionReceipt({
-        hash: transaction,
-      });
-
-    callback({
-      stage: TransactionCallbackStage.CONFIRMATION,
-      payload: transactionReceipt,
-    });
-
-    const confirmations =
-      await this.bus.core.rpcProvider.getTransactionConfirmations({
-        hash: transactionReceipt.transactionHash,
-      });
-
-    callback({
-      stage: TransactionCallbackStage.DONE,
-      payload: confirmations,
-    });
-
-    return { hash: transaction, receipt: transactionReceipt, confirmations };
-  }
+  // TODO
+  // simulate && populate methods
 }

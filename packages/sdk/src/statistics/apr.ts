@@ -12,12 +12,12 @@ export class LidoSDKApr {
   readonly events: LidoSDKEvents;
 
   constructor(props: LidoSDKStatisticsProps) {
-    const { core, ...rest } = props;
+    const { core } = props;
 
     if (core) this.core = core;
-    else this.core = new LidoSDKCore(rest, version);
+    else this.core = new LidoSDKCore(props, version);
 
-    this.events = new LidoSDKEvents({ ...rest, core: this.core });
+    this.events = new LidoSDKEvents({ ...props, core: this.core });
   }
 
   @Logger('Statistic:')

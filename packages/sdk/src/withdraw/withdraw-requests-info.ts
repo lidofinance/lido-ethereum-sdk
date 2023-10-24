@@ -2,20 +2,11 @@ import { type Address } from 'viem';
 
 import { Logger, ErrorHandler } from '../common/decorators/index.js';
 import { isBigint } from '../common/utils/index.js';
-import { version } from '../version.js';
-import { type LidoSDKCoreProps } from '../core/index.js';
 
-import { Bus } from './bus.js';
+import { BusModule } from './bus-module.js';
 import { type RequestStatusWithId } from './types.js';
 
-export class LidoSDKWithdrawRequestsInfo {
-  private readonly bus: Bus;
-
-  constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
-    if (props.bus) this.bus = props.bus;
-    else this.bus = new Bus(props, version);
-  }
-
+export class LidoSDKWithdrawRequestsInfo extends BusModule {
   // Utils
 
   @Logger('Utils:')

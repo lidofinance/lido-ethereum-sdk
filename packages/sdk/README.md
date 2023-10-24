@@ -265,6 +265,7 @@ Callback stages:
 ```ts
 import {
   LidoSDK,
+  LidoSDKСore,
   StakeStageCallback,
   TransactionCallbackStage,
   SDKError,
@@ -276,7 +277,7 @@ const lidoSDK = new LidoSDK({
 });
 
 // Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
-lidoSDK.core.defineWeb3Provider();
+lidoSDK.core.setWeb3Provider(LidoSDKСore.createWeb3Provider(window.ethereum));
 
 const callback: StakeStageCallback = ({ stage, payload }) => {
   switch (stage) {
