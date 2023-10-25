@@ -21,7 +21,9 @@ export class LidoSDKWithdrawRequest extends BusModule {
   // Calls
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async request(props: RequestProps): Promise<TransactionResult> {
+  public async requestApproved(
+    props: RequestProps,
+  ): Promise<TransactionResult> {
     const {
       account,
       requests,

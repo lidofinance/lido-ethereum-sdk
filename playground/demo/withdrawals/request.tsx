@@ -76,7 +76,7 @@ export const WithdrawalsRequestDemo = () => {
       <Action
         title="Request stETH"
         action={() =>
-          withdraw.request.request({
+          withdraw.request.requestApproved({
             account,
             requests: [requestValue ?? ZERO],
             token: 'stETH',
@@ -116,7 +116,7 @@ export const WithdrawalsRequestDemo = () => {
       <Action
         title="Request wstETH Without Permit"
         action={() =>
-          withdraw.request.request({
+          withdraw.request.requestApproved({
             account,
             requests: [requestValue ?? ZERO],
             token: 'wstETH',
