@@ -73,14 +73,15 @@ export class LidoSDKStake {
     await this.validateStakeLimit(value);
 
     const contract = await this.getContractStETH();
-    return this.core.performTransaction(
-      { callback, account },
-      async (options) =>
+    return this.core.performTransaction({
+      callback,
+      account,
+      getGasLimit: async (options) =>
         (await this.submitGasLimit(options.account, value, referralAddress))
           .gasLimit,
-      (options) =>
+      sendTransaction: (options) =>
         contract.write.submit([referralAddress], { ...options, value }),
-    );
+    });
   }
 
   @Logger('Call:')

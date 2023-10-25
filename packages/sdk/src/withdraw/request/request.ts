@@ -49,14 +49,12 @@ export class LidoSDKWithdrawRequest extends BusModule {
             options,
           );
 
-    return this.bus.core.performTransaction(
-      {
-        account,
-        callback,
-      },
+    return this.bus.core.performTransaction({
+      account,
+      callback,
       getGasLimit,
       sendTransaction,
-    );
+    });
   }
 
   @Logger('Call:')
@@ -119,14 +117,12 @@ export class LidoSDKWithdrawRequest extends BusModule {
             options,
           );
 
-    return this.bus.core.performTransaction(
-      {
-        account,
-        callback,
-      },
+    return this.bus.core.performTransaction({
+      account,
+      callback,
       getGasLimit,
       sendTransaction,
-    );
+    });
   }
 
   // TODO

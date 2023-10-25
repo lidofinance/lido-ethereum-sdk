@@ -49,8 +49,6 @@ import {
   type SignPermitProps,
   type LOG_MODE,
   type PerformTransactionOptions,
-  type PerformTransactionSendTransaction,
-  type PerformTransactionGasLimit,
   type TransactionOptions,
   type TransactionResult,
   TransactionCallbackStage,
@@ -357,11 +355,9 @@ export default class LidoSDKCore {
 
   public async performTransaction(
     props: PerformTransactionOptions,
-    getGasLimit: PerformTransactionGasLimit,
-    sendTransaction: PerformTransactionSendTransaction,
   ): Promise<TransactionResult> {
     this.useWeb3Provider();
-    const { account, callback } = props;
+    const { account, callback, getGasLimit, sendTransaction } = props;
     const isContract = await this.isContract(account);
 
     const overrides: TransactionOptions = {

@@ -78,17 +78,21 @@ export abstract class AbstractLidoSDKErc20 {
     const isTransferFrom = from !== account;
     const contract = await this.getContract();
 
-    const estimateGas = async (overrides: TransactionOptions) =>
+    const getGasLimit = async (overrides: TransactionOptions) =>
       isTransferFrom
         ? contract.estimateGas.transferFrom([from, to, amount], overrides)
         : contract.estimateGas.transfer([to, amount], overrides);
 
-    const sendTx = async (overrides: TransactionOptions) =>
+    const sendTransaction = async (overrides: TransactionOptions) =>
       isTransferFrom
         ? contract.write.transferFrom([from, to, amount], overrides)
         : contract.write.transfer([to, amount], overrides);
 
-    return this.core.performTransaction(parsedProps, estimateGas, sendTx);
+    return this.core.performTransaction({
+      ...parsedProps,
+      getGasLimit,
+      sendTransaction,
+    });
   }
 
   @Logger('Utils:')
@@ -199,15 +203,13 @@ export abstract class AbstractLidoSDKErc20 {
     const parsedProps = this.parseProps(props);
     const contract = await this.getContract();
     const txArguments = [parsedProps.to, parsedProps.amount] as const;
-    return this.core.performTransaction(
-      parsedProps,
-      async (overrides) => {
-        return contract.estimateGas.approve(txArguments, overrides);
-      },
-      (overrides) => {
-        return contract.write.approve(txArguments, overrides);
-      },
-    );
+    return this.core.performTransaction({
+      ...parsedProps,
+      getGasLimit: (options) =>
+        contract.estimateGas.approve(txArguments, options),
+      sendTransaction: (options) =>
+        contract.write.approve(txArguments, options),
+    });
   }
 
   @Logger('Utils:')

@@ -33,21 +33,19 @@ export class LidoSDKWithdrawApprove {
       ? await this.bus.contract.getContractStETH()
       : await this.bus.contract.getContractWstETH();
 
-    return this.bus.core.performTransaction(
-      {
-        account,
-        callback,
-      },
-      (options) =>
+    return this.bus.core.performTransaction({
+      account,
+      callback,
+      getGasLimit: (options) =>
         contract.estimateGas.approve(
           [addressWithdrawalsQueue, amount],
           options,
         ),
-      (options) =>
+      sendTransaction: (options) =>
         // weird ts error
         //@ts-expect-error
         contract.write.approve([addressWithdrawalsQueue, amount], options),
-    );
+    });
   }
 
   // Utils

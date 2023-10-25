@@ -19,14 +19,14 @@ export class LidoSDKWithdrawClaim extends BusModule {
       (await this.bus.views.findCheckpointHints({ sortedIds: requestsIds }));
     const params = [requestsIds, hints] as const;
     const contract = await this.bus.contract.getContractWithdrawalQueue();
-    return this.bus.core.performTransaction(
-      {
-        account,
-        callback,
-      },
-      (options) => contract.estimateGas.claimWithdrawals(params, options),
-      (options) => contract.write.claimWithdrawals(params, options),
-    );
+    return this.bus.core.performTransaction({
+      account,
+      callback,
+      getGasLimit: (options) =>
+        contract.estimateGas.claimWithdrawals(params, options),
+      sendTransaction: (options) =>
+        contract.write.claimWithdrawals(params, options),
+    });
   }
 
   // TODO Populate/Simulate

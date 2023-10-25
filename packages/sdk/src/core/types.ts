@@ -51,11 +51,6 @@ export enum TransactionCallbackStage {
   'ERROR' = 'error',
 }
 
-export type PerformTransactionOptions = {
-  callback: TransactionCallback;
-  account: Address;
-};
-
 export type PerformTransactionGasLimit = (
   overrides: TransactionOptions,
 ) => Promise<bigint>;
@@ -63,6 +58,13 @@ export type PerformTransactionGasLimit = (
 export type PerformTransactionSendTransaction = (
   override: TransactionOptions,
 ) => Promise<Hash>;
+
+export type PerformTransactionOptions = {
+  callback: TransactionCallback;
+  account: Address;
+  getGasLimit: PerformTransactionGasLimit;
+  sendTransaction: PerformTransactionSendTransaction;
+};
 
 export type TransactionOptions = {
   account: Address;

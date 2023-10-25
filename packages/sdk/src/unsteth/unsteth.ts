@@ -95,11 +95,14 @@ export class LidoSDKUnstETH {
     ) as SafeTransferFromArguments;
 
     const contract = await this.getContract();
-    return this.core.performTransaction(
-      { callback, account },
-      (options) => contract.estimateGas.safeTransferFrom(args, options),
-      (options) => contract.write.safeTransferFrom(args, options),
-    );
+    return this.core.performTransaction({
+      callback,
+      account,
+      getGasLimit: (options) =>
+        contract.estimateGas.safeTransferFrom(args, options),
+      sendTransaction: (options) =>
+        contract.write.safeTransferFrom(args, options),
+    });
   }
 
   // Approve
@@ -110,11 +113,12 @@ export class LidoSDKUnstETH {
     const { account, callback, to = zeroAddress, id } = this.parseProps(props);
     const args = [to, id] as const;
     const contract = await this.getContract();
-    return this.core.performTransaction(
-      { callback, account },
-      (options) => contract.estimateGas.approve(args, options),
-      (options) => contract.write.approve(args, options),
-    );
+    return this.core.performTransaction({
+      callback,
+      account,
+      getGasLimit: (options) => contract.estimateGas.approve(args, options),
+      sendTransaction: (options) => contract.write.approve(args, options),
+    });
   }
 
   @Logger('Views:')
@@ -130,11 +134,14 @@ export class LidoSDKUnstETH {
     const { account, callback, to, allow } = this.parseProps(props);
     const args = [to, allow] as const;
     const contract = await this.getContract();
-    return this.core.performTransaction(
-      { callback, account },
-      (options) => contract.estimateGas.setApprovalForAll(args, options),
-      (options) => contract.write.setApprovalForAll(args, options),
-    );
+    return this.core.performTransaction({
+      callback,
+      account,
+      getGasLimit: (options) =>
+        contract.estimateGas.setApprovalForAll(args, options),
+      sendTransaction: (options) =>
+        contract.write.setApprovalForAll(args, options),
+    });
   }
 
   @Logger('Views:')

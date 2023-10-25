@@ -91,24 +91,22 @@ export class LidoSDKWrap {
 
     await this.validateStakeLimit(value);
 
-    return this.core.performTransaction(
-      {
-        account,
-        callback,
-      },
-      (options) =>
+    return this.core.performTransaction({
+      account,
+      callback,
+      getGasLimit: (options) =>
         this.core.rpcProvider.estimateGas({
           to: contract.address,
           value,
           ...options,
         }),
-      (options) =>
+      sendTransaction: (options) =>
         web3Provider.sendTransaction({
           value,
           to: contract.address,
           ...options,
         }),
-    );
+    });
   }
 
   @Logger('Utils:')
@@ -150,14 +148,12 @@ export class LidoSDKWrap {
     const { account, callback, value } = this.parseProps(props);
     const contract = await this.getContractWstETH();
 
-    return this.core.performTransaction(
-      {
-        account,
-        callback,
-      },
-      (options) => contract.estimateGas.wrap([value], options),
-      (options) => contract.write.wrap([value], options),
-    );
+    return this.core.performTransaction({
+      account,
+      callback,
+      getGasLimit: (options) => contract.estimateGas.wrap([value], options),
+      sendTransaction: (options) => contract.write.wrap([value], options),
+    });
   }
 
   @Logger('Utils:')
@@ -210,19 +206,17 @@ export class LidoSDKWrap {
     const stethContract = await this.getPartialContractSteth();
     const wstethContractAddress = await this.contractAddressWstETH();
 
-    return this.core.performTransaction(
-      {
-        account,
-        callback,
-      },
-      (options) =>
+    return this.core.performTransaction({
+      account,
+      callback,
+      getGasLimit: (options) =>
         stethContract.estimateGas.approve(
           [wstethContractAddress, value],
           options,
         ),
-      (options) =>
+      sendTransaction: (options) =>
         stethContract.write.approve([wstethContractAddress, value], options),
-    );
+    });
   }
 
   @Logger('Utils:')
@@ -283,14 +277,12 @@ export class LidoSDKWrap {
     const { account, callback, value } = this.parseProps(props);
     const contract = await this.getContractWstETH();
 
-    return this.core.performTransaction(
-      {
-        account,
-        callback,
-      },
-      (options) => contract.estimateGas.unwrap([value], options),
-      (options) => contract.write.unwrap([value], options),
-    );
+    return this.core.performTransaction({
+      account,
+      callback,
+      getGasLimit: (options) => contract.estimateGas.unwrap([value], options),
+      sendTransaction: (options) => contract.write.unwrap([value], options),
+    });
   }
 
   @Logger('Utils:')
