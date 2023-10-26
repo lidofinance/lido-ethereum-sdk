@@ -112,15 +112,17 @@ export default class LidoSDKCore {
     const { chainId, rpcUrls, web3Provider, rpcProvider } = props;
 
     if (!SUPPORTED_CHAINS.includes(chainId)) {
-      throw new Error(`Unsupported chain: ${chainId}`);
+      this.error({
+        message: `Unsupported chain: ${chainId}`,
+        code: 'INVALID_ARGUMENT',
+      });
     }
 
     if (!rpcProvider && rpcUrls.length === 0) {
-      throw new Error('rpcUrls is required');
-    }
-
-    if (!rpcUrls && !rpcProvider) {
-      throw new Error('rpcUrls or rpcProvider is required');
+      this.error({
+        message: `Either rpcProvider or rpcUrls are required`,
+        code: 'INVALID_ARGUMENT',
+      });
     }
 
     const chain = VIEM_CHAINS[chainId];

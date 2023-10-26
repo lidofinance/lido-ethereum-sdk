@@ -64,7 +64,7 @@ export class LidoSDKStake {
   // Calls
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async stakeEth(props: StakeProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
     const { callback, account, referralAddress, value } =
@@ -85,7 +85,7 @@ export class LidoSDKStake {
   }
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async stakeEthSimulateTx(
     props: StakeProps,
   ): Promise<WriteContractParameters> {
@@ -107,7 +107,7 @@ export class LidoSDKStake {
   // Views
 
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getStakeLimitInfo() {
     const contract = await this.getContractStETH();
 

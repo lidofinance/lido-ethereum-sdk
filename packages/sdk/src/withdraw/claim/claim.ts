@@ -9,7 +9,7 @@ import { NOOP } from '../../common/constants.js';
 export class LidoSDKWithdrawClaim extends BusModule {
   // Calls
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async claimRequests(
     props: ClaimRequestsProps,
   ): Promise<TransactionResult> {

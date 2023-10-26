@@ -17,7 +17,7 @@ export class LidoSDKWithdrawApprove {
   }
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async approve(
     props: WithdrawApproveProps,
   ): Promise<TransactionResult> {
@@ -83,7 +83,7 @@ export class LidoSDKWithdrawApprove {
 
   // TODO props&return typings
   @Logger('Utils:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getAllowance({
     account,
     token,
@@ -115,7 +115,7 @@ export class LidoSDKWithdrawApprove {
 
   // TODO props&return typings
   @Logger('Utils:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async checkAllowance({
     amount: _amount,
     account,
