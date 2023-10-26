@@ -16,18 +16,14 @@ import {
   stringify,
   maxUint256,
 } from 'viem';
-import invariant from 'tiny-invariant';
+import {
+  invariant,
+  invariantArgument,
+  withSdkError,
+} from '../common/utils/sdk-error.js';
 import { splitSignature } from '@ethersproject/bytes';
 
-import {
-  type FeeData,
-  type SDKErrorProps,
-  type ErrorMessage,
-  getFeeData,
-  checkIsContract,
-  SDKError,
-  getErrorMessage,
-} from '../common/utils/index.js';
+import { type SDKErrorProps, SDKError } from '../common/utils/index.js';
 import { Logger, Initialize, Cache } from '../common/decorators/index.js';
 import {
   SUPPORTED_CHAINS,
@@ -52,6 +48,7 @@ import {
   type TransactionOptions,
   type TransactionResult,
   TransactionCallbackStage,
+  GetFeeDataResult,
 } from './types.js';
 import { permitAbi } from './abi/permit.js';
 
@@ -142,13 +139,20 @@ export default class LidoSDKCore {
 
   @Logger('Provider:')
   public setWeb3Provider(web3Provider: WalletClient): void {
-    invariant(web3Provider.chain === this.chain, 'Wrong chain');
+    invariantArgument(
+      web3Provider.chain === this.chain,
+      `Chain in Web3Provider(${web3Provider.chain?.id}) does not match current chain(${this.chain})`,
+    );
     this._web3Provider = web3Provider;
   }
 
   @Logger('Provider:')
   public useWeb3Provider(): WalletClient {
-    invariant(this._web3Provider, 'Web3 Provider is not defined');
+    invariant(
+      this._web3Provider,
+      'Web3 Provider is not defined',
+      'PROVIDER_ERROR',
+    );
     return this._web3Provider;
   }
 
@@ -156,8 +160,6 @@ export default class LidoSDKCore {
 
   @Logger('Balances:')
   public async balanceETH(address: Address): Promise<bigint> {
-    invariant(this.rpcProvider, 'RPC provider is not defined');
-
     return this.rpcProvider.getBalance({ address });
   }
 
@@ -166,8 +168,6 @@ export default class LidoSDKCore {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['chain.id'])
   public contractAddressLidoLocator(): Address {
-    invariant(this.chain, 'Chain is not defined');
-
     return LIDO_LOCATOR_BY_CHAIN[this.chain.id as CHAINS];
   }
 
@@ -282,9 +282,36 @@ export default class LidoSDKCore {
   }
 
   @Logger('Utils:')
-  public async getFeeData(): Promise<FeeData> {
-    invariant(this.rpcProvider, 'RPC provider is not defined');
-    return getFeeData(this.rpcProvider);
+  public async getFeeData(): Promise<GetFeeDataResult> {
+    // we look back 5 blocks at fees of botton 25% txs
+    // if you want to increase maxPriorityFee output increase percentile
+    const feeHistory = await this.rpcProvider.getFeeHistory({
+      blockCount: 5,
+      blockTag: 'pending',
+      rewardPercentiles: [25],
+    });
+
+    // get average priority fee
+    const maxPriorityFeePerGas =
+      feeHistory.reward && feeHistory.reward.length > 0
+        ? feeHistory.reward
+            .map((fees) => (fees[0] ? BigInt(fees[0]) : 0n))
+            .reduce((sum, fee) => sum + fee) / BigInt(feeHistory.reward.length)
+        : 0n;
+
+    const lastBaseFeePerGas = feeHistory.baseFeePerGas[0]
+      ? BigInt(feeHistory.baseFeePerGas[0])
+      : 0n;
+
+    // we have to multiply by 2 until we find a reliable way to predict baseFee change
+    const maxFeePerGas = lastBaseFeePerGas * 2n + maxPriorityFeePerGas;
+
+    return {
+      lastBaseFeePerGas,
+      maxPriorityFeePerGas,
+      maxFeePerGas,
+      gasPrice: maxFeePerGas, // fallback
+    };
   }
 
   @Logger('Utils:')
@@ -294,17 +321,22 @@ export default class LidoSDKCore {
     if (web3Provider.account) return web3Provider.account.address;
 
     const [account] = await web3Provider.requestAddresses();
-    invariant(account, 'web3provider must have at least 1 account');
+    invariant(
+      account,
+      'web3provider must have at least 1 account',
+      'PROVIDER_ERROR',
+    );
     return account;
   }
 
   @Logger('Utils:')
   @Cache(60 * 60 * 1000, ['chain.id'])
   public async isContract(address: Address): Promise<boolean> {
-    invariant(this.rpcProvider, 'RPC provider is not defined');
-    const { isContract } = await checkIsContract(this.rpcProvider, address);
-
-    return isContract;
+    // eth_getCode returns hex string of bytecode at address
+    // for accounts it's "0x"
+    // for contract it's potentially very long hex (can't be safely&quickly parsed)
+    const result = await this.rpcProvider.getBytecode({ address: address });
+    return result ? result !== '0x' : false;
   }
 
   @Logger('Utils:')
@@ -313,34 +345,18 @@ export default class LidoSDKCore {
   }
 
   @Logger('Utils:')
-  public getErrorMessage(error: unknown): {
-    message: ErrorMessage;
-    code: string | number;
-  } {
-    return getErrorMessage(error);
-  }
-
-  @Logger('Utils:')
   @Cache(30 * 60 * 1000, ['chain.id'])
   public async getContractAddress(
     contract: LIDO_CONTRACT_NAMES,
   ): Promise<Address> {
-    invariant(this.rpcProvider, 'RPC provider is not defined');
     const lidoLocator = this.getContractLidoLocator();
-
-    invariant(lidoLocator, 'Lido locator is not defined');
-
     if (contract === 'wsteth') {
       const withdrawalQueue = await lidoLocator.read.withdrawalQueue();
       const contract = await this.getContractWQ(withdrawalQueue);
-      const wstethAddress = await contract.read.WSTETH?.();
+      const wstethAddress = await contract.read.WSTETH();
 
-      invariant(wstethAddress, 'wstETH address is not defined');
-
-      return wstethAddress as Address;
+      return wstethAddress;
     } else {
-      invariant(lidoLocator.read[contract], 'Lido locator read is not defined');
-
       return lidoLocator.read[contract]();
     }
   }
@@ -349,7 +365,11 @@ export default class LidoSDKCore {
   @Cache(30 * 60 * 1000, ['chain.id'])
   public getSubgraphId(): string {
     const id = SUBRGRAPH_ID_BY_CHAIN[this.chainId];
-    invariant(id, `Subgraph is not supported for chain ${this.chainId}`);
+    invariant(
+      id,
+      `Subgraph is not supported for chain ${this.chainId}`,
+      'NOT_SUPPORTED',
+    );
     return id;
   }
 
@@ -370,14 +390,34 @@ export default class LidoSDKCore {
 
     if (!isContract) {
       callback({ stage: TransactionCallbackStage.GAS_LIMIT });
-      overrides.gas = await getGasLimit(overrides);
       const feeData = await this.getFeeData();
       overrides.maxFeePerGas = feeData.maxFeePerGas;
       overrides.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
+      try {
+        overrides.gas = await getGasLimit(overrides);
+      } catch {
+        // we retry without fees to see if tx will go trough
+        await withSdkError(
+          getGasLimit({
+            ...overrides,
+            maxFeePerGas: undefined,
+            maxPriorityFeePerGas: undefined,
+          }),
+          'TRANSACTION_ERROR',
+        );
+        throw new SDKError({
+          code: 'TRANSACTION_ERROR',
+          message: 'Not enough ether for gas',
+        });
+      }
     }
 
     callback({ stage: TransactionCallbackStage.SIGN, payload: overrides.gas });
-    const transactionHash = await sendTransaction(overrides);
+
+    const transactionHash = await withSdkError(
+      sendTransaction(overrides),
+      'TRANSACTION_ERROR',
+    );
 
     if (isContract) {
       callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
@@ -389,10 +429,11 @@ export default class LidoSDKCore {
       payload: transactionHash,
     });
 
-    const transactionReceipt = await this.rpcProvider.waitForTransactionReceipt(
-      {
+    const transactionReceipt = await withSdkError(
+      this.rpcProvider.waitForTransactionReceipt({
         hash: transactionHash,
-      },
+      }),
+      'TRANSACTION_ERROR',
     );
 
     callback({

@@ -352,6 +352,7 @@ export class LidoSDKWrap {
 
     if (value > currentStakeLimit) {
       throw this.core.error({
+        code: 'TRANSACTION_ERROR',
         message: `Stake value is greater than daily protocol staking limit (${currentStakeLimit})`,
       });
     }

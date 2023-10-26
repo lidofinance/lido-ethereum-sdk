@@ -1,2 +1,2 @@
 export * from './constants.js';
-export * from './utils/SDKError.js';
+export * from './utils/sdk-error.js';

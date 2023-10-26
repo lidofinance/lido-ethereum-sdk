@@ -51,30 +51,3 @@ export const isCore = function (
 ): value is { core?: LidoSDKCore } {
   return !!value && typeof value === 'object' && 'core' in value;
 };
-
-export const extractError = function <This>(this: This, error: unknown) {
-  let txError = error;
-
-  if (isBus(this)) {
-    const { message, code } = (this.bus.core as LidoSDKCore)?.getErrorMessage?.(
-      error,
-    );
-
-    txError = (this.bus?.core as LidoSDKCore)?.error?.({
-      message,
-      error,
-      code,
-    });
-  } else if (isCore(this)) {
-    const { message, code } = (this.core as LidoSDKCore)?.getErrorMessage?.(
-      error,
-    );
-    txError = (this.core as LidoSDKCore)?.error?.({
-      message,
-      error,
-      code,
-    });
-  }
-
-  return txError;
-};

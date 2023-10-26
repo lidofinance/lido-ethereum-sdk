@@ -1,10 +1,10 @@
 import { type Address } from 'viem';
-import invariant from 'tiny-invariant';
 
 import { Logger, Cache } from '../common/decorators/index.js';
 
 import { BusModule } from './bus-module.js';
 import { type RequestStatusWithId } from './types.js';
+import { invariantArgument } from '../index.js';
 
 export class LidoSDKWithdrawViews extends BusModule {
   // Views
@@ -33,7 +33,10 @@ export class LidoSDKWithdrawViews extends BusModule {
     const contract = await this.bus.contract.getContractWithdrawalQueue();
     const requests = await contract.read.getWithdrawalStatus([requestsIds]);
 
-    invariant(requests.length === requestsIds.length, 'Invalid requests ids');
+    invariantArgument(
+      requests.length === requestsIds.length,
+      'Invalid requests ids',
+    );
 
     return requests.map((request, i) => ({
       ...request,

@@ -1,5 +1,3 @@
-import invariant from 'tiny-invariant';
-
 import { Logger, ErrorHandler } from '../../common/decorators/index.js';
 import { NOOP } from '../../common/constants.js';
 import {
@@ -16,6 +14,7 @@ import type {
   RequestProps,
   SignedPermit,
 } from './types.js';
+import { invariant } from '../../common/utils/sdk-error.js';
 
 export class LidoSDKWithdrawRequest extends BusModule {
   // Calls
@@ -79,7 +78,11 @@ export class LidoSDKWithdrawRequest extends BusModule {
     } else {
       callback({ stage: TransactionCallbackStage.PERMIT });
       const isContract = await this.bus.core.isContract(account);
-      invariant(!isContract, 'Cannot sign permit for contract');
+      invariant(
+        !isContract,
+        'Cannot sign permit for contract',
+        'NOT_SUPPORTED',
+      );
       const amount = requests.reduce((sum, request) => sum + request);
       const signature = await this.bus.core.signPermit({
         account,

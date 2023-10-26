@@ -22,7 +22,6 @@ import {
   zeroAddress,
 } from 'viem';
 import { unstethAbi } from './abi/unsteth-abi.js';
-import invariant from 'tiny-invariant';
 import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
 
 export class LidoSDKUnstETH {
@@ -40,7 +39,6 @@ export class LidoSDKUnstETH {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public contractAddress(): Promise<Address> {
-    invariant(this.core.chain, 'Chain is not defined');
     return this.core.getContractAddress(LIDO_CONTRACT_NAMES.withdrawalQueue);
   }
 
