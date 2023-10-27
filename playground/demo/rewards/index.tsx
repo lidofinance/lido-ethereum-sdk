@@ -49,6 +49,9 @@ const renderRewards = (
       <DataTableRow title={'Initial Share Rate'}>
         {result.baseShareRate}
       </DataTableRow>
+      <DataTableRow title={'Total Rewards'}>
+        {steth(result.totalRewards)}
+      </DataTableRow>
       {result.rewards.length > 0 ? (
         <Table>
           <Thead>
