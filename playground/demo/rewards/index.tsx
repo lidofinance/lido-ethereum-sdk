@@ -94,7 +94,16 @@ export const RewardsDemo = () => {
   const [blocksBack, setBlocksBack] = useState(100000);
   const [step, setStep] = useState(1000);
   const [includeZeroRebases, setIncludeZeroRebases] = useState(false);
+  const [includeOnlyRebases, setIncludeOnlyRebases] = useState(false);
   const { rewards } = useLidoSDK();
+
+  const rewardsProps = {
+    address: rewardsAddress,
+    back: { blocks: BigInt(blocksBack) },
+    step,
+    includeOnlyRebases,
+    includeZeroRebases,
+  };
 
   return (
     <Accordion summary="Rewards">
@@ -102,12 +111,7 @@ export const RewardsDemo = () => {
         title="Get Rewards From Chain"
         renderResult={renderRewards}
         action={() => {
-          return rewards.getRewardsFromChain({
-            address: rewardsAddress,
-            blocksBack: BigInt(blocksBack),
-            step,
-            includeZeroRebases,
-          });
+          return rewards.getRewardsFromChain(rewardsProps);
         }}
       >
         <Input
@@ -139,14 +143,16 @@ export const RewardsDemo = () => {
           value={includeZeroRebases}
           onChange={setIncludeZeroRebases}
         />
+        <ToggleButton
+          title="Include ONLY Rebases"
+          value={includeOnlyRebases}
+          onChange={setIncludeOnlyRebases}
+        />
       </Action>
       <Action
         action={() => {
           return rewards.getRewardsFromSubgraph({
-            address: rewardsAddress,
-            blocksBack: BigInt(blocksBack),
-            step,
-            includeZeroRebases,
+            ...rewardsProps,
             // Warning! these endpoints will be deprecated
             getSubgraphUrl(_, chainId) {
               switch (chainId) {

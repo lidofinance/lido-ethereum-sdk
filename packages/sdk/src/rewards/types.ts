@@ -10,18 +10,47 @@ export type NonPendingBlockTag = Exclude<BlockTag, 'pending'>;
 
 export type LidoSDKRewardsProps = LidoSDKCommonProps;
 
+export type BlockArgumentType =
+  | {
+      block: bigint | NonPendingBlockTag;
+      timestamp?: undefined;
+    }
+  | {
+      block?: undefined;
+      timestamp: bigint;
+    };
+
+export type BackArgumentType =
+  | {
+      seconds: bigint;
+      days?: undefined;
+      blocks?: undefined;
+    }
+  | {
+      seconds?: undefined;
+      days: bigint;
+      blocks?: undefined;
+    }
+  | {
+      days?: undefined;
+      seconds?: undefined;
+      blocks: bigint;
+    };
+
 export type GetRewardsOptions = {
   address: Address;
   includeZeroRebases?: boolean;
-  toBlock?: bigint | NonPendingBlockTag;
+  includeOnlyRebases?: boolean;
+  to?: BlockArgumentType;
   step?: number;
 } & (
   | {
-      fromBlock: bigint | NonPendingBlockTag;
+      from: BlockArgumentType;
+      back?: undefined;
     }
   | {
-      fromBlock?: undefined;
-      blocksBack: bigint;
+      back: BackArgumentType;
+      from?: undefined;
     }
 );
 
@@ -72,6 +101,7 @@ type GetRewardsCommonResult = {
   baseBalance: bigint;
   baseBalanceShares: bigint;
   baseShareRate: number;
+  totalRewards: bigint;
   fromBlock: bigint;
   toBlock: bigint;
 };

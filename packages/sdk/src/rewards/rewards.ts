@@ -10,12 +10,13 @@ import { Logger, ErrorHandler, Cache } from '../common/decorators/index.js';
 import { version } from '../version.js';
 import { rewardsEventsAbi } from './abi/rewardsEvents.js';
 import {
+  BackArgumentType,
+  BlockArgumentType,
   type GetRewardsFromChainResult,
   type GetRewardsFromSubgraphOptions,
   type GetRewardsFromSubgraphResult,
   type GetRewardsOptions,
   type LidoSDKRewardsProps,
-  type NonPendingBlockTag,
   type Reward,
   type RewardsChainEvents,
   type RewardsSubgraphEvents,
@@ -90,7 +91,14 @@ export class LidoSDKRewards {
     props: GetRewardsOptions,
   ): Promise<GetRewardsFromChainResult> {
     const [
-      { address, fromBlock, toBlock, includeZeroRebases, step },
+      {
+        address,
+        fromBlock,
+        toBlock,
+        includeZeroRebases,
+        includeOnlyRebases,
+        step,
+      },
       stethContract,
       withdrawalQueueAddress,
     ] = await Promise.all([
@@ -180,6 +188,7 @@ export class LidoSDKRewards {
     const baseBalance = getCurrentStethFromShares(baseBalanceShares);
     const baseShareRate = getCurrentShareRate();
 
+    let totalRewards = 0n;
     let shareRate = baseShareRate;
     let prevSharesBalance = baseBalanceShares;
     let rewards: Reward<RewardsChainEvents>[] = events.map((event) => {
@@ -217,10 +226,11 @@ export class LidoSDKRewards {
         currentTotalShares = postTotalShares;
         const newBalance = getCurrentStethFromShares(prevSharesBalance);
         shareRate = getCurrentShareRate();
-
+        const change = newBalance - oldBalance;
+        totalRewards += change;
         return {
           type: 'rebase',
-          change: newBalance - oldBalance,
+          change,
           changeShares: 0n,
           balance: newBalance,
           balanceShares: prevSharesBalance,
@@ -230,6 +240,10 @@ export class LidoSDKRewards {
       }
       invariant(false, 'Impossible event');
     });
+
+    if (!includeOnlyRebases) {
+      rewards = rewards.filter((r) => r.type === 'rebase');
+    }
 
     if (!includeZeroRebases) {
       rewards = rewards.filter(
@@ -242,6 +256,7 @@ export class LidoSDKRewards {
       baseBalanceShares,
       baseShareRate,
       baseBalance,
+      totalRewards,
       fromBlock: fromBlock,
       toBlock: toBlock,
     };
@@ -253,7 +268,15 @@ export class LidoSDKRewards {
     props: GetRewardsFromSubgraphOptions,
   ): Promise<GetRewardsFromSubgraphResult> {
     const [
-      { getSubgraphUrl, address, fromBlock, toBlock, step, includeZeroRebases },
+      {
+        getSubgraphUrl,
+        address,
+        fromBlock,
+        toBlock,
+        step,
+        includeZeroRebases,
+        includeOnlyRebases,
+      },
       withdrawalQueueAddress,
     ] = await Promise.all([
       this.parseProps(props),
@@ -272,7 +295,7 @@ export class LidoSDKRewards {
     // fetch data from subgraph
     const [
       transfers,
-      totalRewards,
+      rebases,
       { transfer: initialTransfer, rebase: initialRebase },
     ] = await Promise.all([
       getTransfers({
@@ -288,7 +311,7 @@ export class LidoSDKRewards {
 
     // concat types are broken
     const events = ([] as (TransferEventEntity | TotalRewardEntity)[]).concat(
-      totalRewards,
+      rebases,
       transfers,
     );
 
@@ -349,6 +372,7 @@ export class LidoSDKRewards {
     const baseBalance = prevBalance;
     const baseBalanceShares = prevBalanceShares;
 
+    let totalRewards = 0n;
     let rewards: Reward<RewardsSubgraphEvents>[] = events.map((event) => {
       // it's a transfer
       if ('value' in event) {
@@ -417,6 +441,7 @@ export class LidoSDKRewards {
           LidoSDKRewards.PRECISION,
         );
         const change = newBalance - prevBalance;
+        totalRewards += change;
         prevBalance = newBalance;
         return {
           type: 'rebase',
@@ -441,11 +466,16 @@ export class LidoSDKRewards {
       );
     }
 
+    if (!includeOnlyRebases) {
+      rewards = rewards.filter((r) => r.type === 'rebase');
+    }
+
     return {
       rewards,
       baseBalance,
       lastIndexedBlock,
       baseBalanceShares,
+      totalRewards,
       baseShareRate,
       fromBlock,
       toBlock: cappedToBlock,
@@ -463,19 +493,21 @@ export class LidoSDKRewards {
       fromBlock: bigint;
       step: number;
       includeZeroRebases: boolean;
+      includeOnlyRebases: boolean;
     }
   > {
-    const toBlock = await this.toBlockNumber(props.toBlock ?? 'latest');
-    if (props.fromBlock == undefined) {
-      invariantArgument(toBlock - props.blocksBack >= 0n, 'blocksBack too far');
-    }
-    const fromBlock = await this.toBlockNumber(
-      props.fromBlock ?? toBlock - props.blocksBack,
-    );
+    const toBlock = await this.toBlockNumber(props.to ?? { block: 'latest' });
+    const fromBlock = props.from
+      ? await this.toBlockNumber(props.from)
+      : await this.toBackBlock(props.back, toBlock);
+
     invariantArgument(toBlock >= fromBlock, 'toBlock is lower than fromBlock');
 
-    const { step = LidoSDKRewards.DEFAULT_STEP, includeZeroRebases = false } =
-      props;
+    const {
+      step = LidoSDKRewards.DEFAULT_STEP,
+      includeZeroRebases = false,
+      includeOnlyRebases = false,
+    } = props;
     invariantArgument(step > 0, 'steps must be a positive integer');
 
     return {
@@ -483,19 +515,43 @@ export class LidoSDKRewards {
       fromBlock,
       step,
       includeZeroRebases,
+      includeOnlyRebases,
       toBlock,
     };
   }
 
   @Logger('Utils:')
-  private async toBlockNumber(
-    block: bigint | NonPendingBlockTag,
-  ): Promise<bigint> {
+  private async toBlockNumber(arg: BlockArgumentType): Promise<bigint> {
+    if (arg.timestamp) {
+      const block = await this.core.getLatestBlockToTimestamp(arg.timestamp);
+      return block.number;
+    }
+    const { block } = arg;
     if (typeof block === 'bigint') return block;
     const { number } = await this.core.rpcProvider.getBlock({
       blockTag: block,
     });
     invariantArgument(number, 'block must not be pending');
     return number;
+  }
+
+  private async toBackBlock(
+    arg: BackArgumentType,
+    start: bigint,
+  ): Promise<bigint> {
+    if (arg.blocks) {
+      const end = start - arg.blocks;
+      invariantArgument(end >= 0n, 'Too many blocks back');
+      return end;
+    } else if (arg.days) {
+      const date = (BigInt(Date.now()) - arg.days * 86400000n) / 1000n;
+      const block = await this.core.getLatestBlockToTimestamp(date);
+      return block.number;
+    } else if (arg.seconds) {
+      const date = BigInt(Date.now() / 1000) - arg.seconds;
+      const block = await this.core.getLatestBlockToTimestamp(date);
+      return block.number;
+    }
+    invariantArgument(false, 'must have at least something in back argument');
   }
 }

@@ -15,6 +15,7 @@ import {
   numberToHex,
   stringify,
   maxUint256,
+  GetBlockReturnType,
 } from 'viem';
 import {
   invariant,
@@ -35,6 +36,7 @@ import {
   PERMIT_MESSAGE_TYPES,
   VIEM_CHAINS,
   SUBRGRAPH_ID_BY_CHAIN,
+  APPROX_SECONDS_PER_BLOCK,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
@@ -373,6 +375,42 @@ export default class LidoSDKCore {
       'NOT_SUPPORTED',
     );
     return id;
+  }
+
+  // TODO: important tests for this
+  @Cache(30 * 60, ['chain.id'])
+  public async getLatestBlockToTimestamp(
+    timestamp: bigint,
+  ): Promise<GetBlockReturnType<Chain, false, 'latest'>> {
+    const now = BigInt(Math.floor(Date.now() / 1000));
+    let latestBlock = await this.rpcProvider.getBlock({ blockTag: 'latest' });
+    if (latestBlock.timestamp < timestamp) {
+      return latestBlock;
+    }
+    let mid = latestBlock.number - (now - timestamp) / APPROX_SECONDS_PER_BLOCK;
+    invariantArgument(mid > 0n, 'No blocks at this timestamp');
+
+    let block = await this.rpcProvider.getBlock({ blockNumber: mid });
+    // feeling lucky?
+    if (block.timestamp === timestamp) return block;
+
+    const isOverShoot = block.timestamp < timestamp;
+    let left = isOverShoot ? block.number : 0n;
+    let right = isOverShoot ? latestBlock.number : block.number;
+
+    while (left <= right) {
+      mid = (left + right) / 2n;
+      block = await this.rpcProvider.getBlock({ blockNumber: mid });
+      if (block.timestamp === timestamp) {
+        return block;
+      } else if (block.timestamp < timestamp) {
+        latestBlock = block;
+        left = mid + 1n;
+      } else {
+        right = mid - 1n;
+      }
+    }
+    return latestBlock;
   }
 
   public async performTransaction(

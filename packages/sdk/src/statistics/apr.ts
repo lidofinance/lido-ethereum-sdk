@@ -19,46 +19,7 @@ export class LidoSDKApr {
     this.events = new LidoSDKEvents({ ...props, core: this.core });
   }
 
-  @Logger('Statistic:')
-  @ErrorHandler()
-  public async getLastApr(): Promise<number> {
-    const event = await this.events.stethEvents.getLastRebaseEvent();
-    invariant(event, 'Could not find last Rebase event', 'READ_ERROR');
-    const apr = this.calculateApr(event.args);
-
-    return apr;
-  }
-
-  @Logger('Statistic:')
-  @ErrorHandler()
-  public async getSmaApr(props: { days: number }): Promise<number> {
-    const { days } = props;
-
-    const lastEvent = await this.events.stethEvents.getLastRebaseEvent();
-    invariant(lastEvent, 'Could not find last Rebase event', 'READ_ERROR');
-
-    const firstEvent = await this.events.stethEvents.getFirstRebaseEvent({
-      days,
-      fromBlockNumber: lastEvent.blockNumber,
-    });
-    invariant(firstEvent, 'Could not find first Rebase event', 'READ_ERROR');
-
-    const timeElapsed =
-      firstEvent.args.timeElapsed +
-      (lastEvent.args.reportTimestamp - firstEvent.args.reportTimestamp);
-
-    const smaApr = this.calculateApr({
-      preTotalEther: firstEvent.args.preTotalEther,
-      preTotalShares: firstEvent.args.preTotalShares,
-      postTotalEther: lastEvent.args.postTotalEther,
-      postTotalShares: lastEvent.args.postTotalShares,
-      timeElapsed,
-    });
-
-    return smaApr;
-  }
-
-  private calculateApr(props: {
+  public static calculateAprFromRebaseEvent(props: {
     preTotalEther: bigint;
     preTotalShares: bigint;
     postTotalEther: bigint;
@@ -85,5 +46,44 @@ export class LidoSDKApr {
       timeElapsed;
 
     return (Number(userAPR) * 100) / mulForPrecision;
+  }
+
+  @Logger('Statistic:')
+  @ErrorHandler()
+  public async getLastApr(): Promise<number> {
+    const event = await this.events.stethEvents.getLastRebaseEvent();
+    invariant(event, 'Could not find last Rebase event', 'READ_ERROR');
+    const apr = LidoSDKApr.calculateAprFromRebaseEvent(event.args);
+
+    return apr;
+  }
+
+  @Logger('Statistic:')
+  @ErrorHandler()
+  public async getSmaApr(props: { days: number }): Promise<number> {
+    const { days } = props;
+
+    const lastEvent = await this.events.stethEvents.getLastRebaseEvent();
+    invariant(lastEvent, 'Could not find last Rebase event', 'READ_ERROR');
+
+    const firstEvent = await this.events.stethEvents.getFirstRebaseEvent({
+      days,
+      fromBlockNumber: lastEvent.blockNumber,
+    });
+    invariant(firstEvent, 'Could not find first Rebase event', 'READ_ERROR');
+
+    const timeElapsed =
+      firstEvent.args.timeElapsed +
+      (lastEvent.args.reportTimestamp - firstEvent.args.reportTimestamp);
+
+    const smaApr = LidoSDKApr.calculateAprFromRebaseEvent({
+      preTotalEther: firstEvent.args.preTotalEther,
+      preTotalShares: firstEvent.args.preTotalShares,
+      postTotalEther: lastEvent.args.postTotalEther,
+      postTotalShares: lastEvent.args.postTotalShares,
+      timeElapsed,
+    });
+
+    return smaApr;
   }
 }
