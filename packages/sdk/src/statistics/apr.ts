@@ -4,7 +4,7 @@ import { Logger, ErrorHandler } from '../common/decorators/index.js';
 import { version } from '../version.js';
 
 import type { LidoSDKStatisticsProps } from './types.js';
-import { invariant } from '../common/utils/sdk-error.js';
+import { ERROR_CODE, invariant } from '../common/utils/sdk-error.js';
 
 export class LidoSDKApr {
   readonly core: LidoSDKCore;
@@ -23,7 +23,7 @@ export class LidoSDKApr {
   @ErrorHandler()
   public async getLastApr(): Promise<number> {
     const event = await this.events.stethEvents.getLastRebaseEvent();
-    invariant(event, 'Could not find last Rebase event', 'READ_ERROR');
+    invariant(event, 'Could not find last Rebase event', ERROR_CODE.READ_ERROR);
     const apr = this.calculateApr(event.args);
 
     return apr;
@@ -35,13 +35,21 @@ export class LidoSDKApr {
     const { days } = props;
 
     const lastEvent = await this.events.stethEvents.getLastRebaseEvent();
-    invariant(lastEvent, 'Could not find last Rebase event', 'READ_ERROR');
+    invariant(
+      lastEvent,
+      'Could not find last Rebase event',
+      ERROR_CODE.READ_ERROR,
+    );
 
     const firstEvent = await this.events.stethEvents.getFirstRebaseEvent({
       days,
       fromBlockNumber: lastEvent.blockNumber,
     });
-    invariant(firstEvent, 'Could not find first Rebase event', 'READ_ERROR');
+    invariant(
+      firstEvent,
+      'Could not find first Rebase event',
+      ERROR_CODE.READ_ERROR,
+    );
 
     const timeElapsed =
       firstEvent.args.timeElapsed +

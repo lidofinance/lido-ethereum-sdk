@@ -27,6 +27,7 @@ import {
   type StakeInnerProps,
 } from './types.js';
 import { PopulatedTransaction } from '../core/types.js';
+import { ERROR_CODE } from '../common/utils/sdk-error.js';
 
 export class LidoSDKStake {
   readonly core: LidoSDKCore;
@@ -160,7 +161,7 @@ export class LidoSDKStake {
 
     if (value > currentStakeLimit) {
       throw this.core.error({
-        code: 'TRANSACTION_ERROR',
+        code: ERROR_CODE.TRANSACTION_ERROR,
         message: `Stake value is greater than daily protocol staking limit (${currentStakeLimit})`,
       });
     }

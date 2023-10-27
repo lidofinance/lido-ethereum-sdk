@@ -17,9 +17,10 @@ import {
   maxUint256,
 } from 'viem';
 import {
+  ERROR_CODE,
   invariant,
   invariantArgument,
-  withSdkError,
+  withSDKError,
 } from '../common/utils/sdk-error.js';
 import { splitSignature } from '@ethersproject/bytes';
 
@@ -39,17 +40,17 @@ import {
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
 import { wqAbi } from './abi/wq.js';
-import {
-  type LidoSDKCoreProps,
-  type PermitSignature,
-  type SignPermitProps,
-  type LOG_MODE,
-  type PerformTransactionOptions,
-  type TransactionOptions,
-  type TransactionResult,
-  TransactionCallbackStage,
+import type {
+  LidoSDKCoreProps,
+  PermitSignature,
+  SignPermitProps,
+  LOG_MODE,
+  PerformTransactionOptions,
+  TransactionOptions,
+  TransactionResult,
   GetFeeDataResult,
 } from './types.js';
+import { TransactionCallbackStage } from './types.js';
 import { permitAbi } from './abi/permit.js';
 
 export default class LidoSDKCore {
@@ -114,14 +115,14 @@ export default class LidoSDKCore {
     if (!SUPPORTED_CHAINS.includes(chainId)) {
       this.error({
         message: `Unsupported chain: ${chainId}`,
-        code: 'INVALID_ARGUMENT',
+        code: ERROR_CODE.INVALID_ARGUMENT,
       });
     }
 
     if (!rpcProvider && rpcUrls.length === 0) {
       this.error({
         message: `Either rpcProvider or rpcUrls are required`,
-        code: 'INVALID_ARGUMENT',
+        code: ERROR_CODE.INVALID_ARGUMENT,
       });
     }
 
@@ -153,7 +154,7 @@ export default class LidoSDKCore {
     invariant(
       this._web3Provider,
       'Web3 Provider is not defined',
-      'PROVIDER_ERROR',
+      ERROR_CODE.PROVIDER_ERROR,
     );
     return this._web3Provider;
   }
@@ -326,7 +327,7 @@ export default class LidoSDKCore {
     invariant(
       account,
       'web3provider must have at least 1 account',
-      'PROVIDER_ERROR',
+      ERROR_CODE.PROVIDER_ERROR,
     );
     return account;
   }
@@ -370,7 +371,7 @@ export default class LidoSDKCore {
     invariant(
       id,
       `Subgraph is not supported for chain ${this.chainId}`,
-      'NOT_SUPPORTED',
+      ERROR_CODE.NOT_SUPPORTED,
     );
     return id;
   }
@@ -399,16 +400,16 @@ export default class LidoSDKCore {
         overrides.gas = await getGasLimit(overrides);
       } catch {
         // we retry without fees to see if tx will go trough
-        await withSdkError(
+        await withSDKError(
           getGasLimit({
             ...overrides,
             maxFeePerGas: undefined,
             maxPriorityFeePerGas: undefined,
           }),
-          'TRANSACTION_ERROR',
+          ERROR_CODE.TRANSACTION_ERROR,
         );
-        throw new SDKError({
-          code: 'TRANSACTION_ERROR',
+        throw this.error({
+          code: ERROR_CODE.TRANSACTION_ERROR,
           message: 'Not enough ether for gas',
         });
       }
@@ -416,9 +417,9 @@ export default class LidoSDKCore {
 
     callback({ stage: TransactionCallbackStage.SIGN, payload: overrides.gas });
 
-    const transactionHash = await withSdkError(
+    const transactionHash = await withSDKError(
       sendTransaction(overrides),
-      'TRANSACTION_ERROR',
+      ERROR_CODE.TRANSACTION_ERROR,
     );
 
     if (isContract) {
@@ -431,11 +432,11 @@ export default class LidoSDKCore {
       payload: transactionHash,
     });
 
-    const transactionReceipt = await withSdkError(
+    const transactionReceipt = await withSDKError(
       this.rpcProvider.waitForTransactionReceipt({
         hash: transactionHash,
       }),
-      'TRANSACTION_ERROR',
+      ERROR_CODE.TRANSACTION_ERROR,
     );
 
     callback({
