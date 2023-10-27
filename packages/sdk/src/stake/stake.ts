@@ -1,32 +1,35 @@
 import { zeroAddress, getContract, encodeFunctionData } from 'viem';
-import {
-  type Address,
-  type Account,
-  type GetContractReturnType,
-  type PublicClient,
-  type WalletClient,
-  type Hash,
-  type WriteContractParameters,
+import type {
+  Address,
+  Account,
+  GetContractReturnType,
+  PublicClient,
+  WalletClient,
+  Hash,
+  WriteContractParameters,
 } from 'viem';
-import { LidoSDKCore, TransactionResult } from '../core/index.js';
+import {
+  LidoSDKCore,
+  type TransactionResult,
+  type PopulatedTransaction,
+} from '../core/index.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
-
 import {
   SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
   LIDO_CONTRACT_NAMES,
   NOOP,
+  GAS_TRANSACTION_RATIO_PRECISION,
 } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
 import { version } from '../version.js';
 
 import { StethAbi } from './abi/steth.js';
-import {
-  type LidoSDKStakeProps,
-  type StakeProps,
-  type StakeEncodeDataProps,
-  type StakeInnerProps,
+import type {
+  LidoSDKStakeProps,
+  StakeProps,
+  StakeEncodeDataProps,
+  StakeInnerProps,
 } from './types.js';
-import { PopulatedTransaction } from '../core/types.js';
 
 export class LidoSDKStake {
   readonly core: LidoSDKCore;
@@ -145,11 +148,13 @@ export class LidoSDKStake {
       [referralAddress],
       overrides,
     );
-    const PRECISION = 10 ** 7;
+
     const gasLimit =
       (originalGasLimit *
-        BigInt(PRECISION * SUBMIT_EXTRA_GAS_TRANSACTION_RATIO)) /
-      BigInt(PRECISION);
+        BigInt(
+          GAS_TRANSACTION_RATIO_PRECISION * SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
+        )) /
+      BigInt(GAS_TRANSACTION_RATIO_PRECISION);
 
     return { gasLimit, overrides };
   }

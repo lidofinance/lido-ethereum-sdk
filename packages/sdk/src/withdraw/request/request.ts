@@ -21,7 +21,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
   // Calls
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async requestApproved(
+  public async requestWithdrawal(
     props: RequestProps,
   ): Promise<TransactionResult> {
     const {
@@ -59,7 +59,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
 
   @Logger('Call:')
   @ErrorHandler('Error:')
-  public async requestWithPermit(
+  public async requestWithdrawalWithPermit(
     props: RequestWithPermitProps,
   ): Promise<TransactionResult> {
     const {

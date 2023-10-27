@@ -42,7 +42,7 @@ export class LidoSDKWithdrawApprove {
           options,
         ),
       sendTransaction: (options) =>
-        // weird ts error
+        // both contracts have approve with same signature but types are bugging out
         //@ts-expect-error
         contract.write.approve([addressWithdrawalsQueue, amount], options),
     });
