@@ -51,6 +51,8 @@ import {
   type TransactionResult,
   TransactionCallbackStage,
   GetFeeDataResult,
+  BlockArgumentType,
+  BackArgumentType,
 } from './types.js';
 import { permitAbi } from './abi/permit.js';
 
@@ -411,6 +413,42 @@ export default class LidoSDKCore {
       }
     }
     return latestBlock;
+  }
+
+  @Logger('Utils:')
+  public async toBlockNumber(arg: BlockArgumentType): Promise<bigint> {
+    if (arg.timestamp) {
+      const block = await this.getLatestBlockToTimestamp(arg.timestamp);
+      return block.number;
+    }
+    const { block } = arg;
+    if (typeof block === 'bigint') return block;
+    const { number } = await this.rpcProvider.getBlock({
+      blockTag: block,
+    });
+    invariantArgument(number, 'block must not be pending');
+    return number;
+  }
+
+  @Logger('Utils:')
+  public async toBackBlock(
+    arg: BackArgumentType,
+    start: bigint,
+  ): Promise<bigint> {
+    if (arg.blocks) {
+      const end = start - arg.blocks;
+      invariantArgument(end >= 0n, 'Too many blocks back');
+      return end;
+    } else if (arg.days) {
+      const date = (BigInt(Date.now()) - arg.days * 86400000n) / 1000n;
+      const block = await this.getLatestBlockToTimestamp(date);
+      return block.number;
+    } else if (arg.seconds) {
+      const date = BigInt(Date.now() / 1000) - arg.seconds;
+      const block = await this.getLatestBlockToTimestamp(date);
+      return block.number;
+    }
+    invariantArgument(false, 'must have at least something in back argument');
   }
 
   public async performTransaction(

@@ -1,41 +1,16 @@
-import { type Address, type BlockTag, type Log } from 'viem';
-import { type rewardsEventsAbi } from './abi/rewardsEvents.js';
-import { type LidoSDKCommonProps } from '../core/types.js';
+import type { Address, Log } from 'viem';
+import type { rewardsEventsAbi } from './abi/rewardsEvents.js';
+import type {
+  BackArgumentType,
+  BlockArgumentType,
+  LidoSDKCommonProps,
+} from '../core/types.js';
 import type {
   TotalRewardEntity,
   TransferEventEntity,
 } from './subgraph/types.js';
 
-export type NonPendingBlockTag = Exclude<BlockTag, 'pending'>;
-
 export type LidoSDKRewardsProps = LidoSDKCommonProps;
-
-export type BlockArgumentType =
-  | {
-      block: bigint | NonPendingBlockTag;
-      timestamp?: undefined;
-    }
-  | {
-      block?: undefined;
-      timestamp: bigint;
-    };
-
-export type BackArgumentType =
-  | {
-      seconds: bigint;
-      days?: undefined;
-      blocks?: undefined;
-    }
-  | {
-      seconds?: undefined;
-      days: bigint;
-      blocks?: undefined;
-    }
-  | {
-      days?: undefined;
-      seconds?: undefined;
-      blocks: bigint;
-    };
 
 export type GetRewardsOptions = {
   address: Address;

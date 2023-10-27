@@ -10,8 +10,6 @@ import { Logger, ErrorHandler, Cache } from '../common/decorators/index.js';
 import { version } from '../version.js';
 import { rewardsEventsAbi } from './abi/rewardsEvents.js';
 import {
-  BackArgumentType,
-  BlockArgumentType,
   type GetRewardsFromChainResult,
   type GetRewardsFromSubgraphOptions,
   type GetRewardsFromSubgraphResult,
@@ -496,10 +494,12 @@ export class LidoSDKRewards {
       includeOnlyRebases: boolean;
     }
   > {
-    const toBlock = await this.toBlockNumber(props.to ?? { block: 'latest' });
+    const toBlock = await this.core.toBlockNumber(
+      props.to ?? { block: 'latest' },
+    );
     const fromBlock = props.from
-      ? await this.toBlockNumber(props.from)
-      : await this.toBackBlock(props.back, toBlock);
+      ? await this.core.toBlockNumber(props.from)
+      : await this.core.toBackBlock(props.back, toBlock);
 
     invariantArgument(toBlock >= fromBlock, 'toBlock is lower than fromBlock');
 
@@ -518,40 +518,5 @@ export class LidoSDKRewards {
       includeOnlyRebases,
       toBlock,
     };
-  }
-
-  @Logger('Utils:')
-  private async toBlockNumber(arg: BlockArgumentType): Promise<bigint> {
-    if (arg.timestamp) {
-      const block = await this.core.getLatestBlockToTimestamp(arg.timestamp);
-      return block.number;
-    }
-    const { block } = arg;
-    if (typeof block === 'bigint') return block;
-    const { number } = await this.core.rpcProvider.getBlock({
-      blockTag: block,
-    });
-    invariantArgument(number, 'block must not be pending');
-    return number;
-  }
-
-  private async toBackBlock(
-    arg: BackArgumentType,
-    start: bigint,
-  ): Promise<bigint> {
-    if (arg.blocks) {
-      const end = start - arg.blocks;
-      invariantArgument(end >= 0n, 'Too many blocks back');
-      return end;
-    } else if (arg.days) {
-      const date = (BigInt(Date.now()) - arg.days * 86400000n) / 1000n;
-      const block = await this.core.getLatestBlockToTimestamp(date);
-      return block.number;
-    } else if (arg.seconds) {
-      const date = BigInt(Date.now() / 1000) - arg.seconds;
-      const block = await this.core.getLatestBlockToTimestamp(date);
-      return block.number;
-    }
-    invariantArgument(false, 'must have at least something in back argument');
   }
 }
