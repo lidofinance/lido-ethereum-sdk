@@ -36,6 +36,7 @@ import { addressEqual } from '../common/utils/address-equal.js';
 import { getInitialData } from './subgraph/index.js';
 import { calcShareRate, requestWithBlockStep, sharesToSteth } from './utils.js';
 import { ERROR_CODE, invariant, invariantArgument } from '../index.js';
+import { LidoSDKApr } from '../statistics/apr.js';
 
 export class LidoSDKRewards {
   private static readonly PRECISION = 10n ** 27n;
@@ -225,6 +226,7 @@ export class LidoSDKRewards {
         return {
           type: 'rebase',
           change,
+          apr: LidoSDKApr.calculateAprFromRebaseEvent(event.args),
           changeShares: 0n,
           balance: newBalance,
           balanceShares: prevSharesBalance,
@@ -267,7 +269,6 @@ export class LidoSDKRewards {
         address,
         fromBlock,
         toBlock,
-
         includeZeroRebases,
         includeOnlyRebases,
       },
@@ -425,10 +426,16 @@ export class LidoSDKRewards {
       }
       // it's a rebase
       if ('apr' in event) {
-        const { totalPooledEtherAfter, totalSharesAfter } = event;
+        const {
+          totalPooledEtherAfter,
+          totalSharesAfter,
+          apr: eventApr,
+        } = event;
 
         const totalEther = BigInt(totalPooledEtherAfter);
         const totalShares = BigInt(totalSharesAfter);
+
+        const apr = Number(eventApr);
         const newBalance = sharesToSteth(
           prevBalanceShares,
           totalEther,
@@ -438,9 +445,11 @@ export class LidoSDKRewards {
         const change = newBalance - prevBalance;
         totalRewards += change;
         prevBalance = newBalance;
+
         return {
           type: 'rebase',
           change,
+          apr,
           changeShares: 0n,
           balance: newBalance,
           balanceShares: prevBalanceShares,

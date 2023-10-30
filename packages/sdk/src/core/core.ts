@@ -20,6 +20,7 @@ import {
 import {
   ERROR_CODE,
   invariant,
+  invariantArgument,
   withSDKError,
 } from '../common/utils/sdk-error.js';
 import { splitSignature } from '@ethersproject/bytes';
@@ -58,6 +59,7 @@ import { permitAbi } from './abi/permit.js';
 
 export default class LidoSDKCore {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
+  private static readonly MS_PER_DAY = 86400000n;
 
   #web3Provider: WalletClient | undefined;
 
@@ -431,7 +433,8 @@ export default class LidoSDKCore {
       invariantArgument(end >= 0n, 'Too many blocks back');
       return end;
     } else if (arg.days) {
-      const date = (BigInt(Date.now()) - arg.days * 86400000n) / 1000n;
+      const date =
+        (BigInt(Date.now()) - arg.days * LidoSDKCore.MS_PER_DAY) / 1000n;
       const block = await this.getLatestBlockToTimestamp(date);
       return block.number;
     } else if (arg.seconds) {
