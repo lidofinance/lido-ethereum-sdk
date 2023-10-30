@@ -10,6 +10,7 @@ import { Logger, ErrorHandler, Cache } from '../common/decorators/index.js';
 import { version } from '../version.js';
 import { rewardsEventsAbi } from './abi/rewardsEvents.js';
 import {
+  type GetRewardsFromChainOptions,
   type GetRewardsFromChainResult,
   type GetRewardsFromSubgraphOptions,
   type GetRewardsFromSubgraphResult,
@@ -38,7 +39,8 @@ import { invariant, invariantArgument } from '../index.js';
 
 export class LidoSDKRewards {
   private static readonly PRECISION = 10n ** 27n;
-  private static readonly DEFAULT_STEP = 1000;
+  private static readonly DEFAULT_STEP_ENTITIES = 1000;
+  private static readonly DEFAULT_STEP_BLOCK = 50000;
 
   readonly core: LidoSDKCore;
 
@@ -86,17 +88,10 @@ export class LidoSDKRewards {
   @Logger('Rewards:')
   @ErrorHandler('Rewards:')
   public async getRewardsFromChain(
-    props: GetRewardsOptions,
+    props: GetRewardsFromChainOptions,
   ): Promise<GetRewardsFromChainResult> {
     const [
-      {
-        address,
-        fromBlock,
-        toBlock,
-        includeZeroRebases,
-        includeOnlyRebases,
-        step,
-      },
+      { address, fromBlock, toBlock, includeZeroRebases, includeOnlyRebases },
       stethContract,
       withdrawalQueueAddress,
     ] = await Promise.all([
@@ -104,7 +99,8 @@ export class LidoSDKRewards {
       this.getContractStETH(),
       this.contractAddressWithdrawalQueue(),
     ]);
-
+    const step = props.stepBlock ?? LidoSDKRewards.DEFAULT_STEP_BLOCK;
+    invariantArgument(step > 0, 'stepBlock must be a positive integer');
     const lowerBound = this.earliestRebaseEventBlock();
     if (fromBlock < lowerBound)
       this.core.error({
@@ -271,7 +267,7 @@ export class LidoSDKRewards {
         address,
         fromBlock,
         toBlock,
-        step,
+
         includeZeroRebases,
         includeOnlyRebases,
       },
@@ -281,7 +277,8 @@ export class LidoSDKRewards {
       this.contractAddressWithdrawalQueue(),
     ]);
     const url = getSubgraphUrl(this.core.getSubgraphId(), this.core.chainId);
-
+    const step = props.stepEntities ?? LidoSDKRewards.DEFAULT_STEP_ENTITIES;
+    invariantArgument(step > 0, 'stepEntities must be a positive integer');
     // Cap toBlock to last indexed
     const lastIndexedBlock = BigInt(
       (await getLastIndexedBlock({ url })).number,
@@ -483,13 +480,9 @@ export class LidoSDKRewards {
   private async parseProps<TRewardsProps extends GetRewardsOptions>(
     props: TRewardsProps,
   ): Promise<
-    Omit<
-      TRewardsProps,
-      'toBlock' | 'fromBlock' | 'includeZeroRebases' | 'step'
-    > & {
+    Omit<TRewardsProps, 'toBlock' | 'fromBlock' | 'includeZeroRebases'> & {
       toBlock: bigint;
       fromBlock: bigint;
-      step: number;
       includeZeroRebases: boolean;
       includeOnlyRebases: boolean;
     }
@@ -503,17 +496,11 @@ export class LidoSDKRewards {
 
     invariantArgument(toBlock >= fromBlock, 'toBlock is lower than fromBlock');
 
-    const {
-      step = LidoSDKRewards.DEFAULT_STEP,
-      includeZeroRebases = false,
-      includeOnlyRebases = false,
-    } = props;
-    invariantArgument(step > 0, 'steps must be a positive integer');
+    const { includeZeroRebases = false, includeOnlyRebases = false } = props;
 
     return {
       ...props,
       fromBlock,
-      step,
       includeZeroRebases,
       includeOnlyRebases,
       toBlock,

@@ -17,7 +17,6 @@ export type GetRewardsOptions = {
   includeZeroRebases?: boolean;
   includeOnlyRebases?: boolean;
   to?: BlockArgumentType;
-  step?: number;
 } & (
   | {
       from: BlockArgumentType;
@@ -82,6 +81,7 @@ type GetRewardsCommonResult = {
 };
 
 export type GetRewardsFromSubgraphOptions = GetRewardsOptions & {
+  stepEntities?: number;
   getSubgraphUrl: (id: string, chainId: number) => string;
 };
 
@@ -90,7 +90,9 @@ export type GetRewardsFromSubgraphResult = {
   lastIndexedBlock: bigint;
 } & GetRewardsCommonResult;
 
-export type GetRewardsFromChainOptions = GetRewardsOptions;
+export type GetRewardsFromChainOptions = GetRewardsOptions & {
+  stepBlock?: number;
+};
 
 export type GetRewardsFromChainResult = {
   rewards: Reward<RewardsChainEvents>[];

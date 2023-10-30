@@ -114,7 +114,10 @@ export const RewardsDemo = () => {
         title="Get Rewards From Chain"
         renderResult={renderRewards}
         action={() => {
-          return rewards.getRewardsFromChain(rewardsProps);
+          return rewards.getRewardsFromChain({
+            ...rewardsProps,
+            stepBlock: step,
+          });
         }}
       >
         <Input
@@ -134,8 +137,8 @@ export const RewardsDemo = () => {
           onChange={(event) => setBlocksBack(event.currentTarget.valueAsNumber)}
         />
         <Input
-          label="Requests Steps"
-          placeholder="1000"
+          label="Request block step (for chain method)"
+          placeholder="default"
           min="1"
           type="number"
           value={step}
