@@ -1,8 +1,8 @@
 import { LidoSDKCore } from '../core/index.js';
 
-import { LidoSDKWithdrawContract } from './withdrawContract.js';
-import { LidoSDKWithdrawViews } from './withdrawViews.js';
-import { LidoSDKWithdrawRequestsInfo } from './withdrawRequestsInfo.js';
+import { LidoSDKWithdrawContract } from './withdraw-contract.js';
+import { LidoSDKWithdrawViews } from './withdraw-views.js';
+import { LidoSDKWithdrawRequestsInfo } from './withdraw-requests-info.js';
 import { LidoSDKWithdrawClaim } from './claim/claim.js';
 import {
   LidoSDKWithdrawRequest,
@@ -11,10 +11,9 @@ import {
 import { type LidoSDKWithdrawProps } from './types.js';
 
 export class Bus {
-  private props: LidoSDKWithdrawProps;
   private version: string | undefined;
 
-  private coreInstance: LidoSDKCore | undefined;
+  private coreInstance: LidoSDKCore;
   private contractInstance: LidoSDKWithdrawContract | undefined;
   private viewsInstance: LidoSDKWithdrawViews | undefined;
   private requestsInfoInstance: LidoSDKWithdrawRequestsInfo | undefined;
@@ -23,24 +22,16 @@ export class Bus {
   private requestInstance: LidoSDKWithdrawRequest | undefined;
 
   constructor(props: LidoSDKWithdrawProps, version?: string) {
-    this.props = props;
     this.version = version;
 
-    if (props.core) this.core = props.core;
+    if (props.core) this.coreInstance = props.core;
+    else this.coreInstance = new LidoSDKCore(props, this.version);
   }
 
   // core
 
   get core(): LidoSDKCore {
-    if (!this.coreInstance) {
-      this.coreInstance = new LidoSDKCore(this.props, this.version);
-      return this.coreInstance;
-    }
     return this.coreInstance;
-  }
-
-  set core(core: LidoSDKCore) {
-    this.coreInstance = core;
   }
 
   // Contract
@@ -48,16 +39,11 @@ export class Bus {
   get contract(): LidoSDKWithdrawContract {
     if (!this.contractInstance) {
       this.contractInstance = new LidoSDKWithdrawContract({
-        ...this.props,
         bus: this,
+        version: this.version,
       });
-      return this.contractInstance;
     }
     return this.contractInstance;
-  }
-
-  set contract(contract: LidoSDKWithdrawContract) {
-    this.contractInstance = contract;
   }
 
   // Views
@@ -65,16 +51,11 @@ export class Bus {
   get views(): LidoSDKWithdrawViews {
     if (!this.viewsInstance) {
       this.viewsInstance = new LidoSDKWithdrawViews({
-        ...this.props,
         bus: this,
+        version: this.version,
       });
-      return this.viewsInstance;
     }
     return this.viewsInstance;
-  }
-
-  set views(views: LidoSDKWithdrawViews) {
-    this.viewsInstance = views;
   }
 
   // Requests Info
@@ -82,16 +63,11 @@ export class Bus {
   get requestsInfo(): LidoSDKWithdrawRequestsInfo {
     if (!this.requestsInfoInstance) {
       this.requestsInfoInstance = new LidoSDKWithdrawRequestsInfo({
-        ...this.props,
         bus: this,
+        version: this.version,
       });
-      return this.requestsInfoInstance;
     }
     return this.requestsInfoInstance;
-  }
-
-  set requestsInfo(requestsInfo: LidoSDKWithdrawRequestsInfo) {
-    this.requestsInfoInstance = requestsInfo;
   }
 
   // Approval
@@ -99,16 +75,11 @@ export class Bus {
   get approval(): LidoSDKWithdrawApprove {
     if (!this.approvalInstance) {
       this.approvalInstance = new LidoSDKWithdrawApprove({
-        ...this.props,
         bus: this,
+        version: this.version,
       });
-      return this.approvalInstance;
     }
     return this.approvalInstance;
-  }
-
-  set approval(approve: LidoSDKWithdrawApprove) {
-    this.approvalInstance = approve;
   }
 
   // Claim
@@ -116,16 +87,11 @@ export class Bus {
   get claim(): LidoSDKWithdrawClaim {
     if (!this.claimInstance) {
       this.claimInstance = new LidoSDKWithdrawClaim({
-        ...this.props,
         bus: this,
+        version: this.version,
       });
-      return this.claimInstance;
     }
     return this.claimInstance;
-  }
-
-  set claim(approve: LidoSDKWithdrawClaim) {
-    this.claimInstance = approve;
   }
 
   // Request
@@ -133,15 +99,10 @@ export class Bus {
   get request(): LidoSDKWithdrawRequest {
     if (!this.requestInstance) {
       this.requestInstance = new LidoSDKWithdrawRequest({
-        ...this.props,
         bus: this,
+        version: this.version,
       });
-      return this.requestInstance;
     }
     return this.requestInstance;
-  }
-
-  set request(approve: LidoSDKWithdrawRequest) {
-    this.requestInstance = approve;
   }
 }

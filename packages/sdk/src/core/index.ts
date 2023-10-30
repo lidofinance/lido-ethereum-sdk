@@ -5,7 +5,9 @@ export {
   type LidoSDKCoreProps,
   type TransactionCallback,
   type TransactionCallbackProps,
+  type TransactionResult,
   type EtherValue,
   type PermitSignature,
+  type PopulatedTransaction,
   TransactionCallbackStage,
 } from './types.js';

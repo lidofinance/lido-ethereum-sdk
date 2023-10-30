@@ -1,7 +1,7 @@
 import { LidoSDKCore } from '../core/index.js';
 import { version } from '../version.js';
 
-import { LidoSDKStethEvents } from './stethEvents.js';
+import { LidoSDKStethEvents } from './steth-events.js';
 import type { LidoSDKEventsProps } from './types.js';
 
 export class LidoSDKEvents {
@@ -9,11 +9,11 @@ export class LidoSDKEvents {
   readonly stethEvents: LidoSDKStethEvents;
 
   constructor(props: LidoSDKEventsProps) {
-    const { core, ...rest } = props;
+    const { core } = props;
 
     if (core) this.core = core;
-    else this.core = new LidoSDKCore(rest, version);
+    else this.core = new LidoSDKCore(props, version);
 
-    this.stethEvents = new LidoSDKStethEvents({ ...rest, core: this.core });
+    this.stethEvents = new LidoSDKStethEvents({ ...props, core: this.core });
   }
 }

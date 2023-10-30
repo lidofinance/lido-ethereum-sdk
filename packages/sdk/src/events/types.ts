@@ -1,9 +1,6 @@
-import { type LidoSDKCoreProps, type LidoSDKCore } from '../core/index.js';
+import { LidoSDKCommonProps } from '../core/types.js';
 
-export type LidoSDKEventsProps = LidoSDKCoreProps & {
-  core?: LidoSDKCore;
-};
-
+export type LidoSDKEventsProps = LidoSDKCommonProps;
 export type RebaseEvent = {
   address: string;
   blockHash: string;

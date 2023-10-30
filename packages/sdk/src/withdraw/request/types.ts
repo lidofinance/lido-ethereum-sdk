@@ -1,7 +1,6 @@
-import { type Address, type Hash, type TransactionReceipt } from 'viem';
+import { Hash, type Address } from 'viem';
 
 import { EtherValue, TransactionCallback } from '../../core/index.js';
-import { type SDKError } from '../../common/utils/index.js';
 import { LIDO_TOKENS } from '../../common/constants.js';
 
 export type WithdrawableTokens =
@@ -19,48 +18,29 @@ export type PermitProps = PermitWstETHStETHProps & {
   token: WithdrawableTokens;
 };
 
-export type RequestWithPermitProps = {
-  account: Address;
-  requests: readonly bigint[];
-  token: WithdrawableTokens;
-  callback?: TransactionCallback;
-};
-
 export type RequestProps = {
   account: Address;
+  receiver?: Address;
   requests: readonly bigint[];
   token: WithdrawableTokens;
   callback?: TransactionCallback;
 };
 
-export enum ApproveCallbackStages {
-  'GAS_LIMIT' = 'gas_limit',
-  'SIGN' = 'sign',
-  'RECEIPT' = 'receipt',
-  'CONFIRMATION' = 'confirmation',
-  'DONE' = 'done',
-  'MULTISIG_DONE' = 'multisig_done',
-  'ERROR' = 'error',
-}
+export type SignedPermit = {
+  value: bigint;
+  deadline: bigint;
+  v: number;
+  r: Hash;
+  s: Hash;
+};
 
-export type ApproveCallbackProps =
-  | { stage: ApproveCallbackStages.GAS_LIMIT; payload?: undefined }
-  | { stage: ApproveCallbackStages.SIGN; payload?: bigint }
-  | { stage: ApproveCallbackStages.SIGN; payload: Hash }
-  | { stage: ApproveCallbackStages.RECEIPT; payload: Hash }
-  | {
-      stage: ApproveCallbackStages.CONFIRMATION;
-      payload: TransactionReceipt;
-    }
-  | { stage: ApproveCallbackStages.DONE; payload: bigint }
-  | { stage: ApproveCallbackStages.MULTISIG_DONE; payload?: undefined }
-  | { stage: ApproveCallbackStages.ERROR; payload: SDKError };
+export type RequestWithPermitProps = RequestProps & {
+  permit?: SignedPermit;
+};
 
-export type ApproveStageCallback = (props: ApproveCallbackProps) => void;
-
-export type ApproveProps = {
+export type WithdrawApproveProps = {
   account: Address;
   amount: EtherValue;
-  token: 'stETH' | 'wstETH';
-  callback?: ApproveStageCallback;
+  token: WithdrawableTokens;
+  callback?: TransactionCallback;
 };

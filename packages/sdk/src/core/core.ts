@@ -4,6 +4,7 @@ import {
   type PublicClient,
   type Chain,
   type GetContractReturnType,
+  type CustomTransportConfig,
   createPublicClient,
   createWalletClient,
   fallback,
@@ -14,19 +15,18 @@ import {
   numberToHex,
   stringify,
   maxUint256,
-  Hash,
 } from 'viem';
 import invariant from 'tiny-invariant';
 import { splitSignature } from '@ethersproject/bytes';
 
 import {
-  getFeeData,
   type FeeData,
+  type SDKErrorProps,
+  type ErrorMessage,
+  getFeeData,
   checkIsContract,
   SDKError,
-  type SDKErrorProps,
   getErrorMessage,
-  type ErrorMessage,
 } from '../common/utils/index.js';
 import { Logger, Initialize, Cache } from '../common/decorators/index.js';
 import {
@@ -48,21 +48,27 @@ import {
   type PermitSignature,
   type SignPermitProps,
   type LOG_MODE,
-  PerformTransactionOptions as PerformTransactionProps,
-  TransactionOptions,
-  TransactionResult,
+  type PerformTransactionOptions,
+  type TransactionOptions,
+  type TransactionResult,
   TransactionCallbackStage,
 } from './types.js';
 import { permitAbi } from './abi/permit.js';
 
 export default class LidoSDKCore {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
+
+  #web3Provider: WalletClient | undefined;
+
   readonly chainId: CHAINS;
   readonly rpcUrls: string[] | undefined;
   readonly chain: Chain;
   readonly rpcProvider: PublicClient;
-  public web3Provider: WalletClient | undefined;
   readonly logMode: LOG_MODE;
+
+  public get web3Provider(): WalletClient | undefined {
+    return this.#web3Provider;
+  }
 
   constructor(props: LidoSDKCoreProps, version?: string) {
     const { chain, rpcProvider, web3Provider } = this.init(props, version);
@@ -71,8 +77,36 @@ export default class LidoSDKCore {
     this.chain = chain;
     this.rpcUrls = props.rpcUrls;
     this.rpcProvider = rpcProvider;
-    this.web3Provider = web3Provider;
+    this.#web3Provider = web3Provider;
     this.logMode = props.logMode ?? 'info';
+  }
+
+  // Static Provider Creation
+
+  public static createRpcProvider(
+    chain: Chain,
+    rpcUrls: string[],
+  ): PublicClient {
+    const rpcs = rpcUrls.map((url) => http(url));
+
+    return createPublicClient({
+      batch: {
+        multicall: true,
+      },
+      chain,
+      transport: fallback(rpcs),
+    });
+  }
+
+  public static createWeb3Provider(
+    chain: Chain,
+    transport: { request(...args: any): Promise<any> },
+    transportConfig?: CustomTransportConfig,
+  ): WalletClient {
+    return createWalletClient({
+      chain,
+      transport: custom(transport, transportConfig),
+    });
   }
 
   @Initialize('Init:')
@@ -94,7 +128,7 @@ export default class LidoSDKCore {
 
     const chain = VIEM_CHAINS[chainId];
     const currentRpcProvider =
-      rpcProvider ?? this.createRpcProvider(chain, rpcUrls);
+      rpcProvider ?? LidoSDKCore.createRpcProvider(chain, rpcUrls);
     const currentWeb3Provider = web3Provider;
 
     return {
@@ -104,47 +138,14 @@ export default class LidoSDKCore {
     };
   }
 
-  // Provider
+  // Web 3 provider
 
   @Logger('Provider:')
-  public createRpcProvider(chain: Chain, rpcUrls: string[]): PublicClient {
-    const rpcs = rpcUrls.map((url) => http(url));
-
-    return createPublicClient({
-      batch: {
-        multicall: true,
-      },
-      chain,
-      transport: fallback(rpcs),
-    });
+  public useWeb3Provider(): WalletClient {
+    invariant(this.#web3Provider, 'Web3 Provider is not defined');
+    return this.#web3Provider;
   }
 
-  @Logger('Provider:')
-  public createWeb3Provider(chain: Chain): WalletClient {
-    return createWalletClient({
-      chain,
-      // TODO: fix type
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      transport: custom(window.ethereum),
-    });
-  }
-
-  @Logger('Provider:')
-  public defineWeb3Provider(): WalletClient {
-    invariant(!this.web3Provider, 'Web3 provider is already defined');
-
-    this.web3Provider = this.createWeb3Provider(this.chain);
-
-    return this.web3Provider;
-  }
-
-  @Logger('Provider:')
-  public setWeb3Provider(web3Provider: WalletClient): void {
-    invariant(web3Provider.chain === this.chain, 'Wrong chain');
-
-    this.web3Provider = web3Provider;
-  }
   // Balances
 
   @Logger('Balances:')
@@ -201,7 +202,7 @@ export default class LidoSDKCore {
       spender,
       deadline = LidoSDKCore.INFINITY_DEADLINE_VALUE,
     } = props;
-    invariant(this.web3Provider, 'Web3 provider is not defined');
+    const web3Provider = this.useWeb3Provider();
 
     const { contract, domain } = await this.getPermitContractData(token);
     const nonce = await contract.read.nonces([account]);
@@ -218,7 +219,7 @@ export default class LidoSDKCore {
       (_, value) => (isHex(value) ? value.toLowerCase() : value),
     );
 
-    const signature = await this.web3Provider.request({
+    const signature = await web3Provider.request({
       method: 'eth_signTypedData_v4',
       params: [account, typedData],
     });
@@ -282,26 +283,12 @@ export default class LidoSDKCore {
 
   @Logger('Utils:')
   public async getWeb3Address(): Promise<Address> {
-    invariant(this.web3Provider, 'Web3 provider is not defined');
+    const web3Provider = this.useWeb3Provider();
 
-    if (this.web3Provider.account) return this.web3Provider.account.address;
-    // For walletconnect
-    if ('getAddresses' in this.web3Provider) {
-      const [address] = await this.web3Provider.getAddresses();
-      invariant(address, 'Web3 address is not defined');
+    if (web3Provider.account) return web3Provider.account.address;
 
-      return address;
-    }
-
-    // TODO: fix type
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    const [account] = await window.ethereum.request({
-      method: 'eth_requestAccounts',
-    });
-
-    invariant(account, 'Web3 address is not defined');
-
+    const [account] = await web3Provider.requestAddresses();
+    invariant(account, 'web3provider must have at least 1 account');
     return account;
   }
 
@@ -361,12 +348,10 @@ export default class LidoSDKCore {
   }
 
   public async performTransaction(
-    props: PerformTransactionProps,
-    getGasLimit: (overrides: TransactionOptions) => Promise<bigint>,
-    sendTransaction: (override: TransactionOptions) => Promise<Hash>,
+    props: PerformTransactionOptions,
   ): Promise<TransactionResult> {
-    invariant(this.web3Provider, 'Web3 provider is not defined');
-    const { account, callback } = props;
+    this.useWeb3Provider();
+    const { account, callback, getGasLimit, sendTransaction } = props;
     const isContract = await this.isContract(account);
 
     const overrides: TransactionOptions = {

@@ -23,10 +23,10 @@ export class LidoSDKStethEvents {
   readonly core: LidoSDKCore;
 
   constructor(props: LidoSDKEventsProps) {
-    const { core, ...rest } = props;
+    const { core } = props;
 
     if (core) this.core = core;
-    else this.core = new LidoSDKCore(rest, version);
+    else this.core = new LidoSDKCore(props, version);
   }
 
   // Contracts

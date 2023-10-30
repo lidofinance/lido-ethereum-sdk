@@ -2,20 +2,11 @@ import { type Address } from 'viem';
 import invariant from 'tiny-invariant';
 
 import { Logger, Cache } from '../common/decorators/index.js';
-import { version } from '../version.js';
-import { type LidoSDKCoreProps } from '../core/index.js';
 
-import { Bus } from './bus.js';
+import { BusModule } from './bus-module.js';
 import { type RequestStatusWithId } from './types.js';
 
-export class LidoSDKWithdrawViews {
-  private readonly bus: Bus;
-
-  constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
-    if (props.bus) this.bus = props.bus;
-    else this.bus = new Bus(props, version);
-  }
-
+export class LidoSDKWithdrawViews extends BusModule {
   // Views
   @Logger('Views:')
   public async getWithdrawalRequestsIds(props: {
@@ -55,11 +46,13 @@ export class LidoSDKWithdrawViews {
   public async findCheckpointHints(props: {
     sortedIds: bigint[];
     firstIndex?: bigint;
-    lastIndex: bigint;
+    lastIndex?: bigint;
   }): Promise<readonly bigint[]> {
-    const { sortedIds, firstIndex = BigInt(1), lastIndex } = props;
+    const { sortedIds, firstIndex = BigInt(1), lastIndex: _lastIndex } = props;
+
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
+    const lastIndex = _lastIndex ?? (await this.getLastCheckpointIndex());
     return contract.read.findCheckpointHints([
       sortedIds,
       firstIndex,
@@ -118,8 +111,10 @@ export class LidoSDKWithdrawViews {
 
   @Logger('Views:')
   public async isTurboModeActive(): Promise<boolean> {
-    const isBunkerMode = await this.isBunkerModeActive();
-    const isPaused = await this.isPaused();
+    const [isBunkerMode, isPaused] = await Promise.all([
+      this.isBunkerModeActive(),
+      await this.isPaused(),
+    ]);
 
     return !isPaused && !isBunkerMode;
   }

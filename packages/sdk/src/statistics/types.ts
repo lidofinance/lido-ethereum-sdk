@@ -1,5 +1,3 @@
-import { type LidoSDKCoreProps, type LidoSDKCore } from '../core/index.js';
+import { type LidoSDKCommonProps } from '../core/types.js';
 
-export type LidoSDKStatisticsProps = LidoSDKCoreProps & {
-  core?: LidoSDKCore;
-};
+export type LidoSDKStatisticsProps = LidoSDKCommonProps;

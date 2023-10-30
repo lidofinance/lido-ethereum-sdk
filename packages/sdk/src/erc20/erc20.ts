@@ -28,7 +28,6 @@ import {
   TransactionOptions,
   TransactionResult,
 } from '../core/types.js';
-import invariant from 'tiny-invariant';
 import { splitSignature } from '@ethersproject/bytes';
 
 export abstract class AbstractLidoSDKErc20 {
@@ -73,22 +72,27 @@ export abstract class AbstractLidoSDKErc20 {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async transfer(props: TransferProps): Promise<TransactionResult> {
+    this.core.useWeb3Provider();
     const parsedProps = this.parseProps(props);
     const { account, amount, to, from = account } = parsedProps;
     const isTransferFrom = from !== account;
     const contract = await this.getContract();
 
-    const estimateGas = async (overrides: TransactionOptions) =>
+    const getGasLimit = async (overrides: TransactionOptions) =>
       isTransferFrom
         ? contract.estimateGas.transferFrom([from, to, amount], overrides)
         : contract.estimateGas.transfer([to, amount], overrides);
 
-    const sendTx = async (overrides: TransactionOptions) =>
+    const sendTransaction = async (overrides: TransactionOptions) =>
       isTransferFrom
         ? contract.write.transferFrom([from, to, amount], overrides)
         : contract.write.transfer([to, amount], overrides);
 
-    return this.core.performTransaction(parsedProps, estimateGas, sendTx);
+    return this.core.performTransaction({
+      ...parsedProps,
+      getGasLimit,
+      sendTransaction,
+    });
   }
 
   @Logger('Utils:')
@@ -142,9 +146,9 @@ export abstract class AbstractLidoSDKErc20 {
   public async signPermit(
     props: SignTokenPermitProps,
   ): Promise<PermitSignature> {
+    const web3Provider = this.core.useWeb3Provider();
     const payload = await this.populatePermit(props);
-    invariant(this.core.web3Provider, 'Web3 provider is not defined');
-    const signature = await this.core.web3Provider.signTypedData(payload);
+    const signature = await web3Provider.signTypedData(payload);
     const { s, r, v } = splitSignature(signature);
 
     return {
@@ -195,18 +199,17 @@ export abstract class AbstractLidoSDKErc20 {
   @Logger('Call:')
   @ErrorHandler('Error:')
   public async approve(props: ApproveProps): Promise<TransactionResult> {
+    this.core.useWeb3Provider();
     const parsedProps = this.parseProps(props);
     const contract = await this.getContract();
     const txArguments = [parsedProps.to, parsedProps.amount] as const;
-    return this.core.performTransaction(
-      parsedProps,
-      async (overrides) => {
-        return contract.estimateGas.approve(txArguments, overrides);
-      },
-      (overrides) => {
-        return contract.write.approve(txArguments, overrides);
-      },
-    );
+    return this.core.performTransaction({
+      ...parsedProps,
+      getGasLimit: (options) =>
+        contract.estimateGas.approve(txArguments, options),
+      sendTransaction: (options) =>
+        contract.write.approve(txArguments, options),
+    });
   }
 
   @Logger('Utils:')
