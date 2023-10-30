@@ -29,6 +29,7 @@ import type {
 
 import { abi } from './abi/wsteth.js';
 import { stethPartialAbi } from './abi/steth-partial.js';
+import { ERROR_CODE } from '../common/utils/sdk-error.js';
 
 export class LidoSDKWrap {
   readonly core: LidoSDKCore;
@@ -83,7 +84,7 @@ export class LidoSDKWrap {
   // Calls
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async wrapEth(props: WrapProps): Promise<TransactionResult> {
     const { account, callback, value } = this.parseProps(props);
     const web3Provider = this.core.useWeb3Provider();
@@ -125,7 +126,7 @@ export class LidoSDKWrap {
   }
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async wrapEthEstimateGas(
     props: WrapPropsWithoutCallback,
   ): Promise<bigint> {
@@ -142,7 +143,7 @@ export class LidoSDKWrap {
   /// Wrap stETH
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async wrapSteth(props: WrapProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
     const { account, callback, value } = this.parseProps(props);
@@ -175,7 +176,7 @@ export class LidoSDKWrap {
   }
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async wrapStethSimulateTx(
     props: WrapPropsWithoutCallback,
   ): Promise<WriteContractParameters> {
@@ -197,7 +198,7 @@ export class LidoSDKWrap {
   /// Approve
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async approveStethForWrap(
     props: WrapProps,
   ): Promise<TransactionResult> {
@@ -220,7 +221,7 @@ export class LidoSDKWrap {
   }
 
   @Logger('Utils:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getStethForWrapAllowance(account: Address): Promise<bigint> {
     const stethContract = await this.getPartialContractSteth();
     const wstethAddress = await this.contractAddressWstETH();
@@ -248,7 +249,7 @@ export class LidoSDKWrap {
   }
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async approveStethForWrapSimulateTx(
     props: WrapPropsWithoutCallback,
   ): Promise<WriteContractParameters> {
@@ -271,7 +272,7 @@ export class LidoSDKWrap {
   /// Unwrap
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async unwrap(props: WrapProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
     const { account, callback, value } = this.parseProps(props);
@@ -304,7 +305,7 @@ export class LidoSDKWrap {
   }
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async unwrapSimulateTx(
     props: Omit<WrapProps, 'callback'>,
   ): Promise<WriteContractParameters> {
@@ -326,7 +327,7 @@ export class LidoSDKWrap {
   /// Views
 
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async convertStethToWsteth(steth_value: EtherValue): Promise<bigint> {
     const value = parseValue(steth_value);
     const contract = await this.getContractWstETH();
@@ -334,7 +335,7 @@ export class LidoSDKWrap {
   }
 
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async convertWstethToSteth(wsteth_value: EtherValue): Promise<bigint> {
     const value = parseValue(wsteth_value);
     const contract = await this.getContractWstETH();
@@ -352,6 +353,7 @@ export class LidoSDKWrap {
 
     if (value > currentStakeLimit) {
       throw this.core.error({
+        code: ERROR_CODE.TRANSACTION_ERROR,
         message: `Stake value is greater than daily protocol staking limit (${currentStakeLimit})`,
       });
     }

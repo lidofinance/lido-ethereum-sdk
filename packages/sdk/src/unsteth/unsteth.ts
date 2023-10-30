@@ -22,7 +22,6 @@ import {
   zeroAddress,
 } from 'viem';
 import { unstethAbi } from './abi/unsteth-abi.js';
-import invariant from 'tiny-invariant';
 import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
 
 export class LidoSDKUnstETH {
@@ -40,7 +39,6 @@ export class LidoSDKUnstETH {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public contractAddress(): Promise<Address> {
-    invariant(this.core.chain, 'Chain is not defined');
     return this.core.getContractAddress(LIDO_CONTRACT_NAMES.withdrawalQueue);
   }
 
@@ -60,7 +58,7 @@ export class LidoSDKUnstETH {
 
   // Balance
   @Logger('Balances:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getNFTsByAccount(account: Address): Promise<UnstethNFT[]> {
     const contract = await this.getContract();
 
@@ -71,7 +69,7 @@ export class LidoSDKUnstETH {
   }
 
   @Logger('Balances:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getAccountByNFT(id: bigint): Promise<Address> {
     const contract = await this.getContract();
     return contract.read.ownerOf([id]);
@@ -79,7 +77,7 @@ export class LidoSDKUnstETH {
 
   // Transfer
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async transfer(props: UnstethTransferProps) {
     const {
       account,
@@ -108,7 +106,7 @@ export class LidoSDKUnstETH {
   // Approve
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async setApprovalFor(props: UnstethApproveProps) {
     const { account, callback, to = zeroAddress, id } = this.parseProps(props);
     const args = [to, id] as const;
@@ -122,14 +120,14 @@ export class LidoSDKUnstETH {
   }
 
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getTokenApprovedFor({ id, account }: UnstethApprovedForProps) {
     const contract = await this.getContract();
     return contract.read.getApproved([id], { account });
   }
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async setApprovalForAll(props: UnstethApproveAllProps) {
     const { account, callback, to, allow } = this.parseProps(props);
     const args = [to, allow] as const;
@@ -145,7 +143,7 @@ export class LidoSDKUnstETH {
   }
 
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getIsApprovedForAll({
     account,
     to,
@@ -157,7 +155,7 @@ export class LidoSDKUnstETH {
   // Metadata
 
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContractMetadata() {
     const address = await this.contractAddress();
@@ -193,7 +191,7 @@ export class LidoSDKUnstETH {
   }
 
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getTokenMetadataURI(id: bigint): Promise<string> {
     const contract = await this.getContract();
     return contract.read.tokenURI([id]);

@@ -8,11 +8,13 @@ import type {
   Hash,
   WriteContractParameters,
 } from 'viem';
+
 import {
   LidoSDKCore,
   type TransactionResult,
   type PopulatedTransaction,
 } from '../core/index.js';
+import { ERROR_CODE } from '../common/utils/sdk-error.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import {
   SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
@@ -67,7 +69,7 @@ export class LidoSDKStake {
   // Calls
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async stakeEth(props: StakeProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
     const { callback, account, referralAddress, value } =
@@ -88,7 +90,7 @@ export class LidoSDKStake {
   }
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async stakeEthSimulateTx(
     props: StakeProps,
   ): Promise<WriteContractParameters> {
@@ -110,7 +112,7 @@ export class LidoSDKStake {
   // Views
 
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getStakeLimitInfo() {
     const contract = await this.getContractStETH();
 
@@ -165,6 +167,7 @@ export class LidoSDKStake {
 
     if (value > currentStakeLimit) {
       throw this.core.error({
+        code: ERROR_CODE.TRANSACTION_ERROR,
         message: `Stake value is greater than daily protocol staking limit (${currentStakeLimit})`,
       });
     }

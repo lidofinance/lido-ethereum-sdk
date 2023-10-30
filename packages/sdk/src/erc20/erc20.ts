@@ -61,7 +61,7 @@ export abstract class AbstractLidoSDKErc20 {
   // Balance
 
   @Logger('Balances:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async balance(address: Address): Promise<bigint> {
     const contract = await this.getContract();
     return contract.read.balanceOf([address]);
@@ -70,7 +70,7 @@ export abstract class AbstractLidoSDKErc20 {
   // Transfer
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async transfer(props: TransferProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
     const parsedProps = this.parseProps(props);
@@ -96,7 +96,7 @@ export abstract class AbstractLidoSDKErc20 {
   }
 
   @Logger('Utils:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async populateTransfer(props: NoCallback<TransferProps>) {
     const {
       account,
@@ -125,7 +125,7 @@ export abstract class AbstractLidoSDKErc20 {
   }
 
   @Logger('Utils:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async simulateTransfer(props: NoCallback<TransferProps>) {
     const {
       account,
@@ -142,7 +142,7 @@ export abstract class AbstractLidoSDKErc20 {
 
   // PERMIT
   @Logger('Permit:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async signPermit(
     props: SignTokenPermitProps,
   ): Promise<PermitSignature> {
@@ -165,7 +165,7 @@ export abstract class AbstractLidoSDKErc20 {
   }
 
   @Logger('Utils:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async populatePermit(props: SignTokenPermitProps) {
     const {
       amount,
@@ -197,7 +197,7 @@ export abstract class AbstractLidoSDKErc20 {
   // Allowance
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async approve(props: ApproveProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
     const parsedProps = this.parseProps(props);
@@ -213,7 +213,7 @@ export abstract class AbstractLidoSDKErc20 {
   }
 
   @Logger('Utils:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async populateApprove(props: NoCallback<ApproveProps>) {
     const { account, amount, to } = this.parseProps(props);
     const address = await this.contractAddress();
@@ -230,7 +230,7 @@ export abstract class AbstractLidoSDKErc20 {
   }
 
   @Logger('Utils:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async simulateApprove(props: NoCallback<ApproveProps>) {
     const { account, amount, to } = this.parseProps(props);
 
@@ -245,7 +245,7 @@ export abstract class AbstractLidoSDKErc20 {
 
   // Views
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddress'])
   public async erc20Metadata(): Promise<{
     name: string;
@@ -285,18 +285,18 @@ export abstract class AbstractLidoSDKErc20 {
   }
 
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async totalSupply(): Promise<bigint> {
     return (await this.getContract()).read.totalSupply();
   }
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async nonces(address: Address): Promise<bigint> {
     return (await this.getContract()).read.nonces([address]);
   }
 
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddress'])
   public async erc721Domain(): Promise<{
     name: string;

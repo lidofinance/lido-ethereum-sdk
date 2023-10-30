@@ -1,4 +1,3 @@
-import invariant from 'tiny-invariant';
 import {
   type Address,
   type GetContractReturnType,
@@ -36,6 +35,7 @@ import {
 import { addressEqual } from '../common/utils/address-equal.js';
 import { getInitialData } from './subgraph/index.js';
 import { calcShareRate, requestWithBlockStep, sharesToSteth } from './utils.js';
+import { ERROR_CODE, invariant, invariantArgument } from '../index.js';
 
 export class LidoSDKRewards {
   private static readonly PRECISION = 10n ** 27n;
@@ -53,15 +53,12 @@ export class LidoSDKRewards {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   private async contractAddressStETH(): Promise<Address> {
-    invariant(this.core.chain, 'Chain is not defined');
-
     return await this.core.getContractAddress(LIDO_CONTRACT_NAMES.lido);
   }
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   private async contractAddressWithdrawalQueue(): Promise<Address> {
-    invariant(this.core.chain, 'Chain is not defined');
     return await this.core.getContractAddress(
       LIDO_CONTRACT_NAMES.withdrawalQueue,
     );
@@ -70,7 +67,6 @@ export class LidoSDKRewards {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   private earliestRebaseEventBlock(): bigint {
-    invariant(this.core.chain, 'Chain is not defined');
     return EARLIEST_TOKEN_REBASED_EVENT[this.core.chainId];
   }
 
@@ -105,9 +101,10 @@ export class LidoSDKRewards {
 
     const lowerBound = this.earliestRebaseEventBlock();
     if (fromBlock < lowerBound)
-      throw new Error(
-        `Cannot index events earlier than first TokenRebased event at block ${lowerBound.toString()}`,
-      );
+      this.core.error({
+        message: `Cannot index events earlier than first TokenRebased event at block ${lowerBound.toString()}`,
+        code: ERROR_CODE.NOT_SUPPORTED,
+      });
 
     const preBlock = fromBlock === 0n ? 0n : fromBlock - 1n;
 
@@ -231,7 +228,7 @@ export class LidoSDKRewards {
           originalEvent: event,
         };
       }
-      throw new Error('Impossible event type');
+      invariant(false, 'Impossible event');
     });
 
     if (!includeZeroRebases) {
@@ -435,7 +432,7 @@ export class LidoSDKRewards {
           originalEvent: event,
         };
       }
-      throw new Error('Impossible event');
+      invariant(false, 'impossible event');
     });
 
     if (!includeZeroRebases) {
@@ -470,16 +467,16 @@ export class LidoSDKRewards {
   > {
     const toBlock = await this.toBlockNumber(props.toBlock ?? 'latest');
     if (props.fromBlock == undefined) {
-      invariant(toBlock - props.blocksBack >= 0n, 'blockBack too far');
+      invariantArgument(toBlock - props.blocksBack >= 0n, 'blocksBack too far');
     }
     const fromBlock = await this.toBlockNumber(
       props.fromBlock ?? toBlock - props.blocksBack,
     );
-    invariant(toBlock > fromBlock, 'toBlock is higher than fromBlock');
+    invariantArgument(toBlock > fromBlock, 'toBlock is higher than fromBlock');
 
     const { step = LidoSDKRewards.DEFAULT_STEP, includeZeroRebases = false } =
       props;
-    invariant(step > 0, 'steps must be a positive integer');
+    invariantArgument(step > 0, 'steps must be a positive integer');
 
     return {
       ...props,
@@ -498,7 +495,7 @@ export class LidoSDKRewards {
     const { number } = await this.core.rpcProvider.getBlock({
       blockTag: block,
     });
-    invariant(number, 'block must not be pending');
+    invariantArgument(number, 'block must not be pending');
     return number;
   }
 }

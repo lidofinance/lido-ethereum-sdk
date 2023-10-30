@@ -5,7 +5,6 @@ import type {
   PublicClient,
   WalletClient,
 } from 'viem';
-import invariant from 'tiny-invariant';
 
 import { LidoSDKCore } from '../core/index.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
@@ -14,6 +13,7 @@ import { version } from '../version.js';
 
 import { StethEventsAbi } from './abi/stethEvents.js';
 import { type LidoSDKEventsProps, RebaseEvent } from './types.js';
+import { invariant } from '../common/utils/sdk-error.js';
 
 const BLOCKS_BY_DAY = 7600n;
 const REBASE_EVENT_ABI_INDEX = 8;
@@ -34,8 +34,6 @@ export class LidoSDKStethEvents {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   private async contractAddressStETH(): Promise<Address> {
-    invariant(this.core.chain, 'Chain is not defined');
-
     return await this.core.getContractAddress(LIDO_CONTRACT_NAMES.lido);
   }
 
@@ -117,7 +115,7 @@ export class LidoSDKStethEvents {
     const contract = await this.getContractStETH();
     const lastEvent = await this.getLastRebaseEvent();
     const lastEventTimestamp = lastEvent?.args.reportTimestamp;
-    invariant(lastEventTimestamp, 'lastEventTimestamp is not defined');
+    invariant(lastEventTimestamp, 'Could not find any recent rebases');
 
     const targetTimestamp = lastEventTimestamp - BigInt(days * 24 * 60 * 60);
     const block = await this.getBlockByDays({ days: 7 });

@@ -5,8 +5,6 @@ import {
   type PublicClient,
   type WalletClient,
 } from 'viem';
-import invariant from 'tiny-invariant';
-
 import { Logger, Cache } from '../common/decorators/index.js';
 import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
 
@@ -21,8 +19,6 @@ export class LidoSDKWithdrawContract extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async contractAddressWithdrawalQueue(): Promise<Address> {
-    invariant(this.bus.core.chain, 'Chain is not defined');
-
     return await this.bus.core.getContractAddress(
       LIDO_CONTRACT_NAMES.withdrawalQueue,
     );
@@ -49,8 +45,6 @@ export class LidoSDKWithdrawContract extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async contractAddressStETH(): Promise<Address> {
-    invariant(this.bus.core.chain, 'Chain is not defined');
-
     return await this.bus.core.getContractAddress(LIDO_CONTRACT_NAMES.lido);
   }
 
@@ -72,8 +66,6 @@ export class LidoSDKWithdrawContract extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async contractAddressWstETH(): Promise<Address> {
-    invariant(this.bus.core.chain, 'Chain is not defined');
-
     return await this.bus.core.getContractAddress(LIDO_CONTRACT_NAMES.wsteth);
   }
 

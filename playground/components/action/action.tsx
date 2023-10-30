@@ -78,7 +78,7 @@ const defaultRenderError = (error: SDKError) => {
     <Accordion
       summary={
         <ErrorMessage>
-          {String(error.errorMessage).slice(0, 30) + '...'}
+          {error.code}:{String(error.errorMessage).slice(0, 30) + '...'}
         </ErrorMessage>
       }
     >
