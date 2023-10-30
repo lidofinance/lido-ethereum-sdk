@@ -14,6 +14,11 @@ export type PermitWstETHStETHProps = {
   deadline: bigint;
 };
 
+export type SplitAmountToRequestsProps = {
+  amount: EtherValue;
+  token: WithdrawableTokens;
+};
+
 export type PermitProps = PermitWstETHStETHProps & {
   token: WithdrawableTokens;
 };
@@ -21,10 +26,18 @@ export type PermitProps = PermitWstETHStETHProps & {
 export type RequestProps = {
   account: Address;
   receiver?: Address;
-  requests: readonly bigint[];
   token: WithdrawableTokens;
   callback?: TransactionCallback;
-};
+} & (
+  | {
+      amount: EtherValue;
+      requests?: undefined;
+    }
+  | {
+      requests: readonly bigint[];
+      amount?: undefined;
+    }
+);
 
 export type SignedPermit = {
   value: bigint;
@@ -36,6 +49,10 @@ export type SignedPermit = {
 
 export type RequestWithPermitProps = RequestProps & {
   permit?: SignedPermit;
+};
+
+export type RequirePermit<TProps> = Omit<TProps, 'permit'> & {
+  permit: SignedPermit;
 };
 
 export type WithdrawApproveProps = {

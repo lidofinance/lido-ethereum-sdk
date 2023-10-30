@@ -25,11 +25,6 @@ export type ParsedProps<TProps extends UnstethCommonTransactionProps> = Omit<
 > &
   Required<UnstethCommonTransactionProps>;
 
-export type NoCallback<TProps extends UnstethCommonTransactionProps> = Omit<
-  TProps,
-  'callback'
->;
-
 export type UnstethTransferProps = {
   to: Address;
   id: bigint;

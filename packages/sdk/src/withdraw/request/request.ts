@@ -5,6 +5,8 @@ import {
   type PerformTransactionGasLimit,
   type PerformTransactionSendTransaction,
   type TransactionResult,
+  NoCallback,
+  PopulatedTransaction,
 } from '../../core/types.js';
 
 import { BusModule } from '../bus-module.js';
@@ -13,23 +15,65 @@ import type {
   RequestWithPermitProps,
   RequestProps,
   SignedPermit,
+  SplitAmountToRequestsProps,
+  RequirePermit,
 } from './types.js';
-import { invariant } from '../../common/utils/sdk-error.js';
+import { invariant, invariantArgument } from '../../common/utils/sdk-error.js';
+import {
+  SimulateContractReturnType,
+  encodeFunctionData,
+  formatEther,
+} from 'viem';
+import { parseValue } from '../../common/utils/parse-value.js';
 
 export class LidoSDKWithdrawRequest extends BusModule {
+  @Logger('Views:')
+  public async splitAmountToRequests({
+    amount: _amount,
+    token,
+  }: SplitAmountToRequestsProps): Promise<Array<bigint>> {
+    const amount = parseValue(_amount);
+    const isSteth = token === 'stETH';
+    const [min, max] = await Promise.all([
+      isSteth
+        ? this.bus.views.minStethWithdrawalAmount()
+        : this.bus.views.minWStethWithdrawalAmount(),
+      isSteth
+        ? this.bus.views.maxStethWithdrawalAmount()
+        : this.bus.views.maxWStethWithdrawalAmount(),
+    ]);
+    invariantArgument(
+      amount >= min,
+      `Amount is less than minimal withdrawable amount allowed(${formatEther(
+        min,
+      )} ${token})`,
+    );
+
+    const rest = amount % max;
+    const requestCount = amount / max;
+
+    const result = new Array(requestCount).fill(max);
+    if (rest > 0n) {
+      invariantArgument(
+        rest >= min,
+        `Amount cannot be split, as last request would be less than minimal withdrawable amount allowed(${formatEther(
+          min,
+        )} ${token})`,
+      );
+      result.push(rest);
+    }
+    return result;
+  }
+
   // Calls
   @Logger('Call:')
   @ErrorHandler()
   public async requestApproved(
     props: RequestProps,
   ): Promise<TransactionResult> {
-    const {
-      account,
-      requests,
-      token,
-      receiver = account,
-      callback = NOOP,
-    } = props;
+    const { account, token, receiver = account, callback = NOOP } = props;
+    const requests =
+      props.requests ?? (await this.splitAmountToRequests(props));
     const isSteth = token === 'stETH';
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
@@ -56,6 +100,64 @@ export class LidoSDKWithdrawRequest extends BusModule {
     });
   }
 
+  @Logger('Views:')
+  @ErrorHandler()
+  public async requestApprovedSimulateTx(
+    props: NoCallback<RequestProps>,
+  ): Promise<SimulateContractReturnType> {
+    const {
+      token,
+      account,
+      receiver = account,
+      amount = 0n,
+      requests: _requests,
+    } = props;
+    const requests =
+      _requests ?? (await this.splitAmountToRequests({ amount, token }));
+    const isSteth = token === 'stETH';
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
+
+    const args = [requests, receiver] as const;
+    const result = await (isSteth
+      ? contract.simulate.requestWithdrawals(args)
+      : contract.simulate.requestWithdrawalsWstETH(args));
+
+    return result;
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
+  public async requestApprovedPopulateTx(
+    props: NoCallback<RequestWithPermitProps>,
+  ): Promise<PopulatedTransaction> {
+    const {
+      token,
+      account,
+      receiver = account,
+      amount = 0n,
+      requests: _requests,
+    } = props;
+    const requests =
+      _requests ?? (await this.splitAmountToRequests({ amount, token }));
+    const isSteth = token === 'stETH';
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
+
+    const args = [requests, receiver] as const;
+    const functionName = isSteth
+      ? 'requestWithdrawals'
+      : ('requestWithdrawalsWstETH' as const);
+
+    return {
+      from: account,
+      to: contract.address,
+      data: encodeFunctionData({
+        abi: contract.abi,
+        functionName,
+        args,
+      }),
+    };
+  }
+
   @Logger('Call:')
   @ErrorHandler()
   public async requestWithPermit(
@@ -63,12 +165,13 @@ export class LidoSDKWithdrawRequest extends BusModule {
   ): Promise<TransactionResult> {
     const {
       account,
-      requests,
       token,
       receiver = account,
       callback = NOOP,
       permit: permitProp,
     } = props;
+    const requests =
+      props.requests ?? (await this.splitAmountToRequests(props));
     const isSteth = token === 'stETH';
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
@@ -126,6 +229,66 @@ export class LidoSDKWithdrawRequest extends BusModule {
       getGasLimit,
       sendTransaction,
     });
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
+  public async requestWithPermitSimulateTx(
+    props: NoCallback<RequirePermit<RequestWithPermitProps>>,
+  ): Promise<SimulateContractReturnType> {
+    const {
+      token,
+      account,
+      receiver = account,
+      permit,
+      amount = 0n,
+      requests: _requests,
+    } = props;
+    const requests =
+      _requests ?? (await this.splitAmountToRequests({ amount, token }));
+    const isSteth = token === 'stETH';
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
+
+    const args = [requests, receiver, permit] as const;
+    const result = await (isSteth
+      ? contract.simulate.requestWithdrawalsWithPermit(args)
+      : contract.simulate.requestWithdrawalsWstETHWithPermit(args));
+
+    return result;
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
+  public async requestWithPermitPopulateTx(
+    props: NoCallback<RequirePermit<RequestWithPermitProps>>,
+  ): Promise<PopulatedTransaction> {
+    const {
+      token,
+      account,
+      receiver = account,
+      permit,
+      amount = 0n,
+      requests: _requests,
+    } = props;
+    const requests =
+      _requests ?? (await this.splitAmountToRequests({ amount, token }));
+    const isSteth = token === 'stETH';
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
+
+    const args = [requests, receiver, permit] as const;
+    const functionName = isSteth
+      ? 'requestWithdrawalsWithPermit'
+      : ('requestWithdrawalsWstETHWithPermit' as const);
+
+    return {
+      from: account,
+      to: contract.address,
+      data: encodeFunctionData({
+        abi: contract.abi,
+        functionName,
+        args,
+      }),
+    };
   }
 
   // TODO
