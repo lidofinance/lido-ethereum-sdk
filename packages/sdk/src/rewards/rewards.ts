@@ -35,7 +35,7 @@ import {
 import { addressEqual } from '../common/utils/address-equal.js';
 import { getInitialData } from './subgraph/index.js';
 import { calcShareRate, requestWithBlockStep, sharesToSteth } from './utils.js';
-import { invariant, invariantArgument } from '../index.js';
+import { ERROR_CODE, invariant, invariantArgument } from '../index.js';
 
 export class LidoSDKRewards {
   private static readonly PRECISION = 10n ** 27n;
@@ -105,7 +105,7 @@ export class LidoSDKRewards {
     if (fromBlock < lowerBound)
       this.core.error({
         message: `Cannot index events earlier than first TokenRebased event at block ${lowerBound.toString()}`,
-        code: 'NOT_SUPPORTED',
+        code: ERROR_CODE.NOT_SUPPORTED,
       });
 
     const preBlock = fromBlock === 0n ? 0n : fromBlock - 1n;

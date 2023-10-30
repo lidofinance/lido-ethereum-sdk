@@ -1,17 +1,17 @@
 import { LidoSDKCore } from '../core/index.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import { version } from '../version.js';
-import {
+import type {
   UnstethNFT,
-  type UnstethApproveAllProps,
-  type UnstethApproveProps,
-  type UnstethApprovedForProps,
-  type UnstethIsApprovedForAllProps,
-  type LidoSDKUnstETHProps,
-  type ParsedProps,
-  type SafeTransferFromArguments,
-  type UnstethCommonTransactionProps,
-  type UnstethTransferProps,
+  UnstethApproveAllProps,
+  UnstethApproveProps,
+  UnstethApprovedForProps,
+  UnstethIsApprovedForAllProps,
+  LidoSDKUnstETHProps,
+  ParsedProps,
+  SafeTransferFromArguments,
+  UnstethCommonTransactionProps,
+  UnstethTransferProps,
 } from './types.js';
 import {
   type Address,

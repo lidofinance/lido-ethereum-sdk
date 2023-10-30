@@ -14,13 +14,13 @@ import type {
   RequestProps,
   SignedPermit,
 } from './types.js';
-import { invariant } from '../../common/utils/sdk-error.js';
+import { ERROR_CODE, invariant } from '../../common/utils/sdk-error.js';
 
 export class LidoSDKWithdrawRequest extends BusModule {
   // Calls
   @Logger('Call:')
-  @ErrorHandler()
-  public async requestApproved(
+  @ErrorHandler('Error:')
+  public async requestWithdrawal(
     props: RequestProps,
   ): Promise<TransactionResult> {
     const {
@@ -57,8 +57,8 @@ export class LidoSDKWithdrawRequest extends BusModule {
   }
 
   @Logger('Call:')
-  @ErrorHandler()
-  public async requestWithPermit(
+  @ErrorHandler('Error:')
+  public async requestWithdrawalWithPermit(
     props: RequestWithPermitProps,
   ): Promise<TransactionResult> {
     const {
@@ -81,7 +81,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
       invariant(
         !isContract,
         'Cannot sign permit for contract',
-        'NOT_SUPPORTED',
+        ERROR_CODE.NOT_SUPPORTED,
       );
       const amount = requests.reduce((sum, request) => sum + request);
       const signature = await this.bus.core.signPermit({

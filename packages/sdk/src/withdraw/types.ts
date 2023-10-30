@@ -5,7 +5,7 @@ import type { Bus } from './bus.js';
 
 export type LidoSDKWithdrawProps = LidoSDKCommonProps;
 
-export type LidoSDKWithdrawModuleProps = { bus: Bus };
+export type LidoSDKWithdrawModuleProps = { bus: Bus; version?: string };
 
 export type RequestStatus = {
   amountOfStETH: bigint;

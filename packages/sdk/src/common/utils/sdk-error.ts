@@ -1,10 +1,11 @@
-type ERROR_CODE =
-  | 'INVALID_ARGUMENT'
-  | 'NOT_SUPPORTED'
-  | 'PROVIDER_ERROR'
-  | 'READ_ERROR'
-  | 'TRANSACTION_ERROR'
-  | 'UNKNOWN_ERROR';
+export const enum ERROR_CODE {
+  INVALID_ARGUMENT = 'INVALID_ARGUMENT',
+  NOT_SUPPORTED = 'NOT_SUPPORTED',
+  PROVIDER_ERROR = 'PROVIDER_ERROR',
+  READ_ERROR = 'READ_ERROR',
+  TRANSACTION_ERROR = 'TRANSACTION_ERROR',
+  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+}
 
 export type SDKErrorProps = {
   code?: ERROR_CODE;
@@ -15,7 +16,7 @@ export type SDKErrorProps = {
 export class SDKError extends Error {
   public static from(
     error: unknown,
-    code: ERROR_CODE = 'UNKNOWN_ERROR',
+    code: ERROR_CODE = ERROR_CODE.UNKNOWN_ERROR,
   ): SDKError {
     if (error instanceof SDKError) return error;
     return new SDKError({
@@ -32,13 +33,12 @@ export class SDKError extends Error {
   }
 
   public code: ERROR_CODE;
-
   public errorMessage: string | undefined;
 
   constructor({ code, error = {}, message }: SDKErrorProps) {
     super(message);
     Object.assign(this, error);
-    this.code = code ?? 'UNKNOWN_ERROR';
+    this.code = code ?? ERROR_CODE.UNKNOWN_ERROR;
     this.errorMessage = message;
   }
 }
@@ -46,11 +46,11 @@ export class SDKError extends Error {
 export function invariant(
   condition: any,
   message: string,
-  code: ERROR_CODE = 'UNKNOWN_ERROR',
+  code?: ERROR_CODE,
 ): asserts condition {
   if (condition) return;
 
-  throw new SDKError({ code, message });
+  throw new SDKError({ message, code });
 }
 
 // shortcut for argument error
@@ -60,10 +60,10 @@ export function invariantArgument(
 ): asserts condition {
   if (condition) return;
 
-  throw new SDKError({ code: 'INVALID_ARGUMENT', message });
+  throw new SDKError({ code: ERROR_CODE.INVALID_ARGUMENT, message });
 }
 
-export async function withSdkError<TResult>(
+export async function withSDKError<TResult>(
   func: Promise<TResult>,
   code?: ERROR_CODE,
 ): Promise<TResult> {
