@@ -11,7 +11,6 @@ import {
 import { type LidoSDKWithdrawProps } from './types.js';
 
 export class Bus {
-  private props: LidoSDKWithdrawProps;
   private version: string | undefined;
 
   private coreInstance: LidoSDKCore;
@@ -23,7 +22,6 @@ export class Bus {
   private requestInstance: LidoSDKWithdrawRequest | undefined;
 
   constructor(props: LidoSDKWithdrawProps, version?: string) {
-    this.props = props;
     this.version = version;
 
     if (props.core) this.coreInstance = props.core;
@@ -42,6 +40,7 @@ export class Bus {
     if (!this.contractInstance) {
       this.contractInstance = new LidoSDKWithdrawContract({
         bus: this,
+        version: this.version,
       });
     }
     return this.contractInstance;
@@ -53,6 +52,7 @@ export class Bus {
     if (!this.viewsInstance) {
       this.viewsInstance = new LidoSDKWithdrawViews({
         bus: this,
+        version: this.version,
       });
     }
     return this.viewsInstance;
@@ -64,6 +64,7 @@ export class Bus {
     if (!this.requestsInfoInstance) {
       this.requestsInfoInstance = new LidoSDKWithdrawRequestsInfo({
         bus: this,
+        version: this.version,
       });
     }
     return this.requestsInfoInstance;
@@ -75,6 +76,7 @@ export class Bus {
     if (!this.approvalInstance) {
       this.approvalInstance = new LidoSDKWithdrawApprove({
         bus: this,
+        version: this.version,
       });
     }
     return this.approvalInstance;
@@ -86,13 +88,10 @@ export class Bus {
     if (!this.claimInstance) {
       this.claimInstance = new LidoSDKWithdrawClaim({
         bus: this,
+        version: this.version,
       });
     }
     return this.claimInstance;
-  }
-
-  set claim(approve: LidoSDKWithdrawClaim) {
-    this.claimInstance = approve;
   }
 
   // Request
@@ -100,14 +99,10 @@ export class Bus {
   get request(): LidoSDKWithdrawRequest {
     if (!this.requestInstance) {
       this.requestInstance = new LidoSDKWithdrawRequest({
-        ...this.props,
         bus: this,
+        version: this.version,
       });
     }
     return this.requestInstance;
-  }
-
-  set request(approve: LidoSDKWithdrawRequest) {
-    this.requestInstance = approve;
   }
 }

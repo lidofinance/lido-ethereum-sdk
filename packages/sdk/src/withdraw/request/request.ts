@@ -19,8 +19,8 @@ import { ERROR_CODE, invariant } from '../../common/utils/sdk-error.js';
 export class LidoSDKWithdrawRequest extends BusModule {
   // Calls
   @Logger('Call:')
-  @ErrorHandler()
-  public async requestApproved(
+  @ErrorHandler('Error:')
+  public async requestWithdrawal(
     props: RequestProps,
   ): Promise<TransactionResult> {
     const {
@@ -57,8 +57,8 @@ export class LidoSDKWithdrawRequest extends BusModule {
   }
 
   @Logger('Call:')
-  @ErrorHandler()
-  public async requestWithPermit(
+  @ErrorHandler('Error:')
+  public async requestWithdrawalWithPermit(
     props: RequestWithPermitProps,
   ): Promise<TransactionResult> {
     const {

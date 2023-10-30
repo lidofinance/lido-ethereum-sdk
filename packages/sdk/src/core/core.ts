@@ -19,7 +19,6 @@ import {
 import {
   ERROR_CODE,
   invariant,
-  invariantArgument,
   withSDKError,
 } from '../common/utils/sdk-error.js';
 import { splitSignature } from '@ethersproject/bytes';
@@ -56,7 +55,7 @@ import { permitAbi } from './abi/permit.js';
 export default class LidoSDKCore {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
 
-  private _web3Provider: WalletClient | undefined;
+  #web3Provider: WalletClient | undefined;
 
   readonly chainId: CHAINS;
   readonly rpcUrls: string[] | undefined;
@@ -65,7 +64,7 @@ export default class LidoSDKCore {
   readonly logMode: LOG_MODE;
 
   public get web3Provider(): WalletClient | undefined {
-    return this._web3Provider;
+    return this.#web3Provider;
   }
 
   constructor(props: LidoSDKCoreProps, version?: string) {
@@ -75,7 +74,7 @@ export default class LidoSDKCore {
     this.chain = chain;
     this.rpcUrls = props.rpcUrls;
     this.rpcProvider = rpcProvider;
-    this._web3Provider = web3Provider;
+    this.#web3Provider = web3Provider;
     this.logMode = props.logMode ?? 'info';
   }
 
@@ -141,22 +140,13 @@ export default class LidoSDKCore {
   // Web 3 provider
 
   @Logger('Provider:')
-  public setWeb3Provider(web3Provider: WalletClient): void {
-    invariantArgument(
-      web3Provider.chain === this.chain,
-      `Chain in Web3Provider(${web3Provider.chain?.id}) does not match current chain(${this.chain})`,
-    );
-    this._web3Provider = web3Provider;
-  }
-
-  @Logger('Provider:')
   public useWeb3Provider(): WalletClient {
     invariant(
-      this._web3Provider,
+      this.#web3Provider,
       'Web3 Provider is not defined',
       ERROR_CODE.PROVIDER_ERROR,
     );
-    return this._web3Provider;
+    return this.#web3Provider;
   }
 
   // Balances

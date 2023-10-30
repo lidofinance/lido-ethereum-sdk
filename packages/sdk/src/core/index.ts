@@ -9,5 +9,6 @@ export {
   type EtherValue,
   type PermitSignature,
   type GetFeeDataResult,
+  type PopulatedTransaction,
   TransactionCallbackStage,
 } from './types.js';
