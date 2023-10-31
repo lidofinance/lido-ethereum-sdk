@@ -1,4 +1,4 @@
-export type { LidoSDKWithdraw } from './withdraw.js';
+export { LidoSDKWithdraw } from './withdraw.js';
 export type { ClaimRequestsProps } from './claim/types.js';
 export type {
   RequestProps,

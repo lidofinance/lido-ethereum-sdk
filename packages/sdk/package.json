@@ -66,6 +66,11 @@
       "default": "./dist/cjs/rewards/index.js",
       "types": "./dist/types/rewards/index.d.ts"
     },
+    "./shares": {
+      "import": "./dist/esm/shares/index.js",
+      "default": "./dist/cjs/shares/index.js",
+      "types": "./dist/types/shares/index.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -118,7 +123,7 @@
     "@ethersproject/bytes": "^5.7.0",
     "graphql": "^16.8.1",
     "graphql-request": "^6.1.0",
-    "viem": "^1.15.3"
+    "viem": "^1.18.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.1",
