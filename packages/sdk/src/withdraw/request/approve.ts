@@ -1,13 +1,22 @@
-import { type Address } from 'viem';
+import { type SimulateContractReturnType, encodeFunctionData } from 'viem';
 
-import { EtherValue, TransactionResult } from '../../core/index.js';
+import type {
+  NoCallback,
+  PopulatedTransaction,
+  TransactionResult,
+} from '../../core/types.js';
 import { NOOP } from '../../common/constants.js';
 import { parseValue } from '../../common/utils/parse-value.js';
 import { Logger, Cache, ErrorHandler } from '../../common/decorators/index.js';
 
 import { Bus } from '../bus.js';
 import { LidoSDKWithdrawModuleProps } from '../types.js';
-import type { WithdrawableTokens, WithdrawApproveProps } from './types.js';
+import type {
+  CheckAllowanceProps,
+  CheckAllowanceResult,
+  GetAllowanceProps,
+  WithdrawApproveProps,
+} from './types.js';
 
 export class LidoSDKWithdrawApprove {
   private readonly bus: Bus;
@@ -29,9 +38,12 @@ export class LidoSDKWithdrawApprove {
 
     const isSteth = token === 'stETH';
 
-    const contract = isSteth
-      ? await this.bus.contract.getContractStETH()
-      : await this.bus.contract.getContractWstETH();
+    // typing is wonky so we cast steth contract as interfaces are the same
+    const contract = (
+      isSteth
+        ? await this.bus.contract.getContractStETH()
+        : await this.bus.contract.getContractWstETH()
+    ) as Awaited<ReturnType<typeof this.bus.contract.getContractStETH>>;
 
     return this.bus.core.performTransaction({
       account,
@@ -42,22 +54,72 @@ export class LidoSDKWithdrawApprove {
           options,
         ),
       sendTransaction: (options) =>
-        // weird ts error
-        //@ts-expect-error
         contract.write.approve([addressWithdrawalsQueue, amount], options),
     });
   }
 
+  @Logger('Views:')
+  @ErrorHandler()
+  public async approveSimulateTx(
+    props: NoCallback<WithdrawApproveProps>,
+  ): Promise<SimulateContractReturnType> {
+    const { token, account, amount: _amount } = props;
+    const amount = parseValue(_amount);
+    const isSteth = token === 'stETH';
+    const addressWithdrawalsQueue =
+      await this.bus.contract.contractAddressWithdrawalQueue();
+
+    const contract = (
+      isSteth
+        ? await this.bus.contract.getContractStETH()
+        : await this.bus.contract.getContractWstETH()
+    ) as Awaited<ReturnType<typeof this.bus.contract.getContractStETH>>;
+
+    const result = contract.simulate.approve(
+      [addressWithdrawalsQueue, amount],
+      { account },
+    );
+
+    return result;
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
+  public async approvePopulateTx(
+    props: NoCallback<WithdrawApproveProps>,
+  ): Promise<PopulatedTransaction> {
+    const { token, account, amount: _amount } = props;
+    const amount = parseValue(_amount);
+    const isSteth = token === 'stETH';
+
+    const addressWithdrawalsQueue =
+      await this.bus.contract.contractAddressWithdrawalQueue();
+    const contract = (
+      isSteth
+        ? await this.bus.contract.getContractStETH()
+        : await this.bus.contract.getContractWstETH()
+    ) as Awaited<ReturnType<typeof this.bus.contract.getContractStETH>>;
+
+    return {
+      from: account,
+      to: contract.address,
+      data: encodeFunctionData({
+        abi: contract.abi,
+        functionName: 'approve',
+        args: [addressWithdrawalsQueue, amount],
+      }),
+    };
+  }
+
   // Utils
 
-  // TODO props&return typings
   @Logger('Utils:')
   @Cache(30 * 1000, ['bus.core.chain.id'])
-  public async approveGasLimit(
-    amount: EtherValue,
-    account: Address,
-    token: WithdrawableTokens,
-  ) {
+  public async approveGasLimit({
+    account,
+    token,
+    amount,
+  }: NoCallback<WithdrawApproveProps>): Promise<bigint> {
     const value = parseValue(amount);
     const isSteth = token === 'stETH';
     let estimateGasMethod;
@@ -81,16 +143,12 @@ export class LidoSDKWithdrawApprove {
     return gasLimit;
   }
 
-  // TODO props&return typings
   @Logger('Utils:')
   @ErrorHandler()
   public async getAllowance({
     account,
     token,
-  }: {
-    account: Address;
-    token: WithdrawableTokens;
-  }) {
+  }: GetAllowanceProps): Promise<bigint> {
     const isSteth = token === 'stETH';
     let allowanceMethod;
 
@@ -113,18 +171,13 @@ export class LidoSDKWithdrawApprove {
     return allowance;
   }
 
-  // TODO props&return typings
   @Logger('Utils:')
   @ErrorHandler()
   public async checkAllowance({
     amount: _amount,
     account,
     token,
-  }: {
-    amount: EtherValue;
-    account: Address;
-    token: WithdrawableTokens;
-  }) {
+  }: CheckAllowanceProps): Promise<CheckAllowanceResult> {
     const amount = parseValue(_amount);
     const isSteth = token === 'stETH';
     let allowanceMethod;
@@ -144,8 +197,8 @@ export class LidoSDKWithdrawApprove {
       [account, addressWithdrawalsQueue],
       { account },
     );
-    const isNeedApprove = allowance < amount;
+    const needsApprove = allowance < amount;
 
-    return { allowance, isNeedApprove };
+    return { allowance, needsApprove };
   }
 }

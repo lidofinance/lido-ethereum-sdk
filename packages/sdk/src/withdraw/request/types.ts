@@ -1,6 +1,6 @@
-import { Hash, type Address } from 'viem';
+import type { Hash, Address } from 'viem';
 
-import { EtherValue, TransactionCallback } from '../../core/index.js';
+import type { EtherValue, TransactionCallback } from '../../core/index.js';
 import { LIDO_TOKENS } from '../../common/constants.js';
 
 export type WithdrawableTokens =
@@ -60,4 +60,18 @@ export type WithdrawApproveProps = {
   amount: EtherValue;
   token: WithdrawableTokens;
   callback?: TransactionCallback;
+};
+
+export type GetAllowanceProps = {
+  account: Address;
+  token: WithdrawableTokens;
+};
+
+export type CheckAllowanceProps = GetAllowanceProps & {
+  amount: EtherValue;
+};
+
+export type CheckAllowanceResult = {
+  allowance: bigint;
+  needsApprove: boolean;
 };
