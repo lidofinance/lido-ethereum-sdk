@@ -226,7 +226,7 @@ export class LidoSDKRewards {
         return {
           type: 'rebase',
           change,
-          apr: LidoSDKApr.calculateAprFromRebaseEvent(event.args),
+          apr: LidoSDKApr.calculateAprFromRebaseEvent(event.args) / 100,
           changeShares: 0n,
           balance: newBalance,
           balanceShares: prevSharesBalance,

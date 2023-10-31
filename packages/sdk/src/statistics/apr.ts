@@ -38,7 +38,7 @@ export class LidoSDKApr {
     const postShareRate = (postTotalEther * BigInt(10 ** 27)) / postTotalShares;
     const mulForPrecision = 1000;
 
-    const secondsInYear = BigInt(31536000);
+    const secondsInYear = 31536000n;
     const userAPR =
       (secondsInYear *
         ((postShareRate - preShareRate) * BigInt(mulForPrecision))) /

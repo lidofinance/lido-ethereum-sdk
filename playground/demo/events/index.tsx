@@ -33,11 +33,8 @@ export const EventsDemo = () => {
       <Action
         title="Last 10 Rebase events"
         action={() =>
-          events.stethEvents.getRebaseEvents({
-            back: {
-              days: BigInt(11),
-            },
-            maxCount: 10,
+          events.stethEvents.getLastRebaseEvents({
+            count: 10,
           })
         }
       />
