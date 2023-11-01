@@ -12,6 +12,7 @@ import { UnstethDemo } from './unsteth';
 import { EventsDemo } from './events';
 import { StatisticsDemo } from './statistics';
 import { RewardsDemo } from './rewards';
+import { ShareDemo } from './shares';
 
 export const Demo = () => {
   return (
@@ -26,6 +27,7 @@ export const Demo = () => {
       <StethDemo />
       <WstethDemo />
       <UnstethDemo />
+      <ShareDemo />
       <EventsDemo />
       <StatisticsDemo />
       <RewardsDemo />

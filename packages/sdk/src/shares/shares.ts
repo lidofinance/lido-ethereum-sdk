@@ -11,7 +11,11 @@ import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
 import { LidoSDKCore, TransactionResult } from '../core/index.js';
 import { version } from '../version.js';
-import { LidoSDKSharesProps, SharesTransferProps } from './types.js';
+import {
+  LidoSDKSharesProps,
+  SharesTotalSupplyResult,
+  SharesTransferProps,
+} from './types.js';
 import { stethSharesAbi } from './abi/steth-shares-abi.js';
 import { parseValue } from '../common/utils/parse-value.js';
 import { EtherValue, NoCallback } from '../core/types.js';
@@ -140,10 +144,10 @@ export class LidoSDKShares {
     return contract.read.getPooledEthByShares([amount]);
   }
 
-  // convert
+  // total supply
   @Logger('Views:')
   @ErrorHandler()
-  public async getShareRate(): Promise<number> {
+  public async getTotalSupply(): Promise<SharesTotalSupplyResult> {
     const sharesContract = await this.getContractStETHshares();
     const contract = {
       address: sharesContract.address,
@@ -162,6 +166,13 @@ export class LidoSDKShares {
         },
       ] as const,
     });
+    return { totalEther, totalShares };
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
+  public async getShareRate(): Promise<number> {
+    const { totalEther, totalShares } = await this.getTotalSupply();
     return calcShareRate(totalEther, totalShares, LidoSDKShares.PRECISION);
   }
 }

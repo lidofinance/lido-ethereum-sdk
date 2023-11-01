@@ -14,3 +14,8 @@ export type SharesTransferProps = {
   amount: EtherValue;
   callback?: TransactionCallback;
 };
+
+export type SharesTotalSupplyResult = {
+  totalShares: bigint;
+  totalEther: bigint;
+};
