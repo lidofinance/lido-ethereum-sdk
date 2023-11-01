@@ -8,6 +8,7 @@ import { LidoSDKUnstETH } from './unsteth/index.js';
 import { LidoSDKEvents } from './events/index.js';
 import { LidoSDKStatistics } from './statistics/index.js';
 import { LidoSDKRewards } from './rewards/index.js';
+import { LidoSDKShares } from './shares/shares.js';
 
 import { version } from './version.js';
 
@@ -18,6 +19,7 @@ export class LidoSDK {
   readonly withdraw: LidoSDKWithdraw;
   readonly steth: LidoSDKstETH;
   readonly wsteth: LidoSDKwstETH;
+  readonly shares: LidoSDKShares;
   readonly unsteth: LidoSDKUnstETH;
   readonly events: LidoSDKEvents;
   readonly statistics: LidoSDKStatistics;
@@ -37,6 +39,7 @@ export class LidoSDK {
     this.steth = new LidoSDKstETH({ ...props, core });
     this.wsteth = new LidoSDKwstETH({ ...props, core });
     this.unsteth = new LidoSDKUnstETH({ ...props, core });
+    this.shares = new LidoSDKShares({ ...props, core });
     // Events functionality
     this.events = new LidoSDKEvents({ ...props, core });
     // Statistic functionality

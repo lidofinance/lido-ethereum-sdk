@@ -2725,7 +2725,7 @@ __metadata:
     graphql-request: ^6.1.0
     rimraf: ^5.0.1
     typescript: 5.1.6
-    viem: ^1.15.3
+    viem: ^1.18.1
   languageName: unknown
   linkType: soft
 
@@ -9264,6 +9264,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"isows@npm:1.0.3":
+  version: 1.0.3
+  resolution: "isows@npm:1.0.3"
+  peerDependencies:
+    ws: "*"
+  checksum: 9cacd5cf59f67deb51e825580cd445ab1725ecb05a67c704050383fb772856f3cd5e7da8ad08f5a3bd2823680d77d099459d0c6a7037972a74d6429af61af440
+  languageName: node
+  linkType: hard
+
 "issue-parser@npm:^6.0.0":
   version: 6.0.0
   resolution: "issue-parser@npm:6.0.0"
@@ -13962,25 +13971,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:^1.15.3":
-  version: 1.15.3
-  resolution: "viem@npm:1.15.3"
+"viem@npm:^1.18.1":
+  version: 1.18.1
+  resolution: "viem@npm:1.18.1"
   dependencies:
     "@adraffy/ens-normalize": 1.9.4
     "@noble/curves": 1.2.0
     "@noble/hashes": 1.3.2
     "@scure/bip32": 1.3.2
     "@scure/bip39": 1.2.1
-    "@types/ws": ^8.5.5
     abitype: 0.9.8
-    isomorphic-ws: 5.0.0
+    isows: 1.0.3
     ws: 8.13.0
   peerDependencies:
     typescript: ">=5.0.4"
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 61d573158de32896f9f7957ae2ff943953838385f9b04414a55e6041f0e070827e4c5cfc6196485e0b0101c3dcbfdfd262fb54040817b257b38216a7f50e3384
+  checksum: 99adf4eae6aaf371589d3c966b5eeda76b3c780d83f8cf21b345d050b5d65d2a66b0470a22cb0c8bea39bfdbd2b90c764eb49e1cffcdf3174ccd2e88e9065180
   languageName: node
   linkType: hard
 
