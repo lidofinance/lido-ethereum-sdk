@@ -6,7 +6,6 @@ import {
   Checkbox,
 } from '@lidofinance/lido-ui';
 import { Action } from 'components/action';
-import { ToggleButton } from 'components/toggle-button/toggle-button';
 import { useAddressState } from 'hooks/useAddressState';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
@@ -15,17 +14,13 @@ import { Address } from 'viem';
 import { renderRewards } from './rewards-table';
 import {
   BlockArgumentInput,
+  DEFAULT_FROM,
   useBlockArgumentState,
 } from 'components/block-argument-input';
 import {
   BackArgumentInput,
   useBackArgumentState,
 } from 'components/back-argument-input';
-import { BlockArgumentType } from '@lidofinance/lido-ethereum-sdk/dist/types/core/types';
-
-const DEFAULT_FROM: BlockArgumentType = {
-  block: 'earliest',
-};
 
 export const RewardsDemo = () => {
   const [rewardsAddress, setRewardsAddress] = useAddressState(undefined, {
@@ -43,11 +38,12 @@ export const RewardsDemo = () => {
   const rewardsProps = {
     address: rewardsAddress,
     to,
-    back,
+    back: fromArgType === 'back' ? back : undefined,
+    from: fromArgType === 'from' ? from : undefined,
     step,
     includeOnlyRebases,
     includeZeroRebases,
-  };
+  } as any;
 
   return (
     <Accordion summary="Rewards">

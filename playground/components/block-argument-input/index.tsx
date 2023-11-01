@@ -1,4 +1,4 @@
-import { BlockArgumentType } from '@lidofinance/lido-ethereum-sdk/dist/types/core/types';
+import { BlockArgumentType } from '@lidofinance/lido-ethereum-sdk';
 import { Input, Select, Option, InputGroup } from '@lidofinance/lido-ui';
 import { useState } from 'react';
 
@@ -24,6 +24,10 @@ const getLabel = (type: keyof BlockArgumentType) => {
 const getDefault = (): BlockArgumentType => ({
   block: 'latest',
 });
+
+export const DEFAULT_FROM: BlockArgumentType = {
+  block: 'earliest',
+};
 
 export const useBlockArgumentState = (defaultValue?: BlockArgumentType) =>
   useState<BlockArgumentType>(defaultValue ?? getDefault);

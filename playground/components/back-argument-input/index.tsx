@@ -1,4 +1,4 @@
-import { BackArgumentType } from '@lidofinance/lido-ethereum-sdk/dist/types/core/types';
+import { BackArgumentType } from '@lidofinance/lido-ethereum-sdk';
 import { InputGroup, Select, Input, Option } from '@lidofinance/lido-ui';
 import { useState } from 'react';
 
