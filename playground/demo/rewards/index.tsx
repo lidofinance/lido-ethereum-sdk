@@ -49,6 +49,9 @@ const renderRewards = (
       <DataTableRow title={'Initial Share Rate'}>
         {result.baseShareRate}
       </DataTableRow>
+      <DataTableRow title={'Total Rewards'}>
+        {steth(result.totalRewards)}
+      </DataTableRow>
       {result.rewards.length > 0 ? (
         <Table>
           <Thead>
@@ -57,6 +60,7 @@ const renderRewards = (
               <Th>Type</Th>
               <Th>Balance</Th>
               <Th>Reward</Th>
+              <Th>APR</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -76,6 +80,7 @@ const renderRewards = (
                   {steth(r.change)}
                   <br />({shares(r.changeShares)})
                 </Td>
+                <Td>{r.apr ? `${r.apr * 100}%` : '-'}</Td>
               </Tr>
             ))}
           </Tbody>
@@ -92,8 +97,18 @@ export const RewardsDemo = () => {
     useAccount: true,
   });
   const [blocksBack, setBlocksBack] = useState(100000);
+  const [step, setStep] = useState(50000);
   const [includeZeroRebases, setIncludeZeroRebases] = useState(false);
+  const [includeOnlyRebases, setIncludeOnlyRebases] = useState(false);
   const { rewards } = useLidoSDK();
+
+  const rewardsProps = {
+    address: rewardsAddress,
+    back: { blocks: BigInt(blocksBack) },
+    step,
+    includeOnlyRebases,
+    includeZeroRebases,
+  };
 
   return (
     <Accordion summary="Rewards">
@@ -102,10 +117,8 @@ export const RewardsDemo = () => {
         renderResult={renderRewards}
         action={() => {
           return rewards.getRewardsFromChain({
-            address: rewardsAddress,
-            blocksBack: BigInt(blocksBack),
-            step: 25000,
-            includeZeroRebases,
+            ...rewardsProps,
+            stepBlock: step,
           });
         }}
       >
@@ -125,18 +138,29 @@ export const RewardsDemo = () => {
           value={blocksBack}
           onChange={(event) => setBlocksBack(event.currentTarget.valueAsNumber)}
         />
+        <Input
+          label="Request block step (for chain method)"
+          placeholder="default"
+          min="1"
+          type="number"
+          value={step}
+          onChange={(event) => setStep(event.currentTarget.valueAsNumber)}
+        />
         <ToggleButton
           title="Include Zero Rebases"
           value={includeZeroRebases}
           onChange={setIncludeZeroRebases}
         />
+        <ToggleButton
+          title="Include ONLY Rebases"
+          value={includeOnlyRebases}
+          onChange={setIncludeOnlyRebases}
+        />
       </Action>
       <Action
         action={() => {
           return rewards.getRewardsFromSubgraph({
-            address: rewardsAddress,
-            blocksBack: BigInt(blocksBack),
-            includeZeroRebases,
+            ...rewardsProps,
             // Warning! these endpoints will be deprecated
             getSubgraphUrl(_, chainId) {
               switch (chainId) {

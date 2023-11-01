@@ -6,6 +6,7 @@ import type {
   Address,
   Chain,
   FormattedTransactionRequest,
+  BlockTag,
 } from 'viem';
 
 import { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
@@ -130,3 +131,32 @@ export type GetFeeDataResult = {
   maxPriorityFeePerGas: bigint;
   gasPrice: bigint;
 };
+
+export type NonPendingBlockTag = Exclude<BlockTag, 'pending'>;
+
+export type BlockArgumentType =
+  | {
+      block: bigint | NonPendingBlockTag;
+      timestamp?: undefined;
+    }
+  | {
+      block?: undefined;
+      timestamp: bigint;
+    };
+
+export type BackArgumentType =
+  | {
+      seconds: bigint;
+      days?: undefined;
+      blocks?: undefined;
+    }
+  | {
+      seconds?: undefined;
+      days: bigint;
+      blocks?: undefined;
+    }
+  | {
+      days?: undefined;
+      seconds?: undefined;
+      blocks: bigint;
+    };

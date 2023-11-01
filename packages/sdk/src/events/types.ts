@@ -1,24 +1,38 @@
-import { LidoSDKCommonProps } from '../core/types.js';
+import { Log } from 'viem';
+import {
+  BackArgumentType,
+  BlockArgumentType,
+  LidoSDKCommonProps,
+} from '../core/types.js';
+import type { StethEventsAbi } from './abi/stethEvents.js';
 
 export type LidoSDKEventsProps = LidoSDKCommonProps;
-export type RebaseEvent = {
-  address: string;
-  blockHash: string;
-  blockNumber: bigint;
-  data: string;
-  logIndex: number;
-  removed: boolean;
-  topics: string[];
-  transactionHash: string;
-  transactionIndex: number;
-  args: {
-    reportTimestamp: bigint;
-    timeElapsed: bigint;
-    preTotalShares: bigint;
-    preTotalEther: bigint;
-    postTotalShares: bigint;
-    postTotalEther: bigint;
-    sharesMintedAsFees: bigint;
-  };
-  eventName: 'TokenRebased';
+export type RebaseEvent = Log<
+  bigint,
+  number,
+  false,
+  undefined,
+  true,
+  typeof StethEventsAbi,
+  'TokenRebased'
+>;
+
+export type GetRebaseEventsProps = {
+  to?: BlockArgumentType;
+  maxCount?: number;
+  stepBlock?: number;
+} & (
+  | {
+      from: BlockArgumentType;
+      back?: undefined;
+    }
+  | {
+      from?: undefined;
+      back: BackArgumentType;
+    }
+);
+
+export type GetLastRebaseEventsProps = {
+  count: number;
+  stepBlock?: number;
 };

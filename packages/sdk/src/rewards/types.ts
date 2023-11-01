@@ -1,27 +1,30 @@
-import { type Address, type BlockTag, type Log } from 'viem';
-import { type rewardsEventsAbi } from './abi/rewardsEvents.js';
-import { type LidoSDKCommonProps } from '../core/types.js';
+import type { Address, Log } from 'viem';
+import type { rewardsEventsAbi } from './abi/rewardsEvents.js';
+import type {
+  BackArgumentType,
+  BlockArgumentType,
+  LidoSDKCommonProps,
+} from '../core/types.js';
 import type {
   TotalRewardEntity,
   TransferEventEntity,
 } from './subgraph/types.js';
-
-export type NonPendingBlockTag = Exclude<BlockTag, 'pending'>;
 
 export type LidoSDKRewardsProps = LidoSDKCommonProps;
 
 export type GetRewardsOptions = {
   address: Address;
   includeZeroRebases?: boolean;
-  toBlock?: bigint | NonPendingBlockTag;
-  step?: number;
+  includeOnlyRebases?: boolean;
+  to?: BlockArgumentType;
 } & (
   | {
-      fromBlock: bigint | NonPendingBlockTag;
+      from: BlockArgumentType;
+      back?: undefined;
     }
   | {
-      fromBlock?: undefined;
-      blocksBack: bigint;
+      back: BackArgumentType;
+      from?: undefined;
     }
 );
 
@@ -66,17 +69,20 @@ export type Reward<TEvent> = {
   balanceShares: bigint;
   shareRate: number;
   originalEvent: TEvent;
+  apr?: number;
 };
 
 type GetRewardsCommonResult = {
   baseBalance: bigint;
   baseBalanceShares: bigint;
   baseShareRate: number;
+  totalRewards: bigint;
   fromBlock: bigint;
   toBlock: bigint;
 };
 
 export type GetRewardsFromSubgraphOptions = GetRewardsOptions & {
+  stepEntities?: number;
   getSubgraphUrl: (id: string, chainId: number) => string;
 };
 
@@ -85,7 +91,9 @@ export type GetRewardsFromSubgraphResult = {
   lastIndexedBlock: bigint;
 } & GetRewardsCommonResult;
 
-export type GetRewardsFromChainOptions = GetRewardsOptions;
+export type GetRewardsFromChainOptions = GetRewardsOptions & {
+  stepBlock?: number;
+};
 
 export type GetRewardsFromChainResult = {
   rewards: Reward<RewardsChainEvents>[];

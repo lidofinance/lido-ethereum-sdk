@@ -19,7 +19,7 @@ export const requestWithBlockStep = async <TResultEntry>(
 ): Promise<TResultEntry[]> => {
   let from = fromBlock;
   const result: TResultEntry[] = [];
-  while (from < toBlock) {
+  while (from <= toBlock) {
     const to = from + BigInt(step);
     const nextResult = await request(from, to > toBlock ? toBlock : to);
     result.push(...nextResult);

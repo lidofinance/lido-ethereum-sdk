@@ -7,6 +7,8 @@ export enum CHAINS {
   Holesky = 17000,
 }
 
+export const APPROX_BLOCKS_BY_DAY = 7600n;
+export const APPROX_SECONDS_PER_BLOCK = 12n;
 export const SUPPORTED_CHAINS: CHAINS[] = [
   CHAINS.Goerli,
   CHAINS.Mainnet,

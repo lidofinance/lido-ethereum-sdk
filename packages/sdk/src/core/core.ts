@@ -15,10 +15,12 @@ import {
   numberToHex,
   stringify,
   maxUint256,
+  GetBlockReturnType,
 } from 'viem';
 import {
   ERROR_CODE,
   invariant,
+  invariantArgument,
   withSDKError,
 } from '../common/utils/sdk-error.js';
 import { splitSignature } from '@ethersproject/bytes';
@@ -35,6 +37,7 @@ import {
   PERMIT_MESSAGE_TYPES,
   VIEM_CHAINS,
   SUBRGRAPH_ID_BY_CHAIN,
+  APPROX_SECONDS_PER_BLOCK,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
@@ -48,12 +51,15 @@ import type {
   TransactionOptions,
   TransactionResult,
   GetFeeDataResult,
+  BlockArgumentType,
+  BackArgumentType,
 } from './types.js';
 import { TransactionCallbackStage } from './types.js';
 import { permitAbi } from './abi/permit.js';
 
 export default class LidoSDKCore {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
+  private static readonly MS_PER_DAY = 86400000n;
 
   #web3Provider: WalletClient | undefined;
 
@@ -364,6 +370,79 @@ export default class LidoSDKCore {
       ERROR_CODE.NOT_SUPPORTED,
     );
     return id;
+  }
+
+  // TODO: important tests for this
+  @Cache(30 * 60, ['chain.id'])
+  public async getLatestBlockToTimestamp(
+    timestamp: bigint,
+  ): Promise<GetBlockReturnType<Chain, false, 'latest'>> {
+    const now = BigInt(Math.floor(Date.now() / 1000));
+    let latestBlock = await this.rpcProvider.getBlock({ blockTag: 'latest' });
+    if (latestBlock.timestamp < timestamp) {
+      return latestBlock;
+    }
+    let mid = latestBlock.number - (now - timestamp) / APPROX_SECONDS_PER_BLOCK;
+    invariantArgument(mid > 0n, 'No blocks at this timestamp');
+
+    let block = await this.rpcProvider.getBlock({ blockNumber: mid });
+    // feeling lucky?
+    if (block.timestamp === timestamp) return block;
+
+    const isOverShoot = block.timestamp < timestamp;
+    let left = isOverShoot ? block.number : 0n;
+    let right = isOverShoot ? latestBlock.number : block.number;
+
+    while (left <= right) {
+      mid = (left + right) / 2n;
+      block = await this.rpcProvider.getBlock({ blockNumber: mid });
+      if (block.timestamp === timestamp) {
+        return block;
+      } else if (block.timestamp < timestamp) {
+        latestBlock = block;
+        left = mid + 1n;
+      } else {
+        right = mid - 1n;
+      }
+    }
+    return latestBlock;
+  }
+
+  @Logger('Utils:')
+  public async toBlockNumber(arg: BlockArgumentType): Promise<bigint> {
+    if (arg.timestamp) {
+      const block = await this.getLatestBlockToTimestamp(arg.timestamp);
+      return block.number;
+    }
+    const { block } = arg;
+    if (typeof block === 'bigint') return block;
+    const { number } = await this.rpcProvider.getBlock({
+      blockTag: block,
+    });
+    invariantArgument(number, 'block must not be pending');
+    return number;
+  }
+
+  @Logger('Utils:')
+  public async toBackBlock(
+    arg: BackArgumentType,
+    start: bigint,
+  ): Promise<bigint> {
+    if (arg.blocks) {
+      const end = start - arg.blocks;
+      invariantArgument(end >= 0n, 'Too many blocks back');
+      return end;
+    } else if (arg.days) {
+      const date =
+        (BigInt(Date.now()) - arg.days * LidoSDKCore.MS_PER_DAY) / 1000n;
+      const block = await this.getLatestBlockToTimestamp(date);
+      return block.number;
+    } else if (arg.seconds) {
+      const date = BigInt(Date.now() / 1000) - arg.seconds;
+      const block = await this.getLatestBlockToTimestamp(date);
+      return block.number;
+    }
+    invariantArgument(false, 'must have at least something in back argument');
   }
 
   public async performTransaction(

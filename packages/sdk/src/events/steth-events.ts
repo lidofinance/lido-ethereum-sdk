@@ -12,14 +12,25 @@ import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
 import { version } from '../version.js';
 
 import { StethEventsAbi } from './abi/stethEvents.js';
-import { type LidoSDKEventsProps, RebaseEvent } from './types.js';
-import { invariant } from '../common/utils/sdk-error.js';
+import {
+  type LidoSDKEventsProps,
+  RebaseEvent,
+  GetRebaseEventsProps,
+  GetLastRebaseEventsProps,
+} from './types.js';
+import {
+  ERROR_CODE,
+  invariant,
+  invariantArgument,
+} from '../common/utils/sdk-error.js';
+import { requestWithBlockStep } from '../rewards/utils.js';
 
 const BLOCKS_BY_DAY = 7600n;
 const REBASE_EVENT_ABI_INDEX = 8;
 const DAYS_LIMIT = 7;
 
 export class LidoSDKStethEvents {
+  static readonly DEFAULT_STEP_BLOCK = 50000;
   readonly core: LidoSDKCore;
 
   constructor(props: LidoSDKEventsProps) {
@@ -56,23 +67,8 @@ export class LidoSDKStethEvents {
   @Logger('Events:')
   @ErrorHandler()
   public async getLastRebaseEvent(): Promise<RebaseEvent | undefined> {
-    const contract = await this.getContractStETH();
-    const lastBlock = await this.getLastBlock();
-
-    for (let day = 1; day <= DAYS_LIMIT; day++) {
-      const fromBlock = lastBlock.number - BLOCKS_BY_DAY * BigInt(day);
-      const logs = await this.core.rpcProvider.getLogs({
-        address: contract.address,
-        event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
-        fromBlock: fromBlock,
-        toBlock: fromBlock + BLOCKS_BY_DAY,
-        strict: true,
-      });
-
-      if (logs.length > 0) return logs[logs.length - 1];
-    }
-
-    return undefined;
+    const events = await this.getLastRebaseEvents({ count: 1 });
+    return events[0];
   }
 
   @Logger('Events:')
@@ -98,7 +94,6 @@ export class LidoSDKStethEvents {
         toBlock: to,
         strict: true,
       });
-
       if (logs.length > 0) return logs[0];
     }
 
@@ -107,61 +102,64 @@ export class LidoSDKStethEvents {
 
   @Logger('Events:')
   @ErrorHandler()
-  public async getRebaseEventsByDays(props: {
-    days: number;
-  }): Promise<RebaseEvent[]> {
-    const { days } = props;
-
-    const contract = await this.getContractStETH();
-    const lastEvent = await this.getLastRebaseEvent();
-    const lastEventTimestamp = lastEvent?.args.reportTimestamp;
-    invariant(lastEventTimestamp, 'Could not find any recent rebases');
-
-    const targetTimestamp = lastEventTimestamp - BigInt(days * 24 * 60 * 60);
-    const block = await this.getBlockByDays({ days: 7 });
-
-    const logs = await this.core.rpcProvider.getLogs({
-      address: contract.address,
-      event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
-      fromBlock: block.number,
-      toBlock: 'latest',
-      strict: true,
+  public async getLastRebaseEvents({
+    count,
+    stepBlock = LidoSDKStethEvents.DEFAULT_STEP_BLOCK,
+  }: GetLastRebaseEventsProps): Promise<RebaseEvent[]> {
+    invariantArgument(count, 'count must be a positive integer');
+    const events = await this.getRebaseEvents({
+      maxCount: count,
+      back: { blocks: BLOCKS_BY_DAY * BigInt(count + 1) },
+      stepBlock,
     });
-
-    const logsByDays = logs.filter((log) => {
-      const timestamp = log.args.reportTimestamp;
-
-      const diff = lastEventTimestamp - (timestamp || 0n);
-
-      return diff < targetTimestamp;
+    // most often scenario
+    if (events.length === count) return events;
+    const lastEvent = events.length > 0 ? events[events.length] : undefined;
+    invariant(
+      lastEvent,
+      'Could not find any rebase events',
+      ERROR_CODE.READ_ERROR,
+    );
+    const fromBlock =
+      lastEvent.blockNumber - BigInt(DAYS_LIMIT) * BLOCKS_BY_DAY;
+    const rest = await this.getRebaseEvents({
+      maxCount: count - events.length,
+      to: { block: lastEvent.blockNumber },
+      from: { block: fromBlock > 0n ? fromBlock : 0n },
+      stepBlock,
     });
-
-    return logsByDays;
+    return events.concat(rest);
   }
 
   @Logger('Events:')
   @ErrorHandler()
-  public async getRebaseEvents(props: {
-    count: number;
-  }): Promise<RebaseEvent[]> {
-    const { count } = props;
-    const contract = await this.getContractStETH();
-    const block = await this.getBlockByDays({ days: count });
-    const logs = await this.core.rpcProvider.getLogs({
-      address: contract.address,
-      event: StethEventsAbi[8],
-      fromBlock: block.number,
-      toBlock: 'latest',
-      strict: true,
-    });
+  public async getRebaseEvents(
+    props: GetRebaseEventsProps,
+  ): Promise<RebaseEvent[]> {
+    const [{ fromBlock, stepBlock, toBlock, maxCount }, contract] =
+      await Promise.all([this.parseProps(props), this.getContractStETH()]);
 
-    return logs.slice(logs.length - count);
+    const logs = await requestWithBlockStep(
+      stepBlock,
+      fromBlock,
+      toBlock,
+      (fromBlock, toBlock) =>
+        this.core.rpcProvider.getLogs({
+          address: contract.address,
+          event: StethEventsAbi[8],
+          fromBlock,
+          toBlock,
+          strict: true,
+        }),
+    );
+
+    return maxCount ? logs.slice(Math.max(logs.length - maxCount, 0)) : logs;
   }
 
   // Utils
   @Logger('Utils:')
   @ErrorHandler()
-  public async getLastBlock() {
+  private async getLastBlock() {
     const lastBlock = await this.core.rpcProvider.getBlock({
       blockTag: 'latest',
     });
@@ -169,18 +167,38 @@ export class LidoSDKStethEvents {
     return lastBlock;
   }
 
-  @Logger('Utils:')
-  @ErrorHandler()
-  @Cache(60 * 1000, ['core.chain.id'])
-  private async getBlockByDays(props: { days: number }) {
-    const { days } = props;
+  private async parseProps<TRebaseProps extends GetRebaseEventsProps>(
+    props: TRebaseProps,
+  ): Promise<
+    Omit<
+      TRebaseProps,
+      'toBlock' | 'fromBlock' | 'includeZeroRebases' | 'step'
+    > & {
+      toBlock: bigint;
+      fromBlock: bigint;
+      stepBlock: number;
+    }
+  > {
+    const toBlock = await this.core.toBlockNumber(
+      props.to ?? { block: 'latest' },
+    );
+    const fromBlock = props.from
+      ? await this.core.toBlockNumber(props.from)
+      : await this.core.toBackBlock(props.back, toBlock);
 
-    const lastBlock = await this.getLastBlock();
-    const blockNumber = lastBlock.number - BLOCKS_BY_DAY * BigInt(days);
-    const block = await this.core.rpcProvider.getBlock({
-      blockNumber: blockNumber,
-    });
+    invariantArgument(toBlock >= fromBlock, 'toBlock is lower than fromBlock');
 
-    return block;
+    const { stepBlock = LidoSDKStethEvents.DEFAULT_STEP_BLOCK, maxCount } =
+      props;
+    invariantArgument(stepBlock > 0, 'stepBlock must be a positive integer');
+    if (maxCount !== undefined) {
+      invariantArgument(maxCount > 0, 'maxCount must be a positive integer');
+    }
+    return {
+      ...props,
+      fromBlock,
+      toBlock,
+      stepBlock,
+    };
   }
 }
