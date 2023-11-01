@@ -16,8 +16,13 @@ import {
   type LidoSDKEventsProps,
   RebaseEvent,
   GetRebaseEventsProps,
+  GetLastRebaseEventsProps,
 } from './types.js';
-import { invariantArgument } from '../common/utils/sdk-error.js';
+import {
+  ERROR_CODE,
+  invariant,
+  invariantArgument,
+} from '../common/utils/sdk-error.js';
 import { requestWithBlockStep } from '../rewards/utils.js';
 
 const BLOCKS_BY_DAY = 7600n;
@@ -62,23 +67,8 @@ export class LidoSDKStethEvents {
   @Logger('Events:')
   @ErrorHandler()
   public async getLastRebaseEvent(): Promise<RebaseEvent | undefined> {
-    const contract = await this.getContractStETH();
-    const lastBlock = await this.getLastBlock();
-
-    for (let day = 1; day <= DAYS_LIMIT; day++) {
-      const fromBlock = lastBlock.number - BLOCKS_BY_DAY * BigInt(day);
-      const logs = await this.core.rpcProvider.getLogs({
-        address: contract.address,
-        event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
-        fromBlock: fromBlock,
-        toBlock: fromBlock + BLOCKS_BY_DAY,
-        strict: true,
-      });
-
-      if (logs.length > 0) return logs[logs.length - 1];
-    }
-
-    return undefined;
+    const events = await this.getLastRebaseEvents({ count: 1 });
+    return events[0];
   }
 
   @Logger('Events:')
@@ -104,11 +94,41 @@ export class LidoSDKStethEvents {
         toBlock: to,
         strict: true,
       });
-
       if (logs.length > 0) return logs[0];
     }
 
     return undefined;
+  }
+
+  @Logger('Events:')
+  @ErrorHandler()
+  public async getLastRebaseEvents({
+    count,
+    stepBlock = LidoSDKStethEvents.DEFAULT_STEP_BLOCK,
+  }: GetLastRebaseEventsProps): Promise<RebaseEvent[]> {
+    invariantArgument(count, 'count must be a positive integer');
+    const events = await this.getRebaseEvents({
+      maxCount: count,
+      back: { blocks: BLOCKS_BY_DAY * BigInt(count + 1) },
+      stepBlock,
+    });
+    // most often scenario
+    if (events.length === count) return events;
+    const lastEvent = events.length > 0 ? events[events.length] : undefined;
+    invariant(
+      lastEvent,
+      'Could not find any rebase events',
+      ERROR_CODE.READ_ERROR,
+    );
+    const fromBlock =
+      lastEvent.blockNumber - BigInt(DAYS_LIMIT) * BLOCKS_BY_DAY;
+    const rest = await this.getRebaseEvents({
+      maxCount: count - events.length,
+      to: { block: lastEvent.blockNumber },
+      from: { block: fromBlock > 0n ? fromBlock : 0n },
+      stepBlock,
+    });
+    return events.concat(rest);
   }
 
   @Logger('Events:')
