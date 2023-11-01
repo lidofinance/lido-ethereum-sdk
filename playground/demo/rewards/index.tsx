@@ -60,6 +60,7 @@ const renderRewards = (
               <Th>Type</Th>
               <Th>Balance</Th>
               <Th>Reward</Th>
+              <Th>APR</Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -79,6 +80,7 @@ const renderRewards = (
                   {steth(r.change)}
                   <br />({shares(r.changeShares)})
                 </Td>
+                <Td>{r.apr ? `${r.apr * 100}%` : '-'}</Td>
               </Tr>
             ))}
           </Tbody>
@@ -95,7 +97,7 @@ export const RewardsDemo = () => {
     useAccount: true,
   });
   const [blocksBack, setBlocksBack] = useState(100000);
-  const [step, setStep] = useState(1000);
+  const [step, setStep] = useState(50000);
   const [includeZeroRebases, setIncludeZeroRebases] = useState(false);
   const [includeOnlyRebases, setIncludeOnlyRebases] = useState(false);
   const { rewards } = useLidoSDK();

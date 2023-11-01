@@ -69,6 +69,7 @@ export type Reward<TEvent> = {
   balanceShares: bigint;
   shareRate: number;
   originalEvent: TEvent;
+  apr?: number;
 };
 
 type GetRewardsCommonResult = {

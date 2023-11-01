@@ -29,6 +29,7 @@ import type {
 
 import { abi } from './abi/wsteth.js';
 import { stethPartialAbi } from './abi/steth-partial.js';
+import { ERROR_CODE } from '../common/utils/sdk-error.js';
 
 export class LidoSDKWrap {
   readonly core: LidoSDKCore;
@@ -352,7 +353,7 @@ export class LidoSDKWrap {
 
     if (value > currentStakeLimit) {
       throw this.core.error({
-        code: 'TRANSACTION_ERROR',
+        code: ERROR_CODE.TRANSACTION_ERROR,
         message: `Stake value is greater than daily protocol staking limit (${currentStakeLimit})`,
       });
     }

@@ -31,3 +31,8 @@ export type GetRebaseEventsProps = {
       back: BackArgumentType;
     }
 );
+
+export type GetLastRebaseEventsProps = {
+  count: number;
+  stepBlock?: number;
+};
