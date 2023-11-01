@@ -16,10 +16,6 @@ export type TransactionProps = {
   callback?: TransactionCallback;
 };
 
-export type NoCallback<
-  TProps extends { callback?: TransactionProps['callback'] },
-> = Omit<TProps, 'callback'>;
-
 export type InnerTransactionProps = Required<TransactionProps>;
 
 export type ParsedTransactionProps<TProps extends TransactionProps> = Omit<

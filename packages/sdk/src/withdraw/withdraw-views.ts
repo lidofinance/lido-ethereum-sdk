@@ -84,10 +84,19 @@ export class LidoSDKWithdrawViews extends BusModule {
   // Constants
 
   @Logger('Views:')
+  @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async minStethWithdrawalAmount(): Promise<bigint> {
     const contract = await this.bus.contract.getContractWithdrawalQueue();
-
     return contract.read.MIN_STETH_WITHDRAWAL_AMOUNT();
+  }
+
+  @Logger('Views:')
+  public async minWStethWithdrawalAmount(): Promise<bigint> {
+    const [amount, contract] = await Promise.all([
+      this.minStethWithdrawalAmount(),
+      this.bus.contract.getContractWstETH(),
+    ]);
+    return contract.read.getWstETHByStETH([amount]);
   }
 
   @Logger('Views:')
@@ -96,6 +105,15 @@ export class LidoSDKWithdrawViews extends BusModule {
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     return contract.read.MAX_STETH_WITHDRAWAL_AMOUNT();
+  }
+
+  @Logger('Views:')
+  public async maxWStethWithdrawalAmount(): Promise<bigint> {
+    const [amount, contract] = await Promise.all([
+      this.maxStethWithdrawalAmount(),
+      this.bus.contract.getContractWstETH(),
+    ]);
+    return contract.read.getWstETHByStETH([amount]);
   }
 
   @Logger('Views:')

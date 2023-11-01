@@ -83,6 +83,9 @@ export type TransactionResult = {
 
 export type PopulatedTransaction = Omit<FormattedTransactionRequest, 'type'>;
 
+export type NoCallback<TProps extends { callback?: TransactionCallback }> =
+  Omit<TProps, 'callback'>;
+
 export type TransactionCallbackProps =
   | { stage: TransactionCallbackStage.PERMIT; payload?: undefined }
   | { stage: TransactionCallbackStage.GAS_LIMIT; payload?: undefined }

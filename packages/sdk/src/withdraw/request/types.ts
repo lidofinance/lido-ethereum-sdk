@@ -1,6 +1,6 @@
-import { Hash, type Address } from 'viem';
+import type { Hash, Address } from 'viem';
 
-import { EtherValue, TransactionCallback } from '../../core/index.js';
+import type { EtherValue, TransactionCallback } from '../../core/index.js';
 import { LIDO_TOKENS } from '../../common/constants.js';
 
 export type WithdrawableTokens =
@@ -14,6 +14,11 @@ export type PermitWstETHStETHProps = {
   deadline: bigint;
 };
 
+export type SplitAmountToRequestsProps = {
+  amount: EtherValue;
+  token: WithdrawableTokens;
+};
+
 export type PermitProps = PermitWstETHStETHProps & {
   token: WithdrawableTokens;
 };
@@ -21,10 +26,18 @@ export type PermitProps = PermitWstETHStETHProps & {
 export type RequestProps = {
   account: Address;
   receiver?: Address;
-  requests: readonly bigint[];
   token: WithdrawableTokens;
   callback?: TransactionCallback;
-};
+} & (
+  | {
+      amount: EtherValue;
+      requests?: undefined;
+    }
+  | {
+      requests: readonly bigint[];
+      amount?: undefined;
+    }
+);
 
 export type SignedPermit = {
   value: bigint;
@@ -38,9 +51,27 @@ export type RequestWithPermitProps = RequestProps & {
   permit?: SignedPermit;
 };
 
+export type RequirePermit<TProps> = Omit<TProps, 'permit'> & {
+  permit: SignedPermit;
+};
+
 export type WithdrawApproveProps = {
   account: Address;
   amount: EtherValue;
   token: WithdrawableTokens;
   callback?: TransactionCallback;
+};
+
+export type GetAllowanceProps = {
+  account: Address;
+  token: WithdrawableTokens;
+};
+
+export type CheckAllowanceProps = GetAllowanceProps & {
+  amount: EtherValue;
+};
+
+export type CheckAllowanceResult = {
+  allowance: bigint;
+  needsApprove: boolean;
 };

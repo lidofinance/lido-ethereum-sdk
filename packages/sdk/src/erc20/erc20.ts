@@ -1,10 +1,9 @@
 import { EtherValue, LidoSDKCore } from '../core/index.js';
 import { version } from '../version.js';
-import {
+import type {
   AllowanceProps,
   ApproveProps,
   LidoSDKErc20Props,
-  NoCallback,
   ParsedTransactionProps,
   SignTokenPermitProps,
   TransactionProps,
@@ -23,7 +22,8 @@ import {
 } from 'viem';
 import { NOOP, PERMIT_MESSAGE_TYPES } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
-import {
+import type {
+  NoCallback,
   PermitSignature,
   TransactionOptions,
   TransactionResult,
