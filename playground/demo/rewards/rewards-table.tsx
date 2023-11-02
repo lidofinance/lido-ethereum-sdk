@@ -25,7 +25,9 @@ const RewardsTable = ({
   const shares = renderTokenResult('shares');
 
   const sortedRewards = useMemo(() => {
-    return sortBlocks === 'asc' ? result.rewards : result.rewards.toReversed();
+    return sortBlocks === 'asc'
+      ? result.rewards
+      : [...result.rewards].reverse();
   }, [result, sortBlocks]);
 
   return (

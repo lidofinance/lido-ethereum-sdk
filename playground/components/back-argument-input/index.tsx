@@ -1,13 +1,13 @@
 import { BackArgumentType } from '@lidofinance/lido-ethereum-sdk';
 import { InputGroup, Select, Input, Option } from '@lidofinance/lido-ui';
 import { useState } from 'react';
+import { NOOP } from 'utils/noop';
 
 type BackArgumentInputProps = {
-  label?: string;
   value: BackArgumentType;
   onChange?: (value: BackArgumentType) => void;
+  label?: string;
 };
-const NOOP = () => {};
 
 const extractType = (value: BackArgumentType): keyof BackArgumentType => {
   if (value['blocks'] !== undefined) return 'blocks';
@@ -17,9 +17,14 @@ const extractType = (value: BackArgumentType): keyof BackArgumentType => {
 };
 
 const getLabel = (type: keyof BackArgumentType) => {
-  if (type === 'blocks') return 'blocks back';
-  if (type === 'days') return 'days back';
-  if (type === 'seconds') return 'seconds back';
+  switch (type) {
+    case 'blocks':
+      return 'blocks back';
+    case 'days':
+      return 'days back';
+    case 'seconds':
+      return 'seconds back';
+  }
 };
 
 const getDefault = (): BackArgumentType => ({

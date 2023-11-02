@@ -1,14 +1,13 @@
 import { BlockArgumentType } from '@lidofinance/lido-ethereum-sdk';
 import { Input, Select, Option, InputGroup } from '@lidofinance/lido-ui';
 import { useState } from 'react';
+import { NOOP } from 'utils/noop';
 
 type BlockArgumentInputProps = {
-  label?: string;
   value: BlockArgumentType;
   onChange?: (value: BlockArgumentType) => void;
+  label?: string;
 };
-
-const NOOP = () => {};
 
 const extractType = (value: BlockArgumentType) => {
   if (value.block !== undefined) return 'block';
@@ -17,8 +16,12 @@ const extractType = (value: BlockArgumentType) => {
 };
 
 const getLabel = (type: keyof BlockArgumentType) => {
-  if (type === 'timestamp') return 'in seconds since epoch time';
-  if (type === 'block') return 'block number or tag(e.g. "latest")';
+  switch (type) {
+    case 'timestamp':
+      return 'in seconds since epoch time';
+    case 'block':
+      return 'block number or tag(e.g. "latest")';
+  }
 };
 
 const getDefault = (): BlockArgumentType => ({
@@ -59,6 +62,7 @@ export const BlockArgumentInput = ({
           onChange={(event) => {
             try {
               if (!event.currentTarget.value) throw new Error('not a bigint');
+
               const updatedValue = BigInt(event.currentTarget.value);
               onChange({
                 [type]: updatedValue,
