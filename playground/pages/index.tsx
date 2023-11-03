@@ -2,6 +2,7 @@ import Head from 'next/head';
 
 import Layout from 'components/layout';
 import { Demo } from 'demo';
+import { ConnectionError } from 'components/connection-error';
 
 const Home = () => {
   return (
@@ -9,6 +10,7 @@ const Home = () => {
       <Head>
         <title>Lido | SDK Playground</title>
       </Head>
+      <ConnectionError />
       <Demo />
     </Layout>
   );

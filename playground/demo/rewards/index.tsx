@@ -1,102 +1,35 @@
 import {
-  GetRewardsFromChainResult,
-  GetRewardsFromSubgraphResult,
-} from '@lidofinance/lido-ethereum-sdk/dist/types/rewards/types';
-import {
   Input,
   Accordion,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Td,
-  Th,
-  Container,
-  DataTableRow,
+  Select,
+  Option,
+  Checkbox,
 } from '@lidofinance/lido-ui';
-import { Action, renderTokenResult } from 'components/action';
-import { ToggleButton } from 'components/toggle-button/toggle-button';
+import { Action } from 'components/action';
 import { useAddressState } from 'hooks/useAddressState';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
 
 import { Address } from 'viem';
-
-const renderRewards = (
-  result: GetRewardsFromChainResult | GetRewardsFromSubgraphResult,
-) => {
-  const steth = renderTokenResult('stETH');
-  const shares = renderTokenResult('shares');
-  return (
-    <Container style={{ overflowX: 'scroll' }}>
-      <DataTableRow title={'From Block:'}>
-        {result.fromBlock.toString()}
-      </DataTableRow>
-      <DataTableRow title={'To Block'}>
-        {result.toBlock.toString()}
-      </DataTableRow>
-      {'lastIndexedBlock' in result ? (
-        <DataTableRow title={'Last Indexed Block'}>
-          {result.lastIndexedBlock.toString()}
-        </DataTableRow>
-      ) : null}
-      <DataTableRow title={'Initial Balance'}>
-        {steth(result.baseBalance)}
-      </DataTableRow>
-      <DataTableRow title={'Initial Balance Shares'}>
-        {shares(result.baseBalanceShares)}
-      </DataTableRow>
-      <DataTableRow title={'Initial Share Rate'}>
-        {result.baseShareRate}
-      </DataTableRow>
-      <DataTableRow title={'Total Rewards'}>
-        {steth(result.totalRewards)}
-      </DataTableRow>
-      {result.rewards.length > 0 ? (
-        <Table>
-          <Thead>
-            <Tr>
-              <Th>Block</Th>
-              <Th>Type</Th>
-              <Th>Balance</Th>
-              <Th>Reward</Th>
-              <Th>APR</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {result.rewards.map((r, index) => (
-              <Tr key={index}>
-                <Td>
-                  {'block' in r.originalEvent
-                    ? r.originalEvent.block
-                    : r.originalEvent.blockNumber.toString()}
-                </Td>
-                <Td>{r.type}</Td>
-                <Td>
-                  {steth(r.balance)}
-                  <br />({shares(r.balanceShares)})
-                </Td>
-                <Td>
-                  {steth(r.change)}
-                  <br />({shares(r.changeShares)})
-                </Td>
-                <Td>{r.apr ? `${r.apr * 100}%` : '-'}</Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
-      ) : (
-        <DataTableRow title={'No Rewards for this range'}></DataTableRow>
-      )}
-    </Container>
-  );
-};
+import { renderRewards } from './rewards-table';
+import {
+  BlockArgumentInput,
+  DEFAULT_FROM,
+  useBlockArgumentState,
+} from 'components/block-argument-input';
+import {
+  BackArgumentInput,
+  useBackArgumentState,
+} from 'components/back-argument-input';
 
 export const RewardsDemo = () => {
   const [rewardsAddress, setRewardsAddress] = useAddressState(undefined, {
     useAccount: true,
   });
-  const [blocksBack, setBlocksBack] = useState(100000);
+  const [fromArgType, setFromArgType] = useState('from');
+  const [to, setTo] = useBlockArgumentState();
+  const [from, setFrom] = useBlockArgumentState(DEFAULT_FROM);
+  const [back, setBack] = useBackArgumentState();
   const [step, setStep] = useState(50000);
   const [includeZeroRebases, setIncludeZeroRebases] = useState(false);
   const [includeOnlyRebases, setIncludeOnlyRebases] = useState(false);
@@ -104,11 +37,13 @@ export const RewardsDemo = () => {
 
   const rewardsProps = {
     address: rewardsAddress,
-    back: { blocks: BigInt(blocksBack) },
+    to,
+    back: fromArgType === 'back' ? back : undefined,
+    from: fromArgType === 'from' ? from : undefined,
     step,
     includeOnlyRebases,
     includeZeroRebases,
-  };
+  } as any;
 
   return (
     <Accordion summary="Rewards">
@@ -130,14 +65,21 @@ export const RewardsDemo = () => {
             setRewardsAddress(event.currentTarget.value as Address)
           }
         />
-        <Input
-          label="Blocks back"
-          placeholder="1"
-          min="1"
-          type="number"
-          value={blocksBack}
-          onChange={(event) => setBlocksBack(event.currentTarget.valueAsNumber)}
-        />
+        <BlockArgumentInput label="To" value={to} onChange={setTo} />
+        <Select
+          value={fromArgType}
+          onChange={(value) => setFromArgType(String(value))}
+        >
+          <Option value={'from'}>From Argument</Option>
+          <Option value={'back'}>Back Argument</Option>
+        </Select>
+        {fromArgType === 'back' && (
+          <BackArgumentInput value={back} onChange={setBack} />
+        )}
+        {fromArgType === 'from' && (
+          <BlockArgumentInput value={from} onChange={setFrom} />
+        )}
+
         <Input
           label="Request block step (for chain method)"
           placeholder="default"
@@ -146,15 +88,19 @@ export const RewardsDemo = () => {
           value={step}
           onChange={(event) => setStep(event.currentTarget.valueAsNumber)}
         />
-        <ToggleButton
-          title="Include Zero Rebases"
-          value={includeZeroRebases}
-          onChange={setIncludeZeroRebases}
+        <Checkbox
+          label="Include Zero Rebases"
+          checked={includeZeroRebases}
+          onChange={(event) =>
+            setIncludeZeroRebases(event.currentTarget.checked)
+          }
         />
-        <ToggleButton
-          title="Include ONLY Rebases"
-          value={includeOnlyRebases}
-          onChange={setIncludeOnlyRebases}
+        <Checkbox
+          label="Include ONLY Rebases"
+          checked={includeOnlyRebases}
+          onChange={(event) =>
+            setIncludeOnlyRebases(event.currentTarget.checked)
+          }
         />
       </Action>
       <Action

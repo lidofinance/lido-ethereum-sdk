@@ -1,3 +1,9 @@
+import dynamic from 'next/dynamic';
+
+const ReactJSON = dynamic(() => import('react-json-view'), {
+  ssr: false,
+});
+
 import { Button, Accordion } from '@lidofinance/lido-ui';
 import { PropsWithChildren, useReducer } from 'react';
 import { type SDKError } from '@lidofinance/lido-ethereum-sdk';
@@ -88,15 +94,24 @@ const defaultRenderError = (error: SDKError) => {
 };
 
 const defaultRenderResult = <TResult,>(result: TResult) => {
+  const stringfyed = JSON.stringify(
+    result,
+    (_, value) => (typeof value === 'bigint' ? value.toString() : value),
+    2,
+  );
+
+  if (typeof result !== 'object') {
+    return <ResultCode>{stringfyed}</ResultCode>;
+  }
   return (
     <Accordion summary={<SuccessMessage>Success</SuccessMessage>}>
-      <ResultCode>
-        {JSON.stringify(
-          result,
-          (_, value) => (typeof value === 'bigint' ? value.toString() : value),
-          2,
-        )}
-      </ResultCode>
+      <ReactJSON
+        theme={'pop'}
+        name={null}
+        displayDataTypes={false}
+        src={JSON.parse(stringfyed)}
+        collapseStringsAfterLength={30}
+      />
     </Accordion>
   );
 };
