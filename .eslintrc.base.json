@@ -5,6 +5,7 @@
     "node": true
   },
   "extends": ["plugin:jsx-a11y/recommended", "@lidofinance", "prettier"],
+  "ignorePatterns": ["*.test.*"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaFeatures": {

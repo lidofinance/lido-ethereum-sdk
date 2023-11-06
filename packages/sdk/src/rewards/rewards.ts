@@ -104,7 +104,7 @@ export class LidoSDKRewards {
     invariantArgument(step > 0, 'stepBlock must be a positive integer');
     const lowerBound = this.earliestRebaseEventBlock();
     if (fromBlock < lowerBound)
-      this.core.error({
+      throw this.core.error({
         message: `Cannot index events earlier than first TokenRebased event at block ${lowerBound.toString()}`,
         code: ERROR_CODE.NOT_SUPPORTED,
       });

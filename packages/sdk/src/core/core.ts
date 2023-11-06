@@ -116,16 +116,15 @@ export default class LidoSDKCore {
   @Logger('LOG:')
   private init(props: LidoSDKCoreProps, _version?: string) {
     const { chainId, rpcUrls, web3Provider, rpcProvider } = props;
-
     if (!SUPPORTED_CHAINS.includes(chainId)) {
-      this.error({
+      throw this.error({
         message: `Unsupported chain: ${chainId}`,
         code: ERROR_CODE.INVALID_ARGUMENT,
       });
     }
 
     if (!rpcProvider && rpcUrls.length === 0) {
-      this.error({
+      throw this.error({
         message: `Either rpcProvider or rpcUrls are required`,
         code: ERROR_CODE.INVALID_ARGUMENT,
       });
@@ -372,7 +371,6 @@ export default class LidoSDKCore {
     return id;
   }
 
-  // TODO: important tests for this
   @Cache(30 * 60, ['chain.id'])
   public async getLatestBlockToTimestamp(
     timestamp: bigint,
