@@ -3,7 +3,7 @@
   "extends": "../../tsconfig.base.json",
   "outDir": "dist",
   "baseUrl": "./src/",
-  "include": ["src", "tests"],
+  "include": ["src", "tests", "jest.config.ts"],
   "exclude": ["node_modules", "dist", "__test__"],
   "compilerOptions": {
     "resolveJsonModule": true

@@ -13,7 +13,7 @@ import { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
 import { SDKError } from '../common/utils/sdk-error.js';
 import type LidoSDKCore from './core.js';
 
-export type LOG_MODE = 'info' | 'debug';
+export type LOG_MODE = 'info' | 'debug' | 'none';
 
 type LidoSDKCorePropsRpcProps =
   | {

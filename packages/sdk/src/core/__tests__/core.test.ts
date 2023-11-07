@@ -3,7 +3,7 @@ import { test, expect, describe } from '@jest/globals';
 import { LidoSDKCore } from '../index.js';
 import { useTestsEnvs } from '../../../tests/utils/use-test-envs.js';
 import { expectSDKError } from '../../../tests/utils/expect-sdk-error.js';
-import { ERROR_CODE } from '../../index.js';
+import { ERROR_CODE, LIDO_CONTRACT_NAMES } from '../../index.js';
 import { useRpcCore } from '../../../tests/utils/use-core.js';
 import { useWalletClient } from '../../../tests/utils/use-wallet-client.js';
 import { expectAddress } from '../../../tests/utils/expect-address.js';
@@ -19,7 +19,7 @@ describe('Core Tests', () => {
     const core = new LidoSDKCore({
       chainId: chainId,
       rpcUrls: [rpcUrl],
-      logMode: 'info',
+      logMode: 'none',
     });
     expect(core).toBeDefined();
     expect(core.chainId).toBe(chainId);
@@ -84,13 +84,9 @@ describe('Core Tests', () => {
   });
 
   test('balanceETH', async () => {
-    try {
-      await rpcCore.balanceETH(account.address);
-    } catch (e) {
-      console.log(e);
-    }
-    // expect(typeof balance === 'bigint');
-    // expect(balance > 0n);
+    const balance = await rpcCore.balanceETH(account.address);
+    expect(typeof balance === 'bigint');
+    expect(balance > 0n);
   });
 
   test('contractAddressLidoLocator', async () => {
@@ -133,12 +129,12 @@ describe('Core Tests', () => {
 
   test('toBlockNumber', async () => {
     const block = await rpcCore.rpcProvider.getBlock({ blockTag: 'latest' });
-    await expect(
-      rpcCore.toBlockNumber({ block: block.number }),
-    ).resolves.toMatchObject(block);
+    await expect(rpcCore.toBlockNumber({ block: block.number })).resolves.toBe(
+      block.number,
+    );
     await expect(
       rpcCore.toBlockNumber({ timestamp: block.timestamp }),
-    ).resolves.toMatchObject(block);
+    ).resolves.toBe(block.number);
   });
 
   // toBackBlock

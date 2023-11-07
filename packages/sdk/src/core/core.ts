@@ -74,14 +74,15 @@ export default class LidoSDKCore {
   }
 
   constructor(props: LidoSDKCoreProps, version?: string) {
+    this.chainId = props.chainId;
+    this.rpcUrls = props.rpcUrls;
+    this.logMode = props.logMode ?? 'info';
+
     const { chain, rpcProvider, web3Provider } = this.init(props, version);
 
-    this.chainId = props.chainId;
     this.chain = chain;
-    this.rpcUrls = props.rpcUrls;
     this.rpcProvider = rpcProvider;
     this.#web3Provider = web3Provider;
-    this.logMode = props.logMode ?? 'info';
   }
 
   // Static Provider Creation

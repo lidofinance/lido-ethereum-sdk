@@ -7,7 +7,7 @@ export const useRpcCore = () => {
   return new LidoSDKCore({
     chainId: chainId,
     rpcUrls: [rpcUrl],
-    logMode: 'info',
+    logMode: 'none',
   });
 };
 
@@ -17,7 +17,7 @@ export const useWeb3Core = () => {
   return new LidoSDKCore({
     chainId: chainId,
     rpcUrls: [rpcUrl],
-    logMode: 'info',
+    logMode: 'none',
     web3Provider: walletClient,
   });
 };

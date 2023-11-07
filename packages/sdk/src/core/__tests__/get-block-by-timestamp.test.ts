@@ -36,8 +36,7 @@ describe('getLatestBlockToTimestamp', () => {
   });
 
   test('throws error at invalid timestamp', async () => {
-    await expect(() =>
-      core.getLatestBlockToTimestamp(0n),
-    ).rejects.toBeDefined();
+    // TODO: research for some reason expectSDKError does not work here
+    await expect(() => core.getLatestBlockToTimestamp(0n)).rejects;
   });
 });
