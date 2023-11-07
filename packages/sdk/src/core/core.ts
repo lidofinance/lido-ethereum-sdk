@@ -11,9 +11,6 @@ import {
   http,
   custom,
   getContract,
-  isHex,
-  numberToHex,
-  stringify,
   maxUint256,
   GetBlockReturnType,
 } from 'viem';
@@ -212,21 +209,23 @@ export default class LidoSDKCore {
     const { contract, domain } = await this.getPermitContractData(token);
     const nonce = await contract.read.nonces([account]);
 
-    const message = {
-      owner: account,
-      spender,
-      value: amount.toString(),
-      nonce: numberToHex(nonce),
-      deadline: numberToHex(deadline),
-    };
-    const typedData = stringify(
-      { domain, primaryType: 'Permit', types: PERMIT_MESSAGE_TYPES, message },
-      (_, value) => (isHex(value) ? value.toLowerCase() : value),
+    invariant(
+      web3Provider.account,
+      'must have account in web3Provider',
+      ERROR_CODE.PROVIDER_ERROR,
     );
-
-    const signature = await web3Provider.request({
-      method: 'eth_signTypedData_v4',
-      params: [account, typedData],
+    const signature = await web3Provider.signTypedData({
+      account: web3Provider.account,
+      domain,
+      types: PERMIT_MESSAGE_TYPES,
+      primaryType: 'Permit',
+      message: {
+        owner: account,
+        spender,
+        value: amount,
+        nonce,
+        deadline,
+      },
     });
     const { s, r, v } = splitSignature(signature);
 
@@ -236,10 +235,10 @@ export default class LidoSDKCore {
       s: s as `0x${string}`,
       value: amount,
       deadline,
-      chainId: BigInt(this.chain.id),
-      nonce,
+      nonce: nonce,
+      chainId: domain.chainId,
       owner: account,
-      spender,
+      spender: spender,
     };
   }
 
@@ -261,7 +260,7 @@ export default class LidoSDKCore {
     let domain = {
       name: 'Wrapped liquid staked Ether 2.0',
       version: '1',
-      chainId: this.chain.id,
+      chainId: BigInt(this.chain.id),
       verifyingContract: tokenAddress,
     };
     if (token === LIDO_TOKENS.steth) {
@@ -270,7 +269,7 @@ export default class LidoSDKCore {
       domain = {
         name,
         version,
-        chainId: Number(chainId),
+        chainId,
         verifyingContract,
       };
     }
@@ -444,6 +443,7 @@ export default class LidoSDKCore {
     invariantArgument(false, 'must have at least something in back argument');
   }
 
+  // TODO separate test suit with multisig
   public async performTransaction(
     props: PerformTransactionOptions,
   ): Promise<TransactionResult> {

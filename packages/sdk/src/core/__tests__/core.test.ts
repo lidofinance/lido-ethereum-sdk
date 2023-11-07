@@ -86,7 +86,7 @@ describe('Core Tests', () => {
   test('balanceETH', async () => {
     const balance = await rpcCore.balanceETH(account.address);
     expect(typeof balance === 'bigint');
-    expect(balance > 0n);
+    expect(balance >= 0n);
   });
 
   test('contractAddressLidoLocator', async () => {

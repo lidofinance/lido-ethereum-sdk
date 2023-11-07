@@ -1,4 +1,4 @@
-import { type LidoSDKCore } from '../../core/index.js';
+import { LidoSDKCore } from '../../core/index.js';
 import { type LOG_MODE } from '../../core/types.js';
 
 import { ConsoleCss } from './constants.js';
