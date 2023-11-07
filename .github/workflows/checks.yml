@@ -31,3 +31,7 @@ jobs:
 
       - name: Tests
         run: yarn test
+        env:
+          TEST_PRIVATE_KEY: ${{ secrets.TEST_PRIVATE_KEY }}
+          TEST_CHAIN_ID: ${{ vars.TEST_CHAIN_ID }}
+          TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
