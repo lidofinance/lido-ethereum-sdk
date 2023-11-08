@@ -235,10 +235,10 @@ export default class LidoSDKCore {
       s: s as `0x${string}`,
       value: amount,
       deadline,
-      nonce: nonce,
+      nonce,
       chainId: domain.chainId,
       owner: account,
-      spender: spender,
+      spender,
     };
   }
 
