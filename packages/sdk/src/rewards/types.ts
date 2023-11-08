@@ -83,7 +83,7 @@ type GetRewardsCommonResult = {
 
 export type GetRewardsFromSubgraphOptions = GetRewardsOptions & {
   stepEntities?: number;
-  getSubgraphUrl: (id: string, chainId: number) => string;
+  getSubgraphUrl: (id: string | null, chainId: number) => string;
 };
 
 export type GetRewardsFromSubgraphResult = {

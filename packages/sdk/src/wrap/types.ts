@@ -1,24 +1,20 @@
-import { FormattedTransactionRequest, type Address } from 'viem';
-import {
-  type LidoSDKCommonProps,
-  type EtherValue,
-  type TransactionCallback,
+import type { FormattedTransactionRequest } from 'viem';
+import type {
+  LidoSDKCommonProps,
+  EtherValue,
+  CommonTransactionProps,
 } from '../core/types.js';
 
 export type LidoSDKWrapProps = LidoSDKCommonProps;
 
-export type WrapProps = {
+export type WrapProps = CommonTransactionProps & {
   value: EtherValue;
-  account: Address;
-  callback?: TransactionCallback;
 };
 
 export type WrapPropsWithoutCallback = Omit<WrapProps, 'callback'>;
 
-export type WrapInnerProps = {
+export type WrapInnerProps = CommonTransactionProps & {
   value: bigint;
-  account: Address;
-  callback: TransactionCallback;
 };
 
 export type PopulatedTx = Omit<FormattedTransactionRequest, 'type'>;

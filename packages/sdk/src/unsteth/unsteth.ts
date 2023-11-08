@@ -1,4 +1,8 @@
-import { LidoSDKCore } from '../core/index.js';
+import {
+  CommonTransactionProps,
+  LidoSDKCore,
+  TransactionResult,
+} from '../core/index.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import { version } from '../version.js';
 import type {
@@ -10,7 +14,6 @@ import type {
   LidoSDKUnstETHProps,
   ParsedProps,
   SafeTransferFromArguments,
-  UnstethCommonTransactionProps,
   UnstethTransferProps,
 } from './types.js';
 import {
@@ -24,6 +27,7 @@ import {
 import { unstethAbi } from './abi/unsteth-abi.js';
 import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
 
+// TODO helpers simulate&populate
 export class LidoSDKUnstETH {
   readonly core: LidoSDKCore;
 
@@ -78,16 +82,18 @@ export class LidoSDKUnstETH {
   // Transfer
   @Logger('Call:')
   @ErrorHandler()
-  public async transfer(props: UnstethTransferProps) {
+  public async transfer(
+    props: UnstethTransferProps,
+  ): Promise<TransactionResult> {
     const {
       account,
       callback,
       id,
       to,
-      from = props.account,
+      from: _from,
       data,
     } = this.parseProps(props);
-
+    const from = _from ?? (await this.core.getWeb3Address(account));
     const args = (
       data ? [from, to, id, data] : [from, to, id]
     ) as SafeTransferFromArguments;
@@ -107,7 +113,9 @@ export class LidoSDKUnstETH {
 
   @Logger('Call:')
   @ErrorHandler()
-  public async setApprovalFor(props: UnstethApproveProps) {
+  public async setApprovalFor(
+    props: UnstethApproveProps,
+  ): Promise<TransactionResult> {
     const { account, callback, to = zeroAddress, id } = this.parseProps(props);
     const args = [to, id] as const;
     const contract = await this.getContract();
@@ -128,7 +136,9 @@ export class LidoSDKUnstETH {
 
   @Logger('Call:')
   @ErrorHandler()
-  public async setApprovalForAll(props: UnstethApproveAllProps) {
+  public async setApprovalForAll(
+    props: UnstethApproveAllProps,
+  ): Promise<TransactionResult> {
     const { account, callback, to, allow } = this.parseProps(props);
     const args = [to, allow] as const;
     const contract = await this.getContract();
@@ -197,7 +207,7 @@ export class LidoSDKUnstETH {
     return contract.read.tokenURI([id]);
   }
 
-  private parseProps<TProps extends UnstethCommonTransactionProps>(
+  private parseProps<TProps extends CommonTransactionProps>(
     props: TProps,
   ): ParsedProps<TProps> {
     return {

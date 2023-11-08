@@ -115,12 +115,12 @@ export class LidoSDKWrap {
     props: WrapProps,
   ): Promise<PopulatedTransaction> {
     const { value, account } = this.parseProps(props);
-
+    const accountAddress = await this.core.getWeb3Address(account);
     const address = await this.contractAddressWstETH();
 
     return {
       to: address,
-      from: account,
+      from: accountAddress,
       value,
     };
   }
@@ -131,10 +131,11 @@ export class LidoSDKWrap {
     props: WrapPropsWithoutCallback,
   ): Promise<bigint> {
     const { value, account } = this.parseProps(props);
+    const accountAddress = await this.core.getWeb3Address(account);
 
     const address = await this.contractAddressWstETH();
     return this.core.rpcProvider.estimateGas({
-      account,
+      account: accountAddress,
       to: address,
       value,
     });
@@ -162,11 +163,12 @@ export class LidoSDKWrap {
     props: WrapPropsWithoutCallback,
   ): Promise<PopulatedTransaction> {
     const { value, account } = this.parseProps(props);
+    const accountAddress = await this.core.getWeb3Address(account);
     const address = await this.contractAddressWstETH();
 
     return {
       to: address,
-      from: account,
+      from: accountAddress,
       data: encodeFunctionData({
         abi,
         functionName: 'wrap',
@@ -187,7 +189,6 @@ export class LidoSDKWrap {
       address,
       abi,
       account,
-
       functionName: 'wrap',
       args: [value],
     });
@@ -233,13 +234,14 @@ export class LidoSDKWrap {
     props: WrapPropsWithoutCallback,
   ): Promise<Omit<FormattedTransactionRequest, 'type'>> {
     const { value, account } = this.parseProps(props);
+    const accountAddress = await this.core.getWeb3Address(account);
 
     const stethContract = await this.getPartialContractSteth();
     const wstethContractAddress = await this.contractAddressWstETH();
 
     return {
       to: stethContract.address,
-      from: account,
+      from: accountAddress,
       data: encodeFunctionData({
         abi: stethPartialAbi,
         functionName: 'approve',
@@ -291,11 +293,12 @@ export class LidoSDKWrap {
     props: Omit<WrapProps, 'callback'>,
   ): Promise<PopulatedTransaction> {
     const { value, account } = this.parseProps(props);
+    const accountAddress = await this.core.getWeb3Address(account);
     const to = await this.contractAddressWstETH();
 
     return {
       to,
-      from: account,
+      from: accountAddress,
       data: encodeFunctionData({
         abi: abi,
         functionName: 'unwrap',

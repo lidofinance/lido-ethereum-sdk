@@ -7,6 +7,7 @@ export type {
   TransactionCallbackProps,
   TransactionResult,
   EtherValue,
+  AccountValue,
   PermitSignature,
   GetFeeDataResult,
   PopulatedTransaction,
@@ -20,5 +21,6 @@ export type {
   PermitCallback,
   PermitCallbackProps,
   TransactionOptions,
+  CommonTransactionProps,
 } from './types.js';
 export { TransactionCallbackStage } from './types.js';
