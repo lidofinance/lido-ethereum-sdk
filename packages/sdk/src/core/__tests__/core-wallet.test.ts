@@ -37,6 +37,7 @@ describe('Core Wallet Tests', () => {
     const contractAddress = await web3Core.getContractAddress(
       isSteth ? LIDO_CONTRACT_NAMES.lido : LIDO_CONTRACT_NAMES.wsteth,
     );
+
     const address = await web3Core.getWeb3Address();
     const {
       chainId: permitChainId,
