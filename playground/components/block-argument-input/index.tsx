@@ -21,6 +21,8 @@ const getLabel = (type: keyof BlockArgumentType) => {
       return 'in seconds since epoch time';
     case 'block':
       return 'block number or tag(e.g. "latest")';
+    default:
+      return '';
   }
 };
 

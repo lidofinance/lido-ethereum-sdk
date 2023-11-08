@@ -28,7 +28,7 @@ describe('Core Tests', () => {
     expect(core.web3Provider).toBeUndefined();
   });
 
-  test('Core accepts only valid arguments', async () => {
+  test('Core accepts only valid arguments', () => {
     void expectSDKError(
       () =>
         new LidoSDKCore({

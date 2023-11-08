@@ -41,8 +41,7 @@
       }
     ],
     "import/no-cycle": ["error", { "maxDepth": 1 }],
-    "unicorn/expiring-todo-comments": "off",
-    "@next/eslint-plugin-next": "off"
+    "unicorn/expiring-todo-comments": "off"
   },
   "settings": {
     "react": {
