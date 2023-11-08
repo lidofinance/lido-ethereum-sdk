@@ -117,6 +117,7 @@
     "build:types": "tsc --project tsconfig.build.json --module esnext --declarationDir ./dist/types --emitDeclarationOnly --declaration --declarationMap",
     "test": "jest",
     "prepublishOnly": "node scripts/updateVersion.cjs",
+    "lint": "eslint . --ext .ts --max-warnings 0",
     "clean": "rimraf dist"
   },
   "dependencies": {

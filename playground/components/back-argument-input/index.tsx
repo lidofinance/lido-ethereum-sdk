@@ -24,6 +24,8 @@ const getLabel = (type: keyof BackArgumentType) => {
       return 'days back';
     case 'seconds':
       return 'seconds back';
+    default:
+      return '';
   }
 };
 

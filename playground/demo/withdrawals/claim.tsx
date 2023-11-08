@@ -1,4 +1,4 @@
-import { Checkbox, External, Accordion } from '@lidofinance/lido-ui';
+import { Checkbox, Accordion } from '@lidofinance/lido-ui';
 import { useWeb3 } from '@reef-knot/web3-react';
 import { RequestStatusWithId } from '@lidofinance/lido-ethereum-sdk';
 import { Action } from 'components/action';

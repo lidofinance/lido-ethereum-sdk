@@ -4,7 +4,7 @@ import {
 } from '@lidofinance/lido-ethereum-sdk/core';
 import { toast } from '@lidofinance/lido-ui';
 
-export const transactionToast: TransactionCallback = ({ stage, payload }) => {
+export const transactionToast: TransactionCallback = ({ stage }) => {
   switch (stage) {
     case TransactionCallbackStage.PERMIT:
       return toast('Permit', { type: 'info' });

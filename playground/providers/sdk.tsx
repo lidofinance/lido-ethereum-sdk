@@ -16,7 +16,7 @@ export const useLidoSDK = () => {
 };
 
 export const LidoSDKProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const { providerRpc, providerWeb3, chainId, account } = useSDK();
+  const { providerWeb3, chainId, account } = useSDK();
   const value = useMemo(() => {
     const client =
       providerWeb3 && account
@@ -30,7 +30,7 @@ export const LidoSDKProvider: React.FC<PropsWithChildren> = ({ children }) => {
       web3Provider: client as any,
       logMode: 'debug',
     });
-  }, [providerRpc, providerWeb3, chainId]);
+  }, [providerWeb3, chainId, account]);
 
   return <context.Provider value={value}>{children}</context.Provider>;
 };

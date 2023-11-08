@@ -1,3 +1,4 @@
+/* eslint-disable jest/expect-expect */
 import { test, expect, describe } from '@jest/globals';
 
 import { LidoSDKCore } from '../index.js';
@@ -28,7 +29,7 @@ describe('Core Tests', () => {
   });
 
   test('Core accepts only valid arguments', () => {
-    expectSDKError(
+    void expectSDKError(
       () =>
         new LidoSDKCore({
           chainId: chainId,
@@ -37,7 +38,7 @@ describe('Core Tests', () => {
       ERROR_CODE.INVALID_ARGUMENT,
     );
 
-    expectSDKError(
+    void expectSDKError(
       () =>
         new LidoSDKCore({
           chainId: 100 as any,
@@ -85,8 +86,8 @@ describe('Core Tests', () => {
 
   test('balanceETH', async () => {
     const balance = await rpcCore.balanceETH(account.address);
-    expect(typeof balance === 'bigint');
-    expect(balance >= 0n);
+    expect(typeof balance).toEqual('bigint');
+    expect(balance).toBeGreaterThanOrEqual(0n);
   });
 
   test('contractAddressLidoLocator', async () => {
@@ -94,7 +95,7 @@ describe('Core Tests', () => {
   });
 
   test('getContractLidoLocator', async () => {
-    const locator = await rpcCore.getContractLidoLocator();
+    const locator = rpcCore.getContractLidoLocator();
     expectContract(locator);
   });
 
@@ -111,13 +112,6 @@ describe('Core Tests', () => {
     const locatorAddress = rpcCore.contractAddressLidoLocator();
     await expect(rpcCore.isContract(locatorAddress)).resolves.toBe(true);
     await expect(rpcCore.isContract(account.address)).resolves.toBe(false);
-  });
-
-  test('getContractAddress', async () => {
-    const lido = rpcCore.getContractAddress(LIDO_CONTRACT_NAMES.lido);
-    expectAddress(lido);
-    const wsteth = rpcCore.getContractAddress(LIDO_CONTRACT_NAMES.wsteth);
-    expectAddress(wsteth);
   });
 
   test('getContractAddress', async () => {
