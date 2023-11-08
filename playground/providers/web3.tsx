@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { FC, PropsWithChildren } from 'react';
 import { ProviderWeb3 } from '@reef-knot/web3-react';
 import { getConnectors, holesky } from '@reef-knot/core-react';

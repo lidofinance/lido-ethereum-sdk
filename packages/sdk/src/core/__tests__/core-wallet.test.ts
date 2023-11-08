@@ -37,7 +37,6 @@ describe('Core Wallet Tests', () => {
     const contractAddress = await web3Core.getContractAddress(
       isSteth ? LIDO_CONTRACT_NAMES.lido : LIDO_CONTRACT_NAMES.wsteth,
     );
-    console.log(web3Core.useWeb3Provider().account?.type);
     const address = await web3Core.getWeb3Address();
     const {
       chainId: permitChainId,
@@ -98,14 +97,14 @@ describe('Core Wallet Tests', () => {
   test('account has sufficient balance for testing, >5 ETH', async () => {
     const address = await web3Core.getWeb3Address();
     const balance = await web3Core.balanceETH(address);
-    expect(balance > parseEther('5'));
+    expect(balance).toBeGreaterThan(parseEther('5'));
   });
 
   test('sign permit for stETH', async () => {
-    return testPermit(true);
+    await expect(testPermit(true)).resolves.not.toThrow();
   });
 
   test('sign permit for wstETH', async () => {
-    return testPermit(false);
+    await expect(testPermit(false)).resolves.not.toThrow();
   });
 });
