@@ -4,15 +4,20 @@
 
 ## WIP
 
-The project is currently under development and may change in the future.
+The project is currently under active development and may experience breaking changes in the future.
 
 ## Table of contents
 
 - [Installation](#installation)
 - [Modules](#modules)
 - [Usage](#usage)
-- [Initialization](#initialization)
-- [Examples](#examples)
+
+  - [Import](#import)
+  - [Initialization](#initialization)
+  - [With web3Provider](#with-web3provider)
+  - [Separate modules](#separate-modules)
+
+- [Basic Examples](#basic-examples)
 
   - [Core](#core-example)
   - [Stake](#stake-example)
@@ -84,74 +89,122 @@ The Lido Ethereum SDK consists of several modules:
 - **Wrap** - provides access to the Lido wrap functionality
 - **(w)stETH** - provides access to the stETH and wstETH tokens functionality
 - **unstETH NFT** - provides access to the unstETH NFT functionality
+- **Shares** - provides access to the underlying share token
+- **Statistics** - provides access to the Lido stats, mainly APR
+- **Rewards** - provides access to historical data on stETH rewards
 
 ## Usage
 
-To get started with the Lido Ethereum SDK, you need to import the necessary modules:
+### Import
+
+To get started with the Lido Ethereum SDK, you need to import the necessary modules. You can use CJS or ES6+ imports. Import from root package or each module separately to improve on bundle size.
 
 ```ts
+// CSJ
 const { LidoSDK } = require('@lidofinance/lido-ethereum-sdk');
 // or
 const { LidoSDKStake } = require('@lidofinance/lido-ethereum-sdk/stake');
 // or
-const { LidoSDKWithdraw } = require('@lidofinance/lido-ethereum-sdk/withdraw');
-// or
-const { LidoSDKWrap } = require('@lidofinance/lido-ethereum-sdk/wrap');
-// or
-const { LidoSDKCore } = require('@lidofinance/lido-ethereum-sdk/core');
-// or
-const { LidoSDKstETH } = require('@lidofinance/lido-ethereum-sdk/erc20');
-// or
-const { LidoSDKwstETH } = require('@lidofinance/lido-ethereum-sdk/erc20');
-// or
-const { LidoSDKUnstETH } = require('@lidofinance/lido-ethereum-sdk/unsteth');
-
-// Or, if you are using ES6+:
-import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
-// or
-import { LidoSDKStake } from '@lidofinance/lido-ethereum-sdk/stake';
-// or
-import { LidoSDKWithdraw } from '@lidofinance/lido-ethereum-sdk/withdraw';
-// or
-import { LidoSDKWrap } from '@lidofinance/lido-ethereum-sdk/wrap';
-// or
-import { LidoSDKCore } from '@lidofinance/lido-ethereum-sdk/core';
-// or
-import { LidoSDKstETH } from '@lidofinance/lido-ethereum-sdk/erc20';
-// or
-import { LidoSDKwstETH } from '@lidofinance/lido-ethereum-sdk/erc20';
-// or
-import { LidoSDKUnstETH } from '@lidofinance/lido-ethereum-sdk/unsteth';
 ```
 
-## Initialization
+```ts
+// ES6+, all other modules are available from root
+import { LidoSDK, LidoSDKStake } from '@lidofinance/lido-ethereum-sdk';
+
+// Full list of separate imports
+import { LidoSDKCore } from '@lidofinance/lido-ethereum-sdk/core';
+import { LidoSDKStake } from '@lidofinance/lido-ethereum-sdk/stake';
+import { LidoSDKWithdraw } from '@lidofinance/lido-ethereum-sdk/withdraw';
+import { LidoSDKWrap } from '@lidofinance/lido-ethereum-sdk/wrap';
+import {
+  LidoSDKstETH,
+  LidoSDKwstETH,
+} from '@lidofinance/lido-ethereum-sdk/erc20';
+import { LidoSDKUnstETH } from '@lidofinance/lido-ethereum-sdk/unsteth';
+import { LidoSDKShares } from '@lidofinance/lido-ethereum-sdk/shares';
+import { LidoSDKStatistics } from '@lidofinance/lido-ethereum-sdk/statistics';
+import { LidoSDKRewards } from '@lidofinance/lido-ethereum-sdk/rewards';
+```
+
+### Initialization
 
 Before using the SDK, you need to create an instance of the LidoSDK class:
 
+Pass your own viem PublicClient:
+
 ```ts
-// With own rpc provider
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+import { createPublicClient, http } from 'viem';
+import { goerli } from 'viem/chains';
+
+const client = createPublicClient({
+  chain: goerli,
+  transport: http(),
+});
 const sdk = new LidoSDK({
   chainId: 5,
   rpcProvider: ownRpcProvider,
   web3Provider: provider, // optional
-  logMode: 'debug', // optional 'debug' | 'info'. Default: 'info'
 });
+```
 
-// With RPC urls (without own rpc provider)
+Or just rpc urls so it can be created under the hood:
+
+```ts
 const sdk = new LidoSDK({
   chainId: 5,
-  rpcUrls: [
-    'https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}',
-    'https://fallback-provider',
-  ],
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
   web3Provider: provider, // optional
-  logMode: 'debug', // optional 'debug' | 'info'. Default: 'info'
 });
 ```
 
 Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address of your Ethereum provider.
 
-## Examples
+### With web3Provider
+
+In order to access transaction signing functionality you need to provide viem WalletClient instance. Accessing web3 methods without web3Provider will result in error.
+
+```ts
+import { LidoSDK, LidoSDKCore } from '@lidofinance/lido-ethereum-sdk';
+import { createWalletClient, custom } from 'viem';
+import { goerli } from 'viem/chains';
+
+let web3Provider = createWalletClient({
+  chain: goerli,
+  transport: custom(window.ethereum),
+});
+
+// or use our helper to pass any eip-1193 provider
+let web3Provider = LidoSDKCore.createWeb3Provider(goerli, window.ethereum);
+
+const sdk = new LidoSDK({
+  chainId: 5,
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  web3Provider,
+});
+```
+
+### Separate modules
+
+Every SDK module needs `LidoSDKCore` to function. You can pass same arguments as to `LidoSDKCore` constructor to create it under the hood or pass existing instance. This allows you to build up your SDK only out of parts you need.
+
+```ts
+import { LidoSDKStake } from '@lidofinance/lido-ethereum-sdk/stake';
+import { LidoSDKWrap } from '@lidofinance/lido-ethereum-sdk/stake';
+import { LidoSDKCore } from '@lidofinance/lido-ethereum-sdk/core';
+
+const params = {
+  chainId: 5,
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+};
+// core is created under the hood
+const stake = new LidoSDKStake(params);
+
+const core = new LidoSDKCore(params);
+const wrap = new LidoSDKWrap({ core });
+```
+
+## Basic Examples
 
 ### Core example
 

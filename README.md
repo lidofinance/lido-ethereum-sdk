@@ -28,6 +28,9 @@ const { LidoSDK } = require('@lidofinance/lido-ethereum-sdk');
 
 // Or, if you are using ES6+:
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+
+// Or, import separate each module separately to save up on bundle size
+import { LidoSDKStake } from '@lidofinance/lido-ethereum-sdk/stake';
 ```
 
 ## Initialization
@@ -35,14 +38,24 @@ import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 Before using the SDK, you need to create an instance of the LidoSDK class:
 
 ```ts
-// With own rpc provider
+// Pass your own viem PublicClient
+
+import { createPublicClient, http } from 'viem';
+import { goerli } from 'viem/chains';
+
+const client = createPublicClient({
+  chain: goerli,
+  transport: http(),
+});
 const sdk = new LidoSDK({
   chainId: 5,
   rpcProvider: ownRpcProvider,
   web3Provider: provider, // optional
 });
+```
 
-// With RPC urls (without own rpc provider)
+```ts
+// Or just rpc urls so it can be created under the hood
 const sdk = new LidoSDK({
   chainId: 5,
   rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
@@ -82,4 +95,4 @@ console.log(stakeResult, 'stake result');
 
 ## Documentation
 
-For additional information about available methods and functionality, refer to the documentation for the Lido Ethereum SDK.[TODO: add link to documentation]
+For additional information about available methods and functionality, refer to the [the documentation for the Lido Ethereum SDK](packages/sdk/README.md).
