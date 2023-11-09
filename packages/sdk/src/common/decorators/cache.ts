@@ -69,7 +69,7 @@ export const Cache = function (timeMs = 0, cacheArgs?: string[]) {
       );
       const result = originalMethod.call(this, ...args);
       if (result instanceof Promise) {
-        result.then((resolvedResult) =>
+        void result.then((resolvedResult) =>
           cache.set(cacheKey, { data: resolvedResult, timestamp: Date.now() }),
         );
       } else cache.set(cacheKey, { data: result, timestamp: Date.now() });

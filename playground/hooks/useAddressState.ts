@@ -8,7 +8,7 @@ type UseAddressStateOptions = {
 
 export const useAddressState = (
   defaultValue: Address = '0x0',
-  { useAccount }: UseAddressStateOptions = { useAccount: false },
+  { useAccount = false }: UseAddressStateOptions = {},
 ) => {
   const { account: web3account = '0x0' } = useWeb3();
   const state = useState<Address>(defaultValue);
@@ -16,6 +16,7 @@ export const useAddressState = (
     if (useAccount && web3account && (!state[0] || state[0] === defaultValue)) {
       state[1](web3account as Address);
     }
-  }, [useAccount, web3account]);
+  }, [useAccount, web3account, state, defaultValue]);
+
   return state;
 };

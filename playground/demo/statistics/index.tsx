@@ -1,5 +1,4 @@
 import { Input, Accordion } from '@lidofinance/lido-ui';
-import { useWeb3 } from '@reef-knot/web3-react';
 import { Action } from 'components/action';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
@@ -15,7 +14,7 @@ export const StatisticsDemo = () => {
         title="SMA Apr"
         action={() =>
           statistics.apr.getSmaApr({
-            days: daysValue
+            days: daysValue,
           })
         }
       >

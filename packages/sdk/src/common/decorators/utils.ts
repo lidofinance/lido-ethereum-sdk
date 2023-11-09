@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { LidoSDKCore } from '../../core/index.js';
 import { type LOG_MODE } from '../../core/types.js';
 

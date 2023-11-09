@@ -56,7 +56,9 @@ export class LidoSDKWithdrawRequest extends BusModule {
     const rest = amount % max;
     const requestCount = amount / max;
 
-    const result = new Array(requestCount).fill(max);
+    const result = Array.from<bigint>({ length: Number(requestCount) }).fill(
+      max,
+    );
     if (rest > 0n) {
       invariantArgument(
         rest >= min,

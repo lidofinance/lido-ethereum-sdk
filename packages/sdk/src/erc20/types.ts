@@ -21,7 +21,7 @@ export type InnerTransactionProps = Required<CommonTransactionProps>;
 export type ParsedTransactionProps<TProps extends CommonTransactionProps> =
   Omit<TProps, 'callback'> & {
     callback: NonNullable<TProps['callback']>;
-  } & (TProps extends { amount: EtherValue } ? { amount: bigint } : {});
+  } & (TProps extends { amount: EtherValue } ? { amount: bigint } : object);
 
 export type TransferProps = {
   amount: EtherValue;

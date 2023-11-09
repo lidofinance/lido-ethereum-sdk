@@ -237,10 +237,10 @@ export default class LidoSDKCore {
       s: s as `0x${string}`,
       value: amount,
       deadline,
-      nonce: nonce,
+      nonce,
       chainId: domain.chainId,
       owner: accountAddress,
-      spender: spender,
+      spender,
     };
   }
 
@@ -354,7 +354,7 @@ export default class LidoSDKCore {
     const lidoLocator = this.getContractLidoLocator();
     if (contract === 'wsteth') {
       const withdrawalQueue = await lidoLocator.read.withdrawalQueue();
-      const contract = await this.getContractWQ(withdrawalQueue);
+      const contract = this.getContractWQ(withdrawalQueue);
       const wstethAddress = await contract.read.WSTETH();
 
       return wstethAddress;
