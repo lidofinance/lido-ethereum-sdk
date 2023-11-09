@@ -87,7 +87,7 @@ export default class LidoSDKCore {
   // Static Provider Creation
 
   public static createRpcProvider(
-    chain: Chain,
+    chainId: CHAINS,
     rpcUrls: string[],
   ): PublicClient {
     const rpcs = rpcUrls.map((url) => http(url));
@@ -96,18 +96,18 @@ export default class LidoSDKCore {
       batch: {
         multicall: true,
       },
-      chain,
+      chain: VIEM_CHAINS[chainId],
       transport: fallback(rpcs),
     });
   }
 
   public static createWeb3Provider(
-    chain: Chain,
+    chainId: CHAINS,
     transport: { request(...args: any): Promise<any> },
     transportConfig?: CustomTransportConfig,
   ): WalletClient {
     return createWalletClient({
-      chain,
+      chain: VIEM_CHAINS[chainId],
       transport: custom(transport, transportConfig),
     });
   }
