@@ -132,7 +132,7 @@ export default class LidoSDKCore {
 
     const chain = VIEM_CHAINS[chainId];
     const currentRpcProvider =
-      rpcProvider ?? LidoSDKCore.createRpcProvider(chain, rpcUrls);
+      rpcProvider ?? LidoSDKCore.createRpcProvider(chainId, rpcUrls);
     const currentWeb3Provider = web3Provider;
 
     return {
