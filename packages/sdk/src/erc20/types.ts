@@ -23,7 +23,7 @@ export type ParsedTransactionProps<TProps extends TransactionProps> = Omit<
   'callback'
 > & {
   callback: NonNullable<TProps['callback']>;
-} & (TProps extends { amount: EtherValue } ? { amount: bigint } : {});
+} & (TProps extends { amount: EtherValue } ? { amount: bigint } : object);
 
 export type TransferProps = {
   amount: EtherValue;

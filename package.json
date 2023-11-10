@@ -17,12 +17,14 @@
     "build:packages": "yarn workspaces foreach --no-private run build",
     "types": "yarn workspaces foreach -pt run types",
     "test": "yarn workspaces foreach -pt run test",
+    "lint": "yarn workspaces foreach -pt run lint",
     "prepare": "husky install"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",
     "@lidofinance/eslint-config": "^0.35.0",
+    "@next/eslint-plugin-next": "^14.0.1",
     "@qiwi/multi-semantic-release": "6.7.0",
     "@typescript-eslint/eslint-plugin": "^5",
     "@typescript-eslint/parser": "^5.46.0",
@@ -42,6 +44,7 @@
     "eslint-plugin-unicorn": "^45",
     "husky": "^8.0.3",
     "prettier": "^3.0.1",
+    "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   },
   "resolutions": {

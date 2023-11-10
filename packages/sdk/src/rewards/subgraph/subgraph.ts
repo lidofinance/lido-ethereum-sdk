@@ -39,6 +39,7 @@ const requestAllWithStep = async <TResult, TResultEntry, TVariables>({
 } & SubgraphRequestOptions): Promise<Array<TResultEntry>> => {
   let skip = 0;
   const results: TResultEntry[] = [];
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const partialResult = await request<TResult>({
       url,
@@ -83,8 +84,8 @@ export const getInitialData = async ({
     variables: { address, block: Number(block) },
   });
   return {
-    transfer: lidoTransfers.length > 0 ? lidoTransfers[0]! : null,
-    rebase: totalRewards.length > 0 ? totalRewards[0]! : null,
+    transfer: lidoTransfers.length > 0 ? lidoTransfers?.[0] ?? null : null,
+    rebase: totalRewards.length > 0 ? totalRewards?.[0] ?? null : null,
   };
 };
 
@@ -118,13 +119,15 @@ export const getTotalRewards = async ({
   step,
   toBlock,
 }: GetTotalRewardsOptions): Promise<GetTotalRewardsResult> => {
-  return requestAllWithStep<TotalRewardsQueryResult, TotalRewardEntity, {}>({
-    url,
-    document: TotalRewardsQuery,
-    step,
-    extractArray: (result) => result?.totalRewards ?? [],
-    fromBlock,
-    toBlock,
-    variables: {},
-  });
+  return requestAllWithStep<TotalRewardsQueryResult, TotalRewardEntity, object>(
+    {
+      url,
+      document: TotalRewardsQuery,
+      step,
+      extractArray: (result) => result?.totalRewards ?? [],
+      fromBlock,
+      toBlock,
+      variables: {},
+    },
+  );
 };

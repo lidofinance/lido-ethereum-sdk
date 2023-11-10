@@ -11,9 +11,6 @@ import {
   http,
   custom,
   getContract,
-  isHex,
-  numberToHex,
-  stringify,
   maxUint256,
   GetBlockReturnType,
 } from 'viem';
@@ -74,14 +71,15 @@ export default class LidoSDKCore {
   }
 
   constructor(props: LidoSDKCoreProps, version?: string) {
+    this.chainId = props.chainId;
+    this.rpcUrls = props.rpcUrls;
+    this.logMode = props.logMode ?? 'info';
+
     const { chain, rpcProvider, web3Provider } = this.init(props, version);
 
-    this.chainId = props.chainId;
     this.chain = chain;
-    this.rpcUrls = props.rpcUrls;
     this.rpcProvider = rpcProvider;
     this.#web3Provider = web3Provider;
-    this.logMode = props.logMode ?? 'info';
   }
 
   // Static Provider Creation
@@ -116,16 +114,15 @@ export default class LidoSDKCore {
   @Logger('LOG:')
   private init(props: LidoSDKCoreProps, _version?: string) {
     const { chainId, rpcUrls, web3Provider, rpcProvider } = props;
-
     if (!SUPPORTED_CHAINS.includes(chainId)) {
-      this.error({
+      throw this.error({
         message: `Unsupported chain: ${chainId}`,
         code: ERROR_CODE.INVALID_ARGUMENT,
       });
     }
 
     if (!rpcProvider && rpcUrls.length === 0) {
-      this.error({
+      throw this.error({
         message: `Either rpcProvider or rpcUrls are required`,
         code: ERROR_CODE.INVALID_ARGUMENT,
       });
@@ -212,21 +209,23 @@ export default class LidoSDKCore {
     const { contract, domain } = await this.getPermitContractData(token);
     const nonce = await contract.read.nonces([account]);
 
-    const message = {
-      owner: account,
-      spender,
-      value: amount.toString(),
-      nonce: numberToHex(nonce),
-      deadline: numberToHex(deadline),
-    };
-    const typedData = stringify(
-      { domain, primaryType: 'Permit', types: PERMIT_MESSAGE_TYPES, message },
-      (_, value) => (isHex(value) ? value.toLowerCase() : value),
+    invariant(
+      web3Provider.account,
+      'must have account in web3Provider',
+      ERROR_CODE.PROVIDER_ERROR,
     );
-
-    const signature = await web3Provider.request({
-      method: 'eth_signTypedData_v4',
-      params: [account, typedData],
+    const signature = await web3Provider.signTypedData({
+      account: web3Provider.account,
+      domain,
+      types: PERMIT_MESSAGE_TYPES,
+      primaryType: 'Permit',
+      message: {
+        owner: account,
+        spender,
+        value: amount,
+        nonce,
+        deadline,
+      },
     });
     const { s, r, v } = splitSignature(signature);
 
@@ -236,8 +235,8 @@ export default class LidoSDKCore {
       s: s as `0x${string}`,
       value: amount,
       deadline,
-      chainId: BigInt(this.chain.id),
       nonce,
+      chainId: domain.chainId,
       owner: account,
       spender,
     };
@@ -261,7 +260,7 @@ export default class LidoSDKCore {
     let domain = {
       name: 'Wrapped liquid staked Ether 2.0',
       version: '1',
-      chainId: this.chain.id,
+      chainId: BigInt(this.chain.id),
       verifyingContract: tokenAddress,
     };
     if (token === LIDO_TOKENS.steth) {
@@ -270,7 +269,7 @@ export default class LidoSDKCore {
       domain = {
         name,
         version,
-        chainId: Number(chainId),
+        chainId,
         verifyingContract,
       };
     }
@@ -351,7 +350,7 @@ export default class LidoSDKCore {
     const lidoLocator = this.getContractLidoLocator();
     if (contract === 'wsteth') {
       const withdrawalQueue = await lidoLocator.read.withdrawalQueue();
-      const contract = await this.getContractWQ(withdrawalQueue);
+      const contract = this.getContractWQ(withdrawalQueue);
       const wstethAddress = await contract.read.WSTETH();
 
       return wstethAddress;
@@ -372,7 +371,6 @@ export default class LidoSDKCore {
     return id;
   }
 
-  // TODO: important tests for this
   @Cache(30 * 60, ['chain.id'])
   public async getLatestBlockToTimestamp(
     timestamp: bigint,
@@ -445,6 +443,7 @@ export default class LidoSDKCore {
     invariantArgument(false, 'must have at least something in back argument');
   }
 
+  // TODO separate test suit with multisig
   public async performTransaction(
     props: PerformTransactionOptions,
   ): Promise<TransactionResult> {

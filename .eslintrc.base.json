@@ -7,10 +7,6 @@
   "extends": ["plugin:jsx-a11y/recommended", "@lidofinance", "prettier"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "ecmaVersion": 12,
     "sourceType": "module"
   },
   "plugins": ["@typescript-eslint", "react"],
@@ -44,7 +40,8 @@
         "checksVoidReturn": false
       }
     ],
-    "import/no-cycle": ["error", { "maxDepth": 1 }]
+    "import/no-cycle": ["error", { "maxDepth": 1 }],
+    "unicorn/expiring-todo-comments": "off"
   },
   "settings": {
     "react": {

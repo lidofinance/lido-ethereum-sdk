@@ -25,7 +25,7 @@ export const CoreDemo = () => {
   }, [stake]);
 
   useEffect(() => {
-    getStethContract();
+    void getStethContract();
   }, [getStethContract]);
 
   const account = web3account as `0x{string}`;
