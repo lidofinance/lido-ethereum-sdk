@@ -2,11 +2,10 @@
 
 ## Common
 
-- `SDKError` now has error codes
 - `account` prop now accepts both `Address` and `Account` Viem object. Can also be skipped if account is hoisted to `WalletClient` passed as web3Provider
 - some methods that did't previously use `web3Provider` but accepted `account` prop (like `populate...` or `simulate...`) now will require `web3Provider` if `account` prop is omitted in order to access possibly hoisted account
 - All exports from individual modules are now available from root export `@lidofinance/lido-ethereum-sdk`
-- For all modules constructor arguments typings now more strict. Disallow incorrect combinations (e.g. `core` and `rpcUrls` at same time)
+- For all modules constructor arguments typings are now more strict. Disallow incorrect combinations (e.g. `core` and `rpcUrls` at same time)
 
 ## Core
 
@@ -14,6 +13,9 @@
 - `web3Provider` is now immutable, to change it recreate SDK instance
 - `createRpcProvider` and `createWeb3Provider` are now available as `LidoSDKCore` **static** methods with different signature. Can be used when calling constructors for SDK & modules.
 - `getErrorMessage` was removed
+
+Internal utilities:
+
 - `getSubgraphId` now can return null when id not available for current chain
 - `performTransaction` argument signature changed
 

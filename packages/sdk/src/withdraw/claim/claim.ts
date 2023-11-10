@@ -1,14 +1,15 @@
+import { encodeFunctionData, type SimulateContractReturnType } from 'viem';
+
 import { Logger, ErrorHandler } from '../../common/decorators/index.js';
 import type {
   NoCallback,
   PopulatedTransaction,
   TransactionResult,
 } from '../../core/types.js';
-import type { ClaimRequestsProps } from './types.js';
-import { encodeFunctionData, type SimulateContractReturnType } from 'viem';
+import { NOOP } from '../../common/constants.js';
 
 import { BusModule } from '../bus-module.js';
-import { NOOP } from '../../common/constants.js';
+import type { ClaimRequestsProps } from './types.js';
 
 export class LidoSDKWithdrawClaim extends BusModule {
   // Calls
@@ -57,13 +58,13 @@ export class LidoSDKWithdrawClaim extends BusModule {
   public async claimRequestsPopulateTx(
     props: NoCallback<ClaimRequestsProps>,
   ): Promise<PopulatedTransaction> {
+    const { requestsIds } = props;
     const accountAddress = await this.bus.core.getWeb3Address(props.account);
     const hints =
       props.hints ??
       (await this.bus.views.findCheckpointHints({
         sortedIds: props.requestsIds,
       }));
-    const { requestsIds } = props;
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     return {

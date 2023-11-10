@@ -43,13 +43,13 @@ Before using the SDK, you need to create an instance of the LidoSDK class:
 import { createPublicClient, http } from 'viem';
 import { goerli } from 'viem/chains';
 
-const client = createPublicClient({
+const rpcProvider = createPublicClient({
   chain: goerli,
   transport: http(),
 });
 const sdk = new LidoSDK({
   chainId: 5,
-  rpcProvider: ownRpcProvider,
+  rpcProvider,
   web3Provider: provider, // optional
 });
 ```
@@ -100,3 +100,7 @@ For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
 ## Documentation
 
 For additional information about available methods and functionality, refer to the [the documentation for the Lido Ethereum SDK](packages/sdk/README.md).
+
+## Playground
+
+To check out SDK in action visit [playground](https://lidofinance.github.io/lido-ethereum-sdk/). Or tinker locally by cloning this repo and following [Playground instructions](playground/README.md).

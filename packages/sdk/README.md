@@ -131,13 +131,13 @@ import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import { createPublicClient, http } from 'viem';
 import { goerli } from 'viem/chains';
 
-const client = createPublicClient({
+const rpcProvider = createPublicClient({
   chain: goerli,
   transport: http(),
 });
 const sdk = new LidoSDK({
   chainId: 5,
-  rpcProvider: ownRpcProvider,
+  rpcProvider,
   web3Provider: provider, // optional
 });
 ```
