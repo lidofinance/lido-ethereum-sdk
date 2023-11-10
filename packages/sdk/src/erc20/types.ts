@@ -5,7 +5,7 @@ import {
   type TransactionCallback,
   type EtherValue,
 } from '../core/index.js';
-import { SignPermitProps } from '../core/types.js';
+import { CommonTransactionProps, SignPermitProps } from '../core/types.js';
 
 export type LidoSDKErc20Props = LidoSDKCoreProps & {
   core?: LidoSDKCore;
@@ -16,25 +16,23 @@ export type TransactionProps = {
   callback?: TransactionCallback;
 };
 
-export type InnerTransactionProps = Required<TransactionProps>;
+export type InnerTransactionProps = Required<CommonTransactionProps>;
 
-export type ParsedTransactionProps<TProps extends TransactionProps> = Omit<
-  TProps,
-  'callback'
-> & {
-  callback: NonNullable<TProps['callback']>;
-} & (TProps extends { amount: EtherValue } ? { amount: bigint } : object);
+export type ParsedTransactionProps<TProps extends CommonTransactionProps> =
+  Omit<TProps, 'callback'> & {
+    callback: NonNullable<TProps['callback']>;
+  } & (TProps extends { amount: EtherValue } ? { amount: bigint } : object);
 
 export type TransferProps = {
   amount: EtherValue;
   to: Address;
   from?: Address;
-} & TransactionProps;
+} & CommonTransactionProps;
 
 export type ApproveProps = {
   amount: EtherValue;
   to: Address;
-} & TransactionProps;
+} & CommonTransactionProps;
 
 export type AllowanceProps = {
   account: Address;

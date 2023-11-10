@@ -89,6 +89,7 @@ export class LidoSDKWithdrawApprove {
     props: NoCallback<WithdrawApproveProps>,
   ): Promise<PopulatedTransaction> {
     const { token, account, amount: _amount } = props;
+    const accountAddress = await this.bus.core.getWeb3Address(account);
     const amount = parseValue(_amount);
     const isSteth = token === 'stETH';
 
@@ -101,7 +102,7 @@ export class LidoSDKWithdrawApprove {
     ) as Awaited<ReturnType<typeof this.bus.contract.getContractStETH>>;
 
     return {
-      from: account,
+      from: accountAddress,
       to: contract.address,
       data: encodeFunctionData({
         abi: contract.abi,
@@ -119,7 +120,7 @@ export class LidoSDKWithdrawApprove {
     account,
     token,
     amount,
-  }: NoCallback<WithdrawApproveProps>): Promise<bigint> {
+  }: Required<NoCallback<WithdrawApproveProps>>): Promise<bigint> {
     const value = parseValue(amount);
     const isSteth = token === 'stETH';
     let estimateGasMethod;
@@ -137,7 +138,7 @@ export class LidoSDKWithdrawApprove {
     const gasLimit = await estimateGasMethod.call(
       this,
       [addressWithdrawalsQueue, value],
-      { account },
+      { account: account },
     );
 
     return gasLimit;

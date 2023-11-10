@@ -35,6 +35,7 @@ import {
   VIEM_CHAINS,
   SUBRGRAPH_ID_BY_CHAIN,
   APPROX_SECONDS_PER_BLOCK,
+  NOOP,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
@@ -50,6 +51,7 @@ import type {
   GetFeeDataResult,
   BlockArgumentType,
   BackArgumentType,
+  AccountValue,
 } from './types.js';
 import { TransactionCallbackStage } from './types.js';
 import { permitAbi } from './abi/permit.js';
@@ -205,9 +207,9 @@ export default class LidoSDKCore {
       deadline = LidoSDKCore.INFINITY_DEADLINE_VALUE,
     } = props;
     const web3Provider = this.useWeb3Provider();
-
+    const accountAddress = await this.getWeb3Address(account);
     const { contract, domain } = await this.getPermitContractData(token);
-    const nonce = await contract.read.nonces([account]);
+    const nonce = await contract.read.nonces([accountAddress]);
 
     invariant(
       web3Provider.account,
@@ -220,7 +222,7 @@ export default class LidoSDKCore {
       types: PERMIT_MESSAGE_TYPES,
       primaryType: 'Permit',
       message: {
-        owner: account,
+        owner: accountAddress,
         spender,
         value: amount,
         nonce,
@@ -237,7 +239,7 @@ export default class LidoSDKCore {
       deadline,
       nonce,
       chainId: domain.chainId,
-      owner: account,
+      owner: accountAddress,
       spender,
     };
   }
@@ -313,7 +315,9 @@ export default class LidoSDKCore {
   }
 
   @Logger('Utils:')
-  public async getWeb3Address(): Promise<Address> {
+  public async getWeb3Address(accountValue?: AccountValue): Promise<Address> {
+    if (typeof accountValue === 'string') return accountValue;
+    if (accountValue) return accountValue.address;
     const web3Provider = this.useWeb3Provider();
 
     if (web3Provider.account) return web3Provider.account.address;
@@ -361,13 +365,8 @@ export default class LidoSDKCore {
 
   @Logger('Utils:')
   @Cache(30 * 60 * 1000, ['chain.id'])
-  public getSubgraphId(): string {
+  public getSubgraphId(): string | null {
     const id = SUBRGRAPH_ID_BY_CHAIN[this.chainId];
-    invariant(
-      id,
-      `Subgraph is not supported for chain ${this.chainId}`,
-      ERROR_CODE.NOT_SUPPORTED,
-    );
     return id;
   }
 
@@ -447,12 +446,17 @@ export default class LidoSDKCore {
   public async performTransaction(
     props: PerformTransactionOptions,
   ): Promise<TransactionResult> {
-    this.useWeb3Provider();
-    const { account, callback, getGasLimit, sendTransaction } = props;
-    const isContract = await this.isContract(account);
+    const provider = this.useWeb3Provider();
+    const { account, callback = NOOP, getGasLimit, sendTransaction } = props;
+    const accountAddress = await this.getWeb3Address(account);
+    const isContract = await this.isContract(accountAddress);
 
+    // we need account to be defined for transactions so we fallback in this order
+    // 1. whatever user passed
+    // 2. hoisted account
+    // 3. just address (this will break on local accounts as per viem behavior)
     const overrides: TransactionOptions = {
-      account,
+      account: account ?? provider.account ?? accountAddress,
       chain: this.chain,
       gas: undefined,
       maxFeePerGas: undefined,

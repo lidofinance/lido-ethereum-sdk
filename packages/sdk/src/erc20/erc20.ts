@@ -6,7 +6,6 @@ import type {
   LidoSDKErc20Props,
   ParsedTransactionProps,
   SignTokenPermitProps,
-  TransactionProps,
   TransferProps,
 } from './types.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
@@ -23,6 +22,7 @@ import {
 import { NOOP, PERMIT_MESSAGE_TYPES } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
 import type {
+  CommonTransactionProps,
   NoCallback,
   PermitSignature,
   TransactionOptions,
@@ -74,8 +74,9 @@ export abstract class AbstractLidoSDKErc20 {
   public async transfer(props: TransferProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
     const parsedProps = this.parseProps(props);
-    const { account, amount, to, from = account } = parsedProps;
-    const isTransferFrom = from !== account;
+    const accountAddress = await this.core.getWeb3Address(props.account);
+    const { amount, to, from = accountAddress } = parsedProps;
+    const isTransferFrom = from !== accountAddress;
     const contract = await this.getContract();
 
     const getGasLimit = async (overrides: TransactionOptions) =>
@@ -98,12 +99,14 @@ export abstract class AbstractLidoSDKErc20 {
   @Logger('Utils:')
   @ErrorHandler()
   public async populateTransfer(props: NoCallback<TransferProps>) {
+    const accountAddress = await this.core.getWeb3Address(props.account);
     const {
       account,
       amount,
       to,
-      from = props.account,
+      from = accountAddress,
     } = this.parseProps(props);
+
     const isTransferFrom = from !== account;
     const address = await this.contractAddress();
 
@@ -127,11 +130,12 @@ export abstract class AbstractLidoSDKErc20 {
   @Logger('Utils:')
   @ErrorHandler()
   public async simulateTransfer(props: NoCallback<TransferProps>) {
+    const accountAddress = await this.core.getWeb3Address(props.account);
     const {
       account,
       amount,
       to,
-      from = props.account,
+      from = accountAddress,
     } = this.parseProps(props);
     const isTransferFrom = from !== account;
     const contract = await this.getContract();
@@ -155,12 +159,8 @@ export abstract class AbstractLidoSDKErc20 {
       v,
       r: r as `0x${string}`,
       s: s as `0x${string}`,
-      value: props.amount,
-      deadline: payload.message.deadline,
-      nonce: payload.message.nonce,
       chainId: BigInt(this.core.chain.id),
-      owner: payload.message.owner,
-      spender: payload.message.spender,
+      ...payload.message,
     };
   }
 
@@ -175,10 +175,11 @@ export abstract class AbstractLidoSDKErc20 {
     } = props;
     const contract = await this.getContract();
     const domain = await this.erc721Domain();
-    const nonce = await contract.read.nonces([account]);
+    const accountAddress = await this.core.getWeb3Address(account);
+    const nonce = await contract.read.nonces([accountAddress]);
 
     const message = {
-      owner: account,
+      owner: accountAddress,
       spender,
       value: amount,
       nonce,
@@ -186,7 +187,7 @@ export abstract class AbstractLidoSDKErc20 {
     };
 
     return {
-      account,
+      account: account ?? accountAddress,
       domain,
       types: PERMIT_MESSAGE_TYPES,
       primaryType: 'Permit',
@@ -310,9 +311,9 @@ export abstract class AbstractLidoSDKErc20 {
     return { name, version, chainId, verifyingContract };
   }
 
-  private parseProps<TProps extends TransactionProps & { amount: EtherValue }>(
-    props: TProps,
-  ): ParsedTransactionProps<TProps> {
+  private parseProps<
+    TProps extends CommonTransactionProps & { amount: EtherValue },
+  >(props: TProps): ParsedTransactionProps<TProps> {
     return {
       ...props,
       amount: parseValue(props.amount),

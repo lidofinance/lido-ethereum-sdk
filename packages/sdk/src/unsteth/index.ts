@@ -7,6 +7,5 @@ export {
   type UnstethApproveProps,
   type UnstethApprovedForProps,
   type UnstethIsApprovedForAllProps,
-  type UnstethCommonTransactionProps,
   type UnstethNFTstatus,
 } from './types.js';

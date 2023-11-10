@@ -1,7 +1,6 @@
 import { zeroAddress, getContract, encodeFunctionData } from 'viem';
 import type {
   Address,
-  Account,
   GetContractReturnType,
   PublicClient,
   WalletClient,
@@ -13,6 +12,7 @@ import {
   LidoSDKCore,
   type TransactionResult,
   type PopulatedTransaction,
+  TransactionOptions,
 } from '../core/index.js';
 import { ERROR_CODE } from '../common/utils/sdk-error.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
@@ -82,8 +82,7 @@ export class LidoSDKStake {
       callback,
       account,
       getGasLimit: async (options) =>
-        (await this.submitGasLimit(options.account, value, referralAddress))
-          .gasLimit,
+        this.submitGasLimit(value, referralAddress, options),
       sendTransaction: (options) =>
         contract.write.submit([referralAddress], { ...options, value }),
     });
@@ -124,31 +123,14 @@ export class LidoSDKStake {
   @Logger('Utils:')
   @Cache(30 * 1000, ['core.chain.id'])
   private async submitGasLimit(
-    account: Address,
     value: bigint,
     referralAddress: Address,
-  ): Promise<{
-    gasLimit: bigint;
-    overrides: {
-      account: Account | Address;
-      value: bigint;
-      maxPriorityFeePerGas: bigint | undefined;
-      maxFeePerGas: bigint | undefined;
-    };
-  }> {
-    const { maxPriorityFeePerGas, maxFeePerGas } = await this.core.getFeeData();
-
-    const overrides = {
-      account,
-      value,
-      maxPriorityFeePerGas,
-      maxFeePerGas,
-    };
-
+    options: TransactionOptions,
+  ): Promise<bigint> {
     const contract = await this.getContractStETH();
     const originalGasLimit = await contract.estimateGas.submit(
       [referralAddress],
-      overrides,
+      { ...options, value },
     );
 
     const gasLimit =
@@ -158,7 +140,7 @@ export class LidoSDKStake {
         )) /
       BigInt(GAS_TRANSACTION_RATIO_PRECISION);
 
-    return { gasLimit, overrides };
+    return gasLimit;
   }
 
   @Logger('Utils:')
@@ -189,12 +171,13 @@ export class LidoSDKStake {
     props: StakeProps,
   ): Promise<PopulatedTransaction> {
     const { referralAddress, value, account } = this.parseProps(props);
+    const accountAddress = await this.core.getWeb3Address(account);
     const data = this.stakeEthEncodeData({ referralAddress });
     const address = await this.contractAddressStETH();
 
     return {
       to: address,
-      from: account,
+      from: accountAddress,
       value,
       data,
     };

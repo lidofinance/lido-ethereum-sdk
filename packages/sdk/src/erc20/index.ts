@@ -7,5 +7,4 @@ export type {
   ApproveProps,
   TransferProps,
   SignTokenPermitProps,
-  TransactionProps,
 } from './types.js';

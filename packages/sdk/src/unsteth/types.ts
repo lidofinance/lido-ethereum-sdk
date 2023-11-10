@@ -1,6 +1,10 @@
 import { type Hash, type Address, type ContractFunctionResult } from 'viem';
 import LidoSDKCore from '../core/core.js';
-import { TransactionCallback, type LidoSDKCoreProps } from '../core/types.js';
+import {
+  TransactionCallback,
+  type LidoSDKCoreProps,
+  CommonTransactionProps,
+} from '../core/types.js';
 import { type unstethAbi } from './abi/unsteth-abi.js';
 
 export type LidoSDKUnstETHProps = {
@@ -14,33 +18,27 @@ export type UnstethNFTstatus = ContractFunctionResult<
 
 export type UnstethNFT = { id: bigint } & UnstethNFTstatus;
 
-export type UnstethCommonTransactionProps = {
-  account: Address;
-  callback?: TransactionCallback;
-};
-
-export type ParsedProps<TProps extends UnstethCommonTransactionProps> = Omit<
+export type ParsedProps<TProps extends CommonTransactionProps> = Omit<
   TProps,
   'callback'
-> &
-  Required<UnstethCommonTransactionProps>;
+> & { callback: TransactionCallback };
 
 export type UnstethTransferProps = {
   to: Address;
   id: bigint;
   from?: Address;
   data?: Hash;
-} & UnstethCommonTransactionProps;
+} & CommonTransactionProps;
 
 export type UnstethApproveProps = {
   to?: Address;
   id: bigint;
-} & UnstethCommonTransactionProps;
+} & CommonTransactionProps;
 
 export type UnstethApproveAllProps = {
   to: Address;
   allow: boolean;
-} & UnstethCommonTransactionProps;
+} & CommonTransactionProps;
 
 export type UnstethApprovedForProps = {
   account: Address;

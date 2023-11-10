@@ -7,11 +7,14 @@ import type {
   Chain,
   FormattedTransactionRequest,
   BlockTag,
+  Account,
 } from 'viem';
 
 import { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
 import { SDKError } from '../common/utils/sdk-error.js';
 import type LidoSDKCore from './core.js';
+
+// Constructor Props
 
 export type LOG_MODE = 'info' | 'debug' | 'none';
 
@@ -39,7 +42,11 @@ export type LidoSDKCommonProps =
     }
   | ({ core: undefined } & LidoSDKCoreProps);
 
+// Method Props primitives
+
 export type EtherValue = string | bigint;
+
+export type AccountValue = Address | Account;
 
 export enum TransactionCallbackStage {
   'PERMIT' = 'permit',
@@ -52,6 +59,11 @@ export enum TransactionCallbackStage {
   'ERROR' = 'error',
 }
 
+export type CommonTransactionProps = {
+  callback?: TransactionCallback;
+  account?: AccountValue;
+};
+
 export type PerformTransactionGasLimit = (
   overrides: TransactionOptions,
 ) => Promise<bigint>;
@@ -60,15 +72,13 @@ export type PerformTransactionSendTransaction = (
   override: TransactionOptions,
 ) => Promise<Hash>;
 
-export type PerformTransactionOptions = {
-  callback: TransactionCallback;
-  account: Address;
+export type PerformTransactionOptions = CommonTransactionProps & {
   getGasLimit: PerformTransactionGasLimit;
   sendTransaction: PerformTransactionSendTransaction;
 };
 
 export type TransactionOptions = {
-  account: Address;
+  account: AccountValue;
   chain: Chain;
   gas?: bigint;
   maxFeePerGas?: bigint;
@@ -123,16 +133,9 @@ export type PermitSignature = {
 export type SignPermitProps = {
   token: (typeof LIDO_TOKENS)['steth'] | (typeof LIDO_TOKENS)['wsteth'];
   amount: bigint;
-  account: Address;
+  account?: AccountValue;
   spender: Address;
   deadline?: bigint;
-};
-
-export type GetFeeDataResult = {
-  lastBaseFeePerGas: bigint;
-  maxFeePerGas: bigint;
-  maxPriorityFeePerGas: bigint;
-  gasPrice: bigint;
 };
 
 export type NonPendingBlockTag = Exclude<BlockTag, 'pending'>;
@@ -163,3 +166,12 @@ export type BackArgumentType =
       seconds?: undefined;
       blocks: bigint;
     };
+
+// Core methods
+
+export type GetFeeDataResult = {
+  lastBaseFeePerGas: bigint;
+  maxFeePerGas: bigint;
+  maxPriorityFeePerGas: bigint;
+  gasPrice: bigint;
+};

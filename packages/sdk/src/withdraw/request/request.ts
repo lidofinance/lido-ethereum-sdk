@@ -77,7 +77,14 @@ export class LidoSDKWithdrawRequest extends BusModule {
   public async requestWithdrawal(
     props: RequestProps,
   ): Promise<TransactionResult> {
-    const { account, token, receiver = account, callback = NOOP } = props;
+    const accountAddress = await this.bus.core.getWeb3Address(props.account);
+    const {
+      account,
+      token,
+      receiver = accountAddress,
+      callback = NOOP,
+    } = props;
+
     const requests =
       props.requests ?? (await this.splitAmountToRequests(props));
     const isSteth = token === 'stETH';
@@ -111,10 +118,11 @@ export class LidoSDKWithdrawRequest extends BusModule {
   public async requestWithdrawalSimulateTx(
     props: NoCallback<RequestProps>,
   ): Promise<SimulateContractReturnType> {
+    const accountAddress = await this.bus.core.getWeb3Address(props.account);
     const {
       token,
       account,
-      receiver = account,
+      receiver = accountAddress,
       amount = 0n,
       requests: _requests,
     } = props;
@@ -125,8 +133,8 @@ export class LidoSDKWithdrawRequest extends BusModule {
 
     const args = [requests, receiver] as const;
     const result = await (isSteth
-      ? contract.simulate.requestWithdrawals(args)
-      : contract.simulate.requestWithdrawalsWstETH(args));
+      ? contract.simulate.requestWithdrawals(args, { account })
+      : contract.simulate.requestWithdrawalsWstETH(args, { account }));
 
     return result;
   }
@@ -136,10 +144,10 @@ export class LidoSDKWithdrawRequest extends BusModule {
   public async requestWithdrawalPopulateTx(
     props: NoCallback<RequestWithPermitProps>,
   ): Promise<PopulatedTransaction> {
+    const accountAddress = await this.bus.core.getWeb3Address(props.account);
     const {
       token,
-      account,
-      receiver = account,
+      receiver = accountAddress,
       amount = 0n,
       requests: _requests,
     } = props;
@@ -154,7 +162,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
       : ('requestWithdrawalsWstETH' as const);
 
     return {
-      from: account,
+      from: accountAddress,
       to: contract.address,
       data: encodeFunctionData({
         abi: contract.abi,
@@ -169,10 +177,11 @@ export class LidoSDKWithdrawRequest extends BusModule {
   public async requestWithdrawalWithPermit(
     props: RequestWithPermitProps,
   ): Promise<TransactionResult> {
+    const accountAddress = await this.bus.core.getWeb3Address(props.account);
     const {
       account,
       token,
-      receiver = account,
+      receiver = accountAddress,
       callback = NOOP,
       permit: permitProp,
     } = props;
@@ -186,7 +195,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
       permit = permitProp;
     } else {
       callback({ stage: TransactionCallbackStage.PERMIT });
-      const isContract = await this.bus.core.isContract(account);
+      const isContract = await this.bus.core.isContract(accountAddress);
       invariant(
         !isContract,
         'Cannot sign permit for contract',
@@ -242,10 +251,11 @@ export class LidoSDKWithdrawRequest extends BusModule {
   public async requestWithdrawalWithPermitSimulateTx(
     props: NoCallback<RequirePermit<RequestWithPermitProps>>,
   ): Promise<SimulateContractReturnType> {
+    const accountAddress = await this.bus.core.getWeb3Address(props.account);
     const {
       token,
       account,
-      receiver = account,
+      receiver = accountAddress,
       permit,
       amount = 0n,
       requests: _requests,
@@ -257,8 +267,10 @@ export class LidoSDKWithdrawRequest extends BusModule {
 
     const args = [requests, receiver, permit] as const;
     const result = await (isSteth
-      ? contract.simulate.requestWithdrawalsWithPermit(args)
-      : contract.simulate.requestWithdrawalsWstETHWithPermit(args));
+      ? contract.simulate.requestWithdrawalsWithPermit(args, { account })
+      : contract.simulate.requestWithdrawalsWstETHWithPermit(args, {
+          account,
+        }));
 
     return result;
   }
@@ -268,10 +280,10 @@ export class LidoSDKWithdrawRequest extends BusModule {
   public async requestWithdrawalWithPermitPopulateTx(
     props: NoCallback<RequirePermit<RequestWithPermitProps>>,
   ): Promise<PopulatedTransaction> {
+    const accountAddress = await this.bus.core.getWeb3Address(props.account);
     const {
       token,
-      account,
-      receiver = account,
+      receiver = accountAddress,
       permit,
       amount = 0n,
       requests: _requests,
@@ -287,7 +299,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
       : ('requestWithdrawalsWstETHWithPermit' as const);
 
     return {
-      from: account,
+      from: accountAddress,
       to: contract.address,
       data: encodeFunctionData({
         abi: contract.abi,

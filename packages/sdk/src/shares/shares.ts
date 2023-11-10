@@ -71,9 +71,10 @@ export class LidoSDKShares {
     to,
     amount: _amount,
     callback = NOOP,
-    from = account,
+    from: _from,
   }: SharesTransferProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
+    const from = _from ?? (await this.core.getWeb3Address(account));
     const amount = parseValue(_amount);
     const contract = await this.getContractStETHshares();
 
@@ -95,8 +96,9 @@ export class LidoSDKShares {
     account,
     to,
     amount: _amount,
-    from = account,
+    from: _from,
   }: NoCallback<SharesTransferProps>) {
+    const from = _from ?? (await this.core.getWeb3Address(account));
     const amount = parseValue(_amount);
     const contract = await this.getContractStETHshares();
 
@@ -117,9 +119,10 @@ export class LidoSDKShares {
     account,
     to,
     amount: _amount,
-    from = account,
+    from: _from,
   }: NoCallback<SharesTransferProps>) {
     const amount = parseValue(_amount);
+    const from = _from ?? (await this.core.getWeb3Address(account));
     const contract = await this.getContractStETHshares();
     return contract.simulate.transferSharesFrom([from, to, amount], {
       account,
