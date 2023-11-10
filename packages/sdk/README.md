@@ -2,7 +2,7 @@
 
 **Lido Ethereum SDK** is a package that provides convenient tools for interacting with Lido contracts on the Ethereum network through a software development kit (SDK). This SDK simplifies working with Lido contracts and accessing their functionality.
 
-## WIP
+## ⚒️ Work In Progress ⚒️
 
 The project is currently under active development and may experience breaking changes in the future.
 
@@ -1042,8 +1042,6 @@ Both token classes inherit from the same abstract class `AbstractLidoSDKErc20` w
 If you want to use this with other token extend from this abstract class and implementing`contractAddress` method that returns address of the token contract on current chain from `this.core`. Consult with source code of this sdk module to get started. Use at your own risk, be aware that this is experimental feature and ABI used may not fit your custom token fully or correctly.
 
 ## unstETH NFT
-
-⚒️ Work In Progress ⚒️
 
 This modules exposes NFT functionality of Lido Withdrawal Request NFT.
 

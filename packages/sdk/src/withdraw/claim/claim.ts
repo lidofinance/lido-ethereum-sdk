@@ -35,7 +35,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
 
   @Logger('Views:')
   @ErrorHandler()
-  public async requestWithdrawalSimulateTx(
+  public async claimRequestsSimulateTx(
     props: NoCallback<ClaimRequestsProps>,
   ): Promise<SimulateContractReturnType> {
     const { requestsIds } = props;
@@ -54,7 +54,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
 
   @Logger('Views:')
   @ErrorHandler()
-  public async requestWithdrawalPopulateTx(
+  public async claimRequestsPopulateTx(
     props: NoCallback<ClaimRequestsProps>,
   ): Promise<PopulatedTransaction> {
     const accountAddress = await this.bus.core.getWeb3Address(props.account);
