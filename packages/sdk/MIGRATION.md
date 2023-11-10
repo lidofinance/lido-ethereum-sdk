@@ -6,18 +6,15 @@
 - `account` prop now accepts both `Address` and `Account` Viem object. Can also be skipped if account is hoisted to `WalletClient` passed as web3Provider
 - some methods that did't previously use `web3Provider` but accepted `account` prop (like `populate...` or `simulate...`) now will require `web3Provider` if `account` prop is omitted in order to access possibly hoisted account
 - All exports from individual modules are now available from root export `@lidofinance/lido-ethereum-sdk`
+- For all modules constructor arguments typings now more strict. Disallow incorrect combinations (e.g. `core` and `rpcUrls` at same time)
 
 ## Core
 
-- For all modules constructor arguments typings now more strict. Disallow incorrect combinations (e.g. `core` and `rpcUrls` at same time)
 - `defineWeb3Provider` and `setWeb3Provider` methods were removed.
 - `web3Provider` is now immutable, to change it recreate SDK instance
 - `createRpcProvider` and `createWeb3Provider` are now available as `LidoSDKCore` **static** methods with different signature. Can be used when calling constructors for SDK & modules.
 - `getErrorMessage` was removed
 - `getSubgraphId` now can return null when id not available for current chain
-
-Internal utils:
-
 - `performTransaction` argument signature changed
 
 ## Events
@@ -28,16 +25,18 @@ Internal utils:
 
 ## Rewards
 
+`getRewards...` props signature changed to fit wide range of use cases [see docs](./README.md#Rewards)
+
 Props:
 
-- `getRewards...` prop signature changed to fit wide range of use cases [see docs](./README.md#Rewards)
+- `to`, `from`, `back` props, [see docs](./README.md#Rewards).
 - `step` prop was removed due to conflicting defaults. Replaced with `stepEntities`(defaults 1000) and `stepBlocks`(defaults 50000) for subgraph and chain methods accordingly.
-- `getSubgraphUrl` now can return `id = null` for chains where subgraph id is not available
+- `getSubgraphUrl` now can receive subgraph id `null` for chains where it is not available
 
 Results:
 
 - `apr` is available for rebase events
-- `totalRewards` now contains total stETH rewards for queried period
+- `totalRewards` now contains cumulative stETH rewards for queried period
 
 ## APR
 
