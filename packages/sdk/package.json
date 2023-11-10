@@ -81,8 +81,29 @@
       "core": [
         "./dist/types/core/index.d.ts"
       ],
-      "staking": [
-        "./dist/types/staking/index.d.ts"
+      "stake": [
+        "./dist/types/stake/index.d.ts"
+      ],
+      "wrap": [
+        "./dist/types/wrap/index.d.ts"
+      ],
+      "withdraw": [
+        "./dist/types/withdraw/index.d.ts"
+      ],
+      "erc20": [
+        "./dist/types/erc20/index.d.ts"
+      ],
+      "statistics": [
+        "./dist/types/statistics/index.d.ts"
+      ],
+      "events": [
+        "./dist/types/events/index.d.ts"
+      ],
+      "rewards": [
+        "./dist/types/rewards/index.d.ts"
+      ],
+      "shares": [
+        "./dist/types/shares/index.d.ts"
       ]
     }
   },

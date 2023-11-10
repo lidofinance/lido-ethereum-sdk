@@ -1,17 +1,16 @@
-import { type Address } from 'viem';
-
 import { Logger, ErrorHandler } from '../common/decorators/index.js';
 import { isBigint } from '../common/utils/index.js';
 
 import { BusModule } from './bus-module.js';
 import { type RequestStatusWithId } from './types.js';
+import { AccountValue } from '../index.js';
 
 export class LidoSDKWithdrawRequestsInfo extends BusModule {
   // Utils
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async getWithdrawalRequestsInfo(props: { account: Address }) {
+  public async getWithdrawalRequestsInfo(props: { account: AccountValue }) {
     const claimableInfo = await this.getClaimableRequestsInfo(props);
     const claimableETH = await this.getClaimableRequestsETHByAccount(props);
     const pendingInfo = await this.getPendingRequestsInfo(props);
@@ -26,10 +25,10 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async getWithdrawalRequestsStatus(props: {
-    account: Address;
+    account: AccountValue;
   }): Promise<readonly RequestStatusWithId[]> {
     const requestsIds = await this.bus.views.getWithdrawalRequestsIds({
-      account: props.account,
+      account: await this.bus.core.getWeb3Address(props.account),
     });
 
     return this.bus.views.getWithdrawalStatus({ requestsIds });
@@ -37,7 +36,9 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async getClaimableRequestsInfo(props: { account: Address }): Promise<{
+  public async getClaimableRequestsInfo(props: {
+    account: AccountValue;
+  }): Promise<{
     claimableRequests: RequestStatusWithId[];
     claimableAmountStETH: bigint;
   }> {
@@ -97,7 +98,7 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async getClaimableRequestsETHByAccount(props: {
-    account: Address;
+    account: AccountValue;
   }): Promise<{
     ethByRequests: readonly bigint[];
     ethSum: bigint;
@@ -127,7 +128,9 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async getPendingRequestsInfo(props: { account: Address }): Promise<{
+  public async getPendingRequestsInfo(props: {
+    account: AccountValue;
+  }): Promise<{
     pendingRequests: RequestStatusWithId[];
     pendingAmountStETH: bigint;
   }> {

@@ -1,9 +1,6 @@
-import { type Address } from 'viem';
-import { type TransactionCallback } from '../../core/index.js';
+import type { CommonTransactionProps } from '../../core/index.js';
 
-export type ClaimRequestsProps = {
-  account: Address;
+export type ClaimRequestsProps = CommonTransactionProps & {
   requestsIds: bigint[];
   hints?: bigint[];
-  callback?: TransactionCallback;
 };

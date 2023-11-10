@@ -1,10 +1,15 @@
+import { encodeFunctionData, type SimulateContractReturnType } from 'viem';
+
 import { Logger, ErrorHandler } from '../../common/decorators/index.js';
-import { TransactionResult } from '../../core/types.js';
+import type {
+  NoCallback,
+  PopulatedTransaction,
+  TransactionResult,
+} from '../../core/types.js';
+import { NOOP } from '../../common/constants.js';
 
 import { BusModule } from '../bus-module.js';
-
-import { ClaimRequestsProps } from './types.js';
-import { NOOP } from '../../common/constants.js';
+import type { ClaimRequestsProps } from './types.js';
 
 export class LidoSDKWithdrawClaim extends BusModule {
   // Calls
@@ -29,5 +34,47 @@ export class LidoSDKWithdrawClaim extends BusModule {
     });
   }
 
-  // TODO Populate/Simulate
+  @Logger('Views:')
+  @ErrorHandler()
+  public async claimRequestsSimulateTx(
+    props: NoCallback<ClaimRequestsProps>,
+  ): Promise<SimulateContractReturnType> {
+    const { requestsIds } = props;
+    const hints =
+      props.hints ??
+      (await this.bus.views.findCheckpointHints({
+        sortedIds: props.requestsIds,
+      }));
+
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
+
+    return contract.simulate.claimWithdrawals([requestsIds, hints], {
+      account: props.account,
+    });
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
+  public async claimRequestsPopulateTx(
+    props: NoCallback<ClaimRequestsProps>,
+  ): Promise<PopulatedTransaction> {
+    const { requestsIds } = props;
+    const accountAddress = await this.bus.core.getWeb3Address(props.account);
+    const hints =
+      props.hints ??
+      (await this.bus.views.findCheckpointHints({
+        sortedIds: props.requestsIds,
+      }));
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
+
+    return {
+      from: accountAddress,
+      to: contract.address,
+      data: encodeFunctionData({
+        abi: contract.abi,
+        functionName: 'claimWithdrawals',
+        args: [requestsIds, hints],
+      }),
+    };
+  }
 }
