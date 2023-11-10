@@ -93,6 +93,10 @@ console.log(balanceETH.toString(), 'ETH balance');
 console.log(stakeResult, 'stake result');
 ```
 
+## Migration
+
+For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
+
 ## Documentation
 
 For additional information about available methods and functionality, refer to the [the documentation for the Lido Ethereum SDK](packages/sdk/README.md).
