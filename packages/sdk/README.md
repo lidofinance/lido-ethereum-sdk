@@ -37,6 +37,8 @@ For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
   - [Stake](#stake-example)
   - [Withdraw](#withdraw-example)
   - [Wrap](#wrap-example)
+- [Error Codes](#error-codes)
+- [Lido contract addresses](#lido-contract-addresses)
 - [Stake](#stake)
   - [Call](#call)
   - [Populate transaction](#populate-transaction)
@@ -63,7 +65,6 @@ For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
 - [(w)stETH](#wsteth)
 - [unstETH NFT](#unsteth-nft)
 - [Shares](#shares)
-- [Lido contract addresses](#lido-contract-addresses)
 - [Lido statistics](#lido-statistics)
   - [APR](#apr)
 - [Lido events](#lido-events)
@@ -304,6 +305,32 @@ const wrapResult = await lidoSDK.wrap.wrapEth({
 console.log(addressWstETH, 'wstETH contract address');
 console.log(contractWstETH, 'wstETH contract');
 console.log(wrapResult, 'wrap result');
+```
+
+## Error Codes
+
+- **INVALID_ARGUMENT**: arguments passed to SDK method are not valid
+- **NOT_SUPPORTED**: behavior or feature though possible is not currently supported by SDK
+- **PROVIDER_ERROR**: error with RPC or Web3 Provider
+- **READ_ERROR**: error while accessing Blockchain or External Resource for read
+- **UNKNOWN_ERROR** error was not recognized by SDK and is not directly thrown by it's code
+
+## Lido contract addresses
+
+```ts
+import { LidoSDK, LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk';
+
+const lidoSDK = new LidoSDK({
+  rpcUrls: ['https://rpc-url'],
+  chainId: 5,
+});
+
+const stethAddress = await lidoSDK.core.getContractAddress(
+  LIDO_CONTRACT_NAMES.lido,
+);
+const wsteth = await lidoSDK.core.getContractAddress(
+  LIDO_CONTRACT_NAMES.wsteth,
+);
 ```
 
 ## Stake
@@ -1121,24 +1148,6 @@ const { totalEther, totalShares } = await lidoSDK.getTotalSupply();
 
 // get current share rate from protocol
 const shareRate = await lidoSDK.getShareRate();
-```
-
-## Lido contract addresses
-
-```ts
-import { LidoSDK, LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk';
-
-const lidoSDK = new LidoSDK({
-  rpcUrls: ['https://rpc-url'],
-  chainId: 5,
-});
-
-const stethAddress = await lidoSDK.core.getContractAddress(
-  LIDO_CONTRACT_NAMES.lido,
-);
-const wsteth = await lidoSDK.core.getContractAddress(
-  LIDO_CONTRACT_NAMES.wsteth,
-);
 ```
 
 ## Lido statistics

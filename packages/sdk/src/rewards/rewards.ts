@@ -35,7 +35,12 @@ import {
 import { addressEqual } from '../common/utils/address-equal.js';
 import { getInitialData } from './subgraph/index.js';
 import { calcShareRate, requestWithBlockStep, sharesToSteth } from './utils.js';
-import { ERROR_CODE, invariant, invariantArgument } from '../index.js';
+import {
+  ERROR_CODE,
+  invariant,
+  invariantArgument,
+  withSDKError,
+} from '../index.js';
 import { LidoSDKApr } from '../statistics/apr.js';
 
 export class LidoSDKRewards {
@@ -118,34 +123,37 @@ export class LidoSDKRewards {
       transferOutEvents,
       transferInEvents,
       rebaseEvents,
-    ] = await Promise.all([
-      stethContract.read.sharesOf([address], {
-        blockNumber: preBlock,
-      }),
-      stethContract.read.getTotalPooledEther({ blockNumber: preBlock }),
-      stethContract.read.getTotalShares({ blockNumber: preBlock }),
-      requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
-        stethContract.getEvents.TransferShares(
-          { from: address },
-          { fromBlock, toBlock },
+    ] = await withSDKError(
+      Promise.all([
+        stethContract.read.sharesOf([address], {
+          blockNumber: preBlock,
+        }),
+        stethContract.read.getTotalPooledEther({ blockNumber: preBlock }),
+        stethContract.read.getTotalShares({ blockNumber: preBlock }),
+        requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
+          stethContract.getEvents.TransferShares(
+            { from: address },
+            { fromBlock, toBlock },
+          ),
         ),
-      ),
-      requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
-        stethContract.getEvents.TransferShares(
-          { to: address },
-          { fromBlock, toBlock },
+        requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
+          stethContract.getEvents.TransferShares(
+            { to: address },
+            { fromBlock, toBlock },
+          ),
         ),
-      ),
-      requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
-        stethContract.getEvents.TokenRebased(
-          {},
-          {
-            fromBlock,
-            toBlock,
-          },
+        requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
+          stethContract.getEvents.TokenRebased(
+            {},
+            {
+              fromBlock,
+              toBlock,
+            },
+          ),
         ),
-      ),
-    ]);
+      ]),
+      ERROR_CODE.READ_ERROR,
+    );
 
     // concat types are broken
     const events = ([] as any[]).concat(
@@ -293,17 +301,20 @@ export class LidoSDKRewards {
       transfers,
       rebases,
       { transfer: initialTransfer, rebase: initialRebase },
-    ] = await Promise.all([
-      getTransfers({
-        url,
-        address,
-        fromBlock,
-        toBlock: cappedToBlock,
-        step,
-      }),
-      getTotalRewards({ url, fromBlock, toBlock: cappedToBlock, step }),
-      getInitialData({ url, address, block: preBlock }),
-    ]);
+    ] = await withSDKError(
+      Promise.all([
+        getTransfers({
+          url,
+          address,
+          fromBlock,
+          toBlock: cappedToBlock,
+          step,
+        }),
+        getTotalRewards({ url, fromBlock, toBlock: cappedToBlock, step }),
+        getInitialData({ url, address, block: preBlock }),
+      ]),
+      ERROR_CODE.READ_ERROR,
+    );
 
     // concat types are broken
     const events = ([] as (TransferEventEntity | TotalRewardEntity)[]).concat(
