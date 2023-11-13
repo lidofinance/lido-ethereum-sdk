@@ -31,6 +31,7 @@ import type {
   StakeProps,
   StakeEncodeDataProps,
   StakeInnerProps,
+  StakeLimitResult,
 } from './types.js';
 
 export class LidoSDKStake {
@@ -112,10 +113,26 @@ export class LidoSDKStake {
 
   @Logger('Views:')
   @ErrorHandler()
-  public async getStakeLimitInfo() {
+  public async getStakeLimitInfo(): Promise<StakeLimitResult> {
     const contract = await this.getContractStETH();
-
-    return contract.read.getStakeLimitFullInfo();
+    const [
+      isStakingPaused,
+      isStakingLimitSet,
+      currentStakeLimit,
+      maxStakeLimit,
+      maxStakeLimitGrowthBlocks,
+      prevStakeLimit,
+      prevStakeBlockNumber,
+    ] = await contract.read.getStakeLimitFullInfo();
+    return {
+      isStakingPaused,
+      isStakingLimitSet,
+      currentStakeLimit,
+      maxStakeLimit,
+      maxStakeLimitGrowthBlocks,
+      prevStakeLimit,
+      prevStakeBlockNumber,
+    };
   }
 
   // Utils
@@ -145,7 +162,7 @@ export class LidoSDKStake {
 
   @Logger('Utils:')
   private async validateStakeLimit(value: bigint): Promise<void> {
-    const currentStakeLimit = (await this.getStakeLimitInfo())[3];
+    const { currentStakeLimit } = await this.getStakeLimitInfo();
 
     if (value > currentStakeLimit) {
       throw this.core.error({
