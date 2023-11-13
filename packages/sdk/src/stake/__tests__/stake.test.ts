@@ -9,7 +9,7 @@ import {
   expectPopulatedTx,
   expectPopulatedTxToRun,
 } from '../../../tests/utils/expect-populated-tx.js';
-import { useStake } from './use-stake.js';
+import { useStake } from '../../../tests/utils/use-stake.js';
 
 describe('LidoSDKStake constructor', () => {
   test('can be constructed with core', () => {

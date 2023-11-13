@@ -1,5 +1,5 @@
 import { describe, jest } from '@jest/globals';
-import { useStake } from './use-stake.js';
+import { useStake } from '../../../tests/utils/use-stake.js';
 import {
   SPENDING_TIMEOUT,
   testSpending,

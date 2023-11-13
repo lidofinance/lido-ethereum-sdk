@@ -1,5 +1,5 @@
-import { useWeb3Core } from '../../../tests/utils/use-core.js';
-import { LidoSDKStake } from '../stake.js';
+import { useWeb3Core } from './use-core.js';
+import { LidoSDKStake } from '../../src/stake/stake.js';
 
 export const useStake = () => {
   const web3Core = useWeb3Core();
