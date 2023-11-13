@@ -19,6 +19,10 @@ Internal utilities:
 - `getSubgraphId` now can return null when id not available for current chain
 - `performTransaction` argument signature changed
 
+## Stake
+
+- `getStakeLimitInfo` now returns more informative object
+
 ## Events
 
 - `getRebaseEventsByDays` was removed
