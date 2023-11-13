@@ -48,7 +48,8 @@
     "typescript": "^5.1.6"
   },
   "resolutions": {
-    "postcss": "8.4.31"
+    "postcss": "8.4.31",
+    "crypto-js": "4.2.0"
   },
   "workspaces": [
     "packages/*",

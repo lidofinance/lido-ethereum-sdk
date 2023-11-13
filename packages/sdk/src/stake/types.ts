@@ -23,3 +23,13 @@ export type StakeResult = {
 export type StakeEncodeDataProps = {
   referralAddress?: Address;
 };
+
+export type StakeLimitResult = {
+  isStakingPaused: boolean;
+  isStakingLimitSet: boolean;
+  currentStakeLimit: bigint;
+  maxStakeLimit: bigint;
+  maxStakeLimitGrowthBlocks: bigint;
+  prevStakeLimit: bigint;
+  prevStakeBlockNumber: bigint;
+};

@@ -1,4 +1,17 @@
-# Lido Ethereum SDK
+<div style="display: flex;" align="center">
+  <h1 align="center">Lido Ethereum SDK</h1>
+</div>
+
+<div style="display: flex;" align="center">
+  <img alt="GitHub license" src="https://img.shields.io/github/license/lidofinance/lido-ethereum-sdk?color=limegreen">
+  <img alt="Downloads npm" src="https://img.shields.io/npm/dm/@lidofinance/lido-ethereum-sdk?color=limegreen">
+  <img alt="Version npm" src="https://img.shields.io/npm/v/@lidofinance/lido-ethereum-sdk?label=version">
+  <img alt="npm bundle size" src="https://img.shields.io/bundlephobia/min/@lidofinance/lido-ethereum-sdk">
+  <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/lidofinance/lido-ethereum-sdk">
+  <img alt="GitHub Pull Requests" src="https://img.shields.io/github/issues-pr/lidofinance/lido-ethereum-sdk">
+  <img alt="GitHub open issues" src="https://img.shields.io/github/issues/lidofinance/lido-ethereum-sdk">
+</div>
+<br/>
 
 **Lido Ethereum SDK** is a package that provides convenient tools for interacting with Lido contracts on the Ethereum network through a software development kit (SDK). This SDK simplifies working with Lido contracts and accessing their functionality.
 
@@ -24,6 +37,8 @@ For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
   - [Stake](#stake-example)
   - [Withdraw](#withdraw-example)
   - [Wrap](#wrap-example)
+- [Error Codes](#error-codes)
+- [Lido contract addresses](#lido-contract-addresses)
 - [Stake](#stake)
   - [Call](#call)
   - [Populate transaction](#populate-transaction)
@@ -50,7 +65,6 @@ For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
 - [(w)stETH](#wsteth)
 - [unstETH NFT](#unsteth-nft)
 - [Shares](#shares)
-- [Lido contract addresses](#lido-contract-addresses)
 - [Lido statistics](#lido-statistics)
   - [APR](#apr)
 - [Lido events](#lido-events)
@@ -291,6 +305,32 @@ const wrapResult = await lidoSDK.wrap.wrapEth({
 console.log(addressWstETH, 'wstETH contract address');
 console.log(contractWstETH, 'wstETH contract');
 console.log(wrapResult, 'wrap result');
+```
+
+## Error Codes
+
+- **INVALID_ARGUMENT**: arguments passed to SDK method are not valid
+- **NOT_SUPPORTED**: behavior or feature though possible is not currently supported by SDK
+- **PROVIDER_ERROR**: error with RPC or Web3 Provider
+- **READ_ERROR**: error while accessing Blockchain or External Resource for read
+- **UNKNOWN_ERROR** error was not recognized by SDK and is not directly thrown by it's code
+
+## Lido contract addresses
+
+```ts
+import { LidoSDK, LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk';
+
+const lidoSDK = new LidoSDK({
+  rpcUrls: ['https://rpc-url'],
+  chainId: 5,
+});
+
+const stethAddress = await lidoSDK.core.getContractAddress(
+  LIDO_CONTRACT_NAMES.lido,
+);
+const wsteth = await lidoSDK.core.getContractAddress(
+  LIDO_CONTRACT_NAMES.wsteth,
+);
 ```
 
 ## Stake
@@ -1108,24 +1148,6 @@ const { totalEther, totalShares } = await lidoSDK.getTotalSupply();
 
 // get current share rate from protocol
 const shareRate = await lidoSDK.getShareRate();
-```
-
-## Lido contract addresses
-
-```ts
-import { LidoSDK, LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk';
-
-const lidoSDK = new LidoSDK({
-  rpcUrls: ['https://rpc-url'],
-  chainId: 5,
-});
-
-const stethAddress = await lidoSDK.core.getContractAddress(
-  LIDO_CONTRACT_NAMES.lido,
-);
-const wsteth = await lidoSDK.core.getContractAddress(
-  LIDO_CONTRACT_NAMES.wsteth,
-);
 ```
 
 ## Lido statistics
