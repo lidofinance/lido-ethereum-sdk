@@ -1,6 +1,7 @@
-import { Address } from 'viem';
-import { type TransactionCallback, type EtherValue } from '../core/index.js';
-import {
+import type { Address } from 'viem';
+import type {
+  TransactionCallback,
+  EtherValue,
   CommonTransactionProps,
   LidoSDKCommonProps,
   SignPermitProps,
