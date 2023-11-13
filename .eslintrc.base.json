@@ -45,6 +45,12 @@
     "jest/expect-expect": [
       "error",
       { "assertFunctionNames": ["expect", "expect*"] }
+    ],
+    "jest/no-standalone-expect": [
+      "error",
+      {
+        "additionalTestBlockFunctions": ["testSpending"]
+      }
     ]
   },
   "settings": {

@@ -1,15 +1,12 @@
 import { Address } from 'viem';
+import { type TransactionCallback, type EtherValue } from '../core/index.js';
 import {
-  type LidoSDKCoreProps,
-  type LidoSDKCore,
-  type TransactionCallback,
-  type EtherValue,
-} from '../core/index.js';
-import { CommonTransactionProps, SignPermitProps } from '../core/types.js';
+  CommonTransactionProps,
+  LidoSDKCommonProps,
+  SignPermitProps,
+} from '../core/types.js';
 
-export type LidoSDKErc20Props = LidoSDKCoreProps & {
-  core?: LidoSDKCore;
-};
+export type LidoSDKErc20Props = LidoSDKCommonProps;
 
 export type TransactionProps = {
   account: Address;

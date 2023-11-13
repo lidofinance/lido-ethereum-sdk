@@ -5,12 +5,11 @@ import { useRpcCore } from '../../../tests/utils/use-core.js';
 import { useTestsEnvs } from '../../../tests/utils/use-test-envs.js';
 import { expectAddress } from '../../../tests/utils/expect-address.js';
 import { expectContract } from '../../../tests/utils/expect-contract.js';
-
-const useStake = () => {
-  const rpcCore = useRpcCore();
-  const stake = new LidoSDKStake({ core: rpcCore });
-  return stake;
-};
+import {
+  expectPopulatedTx,
+  expectPopulatedTxToRun,
+} from '../../../tests/utils/expect-populated-tx.js';
+import { useStake } from './use-stake.js';
 
 describe('LidoSDKStake constructor', () => {
   test('can be constructed with core', () => {
@@ -45,5 +44,16 @@ describe('LidoSDKStake read methods', () => {
 
   test('stake limit info', async () => {
     await expect(stake.getStakeLimitInfo()).resolves.toBeDefined();
+  });
+
+  test('stakeEthPopulateTx', async () => {
+    const tx = await stake.stakeEthPopulateTx({ value: 100n });
+    expectPopulatedTx(tx, 100n);
+    await expectPopulatedTxToRun(tx, stake.core.rpcProvider);
+  });
+
+  test('stakeEthSimulateTx', async () => {
+    const simulationResult = await stake.stakeEthSimulateTx({ value: 100n });
+    expect(simulationResult).toBeDefined();
   });
 });

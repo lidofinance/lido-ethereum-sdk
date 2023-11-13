@@ -34,10 +34,10 @@ export abstract class AbstractLidoSDKErc20 {
   readonly core: LidoSDKCore;
 
   constructor(props: LidoSDKErc20Props) {
-    const { core, ...rest } = props;
+    const { core } = props;
 
     if (core) this.core = core;
-    else this.core = new LidoSDKCore(rest, version);
+    else this.core = new LidoSDKCore(props, version);
   }
 
   // Contract
