@@ -8,6 +8,8 @@ export const useWalletClient = () => {
 
   return createWalletClient({
     account,
-    transport: http('https://1rpc.io/holesky'),
+    transport: http(
+      'https://fb55-2403-6200-8851-318c-78af-dbe-6f34-837.ngrok-free.app',
+    ),
   });
 };
