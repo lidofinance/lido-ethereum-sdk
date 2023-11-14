@@ -3,11 +3,11 @@ import { Hash, createWalletClient, http } from 'viem';
 import { useTestsEnvs } from './use-test-envs.js';
 
 export const useWalletClient = () => {
-  const { privateKey, rpcUrl } = useTestsEnvs();
+  const { privateKey } = useTestsEnvs();
   const account = privateKeyToAccount(privateKey as Hash);
 
   return createWalletClient({
     account,
-    transport: http(rpcUrl),
+    transport: http('https://1rpc.io/holesky'),
   });
 };
