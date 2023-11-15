@@ -9,7 +9,6 @@ import {
   type WriteContractParameters,
 } from 'viem';
 
-import { LidoSDKCore } from '../core/index.js';
 import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
 import {
   EtherValue,
@@ -18,10 +17,8 @@ import {
 } from '../core/types.js';
 import { parseValue } from '../common/utils/parse-value.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
-import { version } from '../version.js';
 
 import type {
-  LidoSDKWrapProps,
   WrapProps,
   WrapInnerProps,
   WrapPropsWithoutCallback,
@@ -30,17 +27,9 @@ import type {
 import { abi } from './abi/wsteth.js';
 import { stethPartialAbi } from './abi/steth-partial.js';
 import { ERROR_CODE } from '../common/utils/sdk-error.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 
-export class LidoSDKWrap {
-  readonly core: LidoSDKCore;
-
-  constructor(props: LidoSDKWrapProps) {
-    const { core } = props;
-
-    if (core) this.core = core;
-    else this.core = new LidoSDKCore(props, version);
-  }
-
+export class LidoSDKWrap extends LidoSDKModule {
   // Contracts
 
   @Logger('Contracts:')

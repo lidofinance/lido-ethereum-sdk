@@ -5,9 +5,9 @@ import {
   getContract,
   zeroAddress,
 } from 'viem';
-import { LidoSDKCore } from '../core/index.js';
 import { Logger, ErrorHandler, Cache } from '../common/decorators/index.js';
-import { version } from '../version.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+
 import { rewardsEventsAbi } from './abi/rewardsEvents.js';
 import {
   type GetRewardsFromChainOptions,
@@ -15,7 +15,6 @@ import {
   type GetRewardsFromSubgraphOptions,
   type GetRewardsFromSubgraphResult,
   type GetRewardsOptions,
-  type LidoSDKRewardsProps,
   type Reward,
   type RewardsChainEvents,
   type RewardsSubgraphEvents,
@@ -43,17 +42,10 @@ import {
 } from '../index.js';
 import { LidoSDKApr } from '../statistics/apr.js';
 
-export class LidoSDKRewards {
+export class LidoSDKRewards extends LidoSDKModule {
   private static readonly PRECISION = 10n ** 27n;
   private static readonly DEFAULT_STEP_ENTITIES = 1000;
   private static readonly DEFAULT_STEP_BLOCK = 50000;
-
-  readonly core: LidoSDKCore;
-
-  constructor(props: LidoSDKRewardsProps) {
-    if (props.core) this.core = props.core;
-    else this.core = new LidoSDKCore(props, version);
-  }
 
   // Contracts
 

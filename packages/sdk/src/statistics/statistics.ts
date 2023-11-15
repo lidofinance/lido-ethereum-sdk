@@ -1,18 +1,13 @@
-import { LidoSDKCore } from '../core/index.js';
-import { version } from '../version.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import { LidoSDKCommonProps } from '../core/types.js';
 
 import { LidoSDKApr } from './apr.js';
-import type { LidoSDKStatisticsProps } from './types.js';
 
-export class LidoSDKStatistics {
-  readonly core: LidoSDKCore;
+export class LidoSDKStatistics extends LidoSDKModule {
   readonly apr: LidoSDKApr;
 
-  constructor(props: LidoSDKStatisticsProps) {
-    const { core } = props;
-
-    if (core) this.core = core;
-    else this.core = new LidoSDKCore(props, version);
+  constructor(props: LidoSDKCommonProps) {
+    super(props);
 
     this.apr = new LidoSDKApr({ ...props, core: this.core });
   }

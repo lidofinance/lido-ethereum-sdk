@@ -1,9 +1,7 @@
 import { EtherValue, LidoSDKCore } from '../core/index.js';
-import { version } from '../version.js';
 import type {
   AllowanceProps,
   ApproveProps,
-  LidoSDKErc20Props,
   ParsedTransactionProps,
   SignTokenPermitProps,
   TransferProps,
@@ -21,6 +19,7 @@ import {
 } from 'viem';
 import { NOOP, PERMIT_MESSAGE_TYPES } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 import type {
   CommonTransactionProps,
   NoCallback,
@@ -30,22 +29,13 @@ import type {
 } from '../core/types.js';
 import { splitSignature } from '@ethersproject/bytes';
 
-export abstract class AbstractLidoSDKErc20 {
-  readonly core: LidoSDKCore;
-
-  constructor(props: LidoSDKErc20Props) {
-    const { core, ...rest } = props;
-
-    if (core) this.core = core;
-    else this.core = new LidoSDKCore(rest, version);
-  }
-
+export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   // Contract
 
   public abstract contractAddress(): Promise<Address>;
 
   @Logger('Contracts:')
-  @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressWstETH'])
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContract(): Promise<
     GetContractReturnType<typeof erc20abi, PublicClient, WalletClient>
   > {
