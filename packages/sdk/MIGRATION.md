@@ -6,6 +6,7 @@
 - some methods that did't previously use `web3Provider` but accepted `account` prop (like `populate...` or `simulate...`) now will require `web3Provider` if `account` prop is omitted in order to access possibly hoisted account
 - All exports from individual modules are now available from root export `@lidofinance/lido-ethereum-sdk`
 - For all modules constructor arguments typings are now more strict. Disallow incorrect combinations (e.g. `core` and `rpcUrls` at same time)
+- All dedicated SDK modules now use `type LidoSDKCommonProps` for constructor options and no longer export separate type
 
 ## Core
 

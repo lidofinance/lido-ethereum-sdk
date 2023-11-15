@@ -1,11 +1,5 @@
 import type { FormattedTransactionRequest } from 'viem';
-import type {
-  LidoSDKCommonProps,
-  EtherValue,
-  CommonTransactionProps,
-} from '../core/types.js';
-
-export type LidoSDKWrapProps = LidoSDKCommonProps;
+import type { EtherValue, CommonTransactionProps } from '../core/types.js';
 
 export type WrapProps = CommonTransactionProps & {
   value: EtherValue;
