@@ -6,14 +6,11 @@ import type {
   WalletClient,
 } from 'viem';
 
-import { LidoSDKCore } from '../core/index.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
-import { version } from '../version.js';
 
 import { StethEventsAbi } from './abi/stethEvents.js';
 import {
-  type LidoSDKEventsProps,
   RebaseEvent,
   GetRebaseEventsProps,
   GetLastRebaseEventsProps,
@@ -24,21 +21,14 @@ import {
   invariantArgument,
 } from '../common/utils/sdk-error.js';
 import { requestWithBlockStep } from '../rewards/utils.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 
 const BLOCKS_BY_DAY = 7600n;
 const REBASE_EVENT_ABI_INDEX = 8;
 const DAYS_LIMIT = 7;
 
-export class LidoSDKStethEvents {
+export class LidoSDKStethEvents extends LidoSDKModule {
   static readonly DEFAULT_STEP_BLOCK = 50000;
-  readonly core: LidoSDKCore;
-
-  constructor(props: LidoSDKEventsProps) {
-    const { core } = props;
-
-    if (core) this.core = core;
-    else this.core = new LidoSDKCore(props, version);
-  }
 
   // Contracts
 

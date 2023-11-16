@@ -1,12 +1,7 @@
-import { Log } from 'viem';
-import {
-  BackArgumentType,
-  BlockArgumentType,
-  LidoSDKCommonProps,
-} from '../core/types.js';
+import type { Log } from 'viem';
+import type { BackArgumentType, BlockArgumentType } from '../core/types.js';
 import type { StethEventsAbi } from './abi/stethEvents.js';
 
-export type LidoSDKEventsProps = LidoSDKCommonProps;
 export type RebaseEvent = Log<
   bigint,
   number,

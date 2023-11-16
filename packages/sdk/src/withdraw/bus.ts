@@ -1,5 +1,3 @@
-import { LidoSDKCore } from '../core/index.js';
-
 import { LidoSDKWithdrawContract } from './withdraw-contract.js';
 import { LidoSDKWithdrawViews } from './withdraw-views.js';
 import { LidoSDKWithdrawRequestsInfo } from './withdraw-requests-info.js';
@@ -8,31 +6,17 @@ import {
   LidoSDKWithdrawRequest,
   LidoSDKWithdrawApprove,
 } from './request/index.js';
-import { type LidoSDKWithdrawProps } from './types.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 
-export class Bus {
+export class Bus extends LidoSDKModule {
   private version: string | undefined;
 
-  private coreInstance: LidoSDKCore;
   private contractInstance: LidoSDKWithdrawContract | undefined;
   private viewsInstance: LidoSDKWithdrawViews | undefined;
   private requestsInfoInstance: LidoSDKWithdrawRequestsInfo | undefined;
   private approvalInstance: LidoSDKWithdrawApprove | undefined;
   private claimInstance: LidoSDKWithdrawClaim | undefined;
   private requestInstance: LidoSDKWithdrawRequest | undefined;
-
-  constructor(props: LidoSDKWithdrawProps, version?: string) {
-    this.version = version;
-
-    if (props.core) this.coreInstance = props.core;
-    else this.coreInstance = new LidoSDKCore(props, this.version);
-  }
-
-  // core
-
-  get core(): LidoSDKCore {
-    return this.coreInstance;
-  }
 
   // Contract
 

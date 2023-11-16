@@ -1,3 +1,4 @@
+import { LidoSDKCacheable } from '../class-primitives/cacheable.js';
 import { isBigint } from '../utils/index.js';
 
 import { callConsoleMessage } from './utils.js';
@@ -26,9 +27,11 @@ const getDecoratorArgsString = function <This>(this: This, args?: string[]) {
 };
 
 export const Cache = function (timeMs = 0, cacheArgs?: string[]) {
-  const cache = new Map<string, { data: any; timestamp: number }>();
-
-  return function CacheMethod<This, Args extends any[], Return>(
+  return function CacheMethod<
+    This extends LidoSDKCacheable,
+    Args extends any[],
+    Return,
+  >(
     originalMethod: (this: This, ...args: Args) => Return,
     context: ClassMethodDecoratorContext<
       This,
@@ -37,6 +40,7 @@ export const Cache = function (timeMs = 0, cacheArgs?: string[]) {
   ) {
     const methodName = String(context.name);
     const replacementMethod = function (this: This, ...args: Args): Return {
+      const cache = this.cache;
       const decoratorArgsKey = getDecoratorArgsString.call(this, cacheArgs);
       const argsKey = serializeArgs(args);
       const cacheKey = `${methodName}:${decoratorArgsKey}:${argsKey}`;

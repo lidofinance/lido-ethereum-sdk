@@ -55,8 +55,9 @@ import type {
 } from './types.js';
 import { TransactionCallbackStage } from './types.js';
 import { permitAbi } from './abi/permit.js';
+import { LidoSDKCacheable } from '../common/class-primitives/cacheable.js';
 
-export default class LidoSDKCore {
+export default class LidoSDKCore extends LidoSDKCacheable {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
   private static readonly MS_PER_DAY = 86400000n;
 
@@ -73,6 +74,7 @@ export default class LidoSDKCore {
   }
 
   constructor(props: LidoSDKCoreProps, version?: string) {
+    super();
     this.chainId = props.chainId;
     this.rpcUrls = props.rpcUrls;
     this.logMode = props.logMode ?? 'info';

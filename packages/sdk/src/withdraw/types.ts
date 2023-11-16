@@ -1,9 +1,5 @@
 import type { Address } from 'viem';
-
-import type { LidoSDKCommonProps } from '../core/types.js';
 import type { Bus } from './bus.js';
-
-export type LidoSDKWithdrawProps = LidoSDKCommonProps;
 
 export type LidoSDKWithdrawModuleProps = { bus: Bus; version?: string };
 

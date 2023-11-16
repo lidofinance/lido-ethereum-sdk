@@ -9,22 +9,15 @@ import { NOOP } from '../../common/constants.js';
 import { parseValue } from '../../common/utils/parse-value.js';
 import { Logger, Cache, ErrorHandler } from '../../common/decorators/index.js';
 
-import { Bus } from '../bus.js';
-import { LidoSDKWithdrawModuleProps } from '../types.js';
 import type {
   CheckAllowanceProps,
   CheckAllowanceResult,
   GetAllowanceProps,
   WithdrawApproveProps,
 } from './types.js';
+import { BusModule } from '../bus-module.js';
 
-export class LidoSDKWithdrawApprove {
-  private readonly bus: Bus;
-
-  constructor(props: LidoSDKWithdrawModuleProps) {
-    this.bus = props.bus;
-  }
-
+export class LidoSDKWithdrawApprove extends BusModule {
   @Logger('Call:')
   @ErrorHandler()
   public async approve(
