@@ -19,7 +19,6 @@ import {
   PublicClient,
   WalletClient,
   encodeFunctionData,
-  getContract,
 } from 'viem';
 import { NOOP, PERMIT_MESSAGE_TYPES } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
@@ -45,19 +44,9 @@ export abstract class AbstractLidoSDKErc20 {
 
   public abstract contractAddress(): Promise<Address>;
 
-  @Logger('Contracts:')
-  @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressWstETH'])
-  public async getContract(): Promise<
+  public abstract getContract(): Promise<
     GetContractReturnType<typeof erc20abi, PublicClient, WalletClient>
-  > {
-    const address = await this.contractAddress();
-    return getContract({
-      address,
-      abi: erc20abi,
-      publicClient: this.core.rpcProvider,
-      walletClient: this.core.web3Provider,
-    });
-  }
+  >;
 
   // Balance
 
