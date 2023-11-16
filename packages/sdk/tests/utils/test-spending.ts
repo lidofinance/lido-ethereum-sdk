@@ -1,5 +1,5 @@
 import { test } from '@jest/globals';
-import { useTestsEnvs } from './use-test-envs.js';
+import { useTestsEnvs } from './fixtures/use-test-envs.js';
 
 const { skipSpendingTests } = useTestsEnvs();
 

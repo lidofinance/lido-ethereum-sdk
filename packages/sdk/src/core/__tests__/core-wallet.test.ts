@@ -1,10 +1,10 @@
 import { test, expect, describe } from '@jest/globals';
 
-import { useWeb3Core } from '../../../tests/utils/use-core.js';
+import { useWeb3Core } from '../../../tests/utils/fixtures/use-core.js';
 import { getContract, maxUint256, parseEther } from 'viem';
-import { expectAddress } from '../../../tests/utils/expect-address.js';
-import { useTestsEnvs } from '../../../tests/utils/use-test-envs.js';
-import { expectNonNegativeBn } from '../../../tests/utils/expect-bn.js';
+import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
+import { useTestsEnvs } from '../../../tests/utils/fixtures/use-test-envs.js';
+import { expectNonNegativeBn } from '../../../tests/utils/expect/expect-bn.js';
 import { LIDO_CONTRACT_NAMES } from '../../index.js';
 
 const permitAbi = [

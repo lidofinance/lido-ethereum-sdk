@@ -1,4 +1,4 @@
-import { ERROR_CODE, SDKError } from '../../src/index.js';
+import { ERROR_CODE, SDKError } from '../../../src/index.js';
 import { expect } from '@jest/globals';
 
 export const expectSDKError = async (

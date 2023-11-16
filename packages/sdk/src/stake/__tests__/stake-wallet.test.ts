@@ -1,12 +1,12 @@
 import { describe, jest } from '@jest/globals';
-import { useStake } from '../../../tests/utils/use-stake.js';
+import { useStake } from '../../../tests/utils/fixtures/use-stake.js';
 import {
   SPENDING_TIMEOUT,
   testSpending,
 } from '../../../tests/utils/test-spending.js';
 import { LidoSDKstETH } from '../../index.js';
-import { expectTxCallback } from '../../../tests/utils/expect-tx-callback.js';
-import { expectAlmostEqualBn } from '../../../tests/utils/expect-bn.js';
+import { expectTxCallback } from '../../../tests/utils/expect/expect-tx-callback.js';
+import { expectAlmostEqualBn } from '../../../tests/utils/expect/expect-bn.js';
 
 describe('LidoSDKStake wallet methods', () => {
   const stake = useStake();

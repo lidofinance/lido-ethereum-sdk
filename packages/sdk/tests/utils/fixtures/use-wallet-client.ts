@@ -1,7 +1,7 @@
 import { privateKeyToAccount } from 'viem/accounts';
 import { Hash, createWalletClient, http } from 'viem';
 import { useTestsEnvs } from './use-test-envs.js';
-import { CHAINS, VIEM_CHAINS } from '../../src/index.js';
+import { CHAINS, VIEM_CHAINS } from '../../../src/index.js';
 
 export const useWalletClient = () => {
   const { privateKey, chainId, rpcUrl } = useTestsEnvs();

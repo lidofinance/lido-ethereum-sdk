@@ -1,4 +1,4 @@
-import { LidoSDKCore } from '../../src/core/index.js';
+import { LidoSDKCore } from '../../../src/core/index.js';
 import { useTestsEnvs } from './use-test-envs.js';
 import { useWalletClient } from './use-wallet-client.js';
 
