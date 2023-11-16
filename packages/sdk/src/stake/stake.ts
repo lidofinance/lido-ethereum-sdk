@@ -84,13 +84,13 @@ export class LidoSDKStake extends LidoSDKModule {
     props: StakeProps,
   ): Promise<WriteContractParameters> {
     const { referralAddress, value, account } = this.parseProps(props);
-
+    const accountAddress = await this.core.getWeb3Address(account);
     const address = await this.contractAddressStETH();
     const { request } = await this.core.rpcProvider.simulateContract({
       address,
       abi: StethAbi,
       functionName: 'submit',
-      account,
+      account: accountAddress,
       args: [referralAddress],
       value: value,
     });

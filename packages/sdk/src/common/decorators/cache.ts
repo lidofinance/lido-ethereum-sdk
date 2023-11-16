@@ -1,4 +1,4 @@
-import { LidoSDKCacheable } from '../class-primitives/cacheable.js';
+import type { LidoSDKCacheable } from '../class-primitives/cacheable.js';
 import { isBigint } from '../utils/index.js';
 
 import { callConsoleMessage } from './utils.js';

@@ -41,7 +41,17 @@
       }
     ],
     "import/no-cycle": ["error", { "maxDepth": 1 }],
-    "unicorn/expiring-todo-comments": "off"
+    "unicorn/expiring-todo-comments": "off",
+    "jest/expect-expect": [
+      "error",
+      { "assertFunctionNames": ["expect", "expect*"] }
+    ],
+    "jest/no-standalone-expect": [
+      "error",
+      {
+        "additionalTestBlockFunctions": ["testSpending"]
+      }
+    ]
   },
   "settings": {
     "react": {

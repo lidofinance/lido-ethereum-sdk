@@ -40,7 +40,7 @@ export type LidoSDKCommonProps =
   | {
       core: LidoSDKCore;
     }
-  | ({ core: undefined } & LidoSDKCoreProps);
+  | ({ core?: undefined } & LidoSDKCoreProps);
 
 // Method Props primitives
 
