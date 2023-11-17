@@ -38,7 +38,7 @@ describe('LidoSDKWrap wallet methods', () => {
   testSpending('reset allowance', async () => {
     const mock = jest.fn();
     const tx = await wrap.approveStethForWrap({ value: 0n, callback: mock });
-    await expectTxCallback(mock, tx);
+    expectTxCallback(mock, tx);
     await expect(wrap.getStethForWrapAllowance(address)).resolves.toEqual(0n);
   });
 
@@ -49,7 +49,7 @@ describe('LidoSDKWrap wallet methods', () => {
   testSpending('set allowance', async () => {
     const mock = jest.fn();
     const tx = await wrap.approveStethForWrap({ value, callback: mock });
-    await expectTxCallback(mock, tx);
+    expectTxCallback(mock, tx);
     await expect(wrap.getStethForWrapAllowance(address)).resolves.toEqual(
       value,
     );
@@ -63,7 +63,7 @@ describe('LidoSDKWrap wallet methods', () => {
     expectAddress(tx.to, wstethAddress);
     expectAddress(tx.from, address);
     expectPopulatedTx(tx, undefined);
-    expectPopulatedTxToRun(tx, wrap.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, wrap.core.rpcProvider);
   });
 
   testSpending('wrap steth simulate', async () => {
@@ -98,7 +98,7 @@ describe('LidoSDKWrap wallet methods', () => {
     expectAddress(tx.to, wstethAddress);
     expectAddress(tx.from, address);
     expectPopulatedTx(tx, undefined);
-    expectPopulatedTxToRun(tx, wrap.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, wrap.core.rpcProvider);
   });
 
   testSpending('unwrap steth simulate', async () => {
