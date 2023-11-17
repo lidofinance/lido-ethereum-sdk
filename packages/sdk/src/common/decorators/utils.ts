@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import { LidoSDKCore } from '../../core/index.js';
-import { type LOG_MODE } from '../../core/types.js';
+import type { LidoSDKCore } from '../../core/index.js';
+import type { LOG_MODE } from '../../core/types.js';
 
 import { ConsoleCss } from './constants.js';
 import { HeadMessage } from './types.js';
@@ -47,7 +47,7 @@ export const callConsoleMessage = function <This>(
 };
 
 export const isCore = function (value: unknown): value is LidoSDKCore {
-  return value instanceof LidoSDKCore;
+  return !!value && typeof value === 'object' && 'rpcProvider' in value;
 };
 
 export const hasBus = function (

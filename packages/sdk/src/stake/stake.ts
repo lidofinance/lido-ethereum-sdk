@@ -9,7 +9,6 @@ import type {
 } from 'viem';
 
 import {
-  LidoSDKCore,
   type TransactionResult,
   type PopulatedTransaction,
   TransactionOptions,
@@ -23,27 +22,17 @@ import {
   GAS_TRANSACTION_RATIO_PRECISION,
 } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
-import { version } from '../version.js';
 
 import { StethAbi } from './abi/steth.js';
 import type {
-  LidoSDKStakeProps,
   StakeProps,
   StakeEncodeDataProps,
   StakeInnerProps,
   StakeLimitResult,
 } from './types.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 
-export class LidoSDKStake {
-  readonly core: LidoSDKCore;
-
-  constructor(props: LidoSDKStakeProps) {
-    const { core } = props;
-
-    if (core) this.core = core;
-    else this.core = new LidoSDKCore(props, version);
-  }
-
+export class LidoSDKStake extends LidoSDKModule {
   // Contracts
 
   @Logger('Contracts:')

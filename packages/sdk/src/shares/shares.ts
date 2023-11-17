@@ -9,28 +9,17 @@ import {
 
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
-import { LidoSDKCore, TransactionResult } from '../core/index.js';
-import { version } from '../version.js';
-import {
-  LidoSDKSharesProps,
-  SharesTotalSupplyResult,
-  SharesTransferProps,
-} from './types.js';
+import { TransactionResult } from '../core/index.js';
+
+import { SharesTotalSupplyResult, SharesTransferProps } from './types.js';
 import { stethSharesAbi } from './abi/steth-shares-abi.js';
 import { parseValue } from '../common/utils/parse-value.js';
 import { EtherValue, NoCallback } from '../core/types.js';
 import { calcShareRate } from '../rewards/utils.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 
-export class LidoSDKShares {
+export class LidoSDKShares extends LidoSDKModule {
   static readonly PRECISION = 10n ** 27n;
-  readonly core: LidoSDKCore;
-
-  constructor(props: LidoSDKSharesProps) {
-    const { core } = props;
-
-    if (core) this.core = core;
-    else this.core = new LidoSDKCore(props, version);
-  }
 
   /// Contract
 

@@ -1,15 +1,6 @@
 import { type Hash, type Address, type ContractFunctionResult } from 'viem';
-import LidoSDKCore from '../core/core.js';
-import {
-  TransactionCallback,
-  type LidoSDKCoreProps,
-  CommonTransactionProps,
-} from '../core/types.js';
+import { TransactionCallback, CommonTransactionProps } from '../core/types.js';
 import { type unstethAbi } from './abi/unsteth-abi.js';
-
-export type LidoSDKUnstETHProps = {
-  core?: LidoSDKCore;
-} & LidoSDKCoreProps;
 
 export type UnstethNFTstatus = ContractFunctionResult<
   typeof unstethAbi,

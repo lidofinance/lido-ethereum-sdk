@@ -1,16 +1,10 @@
 import type { Address, Log } from 'viem';
 import type { rewardsEventsAbi } from './abi/rewardsEvents.js';
-import type {
-  BackArgumentType,
-  BlockArgumentType,
-  LidoSDKCommonProps,
-} from '../core/types.js';
+import type { BackArgumentType, BlockArgumentType } from '../core/types.js';
 import type {
   TotalRewardEntity,
   TransferEventEntity,
 } from './subgraph/types.js';
-
-export type LidoSDKRewardsProps = LidoSDKCommonProps;
 
 export type GetRewardsOptions = {
   address: Address;

@@ -1,11 +1,5 @@
 import type { Address } from 'viem';
-import type {
-  CommonTransactionProps,
-  EtherValue,
-  LidoSDKCommonProps,
-} from '../core/types.js';
-
-export type LidoSDKSharesProps = LidoSDKCommonProps;
+import type { CommonTransactionProps, EtherValue } from '../core/types.js';
 
 export type SharesTransferProps = CommonTransactionProps & {
   from?: Address;

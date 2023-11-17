@@ -1,20 +1,15 @@
-import { LidoSDKCore } from '../core/index.js';
 import { LidoSDKEvents } from '../events/index.js';
 import { Logger, ErrorHandler } from '../common/decorators/index.js';
-import { version } from '../version.js';
 
-import type { LidoSDKStatisticsProps } from './types.js';
 import { ERROR_CODE, invariant } from '../common/utils/sdk-error.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import { LidoSDKCommonProps } from '../core/types.js';
 
-export class LidoSDKApr {
-  readonly core: LidoSDKCore;
+export class LidoSDKApr extends LidoSDKModule {
   readonly events: LidoSDKEvents;
 
-  constructor(props: LidoSDKStatisticsProps) {
-    const { core } = props;
-
-    if (core) this.core = core;
-    else this.core = new LidoSDKCore(props, version);
+  constructor(props: LidoSDKCommonProps) {
+    super(props);
 
     this.events = new LidoSDKEvents({ ...props, core: this.core });
   }

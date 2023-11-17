@@ -1,17 +1,12 @@
-import {
-  CommonTransactionProps,
-  LidoSDKCore,
-  TransactionResult,
-} from '../core/index.js';
+import { CommonTransactionProps, TransactionResult } from '../core/index.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
-import { version } from '../version.js';
+
 import type {
   UnstethNFT,
   UnstethApproveAllProps,
   UnstethApproveProps,
   UnstethApprovedForProps,
   UnstethIsApprovedForAllProps,
-  LidoSDKUnstETHProps,
   ParsedProps,
   SafeTransferFromArguments,
   UnstethTransferProps,
@@ -26,18 +21,10 @@ import {
 } from 'viem';
 import { unstethAbi } from './abi/unsteth-abi.js';
 import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 
 // TODO helpers simulate&populate
-export class LidoSDKUnstETH {
-  readonly core: LidoSDKCore;
-
-  constructor(props: LidoSDKUnstETHProps) {
-    const { core, ...rest } = props;
-
-    if (core) this.core = core;
-    else this.core = new LidoSDKCore(rest, version);
-  }
-
+export class LidoSDKUnstETH extends LidoSDKModule {
   // Contract
 
   @Logger('Contracts:')
