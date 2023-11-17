@@ -213,13 +213,8 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     const { contract, domain } = await this.getPermitContractData(token);
     const nonce = await contract.read.nonces([accountAddress]);
 
-    invariant(
-      web3Provider.account,
-      'must have account in web3Provider',
-      ERROR_CODE.PROVIDER_ERROR,
-    );
     const signature = await web3Provider.signTypedData({
-      account: web3Provider.account,
+      account: account ?? web3Provider.account ?? accountAddress,
       domain,
       types: PERMIT_MESSAGE_TYPES,
       primaryType: 'Permit',

@@ -14,12 +14,14 @@ import {
   ResultCode,
   SuccessMessage,
 } from './styles';
+import { useWeb3 } from '@reef-knot/web3-react';
 
 type ActionProps<TResult> = PropsWithChildren<{
   action: () => Promise<TResult> | TResult;
   title: string;
   renderResult?: (result: TResult) => JSX.Element;
   renderError?: (error: SDKError) => JSX.Element;
+  walletAction?: boolean;
 }>;
 
 type ReducerAction<TResult> =
@@ -119,10 +121,12 @@ const defaultRenderResult = <TResult,>(result: TResult) => {
 export const Action = <TResult,>({
   action,
   title,
+  walletAction = false,
   renderResult = defaultRenderResult,
   renderError = defaultRenderError,
   children,
 }: ActionProps<TResult>) => {
+  const { active } = useWeb3();
   const [{ result, error, loading }, dispatch] = useReducer(
     reducer<TResult>,
     {
@@ -148,7 +152,11 @@ export const Action = <TResult,>({
     <ActionBlock>
       {children && <Controls>{children}</Controls>}
       <Controls>
-        <Button loading={loading} onClick={startLoading}>
+        <Button
+          disabled={walletAction && !active}
+          loading={loading}
+          onClick={startLoading}
+        >
           {title}
         </Button>
         {result !== undefined && renderResult(result)}
