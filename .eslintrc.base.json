@@ -49,7 +49,13 @@
     "jest/no-standalone-expect": [
       "error",
       {
-        "additionalTestBlockFunctions": ["testSpending"]
+        "additionalTestBlockFunctions": [
+          "testSpending",
+          "testSpending.concurrent",
+          "testSpending.skip",
+          "testSpending.only",
+          "testSpending.todo"
+        ]
       }
     ]
   },
