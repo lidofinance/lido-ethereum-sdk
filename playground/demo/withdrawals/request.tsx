@@ -1,4 +1,4 @@
-import { Accordion } from '@lidofinance/lido-ui';
+import { Accordion, Select, Option } from '@lidofinance/lido-ui';
 import { useWeb3 } from '@reef-knot/web3-react';
 import { Action, renderTokenResult } from 'components/action';
 import TokenInput from 'components/tokenInput/tokenInput';
@@ -12,115 +12,171 @@ const ZERO = BigInt(0);
 export const WithdrawalsRequestDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
   const [requestValue, setRequestValue] = useState<ValueType>(DEFAULT_VALUE);
+  const [token, setToken] = useState<'stETH' | 'wstETH'>('stETH');
+  const amount = requestValue ?? ZERO;
   const { withdraw } = useLidoSDK();
 
   const account = web3account as `0x{string}`;
 
   return (
     <Accordion summary="Withdraw requests">
-      <TokenInput
-        label="value"
-        value={requestValue}
-        placeholder="0.0"
-        onChange={setRequestValue}
-      />
       <Action
-        title="Request stETH (permit)"
+        title={`Request ${token} withdrawal (permit)`}
+        walletAction
         action={() =>
           withdraw.request.requestWithdrawalWithPermit({
             account,
-            requests: [requestValue ?? ZERO],
-            token: 'stETH',
+            amount,
+            token,
             callback: transactionToast,
           })
         }
-      />
+      >
+        <Select
+          onChange={(token) => setToken(token as 'stETH' | 'wstETH')}
+          value={token}
+        >
+          <Option value={'stETH'}>stETH</Option>
+          <Option value={'wstETH'}>wstETH</Option>
+        </Select>
+        <TokenInput
+          label="value"
+          value={requestValue}
+          placeholder="0.0"
+          onChange={setRequestValue}
+        />
+      </Action>
       <Action
-        title="Request wstETH (permit)"
-        action={() =>
-          withdraw.request.requestWithdrawalWithPermit({
+        title={`Request ${token} withdrawal (permit) populate`}
+        walletAction
+        action={async () => {
+          const spender =
+            await withdraw.contract.contractAddressWithdrawalQueue();
+          const permit = await withdraw.core.signPermit({
             account,
-            requests: [requestValue ?? ZERO],
-            token: 'wstETH',
-            callback: transactionToast,
-          })
-        }
+            amount,
+            spender,
+            token,
+          });
+          return withdraw.request.requestWithdrawalWithPermitPopulateTx({
+            account,
+            amount,
+            token,
+            permit,
+          });
+        }}
       />
       <Action
-        title="Get allowance stETH"
-        renderResult={renderTokenResult('stETH')}
-        action={() =>
-          withdraw.approval.getAllowance({ account, token: 'stETH' })
-        }
+        title={`Request ${token} withdrawal (permit) simulate`}
+        walletAction
+        action={async () => {
+          const spender =
+            await withdraw.contract.contractAddressWithdrawalQueue();
+          const permit = await withdraw.core.signPermit({
+            account,
+            amount,
+            spender,
+            token,
+          });
+          return withdraw.request.requestWithdrawalWithPermitSimulateTx({
+            account,
+            amount,
+            token,
+            permit,
+          });
+        }}
       />
       <Action
-        title="Check stETH allowance by amount"
+        title={`Get allowance ${token}`}
+        walletAction
+        renderResult={renderTokenResult(token)}
+        action={() => withdraw.approval.getAllowance({ account, token })}
+      />
+      <Action
+        title={`Check ${token} allowance by amount`}
+        walletAction
         action={() =>
           withdraw.approval.checkAllowance({
-            amount: requestValue ?? ZERO,
+            amount,
             account,
-            token: 'stETH',
+            token,
           })
         }
       />
       <Action
-        title="Approve stETH"
+        title={`Approve ${token}`}
+        walletAction
         action={() =>
           withdraw.approval.approve({
             account,
-            token: 'stETH',
-            amount: requestValue ?? ZERO,
+            token,
+            amount,
           })
         }
       />
       <Action
-        title="Request stETH"
+        title={`Approve ${token} populate`}
+        walletAction
+        action={() =>
+          withdraw.approval.approvePopulateTx({
+            account,
+            token,
+            amount,
+          })
+        }
+      />
+      <Action
+        title={`Approve ${token} simulate`}
+        walletAction
+        action={() =>
+          withdraw.approval.approveSimulateTx({
+            account,
+            token,
+            amount,
+          })
+        }
+      />
+      <Action
+        title={`Request ${token} (needs allowance)`}
+        walletAction
         action={() =>
           withdraw.request.requestWithdrawal({
             account,
-            requests: [requestValue ?? ZERO],
-            token: 'stETH',
+            amount,
+            token,
             callback: transactionToast,
           })
         }
       />
       <Action
-        title="Check wstETH allowance by amount"
+        title={`Request ${token} populate`}
+        walletAction
         action={() =>
-          withdraw.approval.checkAllowance({
+          withdraw.request.requestWithdrawalPopulateTx({
             account,
-            amount: requestValue ?? ZERO,
-            token: 'stETH',
+            amount,
+            token,
           })
         }
       />
       <Action
-        title="Get allowance wsStETH"
+        title={`Request ${token} simulate (needs allowance) `}
+        walletAction
         action={() =>
-          withdraw.approval.getAllowance({ account, token: 'wstETH' })
-        }
-        renderResult={renderTokenResult('wstETH')}
-      />
-
-      <Action
-        title="Approve wstETH"
-        action={() =>
-          withdraw.approval.approve({
+          withdraw.request.requestWithdrawalSimulateTx({
             account,
-            token: 'wstETH',
-            amount: requestValue ?? ZERO,
-            callback: transactionToast,
+            amount,
+            token,
           })
         }
       />
       <Action
-        title="Request wstETH Without Permit"
+        title={`Split Amount to Requests`}
+        walletAction
         action={() =>
-          withdraw.request.requestWithdrawal({
-            account,
-            requests: [requestValue ?? ZERO],
-            token: 'wstETH',
-            callback: transactionToast,
+          withdraw.request.splitAmountToRequests({
+            amount,
+            token,
           })
         }
       />

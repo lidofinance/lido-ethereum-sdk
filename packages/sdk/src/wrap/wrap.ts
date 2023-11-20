@@ -102,7 +102,7 @@ export class LidoSDKWrap extends LidoSDKModule {
 
   @Logger('Utils:')
   public async wrapEthPopulateTx(
-    props: WrapProps,
+    props: WrapPropsWithoutCallback,
   ): Promise<PopulatedTransaction> {
     const { value, account } = this.parseProps(props);
     const accountAddress = await this.core.getWeb3Address(account);

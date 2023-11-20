@@ -1,2 +1,2 @@
 export { Action } from './action';
-export { renderTokenResult } from './renderTokenResult';
+export { renderTokenResult } from './render-token-result';

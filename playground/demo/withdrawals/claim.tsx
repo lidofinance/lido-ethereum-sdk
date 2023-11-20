@@ -24,6 +24,7 @@ export const WithdrawalsClaimDemo = () => {
   return (
     <Accordion summary="Withdrawals claim">
       <Action
+        walletAction
         title="Get claimable request info"
         action={async () => {
           const result =
@@ -38,6 +39,7 @@ export const WithdrawalsClaimDemo = () => {
       />
       <Action
         title="Claim selected requests"
+        walletAction
         action={() =>
           withdraw.claim.claimRequests({
             account,

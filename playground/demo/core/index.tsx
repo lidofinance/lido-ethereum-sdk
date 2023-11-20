@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useWeb3 } from '@reef-knot/web3-react';
 import { Input, Accordion } from '@lidofinance/lido-ui';
-import { Action } from 'components/action';
+import { Action, renderTokenResult } from 'components/action';
 import { useLidoSDK } from 'providers/sdk';
 import { renderBlockResult } from 'components/action/render-block-result';
 
@@ -33,6 +33,7 @@ export const CoreDemo = () => {
   return (
     <Accordion summary="Core">
       <Action
+        walletAction
         title="Get Web3 Address"
         action={async () => await core.getWeb3Address()}
       />
@@ -52,8 +53,10 @@ export const CoreDemo = () => {
         />
       </Action>
       <Action
+        walletAction
         title="Balance ETH"
         action={async () => await core.balanceETH(account)}
+        renderResult={renderTokenResult('ETH')}
       />
       <Action
         title="Block by timestamp"

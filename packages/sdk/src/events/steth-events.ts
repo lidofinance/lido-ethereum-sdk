@@ -75,6 +75,7 @@ export class LidoSDKStethEvents extends LidoSDKModule {
 
     for (let day = 1; day <= DAYS_LIMIT; day++) {
       const from = fromBlockNumber - BigInt(days + 1 - day) * BLOCKS_BY_DAY;
+      invariantArgument(from >= 0n, 'Days range precedes first block');
       const to = from + BLOCKS_BY_DAY;
 
       const logs = await this.core.rpcProvider.getLogs({

@@ -24,6 +24,15 @@ const RewardsTable = ({
   const steth = renderTokenResult('stETH');
   const shares = renderTokenResult('shares');
 
+  const changeSteth = renderTokenResult('stETH', {
+    colorCoded: true,
+    alwaysShowSign: true,
+  });
+  const changeShares = renderTokenResult('shares', {
+    colorCoded: true,
+    alwaysShowSign: true,
+  });
+
   const sortedRewards = useMemo(() => {
     return sortBlocks === 'asc'
       ? result.rewards
@@ -68,7 +77,7 @@ const RewardsTable = ({
               </Th>
               <Th>Type</Th>
               <Th>Balance</Th>
-              <Th>Reward</Th>
+              <Th>Rewards(Change)</Th>
               <Th>APR</Th>
             </Tr>
           </Thead>
@@ -86,8 +95,8 @@ const RewardsTable = ({
                   <br />({shares(r.balanceShares)})
                 </Td>
                 <Td>
-                  {steth(r.change)}
-                  <br />({shares(r.changeShares)})
+                  {changeSteth(r.change)}
+                  <br />({changeShares(r.changeShares)})
                 </Td>
                 <Td>{r.apr ? `${r.apr * 100}%` : '-'}</Td>
               </Tr>

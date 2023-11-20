@@ -61,6 +61,7 @@ export const UnstethDemo = () => {
         action={() => unsteth.getTokenMetadataURI(BigInt(nftId))}
       />
       <Action
+        walletAction
         title="Transfer"
         action={() =>
           unsteth.transfer({
@@ -94,6 +95,7 @@ export const UnstethDemo = () => {
         />
       </Action>
       <Action
+        walletAction
         title="Approve Token To"
         action={() =>
           unsteth.setApprovalFor({
@@ -120,6 +122,7 @@ export const UnstethDemo = () => {
         />
       </Action>
       <Action
+        walletAction
         title="Get Token Approved To Address"
         action={() =>
           unsteth.getTokenApprovedFor({ account, id: BigInt(approveNftId) })
@@ -127,6 +130,7 @@ export const UnstethDemo = () => {
       />
       <Action
         title="Approve for all tokens"
+        walletAction
         action={() =>
           unsteth.setApprovalForAll({
             account,
@@ -144,6 +148,7 @@ export const UnstethDemo = () => {
         />
       </Action>
       <Action
+        walletAction
         title="Revoke for all tokens"
         action={() =>
           unsteth.setApprovalForAll({
@@ -155,6 +160,7 @@ export const UnstethDemo = () => {
         }
       />
       <Action
+        walletAction
         title="Check is approved for all"
         action={() =>
           unsteth.getIsApprovedForAll({ account, to: toAllApprove })

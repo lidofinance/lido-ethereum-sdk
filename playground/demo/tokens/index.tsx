@@ -50,11 +50,13 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
     <Accordion summary={name}>
       <Action
         title="Balance"
+        walletAction
         action={() => instance.balance(account)}
         renderResult={renderTokenResult(name)}
       />
       <Action
         title="Transfer"
+        walletAction
         action={() =>
           instance.transfer({
             account,
@@ -85,6 +87,7 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
         />
       </Action>
       <Action
+        walletAction
         title="Simulate Transfer"
         action={() =>
           instance.simulateTransfer({
@@ -96,6 +99,7 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
         }
       />
       <Action
+        walletAction
         title="Populate Transfer"
         action={() =>
           instance.populateTransfer({
@@ -108,6 +112,7 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
       />
       <Action
         title="Approve"
+        walletAction
         action={() =>
           instance.approve({ account, amount: approveAmount, to: toApprove })
         }
@@ -127,6 +132,7 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
       </Action>
       <Action
         title="Simulate Approve"
+        walletAction
         action={() =>
           instance.simulateApprove({
             account,
@@ -137,6 +143,7 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
       />
       <Action
         title="Populate Approve"
+        walletAction
         action={() =>
           instance.populateApprove({
             account,
@@ -147,13 +154,19 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
       />
       <Action
         title="Allowance"
+        walletAction
         action={() => instance.allowance({ account, to: toApprove })}
         renderResult={renderTokenResult(name)}
       />
       <Action title="ERC 721 Domain" action={() => instance.erc721Domain()} />
-      <Action title="Permit nonces" action={() => instance.nonces(account)} />
+      <Action
+        walletAction
+        title="Permit nonces"
+        action={() => instance.nonces(account)}
+      />
       <Action
         title="Permit"
+        walletAction
         action={() =>
           instance.signPermit({
             account,
@@ -177,6 +190,7 @@ const TokenDemo = ({ instance, name }: TokenDemoProps) => {
       </Action>
       <Action
         title="Populate Permit"
+        walletAction
         action={() =>
           instance.populatePermit({
             account,

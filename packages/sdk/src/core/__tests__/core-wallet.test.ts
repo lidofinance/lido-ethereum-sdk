@@ -49,7 +49,6 @@ describe('Core Wallet Tests', () => {
       s,
       v,
     } = await web3Core.signPermit({
-      account: address,
       amount: value,
       spender,
       token: isSteth ? 'stETH' : 'wstETH',

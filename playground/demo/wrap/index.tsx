@@ -27,6 +27,7 @@ export const WrapDemo = () => {
   return (
     <Accordion summary="Wrap">
       <Action
+        walletAction
         title="Wrap ETH"
         action={() =>
           wrap.wrapEth({
@@ -44,11 +45,30 @@ export const WrapDemo = () => {
         />
       </Action>
       <Action
+        title="Wrap ETH Populate"
+        action={() =>
+          wrap.wrapEthPopulateTx({
+            value: wrapValue ?? ZERO,
+            account,
+          })
+        }
+      />
+      <Action
+        title="Wrap ETH Estimate Gas(simulate)"
+        action={() =>
+          wrap.wrapEthEstimateGas({
+            value: wrapValue ?? ZERO,
+            account,
+          })
+        }
+      />
+      <Action
         title="Get Approved stETH for Wrap"
         renderResult={renderTokenResult('stETH')}
         action={() => wrap.getStethForWrapAllowance(account)}
       />
       <Action
+        walletAction
         title="Approve Steth For Wrap"
         action={() =>
           wrap.approveStethForWrap({
@@ -66,6 +86,25 @@ export const WrapDemo = () => {
         />
       </Action>
       <Action
+        title="Approve stETH For Wrap Populate"
+        action={() =>
+          wrap.approveStethForWrapPopulateTx({
+            value: approveValue ?? ZERO,
+            account,
+          })
+        }
+      />
+      <Action
+        title="Approve stETH For Wrap Simulate"
+        action={() =>
+          wrap.approveStethForWrapSimulateTx({
+            value: approveValue ?? ZERO,
+            account,
+          })
+        }
+      />
+      <Action
+        walletAction
         title="Wrap stETH"
         action={() =>
           wrap.wrapSteth({
@@ -83,9 +122,28 @@ export const WrapDemo = () => {
         />
       </Action>
       <Action
+        title="Populate Wrap stETH"
+        action={() =>
+          wrap.wrapStethPopulateTx({
+            value: wrapStethValue ?? ZERO,
+            account,
+          })
+        }
+      />
+      <Action
+        title="Populate Wrap stETH"
+        action={() =>
+          wrap.wrapStethSimulateTx({
+            value: wrapStethValue ?? ZERO,
+            account,
+          })
+        }
+      />
+      <Action
+        walletAction
         title="Unwrap wstETH"
         action={() =>
-          wrap.wrapSteth({
+          wrap.unwrap({
             value: unwrapValue ?? ZERO,
             account,
             callback: transactionToast,
@@ -105,7 +163,7 @@ export const WrapDemo = () => {
         renderResult={renderTokenResult('stETH')}
       >
         <TokenInput
-          label="wsteth"
+          label="wstETH"
           value={wstethValue}
           placeholder="0.0"
           onChange={setWstethValue}
@@ -117,7 +175,7 @@ export const WrapDemo = () => {
         renderResult={renderTokenResult('wstETH')}
       >
         <TokenInput
-          label="steth"
+          label="stETH"
           value={stethValue}
           placeholder="0.0"
           onChange={setStethValue}

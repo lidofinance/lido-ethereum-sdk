@@ -26,7 +26,7 @@ export const RewardsDemo = () => {
   const [rewardsAddress, setRewardsAddress] = useAddressState(undefined, {
     useAccount: true,
   });
-  const [fromArgType, setFromArgType] = useState('from');
+  const [fromArgType, setFromArgType] = useState('back');
   const [to, setTo] = useBlockArgumentState();
   const [from, setFrom] = useBlockArgumentState(DEFAULT_FROM);
   const [back, setBack] = useBackArgumentState();
@@ -74,10 +74,10 @@ export const RewardsDemo = () => {
           <Option value={'back'}>Back Argument</Option>
         </Select>
         {fromArgType === 'back' && (
-          <BackArgumentInput value={back} onChange={setBack} />
+          <BackArgumentInput label="Back" value={back} onChange={setBack} />
         )}
         {fromArgType === 'from' && (
-          <BlockArgumentInput value={from} onChange={setFrom} />
+          <BlockArgumentInput label="From" value={from} onChange={setFrom} />
         )}
 
         <Input
