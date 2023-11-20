@@ -26,7 +26,7 @@ export const ShareDemo = () => {
   return (
     <Accordion summary={'Shares'}>
       <Action
-        title="Balance"
+        title="Balance Shares"
         action={() => shares.balance(account)}
         renderResult={renderTokenResult('shares')}
       />
