@@ -59,7 +59,7 @@ import { LidoSDKCacheable } from '../common/class-primitives/cacheable.js';
 
 export default class LidoSDKCore extends LidoSDKCacheable {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
-  private static readonly SECONDS_PER_DAY = 60n * 60n * 24n;
+  private static readonly SECONDS_PER_DAY = 86400n;
 
   #web3Provider: WalletClient | undefined;
 
