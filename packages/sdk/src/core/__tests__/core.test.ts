@@ -2,14 +2,14 @@
 import { test, expect, describe } from '@jest/globals';
 
 import { LidoSDKCore } from '../index.js';
-import { useTestsEnvs } from '../../../tests/utils/use-test-envs.js';
-import { expectSDKError } from '../../../tests/utils/expect-sdk-error.js';
+import { useTestsEnvs } from '../../../tests/utils/fixtures/use-test-envs.js';
+import { expectSDKError } from '../../../tests/utils/expect/expect-sdk-error.js';
 import { ERROR_CODE, LIDO_CONTRACT_NAMES } from '../../index.js';
-import { useRpcCore } from '../../../tests/utils/use-core.js';
-import { useWalletClient } from '../../../tests/utils/use-wallet-client.js';
-import { expectAddress } from '../../../tests/utils/expect-address.js';
-import { expectContract } from '../../../tests/utils/expect-contract.js';
-import { expectPositiveBn } from '../../../tests/utils/expect-bn.js';
+import { useRpcCore } from '../../../tests/utils/fixtures/use-core.js';
+import { useWalletClient } from '../../../tests/utils/fixtures/use-wallet-client.js';
+import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
+import { expectContract } from '../../../tests/utils/expect/expect-contract.js';
+import { expectPositiveBn } from '../../../tests/utils/expect/expect-bn.js';
 
 describe('Core Tests', () => {
   const { rpcUrl, chainId } = useTestsEnvs();

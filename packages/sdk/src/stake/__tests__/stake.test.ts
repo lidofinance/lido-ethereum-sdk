@@ -1,15 +1,15 @@
 import { expect, describe, test } from '@jest/globals';
 import { LidoSDKStake } from '../stake.js';
 import { LidoSDKCore } from '../../index.js';
-import { useRpcCore } from '../../../tests/utils/use-core.js';
-import { useTestsEnvs } from '../../../tests/utils/use-test-envs.js';
-import { expectAddress } from '../../../tests/utils/expect-address.js';
-import { expectContract } from '../../../tests/utils/expect-contract.js';
+import { useRpcCore } from '../../../tests/utils/fixtures/use-core.js';
+import { useTestsEnvs } from '../../../tests/utils/fixtures/use-test-envs.js';
+import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
+import { expectContract } from '../../../tests/utils/expect/expect-contract.js';
 import {
   expectPopulatedTx,
   expectPopulatedTxToRun,
-} from '../../../tests/utils/expect-populated-tx.js';
-import { useStake } from '../../../tests/utils/use-stake.js';
+} from '../../../tests/utils/expect/expect-populated-tx.js';
+import { useStake } from '../../../tests/utils/fixtures/use-stake.js';
 
 describe('LidoSDKStake constructor', () => {
   test('can be constructed with core', () => {

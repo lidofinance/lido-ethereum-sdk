@@ -2,7 +2,7 @@ import { expect, jest } from '@jest/globals';
 import {
   TransactionCallback,
   TransactionCallbackStage,
-} from '../../src/core/types.js';
+} from '../../../src/core/types.js';
 import { expectPositiveBn } from './expect-bn.js';
 import { expectHash } from './expect-hash.js';
 
