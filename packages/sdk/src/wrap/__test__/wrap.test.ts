@@ -1,8 +1,7 @@
 import { expect, describe, test } from '@jest/globals';
 import { LidoSDKWrap } from '../wrap.js';
-import { LIDO_CONTRACT_NAMES, LidoSDKCore, LidoSDKstETH } from '../../index.js';
-import { useRpcCore } from '../../../tests/utils/fixtures/use-core.js';
-import { useTestsEnvs } from '../../../tests/utils/fixtures/use-test-envs.js';
+import { LIDO_CONTRACT_NAMES, LidoSDKstETH } from '../../index.js';
+
 import { useWrap } from '../../../tests/utils/fixtures/use-wrap.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
 import { expectContract } from '../../../tests/utils/expect/expect-contract.js';
@@ -16,22 +15,11 @@ import {
   expectNonNegativeBn,
   expectPositiveBn,
 } from '../../../tests/utils/expect/expect-bn.js';
+import { expectSDKModule } from '../../../tests/utils/expect/expect-sdk-module.js';
 
 describe('LidoSDKWrap constructor', () => {
-  test('can be constructed with core', () => {
-    const rpcCore = useRpcCore();
-    const wrap = new LidoSDKWrap({ core: rpcCore });
-    expect(wrap.core).toBeInstanceOf(LidoSDKCore);
-  });
-
-  test('can be constructed with rpc', () => {
-    const { rpcUrl, chainId } = useTestsEnvs();
-    const wrap = new LidoSDKWrap({
-      chainId,
-      rpcUrls: [rpcUrl],
-      logMode: 'none',
-    });
-    expect(wrap.core).toBeInstanceOf(LidoSDKCore);
+  test('is correct module', () => {
+    expectSDKModule(LidoSDKWrap);
   });
 });
 

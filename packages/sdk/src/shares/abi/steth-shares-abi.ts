@@ -76,4 +76,16 @@ export const stethSharesAbi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
+  {
+    constant: false,
+    inputs: [
+      { name: '_recipient', type: 'address' },
+      { name: '_sharesAmount', type: 'uint256' },
+    ],
+    name: 'transferShares',
+    outputs: [{ name: '', type: 'uint256' }],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
 ] as const;
