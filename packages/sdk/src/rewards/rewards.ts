@@ -467,14 +467,14 @@ export class LidoSDKRewards extends LidoSDKModule {
       invariant(false, 'impossible event');
     });
 
-    if (includeZeroRebases) {
+    if (includeOnlyRebases) {
+      rewards = rewards.filter((r) => r.type === 'rebase');
+    }
+
+    if (!includeZeroRebases) {
       rewards = rewards.filter(
         (r) => !(r.type === 'rebase' && r.change === 0n),
       );
-    }
-
-    if (!includeOnlyRebases) {
-      rewards = rewards.filter((r) => r.type === 'rebase');
     }
 
     return {
