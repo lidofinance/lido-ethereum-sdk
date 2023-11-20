@@ -413,7 +413,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     const { number } = await this.rpcProvider.getBlock({
       blockTag: block,
     });
-    invariantArgument(number, 'block must not be pending');
+    invariantArgument(number !== null, 'block must not be pending');
     return number;
   }
 

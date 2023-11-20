@@ -51,6 +51,7 @@ export const RewardsDemo = () => {
         title="Get Rewards From Chain"
         renderResult={renderRewards}
         action={() => {
+          console.log(rewardsProps);
           return rewards.getRewardsFromChain({
             ...rewardsProps,
             stepBlock: step,
@@ -74,10 +75,10 @@ export const RewardsDemo = () => {
           <Option value={'back'}>Back Argument</Option>
         </Select>
         {fromArgType === 'back' && (
-          <BackArgumentInput value={back} onChange={setBack} />
+          <BackArgumentInput label="Back" value={back} onChange={setBack} />
         )}
         {fromArgType === 'from' && (
-          <BlockArgumentInput value={from} onChange={setFrom} />
+          <BlockArgumentInput label="From" value={from} onChange={setFrom} />
         )}
 
         <Input

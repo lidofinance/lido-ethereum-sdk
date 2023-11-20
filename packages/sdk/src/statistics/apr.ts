@@ -71,7 +71,7 @@ export class LidoSDKApr extends LidoSDKModule {
     });
     invariant(
       firstEvent,
-      'Could not find first Rebase event',
+      'Could not locate first Rebase event. Likely days range greatly preceded first firing of the event.',
       ERROR_CODE.READ_ERROR,
     );
 
