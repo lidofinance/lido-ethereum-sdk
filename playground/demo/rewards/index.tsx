@@ -26,7 +26,7 @@ export const RewardsDemo = () => {
   const [rewardsAddress, setRewardsAddress] = useAddressState(undefined, {
     useAccount: true,
   });
-  const [fromArgType, setFromArgType] = useState('from');
+  const [fromArgType, setFromArgType] = useState('back');
   const [to, setTo] = useBlockArgumentState();
   const [from, setFrom] = useBlockArgumentState(DEFAULT_FROM);
   const [back, setBack] = useBackArgumentState();
@@ -51,7 +51,6 @@ export const RewardsDemo = () => {
         title="Get Rewards From Chain"
         renderResult={renderRewards}
         action={() => {
-          console.log(rewardsProps);
           return rewards.getRewardsFromChain({
             ...rewardsProps,
             stepBlock: step,

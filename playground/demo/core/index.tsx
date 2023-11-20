@@ -33,6 +33,7 @@ export const CoreDemo = () => {
   return (
     <Accordion summary="Core">
       <Action
+        walletAction
         title="Get Web3 Address"
         action={async () => await core.getWeb3Address()}
       />
@@ -52,6 +53,7 @@ export const CoreDemo = () => {
         />
       </Action>
       <Action
+        walletAction
         title="Balance ETH"
         action={async () => await core.balanceETH(account)}
         renderResult={renderTokenResult('ETH')}

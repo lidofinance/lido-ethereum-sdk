@@ -59,7 +59,7 @@ import { LidoSDKCacheable } from '../common/class-primitives/cacheable.js';
 
 export default class LidoSDKCore extends LidoSDKCacheable {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
-  private static readonly MS_PER_DAY = 86400000n;
+  private static readonly SECONDS_PER_DAY = 60n * 60n * 24n;
 
   #web3Provider: WalletClient | undefined;
 
@@ -426,17 +426,18 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       const end = start - arg.blocks;
       invariantArgument(end >= 0n, 'Too many blocks back');
       return end;
-    } else if (arg.days) {
-      const date =
-        (BigInt(Date.now()) - arg.days * LidoSDKCore.MS_PER_DAY) / 1000n;
-      const block = await this.getLatestBlockToTimestamp(date);
-      return block.number;
-    } else if (arg.seconds) {
-      const date = BigInt(Date.now() / 1000) - arg.seconds;
-      const block = await this.getLatestBlockToTimestamp(date);
+    } else {
+      const { timestamp: startTimestamp } = await this.rpcProvider.getBlock({
+        blockNumber: start,
+      });
+      const diff = arg.days
+        ? arg.days * LidoSDKCore.SECONDS_PER_DAY
+        : arg.seconds;
+      invariantArgument(diff, 'must have at least something in back argument');
+      const endTimestamp = startTimestamp - diff;
+      const block = await this.getLatestBlockToTimestamp(endTimestamp);
       return block.number;
     }
-    invariantArgument(false, 'must have at least something in back argument');
   }
 
   // TODO separate test suit with multisig
