@@ -1120,12 +1120,7 @@ This module exposes methods of Lido(stETH) contract that allow interaction with 
 ### Example
 
 ```ts
-import {
-  LidoSDK,
-  ApproveCallbackStages,
-  ApproveStageCallback,
-  SDKError,
-} from '@lidofinance/lido-ethereum-sdk';
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
   rpcUrls: ['https://rpc-url'],

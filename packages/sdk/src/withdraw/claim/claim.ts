@@ -10,6 +10,8 @@ import { NOOP } from '../../common/constants.js';
 
 import { BusModule } from '../bus-module.js';
 import type { ClaimRequestsProps } from './types.js';
+import { invariantArgument } from '../../index.js';
+import { bigintComparator } from '../../common/utils/bigint-comparator.js';
 
 export class LidoSDKWithdrawClaim extends BusModule {
   // Calls
@@ -18,10 +20,11 @@ export class LidoSDKWithdrawClaim extends BusModule {
   public async claimRequests(
     props: ClaimRequestsProps,
   ): Promise<TransactionResult> {
-    const { account, callback = NOOP, requestsIds, hints: _hints } = props;
-    const hints =
-      _hints ??
-      (await this.bus.views.findCheckpointHints({ sortedIds: requestsIds }));
+    const { account, callback = NOOP } = props;
+    const { requestsIds, hints } = await this.sortRequestsWithHints(
+      props.requestsIds,
+      props.hints,
+    );
     const params = [requestsIds, hints] as const;
     const contract = await this.bus.contract.getContractWithdrawalQueue();
     return this.bus.core.performTransaction({
@@ -39,17 +42,16 @@ export class LidoSDKWithdrawClaim extends BusModule {
   public async claimRequestsSimulateTx(
     props: NoCallback<ClaimRequestsProps>,
   ): Promise<SimulateContractReturnType> {
-    const { requestsIds } = props;
-    const hints =
-      props.hints ??
-      (await this.bus.views.findCheckpointHints({
-        sortedIds: props.requestsIds,
-      }));
+    const accountAddress = await this.bus.core.getWeb3Address(props.account);
+    const { requestsIds, hints } = await this.sortRequestsWithHints(
+      props.requestsIds,
+      props.hints,
+    );
 
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     return contract.simulate.claimWithdrawals([requestsIds, hints], {
-      account: props.account,
+      account: accountAddress,
     });
   }
 
@@ -58,13 +60,11 @@ export class LidoSDKWithdrawClaim extends BusModule {
   public async claimRequestsPopulateTx(
     props: NoCallback<ClaimRequestsProps>,
   ): Promise<PopulatedTransaction> {
-    const { requestsIds } = props;
     const accountAddress = await this.bus.core.getWeb3Address(props.account);
-    const hints =
-      props.hints ??
-      (await this.bus.views.findCheckpointHints({
-        sortedIds: props.requestsIds,
-      }));
+    const { requestsIds, hints } = await this.sortRequestsWithHints(
+      props.requestsIds,
+      props.hints,
+    );
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     return {
@@ -75,6 +75,39 @@ export class LidoSDKWithdrawClaim extends BusModule {
         functionName: 'claimWithdrawals',
         args: [requestsIds, hints],
       }),
+    };
+  }
+
+  @Logger('Utils:')
+  private async sortRequestsWithHints(
+    requestsIds: readonly bigint[],
+    hints?: readonly bigint[],
+  ) {
+    invariantArgument(requestsIds.length > 0, 'requests array is empty');
+    if (hints) {
+      return requestsIds
+        .map((request, index) => {
+          const hint = hints[index];
+          invariantArgument(hint, 'Hints array does not match request array');
+          return [request, hint] as const;
+        })
+        .sort(([r1], [r2]) => bigintComparator(r1, r2))
+        .reduce(
+          (acc, [request, hint]) => {
+            acc.requestsIds.push(request);
+            acc.hints.push(hint);
+            return acc;
+          },
+          { requestsIds: [] as bigint[], hints: [] as bigint[] },
+        );
+    }
+    const sortedRequestsIds = [...requestsIds].sort(bigintComparator);
+    const fetchedHints = await this.bus.views.findCheckpointHints({
+      sortedIds: sortedRequestsIds,
+    });
+    return {
+      requestsIds: sortedRequestsIds,
+      hints: fetchedHints,
     };
   }
 }
