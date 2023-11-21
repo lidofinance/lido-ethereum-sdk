@@ -20,6 +20,7 @@ import {
   expectPopulatedTxToRun,
 } from '../../../tests/utils/expect/expect-populated-tx.js';
 import { expectTxCallback } from '../../../tests/utils/expect/expect-tx-callback.js';
+import { zeroAddress } from 'viem';
 
 describe('unsteth wallet tests', () => {
   const unsteth = useUnsteth();
@@ -146,6 +147,153 @@ describe('unsteth wallet tests', () => {
       to: altAccount.address,
     });
     expectAddress(tx.request.address, wqAddress);
-    expect(tx.request.functionName).toBe('safeTransferFrom');
+    expect(tx.request.functionName).toBe('approve');
+  });
+
+  testSpending('token is not approved to anyone', async () => {
+    const approved = await unsteth.getSingleTokenApproval({
+      id: nftId,
+      account: account.address,
+    });
+    expectAddress(approved, zeroAddress);
+  });
+
+  testSpending('can approve single token', async () => {
+    const mock = jest.fn();
+    const tx = await unsteth.setSingleTokenApproval({
+      id: nftId,
+      to: altAccount.address,
+    });
+    expectTxCallback(mock, tx);
+
+    await expect(
+      unsteth.transferSimulateTx({
+        id: nftId,
+        to: altAccount.address,
+        from: account.address,
+        account: altAccount,
+      }),
+    ).resolves.toBeDefined();
+  });
+
+  testSpending('can get approved for single token', async () => {
+    const approved = await unsteth.getSingleTokenApproval({
+      id: nftId,
+      account: account.address,
+    });
+    expectAddress(approved, altAccount.address);
+  });
+
+  testSpending('can revoke approve single token', async () => {
+    const mock = jest.fn();
+    const tx = await unsteth.setSingleTokenApproval({
+      id: nftId,
+    });
+    expectTxCallback(mock, tx);
+
+    const approved = await unsteth.getSingleTokenApproval({
+      id: nftId,
+      account: account.address,
+    });
+    expectAddress(approved, zeroAddress);
+
+    await expect(
+      unsteth.transferSimulateTx({
+        id: nftId,
+        to: altAccount.address,
+        from: account.address,
+        account: altAccount,
+      }),
+    ).rejects.toBeDefined();
+  });
+
+  testSpending('all tokens are not approved to alt address', async () => {
+    await expect(
+      unsteth.areAllTokensApproved({
+        to: altAccount.address,
+        account: account.address,
+      }),
+    ).resolves.toBe(false);
+  });
+
+  testSpending('can populate approve for all tokens', async () => {
+    const wqAddress = await core.getContractAddress(
+      LIDO_CONTRACT_NAMES.withdrawalQueue,
+    );
+    const tx = await unsteth.setAllTokensApprovalPopulateTx({
+      to: altAccount.address,
+      allow: true,
+    });
+    expectAddress(tx.to, wqAddress);
+    expectAddress(tx.from, account.address);
+    expectPopulatedTx(tx, undefined);
+    await expectPopulatedTxToRun(tx, core.rpcProvider);
+  });
+
+  testSpending('can simulate approve for all tokens', async () => {
+    const wqAddress = await core.getContractAddress(
+      LIDO_CONTRACT_NAMES.withdrawalQueue,
+    );
+    const tx = await unsteth.setAllTokensApprovalSimulateTx({
+      to: altAccount.address,
+      allow: true,
+    });
+    expectAddress(tx.request.address, wqAddress);
+    expect(tx.request.functionName).toBe('setApprovalForAll');
+  });
+
+  testSpending('can approve for all tokens', async () => {
+    const mock = jest.fn();
+    const tx = await unsteth.setAllTokensApproval({
+      to: altAccount.address,
+      allow: true,
+    });
+    expectTxCallback(mock, tx);
+
+    await expect(
+      unsteth.areAllTokensApproved({
+        to: altAccount.address,
+        account: account.address,
+      }),
+    ).resolves.toBe(true);
+
+    for (const nft of nftIds) {
+      await expect(
+        unsteth.transferSimulateTx({
+          id: nft,
+          to: altAccount.address,
+          from: account.address,
+          account: altAccount,
+        }),
+      ).resolves.toBeDefined();
+    }
+  });
+
+  testSpending('can revoke approve for all tokens', async () => {
+    const mock = jest.fn();
+    const tx = await unsteth.setAllTokensApproval({
+      to: altAccount.address,
+      allow: false,
+    });
+
+    expectTxCallback(mock, tx);
+
+    await expect(
+      unsteth.areAllTokensApproved({
+        to: altAccount.address,
+        account: account.address,
+      }),
+    ).resolves.toBe(false);
+
+    for (const nft of nftIds) {
+      await expect(
+        unsteth.transferSimulateTx({
+          id: nft,
+          to: altAccount.address,
+          from: account.address,
+          account: altAccount,
+        }),
+      ).rejects.toBeDefined();
+    }
   });
 });
