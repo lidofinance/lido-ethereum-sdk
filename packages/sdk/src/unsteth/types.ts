@@ -1,11 +1,6 @@
 import { type Hash, type Address, type ContractFunctionResult } from 'viem';
-import LidoSDKCore from '../core/core.js';
-import { TransactionCallback, type LidoSDKCoreProps } from '../core/types.js';
+import { TransactionCallback, CommonTransactionProps } from '../core/types.js';
 import { type unstethAbi } from './abi/unsteth-abi.js';
-
-export type LidoSDKUnstETHProps = {
-  core?: LidoSDKCore;
-} & LidoSDKCoreProps;
 
 export type UnstethNFTstatus = ContractFunctionResult<
   typeof unstethAbi,
@@ -14,45 +9,34 @@ export type UnstethNFTstatus = ContractFunctionResult<
 
 export type UnstethNFT = { id: bigint } & UnstethNFTstatus;
 
-export type TransactionProps = {
-  account: Address;
-  callback?: TransactionCallback;
-};
-
-export type ParsedProps<TProps extends TransactionProps> = Omit<
+export type ParsedProps<TProps extends CommonTransactionProps> = Omit<
   TProps,
   'callback'
-> &
-  Required<TransactionProps>;
+> & { callback: TransactionCallback };
 
-export type NoCallback<TProps extends TransactionProps> = Omit<
-  TProps,
-  'callback'
->;
-
-export type TransferProps = {
+export type UnstethTransferProps = {
   to: Address;
   id: bigint;
   from?: Address;
   data?: Hash;
-} & TransactionProps;
+} & CommonTransactionProps;
 
-export type ApproveProps = {
+export type UnstethApproveProps = {
   to?: Address;
   id: bigint;
-} & TransactionProps;
+} & CommonTransactionProps;
 
-export type ApproveAllProps = {
+export type UnstethApproveAllProps = {
   to: Address;
   allow: boolean;
-} & TransactionProps;
+} & CommonTransactionProps;
 
-export type ApprovedForProps = {
+export type UnstethApprovedForProps = {
   account: Address;
   id: bigint;
 };
 
-export type IsApprovedForAllProps = {
+export type UnstethIsApprovedForAllProps = {
   account: Address;
   to: Address;
 };

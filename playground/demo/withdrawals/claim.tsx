@@ -1,11 +1,10 @@
-import { Checkbox, External, Accordion } from '@lidofinance/lido-ui';
+import { Checkbox, Accordion } from '@lidofinance/lido-ui';
 import { useWeb3 } from '@reef-knot/web3-react';
 import { RequestStatusWithId } from '@lidofinance/lido-ethereum-sdk';
 import { Action } from 'components/action';
 import { RequestsWrapper } from 'components/requestsWrapper';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
-import { parseEther } from '@ethersproject/units';
 import { transactionToast } from 'utils/transaction-toast';
 
 export const WithdrawalsClaimDemo = () => {
@@ -15,9 +14,8 @@ export const WithdrawalsClaimDemo = () => {
     ethSum: bigint;
     hints: readonly bigint[];
     requests: readonly RequestStatusWithId[];
-    sortedIds: readonly bigint[];
   }>();
-  const [selectedIds, setSelectedIds] = useState<bigint[]>();
+  const [selectedIds, setSelectedIds] = useState<bigint[]>([]);
   const { withdraw } = useLidoSDK();
 
   const account = web3account as `0x{string}`;
@@ -25,32 +23,30 @@ export const WithdrawalsClaimDemo = () => {
   return (
     <Accordion summary="Withdrawals claim">
       <Action
+        walletAction
         title="Get claimable request info"
         action={async () => {
           const result =
             await withdraw.requestsInfo.getClaimableRequestsETHByAccount({
               account,
             });
-
           setRequestsInfo(result);
-
+          setSelectedIds([]);
           return result;
         }}
       />
       <Action
         title="Claim selected requests"
-        action={() =>
-          withdraw.claim.claimRequests({
+        walletAction
+        action={async () => {
+          const result = await withdraw.claim.claimRequests({
             account,
             requestsIds: selectedIds ?? [],
-            hints:
-              requestsInfo?.hints.filter(
-                (_, index) =>
-                  selectedIds?.includes(requestsInfo?.sortedIds[index]),
-              ) ?? [],
             callback: transactionToast,
-          })
-        }
+          });
+          setSelectedIds([]);
+          return result;
+        }}
       >
         <RequestsWrapper>
           {requestsInfo?.requests.map((item) => (
@@ -61,13 +57,33 @@ export const WithdrawalsClaimDemo = () => {
                 if (selectedIds?.includes(item.id)) {
                   setSelectedIds(selectedIds.filter((id) => id !== item.id));
                 } else {
-                  setSelectedIds([...(selectedIds ?? []), item.id]);
+                  setSelectedIds([...selectedIds, item.id]);
                 }
               }}
             />
           ))}
         </RequestsWrapper>
       </Action>
+      <Action
+        title="Claim selected requests Populate"
+        walletAction
+        action={() =>
+          withdraw.claim.claimRequestsPopulateTx({
+            account,
+            requestsIds: selectedIds ?? [],
+          })
+        }
+      />
+      <Action
+        title="Claim selected requests Simulate"
+        walletAction
+        action={() =>
+          withdraw.claim.claimRequestsSimulateTx({
+            account,
+            requestsIds: selectedIds ?? [],
+          })
+        }
+      ></Action>
     </Accordion>
   );
 };

@@ -15,23 +15,30 @@
 
 **Lido Ethereum SDK** is a package that provides convenient tools for interacting with Lido contracts on the Ethereum network through a software development kit (SDK). This SDK simplifies working with Lido contracts and accessing their functionality.
 
-## WIP
+## ⚒️ Work In Progress ⚒️
 
-The project is currently under development and may change in the future.
+The project is currently under active development and may experience breaking changes in the future.
+
+## Migration
+
+For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
 
 ## Table of contents
 
 - [Installation](#installation)
 - [Modules](#modules)
 - [Usage](#usage)
-- [Initialization](#initialization)
-- [Examples](#examples)
-
+  - [Import](#import)
+  - [Initialization](#initialization)
+  - [With web3Provider](#with-web3provider)
+  - [Separate modules](#separate-modules)
+- [Basic Examples](#basic-examples)
   - [Core](#core-example)
   - [Stake](#stake-example)
   - [Withdraw](#withdraw-example)
   - [Wrap](#wrap-example)
-
+- [Error Codes](#error-codes)
+- [Lido contract addresses](#lido-contract-addresses)
 - [Stake](#stake)
   - [Call](#call)
   - [Populate transaction](#populate-transaction)
@@ -43,28 +50,21 @@ The project is currently under development and may change in the future.
     - [Unwrap](#unwrap)
   - [Wrap utilities](#wrap-utilities)
 - [Withdraw](#withdraw)
-
   - [Call](#call-1)
-
     - [Send request withdrawal with Permit](#send-request-withdrawal-with-permit)
     - [Send request withdrawal with preallocated allowance](#send-request-withdrawal-with-preallocated-allowance)
     - [`Request` other methods](#request-other-methods)
     - [Claim requests](#claim-requests)
     - [`Claim` other methods](#claim-other-methods)
-
   - [Withdraw utilities](#withdraw-utilities)
-
     - [Set allowance of WithdrawalQueue contract](#set-allowance-of-withdrawalqueue-contract)
     - [`Allowance` other methods](#allowance-other-methods)
-
   - [Views](#views)
-
     - [Constants](#constants)
     - [Requests info](#requests-info)
-
 - [(w)stETH](#wsteth)
 - [unstETH NFT](#unsteth-nft)
-- [Lido contract addresses](#lido-contract-addresses)
+- [Shares](#shares)
 - [Lido statistics](#lido-statistics)
   - [APR](#apr)
 - [Lido events](#lido-events)
@@ -97,74 +97,125 @@ The Lido Ethereum SDK consists of several modules:
 - **Wrap** - provides access to the Lido wrap functionality
 - **(w)stETH** - provides access to the stETH and wstETH tokens functionality
 - **unstETH NFT** - provides access to the unstETH NFT functionality
+- **Shares** - provides access to the underlying share token
+- **Statistics** - provides access to the Lido stats, mainly APR
+- **Rewards** - provides access to historical data on stETH rewards
 
 ## Usage
 
-To get started with the Lido Ethereum SDK, you need to import the necessary modules:
+### Import
+
+To get started with the Lido Ethereum SDK, you need to import the necessary modules. You can use CJS or ES6+ imports. Import from root package or each module separately to improve on bundle size.
 
 ```ts
+// CSJ
 const { LidoSDK } = require('@lidofinance/lido-ethereum-sdk');
 // or
 const { LidoSDKStake } = require('@lidofinance/lido-ethereum-sdk/stake');
 // or
-const { LidoSDKWithdraw } = require('@lidofinance/lido-ethereum-sdk/withdraw');
-// or
-const { LidoSDKWrap } = require('@lidofinance/lido-ethereum-sdk/wrap');
-// or
-const { LidoSDKCore } = require('@lidofinance/lido-ethereum-sdk/core');
-// or
-const { LidoSDKstETH } = require('@lidofinance/lido-ethereum-sdk/erc20');
-// or
-const { LidoSDKwstETH } = require('@lidofinance/lido-ethereum-sdk/erc20');
-// or
-const { LidoSDKUnstETH } = require('@lidofinance/lido-ethereum-sdk/unsteth');
-
-// Or, if you are using ES6+:
-import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
-// or
-import { LidoSDKStake } from '@lidofinance/lido-ethereum-sdk/stake';
-// or
-import { LidoSDKWithdraw } from '@lidofinance/lido-ethereum-sdk/withdraw';
-// or
-import { LidoSDKWrap } from '@lidofinance/lido-ethereum-sdk/wrap';
-// or
-import { LidoSDKCore } from '@lidofinance/lido-ethereum-sdk/core';
-// or
-import { LidoSDKstETH } from '@lidofinance/lido-ethereum-sdk/erc20';
-// or
-import { LidoSDKwstETH } from '@lidofinance/lido-ethereum-sdk/erc20';
-// or
-import { LidoSDKUnstETH } from '@lidofinance/lido-ethereum-sdk/unsteth';
 ```
 
-## Initialization
+```ts
+// ES6+, all other modules are available from root
+import { LidoSDK, LidoSDKStake } from '@lidofinance/lido-ethereum-sdk';
+
+// Full list of separate imports
+import { LidoSDKCore } from '@lidofinance/lido-ethereum-sdk/core';
+import { LidoSDKStake } from '@lidofinance/lido-ethereum-sdk/stake';
+import { LidoSDKWithdraw } from '@lidofinance/lido-ethereum-sdk/withdraw';
+import { LidoSDKWrap } from '@lidofinance/lido-ethereum-sdk/wrap';
+import {
+  LidoSDKstETH,
+  LidoSDKwstETH,
+} from '@lidofinance/lido-ethereum-sdk/erc20';
+import { LidoSDKUnstETH } from '@lidofinance/lido-ethereum-sdk/unsteth';
+import { LidoSDKShares } from '@lidofinance/lido-ethereum-sdk/shares';
+import { LidoSDKStatistics } from '@lidofinance/lido-ethereum-sdk/statistics';
+import { LidoSDKRewards } from '@lidofinance/lido-ethereum-sdk/rewards';
+```
+
+### Initialization
 
 Before using the SDK, you need to create an instance of the LidoSDK class:
 
-```ts
-// With own rpc provider
-const sdk = new LidoSDK({
-  chainId: 5,
-  rpcProvider: ownRpcProvider,
-  web3Provider: provider, // optional
-  logMode: 'debug', // optional 'debug' | 'info'. Default: 'info'
-});
+Pass your own viem PublicClient:
 
-// With RPC urls (without own rpc provider)
+```ts
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+import { createPublicClient, http } from 'viem';
+import { goerli } from 'viem/chains';
+
+const rpcProvider = createPublicClient({
+  chain: goerli,
+  transport: http(),
+});
 const sdk = new LidoSDK({
   chainId: 5,
-  rpcUrls: [
-    'https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}',
-    'https://fallback-provider',
-  ],
+  rpcProvider,
   web3Provider: provider, // optional
-  logMode: 'debug', // optional 'debug' | 'info'. Default: 'info'
+});
+```
+
+Or just rpc urls so it can be created under the hood:
+
+```ts
+const sdk = new LidoSDK({
+  chainId: 5,
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  web3Provider: provider, // optional
 });
 ```
 
 Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address of your Ethereum provider.
 
-## Examples
+### With web3Provider
+
+In order to access transaction signing functionality you need to provide viem WalletClient instance. Accessing web3 methods without web3Provider will result in error.
+
+We support account hoisting as per Viem `WalletClient`, so passing account is not required for transactions and related functions.
+Some functions don't usually require web3provider to be present like `simulate...` or `populate..` but **not passing an account** to them will result in **request to web3provider** and an **error if it is missing**.
+
+```ts
+import { LidoSDK, LidoSDKCore } from '@lidofinance/lido-ethereum-sdk';
+import { createWalletClient, custom } from 'viem';
+import { goerli } from 'viem/chains';
+
+let web3Provider = createWalletClient({
+  chain: goerli,
+  transport: custom(window.ethereum),
+});
+
+// or use our helper to pass any eip-1193 provider
+let web3Provider = LidoSDKCore.createWeb3Provider(5, window.ethereum);
+
+const sdk = new LidoSDK({
+  chainId: 5,
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  web3Provider,
+});
+```
+
+### Separate modules
+
+Every SDK module needs `LidoSDKCore` to function. You can pass same arguments as to `LidoSDKCore` constructor to create it under the hood or pass existing instance. This allows you to build up your SDK only out of parts you need.
+
+```ts
+import { LidoSDKStake } from '@lidofinance/lido-ethereum-sdk/stake';
+import { LidoSDKWrap } from '@lidofinance/lido-ethereum-sdk/stake';
+import { LidoSDKCore } from '@lidofinance/lido-ethereum-sdk/core';
+
+const params = {
+  chainId: 5,
+  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+};
+// core is created under the hood
+const stake = new LidoSDKStake(params);
+
+const core = new LidoSDKCore(params);
+const wrap = new LidoSDKWrap({ core });
+```
+
+## Basic Examples
 
 ### Core example
 
@@ -186,6 +237,7 @@ console.log(balanceETH.toString(), 'ETH balance');
 const lidoSDK = new LidoSDK({
   chainId: 5,
   rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  web3provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
 
 // Contracts
@@ -197,7 +249,6 @@ const stakeResult = await lidoSDK.stake.stakeEth({
   value,
   callback,
   referralAddress,
-  account,
 });
 
 console.log(addressStETH, 'stETH contract address');
@@ -211,6 +262,7 @@ console.log(stakeResult, 'stake result');
 const lidoSDK = new LidoSDK({
   chainId: 5,
   rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  web3provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
 
 // Contracts
@@ -222,9 +274,8 @@ const contractWithdrawalQueue =
 // Calls
 const requestResult = await lidoSDK.withdraw.request.requestByToken({
   account,
-  requests: requestsArray,
+  amount: 10000000n, // `10000000` string is accepted as well
   token: 'stETH',
-  callback,
 });
 
 console.log(addressWithdrawalQueue, 'Withdrawal Queue contract address');
@@ -238,6 +289,7 @@ console.log(requestResult, 'request result');
 const lidoSDK = new LidoSDK({
   chainId: 5,
   rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  web3provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
 
 // Contracts
@@ -248,12 +300,37 @@ const contractWstETH = await lidoSDK.withdraw.getContractWstETH();
 const wrapResult = await lidoSDK.wrap.wrapEth({
   value,
   account,
-  callback,
 });
 
 console.log(addressWstETH, 'wstETH contract address');
 console.log(contractWstETH, 'wstETH contract');
 console.log(wrapResult, 'wrap result');
+```
+
+## Error Codes
+
+- **INVALID_ARGUMENT**: arguments passed to SDK method are not valid
+- **NOT_SUPPORTED**: behavior or feature though possible is not currently supported by SDK
+- **PROVIDER_ERROR**: error with RPC or Web3 Provider
+- **READ_ERROR**: error while accessing Blockchain or External Resource for read
+- **UNKNOWN_ERROR** error was not recognized by SDK and is not directly thrown by it's code
+
+## Lido contract addresses
+
+```ts
+import { LidoSDK, LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk';
+
+const lidoSDK = new LidoSDK({
+  rpcUrls: ['https://rpc-url'],
+  chainId: 5,
+});
+
+const stethAddress = await lidoSDK.core.getContractAddress(
+  LIDO_CONTRACT_NAMES.lido,
+);
+const wsteth = await lidoSDK.core.getContractAddress(
+  LIDO_CONTRACT_NAMES.wsteth,
+);
 ```
 
 ## Stake
@@ -278,6 +355,7 @@ Callback stages:
 ```ts
 import {
   LidoSDK,
+  LidoSDKCore,
   StakeStageCallback,
   TransactionCallbackStage,
   SDKError,
@@ -286,10 +364,8 @@ import {
 const lidoSDK = new LidoSDK({
   rpcUrls: ['https://rpc-url'],
   chainId: 5,
+  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
-
-// Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
-lidoSDK.core.defineWeb3Provider();
 
 const callback: StakeStageCallback = ({ stage, payload }) => {
   switch (stage) {
@@ -393,10 +469,8 @@ import {
 const lidoSDK = new LidoSDK({
   rpcUrls: ['https://rpc-url'],
   chainId: 5,
+  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
-
-// Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
-lidoSDK.core.defineWeb3Provider();
 
 const callback: TransactionCallback = ({ stage, payload }) => {
   switch (stage) {
@@ -454,6 +528,7 @@ import {
 const lidoSDK = new LidoSDK({
   rpcUrls: ['https://rpc-url'],
   chainId: 5,
+  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
 
 // get existing allowance
@@ -462,12 +537,11 @@ const allowance = await lidoSDK.wrap.getStethForWrapAllowance(account);
 // if value is more than allowance perform approve
 const approveResult = await lidoSDK.wrap.approveStethForWrap({
   value,
-  account,
   callback,
 });
 
 // wrap stETH
-const wrapResult = await lidoSDK.wrap.wrapSteth({ value, account, callback });
+const wrapResult = await lidoSDK.wrap.wrapSteth({ value, callback });
 ```
 
 #### Unwrap
@@ -476,7 +550,6 @@ const wrapResult = await lidoSDK.wrap.wrapSteth({ value, account, callback });
 // unwrap wstETH to receive stETH
 const unwrapResult = await lidoSDK.wrap.unwrap({
   value: unwrapAmount,
-  account,
   callback,
 });
 ```
@@ -496,14 +569,18 @@ For `wrapEth` only `wrapEthEstimateGas` is available instead of `simulateTx` but
 
 #### Send request withdrawal with Permit
 
-`Supports EOA and Multisig`
+`Signing Permit is only supported for EOA`
 
 Arguments:
 
 - `requests`: (Type: bigint[] ) - array of requests ids
-- `token`: (Type: string) - token name ('stETH' | 'wstETH')
-- `callback`: (Type: TransactionCallback) - callback function that will be on each stage of the transaction
-- `account` (Type: Address): The account address.
+  or
+- `amount`: (Type: String | BigInt ) - amount of token to withdraw, will be split into minimum amount of requests
+
+- `token`: (Type: 'stETH' | 'wstETH') - token name
+- `permit`: (Type: SignedPermit **optional**) - presigned permit, will be requested if not present
+- `callback`: (Type: TransactionCallback **optional**) - callback function that will be on each stage of the transaction
+- `account` (Type: Address | Account **optional**): The account address.
 
 ```ts
 import {
@@ -516,10 +593,8 @@ import {
 const lidoSDK = new LidoSDK({
   rpcUrls: ['https://rpc-url'],
   chainId: 5,
+  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
-
-// Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
-lidoSDK.core.defineWeb3Provider();
 
 const callback: TransactionCallback = ({ stage, payload }) => {
   switch (stage) {
@@ -557,7 +632,7 @@ const callback: TransactionCallback = ({ stage, payload }) => {
 };
 
 try {
-  const requestResult = await lidoSDK.withdrawals.request.requestByToken({
+  const requestResult = await lidoSDK.withdrawals.request.requestWithPermit({
     requests,
     token, // 'stETH' | 'wstETH'
     callback,
@@ -580,9 +655,12 @@ try {
 Arguments:
 
 - `requests`: (Type: bigint[] ) - array of requests ids
+  or
+- `amount`: (Type: String | BigInt ) - amount of token to withdraw, will be split into minimum amount of requests
+
 - `token`: (Type: string) - token name ('stETH' | 'wstETH')
-- `callback`: (Type: TransactionCallback) - callback function that will be on each stage of the transaction
-- `account` (Type: Address): The account address.
+- `callback`: (Type: TransactionCallback **optional**) - callback function that will be on each stage of the transaction
+- `account` (Type: Address | Account **optional**): The account address.
 
 ```ts
 import {
@@ -595,10 +673,8 @@ import {
 const lidoSDK = new LidoSDK({
   rpcUrls: ['https://rpc-url'],
   chainId: 5,
+  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
-
-// Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
-lidoSDK.core.defineWeb3Provider();
 
 const callback: TransactionCallback = ({ stage, payload }) => {
   switch (stage) {
@@ -630,10 +706,9 @@ const callback: TransactionCallback = ({ stage, payload }) => {
 
 try {
   const requestResult = await lidoSDK.withdrawals.request.requestWithoutPermit({
-    requests,
+    amount,
     token, // 'stETH' | 'wstETH'
     callback,
-    account,
   });
 
   console.log(
@@ -645,31 +720,19 @@ try {
 }
 ```
 
-#### `Request` other methods
+#### `Request` helpers
 
-##### EOA
-
-- requestStethWithPermit
-- requestWstethWithPermit
-- requestStethWithoutPermit
-- requestWstethWithoutPermit
-- requestWithoutPermitByToken
-- requestWithPermitByToken
-
-##### Multisig
-
-- requestStethMultisig
-- requestWstethMultisig
-- requestMultisigByToken
+- `populate` and `simulate` helpers are available
+- `splitAmountToRequests({amount, token})` splits token amount into minimal possible array of withdrawal requests
 
 #### Claim requests
 
 Arguments:
 
-- `account`: (Type: Address ): The account address.
 - `requestsIds`: (Type: bigint[]): An array of request ids.
-- `hints` (Type: bigint[]): An array of hints for each request.
-- `callback`: (Type: TransactionCallback): callback function that will be on each stage of the transaction
+- `hints` (Type: bigint[] **optional**): An array of hints per each request, will be calculated if not provided.
+- `account`: (Type: Address **optional**): The account address.
+- `callback`: (Type: TransactionCallback **optional**): callback function that will be on each stage of the transaction
 
 ```ts
 import {
@@ -682,10 +745,8 @@ import {
 const lidoSDK = new LidoSDK({
   rpcUrls: ['https://rpc-url'],
   chainId: 5,
+  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
-
-// Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
-lidoSDK.core.defineWeb3Provider();
 
 const callback: TransactionCallback = ({ stage, payload }) => {
   switch (stage) {
@@ -717,9 +778,7 @@ const callback: TransactionCallback = ({ stage, payload }) => {
 
 try {
   const claimResult = await lidoSDK.withdrawals.claim.claimRequests({
-    account,
     requestsIds,
-    hints,
     callback,
   });
 
@@ -732,15 +791,9 @@ try {
 }
 ```
 
-#### `Claim` other methods
+#### `Claim` helpers
 
-##### EOA
-
-- claimRequestsEOA
-
-##### Multisig
-
-- claimRequestsMultisig
+`populate` and `simulate` helpers are available
 
 ### Withdraw utilities
 
@@ -759,10 +812,8 @@ import {
 const lidoSDK = new LidoSDK({
   rpcUrls: ['https://rpc-url'],
   chainId: 5,
+  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
-
-// Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
-lidoSDK.core.defineWeb3Provider();
 
 const callback: ApproveStageCallback = ({ stage, payload }) => {
   switch (stage) {
@@ -811,25 +862,11 @@ try {
 
 #### `Allowance` other methods
 
-##### EOA
-
-- approveEOA
-- approveSteth
-- approveWsteth
-- approveByToken
-
-##### Multisig
-
-- approveStethMultisig
-- approveWstethMultisig
-- approveMultisigByToken
-
 ##### Views
 
-- getAllowanceByToken
-- checkAllowanceByToken
-- checkAllowanceSteth
-- checkAllowanceWsteth
+- `populate` and `simulate` helpers are available
+- `getAllowance` returns current allowance for token
+- `checkAllowance` return current allowance and compares with amount to check if you need to approve
 
 ### Views
 
@@ -844,6 +881,8 @@ try {
 
 - minStethWithdrawalAmount
 - maxStethWithdrawalAmount
+- minWStethWithdrawalAmount
+- maxWStethWithdrawalAmount
 - isPaused
 - isBunkerModeActive
 - isTurboModeActive
@@ -854,8 +893,8 @@ try {
 
 ###### Input Parameters:
 
-- `props: { account: Address }`
-  - `account` (Type: Address): The account address.
+- `props: { account:  Address | Account }`
+  - `account` (Type: Address | Account): The account address.
 
 ##### Output Parameters:
 
@@ -875,7 +914,7 @@ try {
 ###### Input Parameters:
 
 - `props: { account: Address }`
-  - `account` (Type: Address): The account address.
+  - `account` (Type: Address | Account): The account address.
 
 ##### Output Parameters:
 
@@ -896,7 +935,7 @@ try {
 ###### Input Parameters:
 
 - `props: { account: Address }`
-  - `account` (Type: Address): The account address.
+  - `account` (Type: Address | Account): The account address.
 
 ###### Output Parameters:
 
@@ -927,7 +966,7 @@ try {
 ###### Input Parameters:
 
 - `props: { account: Address }`
-  - `account` (Type: Address): The account address.
+  - `account` (Type: Address | Account): The account address.
 
 ###### Output Parameters:
 
@@ -944,8 +983,8 @@ try {
 
 ##### Input Parameters:
 
-- `props: { account: Address }`
-  - `account` (Type: Address): The account address.
+- `props: { account:  Address | Account }`
+  - `account` (Type: Address | Account): The account address.
 
 ##### Output Parameters:
 
@@ -963,6 +1002,7 @@ stETH and wstETH tokens functionality is presented trough modules with same ERC2
 const lidoSDK = new LidoSDK({
   chainId: 5,
   rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
 
 // Views
@@ -980,8 +1020,6 @@ const addressWStETH = await lidoSDK.wsteth.contractAddress();
 const transfer = await lidoSDK.steth.transfer({
   amount,
   to,
-  account,
-  callback,
 });
 ```
 
@@ -1049,8 +1087,6 @@ If you want to use this with other token extend from this abstract class and imp
 
 ## unstETH NFT
 
-⚒️ Work In Progress ⚒️
-
 This modules exposes NFT functionality of Lido Withdrawal Request NFT.
 
 ```ts
@@ -1077,22 +1113,36 @@ const transfer = await lidoSDK.unsteth.transfer({
 });
 ```
 
-## Lido contract addresses
+## Shares
+
+This module exposes methods of Lido(stETH) contract that allow interaction with underlying shares mechanism with interface similar to ERC20. You can query balance, transfer and convert values between shares and stETH. It's best used for tracking balances and performing operations in values unchanged by rebases.
+
+### Example
 
 ```ts
-import { LidoSDK, LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk';
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
   rpcUrls: ['https://rpc-url'],
   chainId: 5,
+  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
 
-const stethAddress = await lidoSDK.core.getContractAddress(
-  LIDO_CONTRACT_NAMES.lido,
-);
-const wsteth = await lidoSDK.core.getContractAddress(
-  LIDO_CONTRACT_NAMES.wsteth,
-);
+const balanceShares = await lidoSDK.shares.balance(address);
+
+// transferring shares is equivalent to transferring corresponding amount of stETH
+const transferTx = await lidoSDK.shares.transfer({ account, amount, to });
+
+// converting stETH amount to shares trough on-chain call based on actual share rate
+const shares = await lidoSDK.convertToShares(1000n);
+// reverse
+const steth = await lidoSDK.convertToSteth(1000n);
+
+// total supply of shares and ether in protocol
+const { totalEther, totalShares } = await lidoSDK.getTotalSupply();
+
+// get current share rate from protocol
+const shareRate = await lidoSDK.getShareRate();
 ```
 
 ## Lido statistics
@@ -1163,19 +1213,41 @@ console.log(smaApr, 'sma apr by 7 days');
 
 ###### Input Parameters:
 
-- `props: { count }`
-  - `count` (Type: number): The number of events to return.
+**Warning: specifying timestamp/seconds/days will result in binary search for fitting block number which will negatively affect rpc request count and execution time**
+
+Sub types:
+
+- `blockType` object that contains one of possible fields:
+
+  - `block` block number(Type: BigInt) or Block Tag(excluding `pending`)
+  - `timestamp` timestamp in seconds(type:BigInt) since epoch time
+
+- `backType` object that contains one of possible fields:
+  - `seconds` (Type: BigInt): seconds back
+  - `days` (Type: BigInt): days back
+  - `blocks` (Type: BigInt): block back
+
+Props:
+
+- `to` (Type: blockType **optional**) defaults to `{block:"latests"}` upper bound for events parsing
+- `maxCount` (Type: number **optional**) maximum count of events to return, if omitted will return all events in range
+- `stepBlock`: (Type: number **optional**) defaults to 50000, maximum block range per 1 request
+
+- `from` (Type: blockType) lower bound for events parsing
+  or
+- `back` (Type: backType) alternative way to define lower bound relative to `to`
 
 ###### Output Parameters:
 
 - Type: Array of RebaseEvent objects
 
-##### `getRebaseEventsByDays`
+##### `getLastRebaseEvents`
 
 ###### Input Parameters:
 
-- `props: { days }`
-  - `days` (Type: number): The number of days back to return rebase events.
+- `props: { count, stepBlock? }`
+  - `count` (Type: number): how many last rebase events to return
+  - `stepBlock`: (Type: number **optional**) defaults to 50000, maximum block range per 1 request
 
 ###### Output Parameters:
 
@@ -1196,7 +1268,7 @@ const firstRebaseEvent = await lidoSDK.events.stethEvents.getFirstRebaseEvent({
   days: 3,
 });
 const lastRebaseEventsByCount =
-  await lidoSDK.events.stethEvents.getRebaseEvents({ count: 7 });
+  await lidoSDK.events.stethEvents.getLastRebaseEvents({ count: 7 });
 const lastRebaseEventsByDays =
   await lidoSDK.events.stethEvents.getRebaseEventsByDays({ days: 7 });
 
@@ -1212,12 +1284,15 @@ This module allows you to query historical rewards data for given address via ch
 
 ### Common Options
 
-- **address** - address of an account you want to query rewards for
-- **toBlock** [default: `latest` ] - block number or tag for upper bound for rewards. `pending` not allowed
-- **fromBlock** - block number or tag for lower bound for rewards. `pending` not allowed
-- **blocksBack** - alternative to **fromBlock**. Amount of blocks to look back from **toBlock**.
-- **step** [default: `1000` ] - step per one request for large queries. For chain method max amount of blocks per one request. For subgraph method max amount of entities returned per one requests.
+- **address** - (Type: Address) address of an account you want to query rewards for
+- **to** (Type: [`blockType`](#`getRebaseEvents`)) defaults to `{block: "latest"}`, upper bound for query
+
+- **from** (Type: [`blockType`](#`getRebaseEvents`)) lower bound for query
+  or
+- **back** (Type: [`backType`](#`getRebaseEvents`)) alternative way to define lower bound relative to `to`
+
 - **includeZeroRebases** [default: `false` ] - include rebase events when users had no rewards(because of empty balance)
+- **includeOnlyRewards** [default: `false` ] - include only rebase events
 
 ### Common Return
 
@@ -1227,6 +1302,8 @@ type RewardsResult = {
   baseBalance: bigint;
   baseBalanceShares: bigint;
   baseShareRate: number;
+  // commutative rewards in stETH
+  totalRewards: bigint;
   // computed block numbers
   fromBlock: bigint;
   toBlock: bigint;
@@ -1238,6 +1315,7 @@ type RewardsResult = {
     balance: bigint; // post event balance in stETH
     balanceShares: bigint; // same in shares
     shareRate: number; // apx share rate at a time of event
+    apr?: number; // apr for rebase events
     originalEvent: RewardsChainEvents | RewardsSubgraphEvents ; // original event from chain/subgraph, contains extra info
   }[]
 };
@@ -1255,7 +1333,10 @@ const lidoSDK = new LidoSDK({
 
 const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
   address: rewardsAddress,
-  blocksBack: 1000,
+  stepBlock: 10000, // defaults to 50000, max block range per 1 query
+  back: {
+    days: 10n,
+  },
 });
 
 console.log(rewardsQuery.rewards);
@@ -1267,7 +1348,7 @@ This method requires you to provide API URL to send subgraph requests to. It's b
 
 #### Important notes
 
-**toBlock** is capped by last indexed block in subgraph. Block number is available in result object by `lastIndexedBlock`.
+**to** is capped by last indexed block in subgraph. Block number is available in result object by `lastIndexedBlock`.
 
 ```ts
 const lidoSDK = new LidoSDK({
@@ -1278,7 +1359,7 @@ const lidoSDK = new LidoSDK({
 const rewardsQuery = await lidoSDK.rewards.getRewardsFromSubgraph({
   address: rewardsAddress,
   blocksBack: 10000,
-  step: 500, // defaults to 1000,  max entities per one request to endpoint
+  stepEntities: 500, // defaults to 1000,  max entities per one request to endpoint
   getSubgraphUrl(graphId, chainId) {
     return `https://gateway.thegraph.com/api/${apiKey}/subgraphs/id/${id}`;
   },

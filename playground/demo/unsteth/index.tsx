@@ -1,6 +1,7 @@
 import { Input, Accordion } from '@lidofinance/lido-ui';
 import { useWeb3 } from '@reef-knot/web3-react';
 import { Action } from 'components/action';
+import { ToggleButton } from 'components/toggle-button';
 
 import { useAddressState } from 'hooks/useAddressState';
 import { useLidoSDK } from 'providers/sdk';
@@ -14,7 +15,7 @@ export const UnstethDemo = () => {
   const account = web3account as Address;
 
   // nfts
-  const [owner, setOwner] = useAddressState();
+  const [owner, setOwner] = useAddressState(undefined, { useAccount: true });
 
   const [nftId, setNftId] = useState<number>(0);
   // transfer
@@ -27,6 +28,7 @@ export const UnstethDemo = () => {
   const [toApprove, setToApprove] = useAddressState('' as Address);
   // Approve for all
   const [toAllApprove, setToAllApprove] = useAddressState();
+  const [allow, setAllow] = useState(true);
 
   return (
     <Accordion summary={'unstETH'}>
@@ -61,6 +63,7 @@ export const UnstethDemo = () => {
         action={() => unsteth.getTokenMetadataURI(BigInt(nftId))}
       />
       <Action
+        walletAction
         title="Transfer"
         action={() =>
           unsteth.transfer({
@@ -94,9 +97,41 @@ export const UnstethDemo = () => {
         />
       </Action>
       <Action
-        title="Approve Token To"
+        walletAction
+        title="Transfer Populate"
         action={() =>
-          unsteth.setApprovalFor({
+          unsteth.transferPopulateTx({
+            account,
+            id: BigInt(transferId),
+            to: toTransfer,
+            from: fromTransfer ? fromTransfer : undefined,
+          })
+        }
+      />
+      <Action
+        walletAction
+        title="Transfer Simulate"
+        action={() =>
+          unsteth.transferSimulateTx({
+            account,
+            id: BigInt(transferId),
+            to: toTransfer,
+            from: fromTransfer ? fromTransfer : undefined,
+          })
+        }
+      />
+      <Action
+        walletAction
+        title="Get Single Token Id Approved To Address"
+        action={() =>
+          unsteth.getSingleTokenApproval({ account, id: BigInt(approveNftId) })
+        }
+      />
+      <Action
+        walletAction
+        title="Approve Single Token To"
+        action={() =>
+          unsteth.setSingleTokenApproval({
             id: BigInt(approveNftId),
             to: toApprove ? toApprove : undefined,
             account,
@@ -120,22 +155,47 @@ export const UnstethDemo = () => {
         />
       </Action>
       <Action
-        title="Get Token Approved To Address"
+        walletAction
+        title="Approve Single Token To (Populate)"
         action={() =>
-          unsteth.getTokenApprovedFor({ account, id: BigInt(approveNftId) })
+          unsteth.setSingleTokenApprovalPopulateTx({
+            id: BigInt(approveNftId),
+            to: toApprove ? toApprove : undefined,
+            account,
+          })
         }
       />
       <Action
-        title="Approve for all tokens"
+        walletAction
+        title="Approve Single Token To (Simulate)"
         action={() =>
-          unsteth.setApprovalForAll({
+          unsteth.setSingleTokenApprovalSimulateTx({
+            id: BigInt(approveNftId),
+            to: toApprove ? toApprove : undefined,
+            account,
+          })
+        }
+      />
+      <Action
+        walletAction
+        title="Are All tokens approved to"
+        action={() =>
+          unsteth.areAllTokensApproved({ account, to: toAllApprove })
+        }
+      />
+      <Action
+        title="Set Approval For all tokens"
+        walletAction
+        action={() =>
+          unsteth.setAllTokensApproval({
             account,
             to: toAllApprove,
-            allow: true,
+            allow,
             callback: transactionToast,
           })
         }
       >
+        <ToggleButton title="allow tokens" value={allow} onChange={setAllow} />
         <Input
           label="To address"
           placeholder="0x0000000"
@@ -144,20 +204,25 @@ export const UnstethDemo = () => {
         />
       </Action>
       <Action
-        title="Revoke for all tokens"
+        title="Set Approval For all tokens (Populate)"
+        walletAction
         action={() =>
-          unsteth.setApprovalForAll({
+          unsteth.setAllTokensApprovalPopulateTx({
             account,
             to: toAllApprove,
-            allow: false,
-            callback: transactionToast,
+            allow,
           })
         }
       />
       <Action
-        title="Check is approved for all"
+        title="Set Approval For all tokens (Simulate)"
+        walletAction
         action={() =>
-          unsteth.getIsApprovedForAll({ account, to: toAllApprove })
+          unsteth.setAllTokensApprovalSimulateTx({
+            account,
+            to: toAllApprove,
+            allow,
+          })
         }
       />
       <Action

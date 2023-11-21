@@ -1,10 +1,7 @@
-import { type Address } from 'viem';
+import type { Address } from 'viem';
+import type { Bus } from './bus.js';
 
-import { type LidoSDKCoreProps, type LidoSDKCore } from '../core/index.js';
-
-export type LidoSDKWithdrawProps = LidoSDKCoreProps & {
-  core?: LidoSDKCore;
-};
+export type LidoSDKWithdrawModuleProps = { bus: Bus; version?: string };
 
 export type RequestStatus = {
   amountOfStETH: bigint;

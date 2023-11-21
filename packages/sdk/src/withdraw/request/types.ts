@@ -1,7 +1,6 @@
-import { type Address, type Hash, type TransactionReceipt } from 'viem';
+import type { Hash, Address } from 'viem';
 
-import { EtherValue, TransactionCallback } from '../../core/index.js';
-import { type SDKError } from '../../common/utils/index.js';
+import type { CommonTransactionProps, EtherValue } from '../../core/index.js';
 import { LIDO_TOKENS } from '../../common/constants.js';
 
 export type WithdrawableTokens =
@@ -15,52 +14,60 @@ export type PermitWstETHStETHProps = {
   deadline: bigint;
 };
 
+export type SplitAmountToRequestsProps = {
+  amount: EtherValue;
+  token: WithdrawableTokens;
+};
+
 export type PermitProps = PermitWstETHStETHProps & {
   token: WithdrawableTokens;
 };
 
-export type RequestWithPermitProps = {
-  account: Address;
-  requests: readonly bigint[];
+export type RequestProps = CommonTransactionProps & {
+  receiver?: Address;
   token: WithdrawableTokens;
-  callback?: TransactionCallback;
+} & (
+    | {
+        amount: EtherValue;
+        requests?: undefined;
+      }
+    | {
+        requests: readonly bigint[];
+        amount?: undefined;
+      }
+  );
+
+export type SignedPermit = {
+  value: bigint;
+  deadline: bigint;
+  v: number;
+  r: Hash;
+  s: Hash;
 };
 
-export type RequestProps = {
-  account: Address;
-  requests: readonly bigint[];
-  token: WithdrawableTokens;
-  callback?: TransactionCallback;
+export type RequestWithPermitProps = RequestProps & {
+  permit?: SignedPermit;
 };
 
-export enum ApproveCallbackStages {
-  'GAS_LIMIT' = 'gas_limit',
-  'SIGN' = 'sign',
-  'RECEIPT' = 'receipt',
-  'CONFIRMATION' = 'confirmation',
-  'DONE' = 'done',
-  'MULTISIG_DONE' = 'multisig_done',
-  'ERROR' = 'error',
-}
+export type RequirePermit<TProps> = Omit<TProps, 'permit'> & {
+  permit: SignedPermit;
+};
 
-export type ApproveCallbackProps =
-  | { stage: ApproveCallbackStages.GAS_LIMIT; payload?: undefined }
-  | { stage: ApproveCallbackStages.SIGN; payload?: bigint }
-  | { stage: ApproveCallbackStages.SIGN; payload: Hash }
-  | { stage: ApproveCallbackStages.RECEIPT; payload: Hash }
-  | {
-      stage: ApproveCallbackStages.CONFIRMATION;
-      payload: TransactionReceipt;
-    }
-  | { stage: ApproveCallbackStages.DONE; payload: bigint }
-  | { stage: ApproveCallbackStages.MULTISIG_DONE; payload?: undefined }
-  | { stage: ApproveCallbackStages.ERROR; payload: SDKError };
-
-export type ApproveStageCallback = (props: ApproveCallbackProps) => void;
-
-export type ApproveProps = {
-  account: Address;
+export type WithdrawApproveProps = CommonTransactionProps & {
   amount: EtherValue;
-  token: 'stETH' | 'wstETH';
-  callback?: ApproveStageCallback;
+  token: WithdrawableTokens;
+};
+
+export type GetAllowanceProps = {
+  account: Address;
+  token: WithdrawableTokens;
+};
+
+export type CheckAllowanceProps = GetAllowanceProps & {
+  amount: EtherValue;
+};
+
+export type CheckAllowanceResult = {
+  allowance: bigint;
+  needsApprove: boolean;
 };

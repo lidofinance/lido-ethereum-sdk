@@ -4,30 +4,25 @@ import {
   type PublicClient,
   type Chain,
   type GetContractReturnType,
+  type CustomTransportConfig,
   createPublicClient,
   createWalletClient,
   fallback,
   http,
   custom,
   getContract,
-  isHex,
-  numberToHex,
-  stringify,
   maxUint256,
-  Hash,
+  GetBlockReturnType,
 } from 'viem';
-import invariant from 'tiny-invariant';
+import {
+  ERROR_CODE,
+  invariant,
+  invariantArgument,
+  withSDKError,
+} from '../common/utils/sdk-error.js';
 import { splitSignature } from '@ethersproject/bytes';
 
-import {
-  getFeeData,
-  type FeeData,
-  checkIsContract,
-  SDKError,
-  type SDKErrorProps,
-  getErrorMessage,
-  type ErrorMessage,
-} from '../common/utils/index.js';
+import { type SDKErrorProps, SDKError } from '../common/utils/index.js';
 import { Logger, Initialize, Cache } from '../common/decorators/index.js';
 import {
   SUPPORTED_CHAINS,
@@ -39,62 +34,107 @@ import {
   PERMIT_MESSAGE_TYPES,
   VIEM_CHAINS,
   SUBRGRAPH_ID_BY_CHAIN,
+  APPROX_SECONDS_PER_BLOCK,
+  NOOP,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
 import { wqAbi } from './abi/wq.js';
-import {
-  type LidoSDKCoreProps,
-  type PermitSignature,
-  type SignPermitProps,
-  type LOG_MODE,
-  PerformTransactionOptions as PerformTransactionProps,
+import type {
+  LidoSDKCoreProps,
+  PermitSignature,
+  SignPermitProps,
+  LOG_MODE,
+  PerformTransactionOptions,
   TransactionOptions,
   TransactionResult,
-  TransactionCallbackStage,
+  GetFeeDataResult,
+  BlockArgumentType,
+  BackArgumentType,
+  AccountValue,
 } from './types.js';
+import { TransactionCallbackStage } from './types.js';
 import { permitAbi } from './abi/permit.js';
+import { LidoSDKCacheable } from '../common/class-primitives/cacheable.js';
 
-export default class LidoSDKCore {
+export default class LidoSDKCore extends LidoSDKCacheable {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
+  private static readonly SECONDS_PER_DAY = 86400n;
+
+  #web3Provider: WalletClient | undefined;
+
   readonly chainId: CHAINS;
   readonly rpcUrls: string[] | undefined;
   readonly chain: Chain;
   readonly rpcProvider: PublicClient;
-  public web3Provider: WalletClient | undefined;
   readonly logMode: LOG_MODE;
 
+  public get web3Provider(): WalletClient | undefined {
+    return this.#web3Provider;
+  }
+
   constructor(props: LidoSDKCoreProps, version?: string) {
+    super();
+    this.chainId = props.chainId;
+    this.rpcUrls = props.rpcUrls;
+    this.logMode = props.logMode ?? 'info';
+
     const { chain, rpcProvider, web3Provider } = this.init(props, version);
 
-    this.chainId = props.chainId;
     this.chain = chain;
-    this.rpcUrls = props.rpcUrls;
     this.rpcProvider = rpcProvider;
-    this.web3Provider = web3Provider;
-    this.logMode = props.logMode ?? 'info';
+    this.#web3Provider = web3Provider;
+  }
+
+  // Static Provider Creation
+
+  public static createRpcProvider(
+    chainId: CHAINS,
+    rpcUrls: string[],
+  ): PublicClient {
+    const rpcs = rpcUrls.map((url) => http(url));
+
+    return createPublicClient({
+      batch: {
+        multicall: true,
+      },
+      chain: VIEM_CHAINS[chainId],
+      transport: fallback(rpcs),
+    });
+  }
+
+  public static createWeb3Provider(
+    chainId: CHAINS,
+    transport: { request(...args: any): Promise<any> },
+    transportConfig?: CustomTransportConfig,
+  ): WalletClient {
+    return createWalletClient({
+      chain: VIEM_CHAINS[chainId],
+      transport: custom(transport, transportConfig),
+    });
   }
 
   @Initialize('Init:')
   @Logger('LOG:')
   private init(props: LidoSDKCoreProps, _version?: string) {
     const { chainId, rpcUrls, web3Provider, rpcProvider } = props;
-
     if (!SUPPORTED_CHAINS.includes(chainId)) {
-      throw new Error(`Unsupported chain: ${chainId}`);
+      throw this.error({
+        message: `Unsupported chain: ${chainId}`,
+        code: ERROR_CODE.INVALID_ARGUMENT,
+      });
     }
 
     if (!rpcProvider && rpcUrls.length === 0) {
-      throw new Error('rpcUrls is required');
-    }
-
-    if (!rpcUrls && !rpcProvider) {
-      throw new Error('rpcUrls or rpcProvider is required');
+      throw this.error({
+        message: `Either rpcProvider or rpcUrls are required`,
+        code: ERROR_CODE.INVALID_ARGUMENT,
+      });
     }
 
     const chain = VIEM_CHAINS[chainId];
     const currentRpcProvider =
-      rpcProvider ?? this.createRpcProvider(chain, rpcUrls);
+      rpcProvider ?? LidoSDKCore.createRpcProvider(chainId, rpcUrls);
     const currentWeb3Provider = web3Provider;
 
     return {
@@ -104,53 +144,22 @@ export default class LidoSDKCore {
     };
   }
 
-  // Provider
+  // Web 3 provider
 
   @Logger('Provider:')
-  public createRpcProvider(chain: Chain, rpcUrls: string[]): PublicClient {
-    const rpcs = rpcUrls.map((url) => http(url));
-
-    return createPublicClient({
-      batch: {
-        multicall: true,
-      },
-      chain,
-      transport: fallback(rpcs),
-    });
+  public useWeb3Provider(): WalletClient {
+    invariant(
+      this.#web3Provider,
+      'Web3 Provider is not defined',
+      ERROR_CODE.PROVIDER_ERROR,
+    );
+    return this.#web3Provider;
   }
 
-  @Logger('Provider:')
-  public createWeb3Provider(chain: Chain): WalletClient {
-    return createWalletClient({
-      chain,
-      // TODO: fix type
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      transport: custom(window.ethereum),
-    });
-  }
-
-  @Logger('Provider:')
-  public defineWeb3Provider(): WalletClient {
-    invariant(!this.web3Provider, 'Web3 provider is already defined');
-
-    this.web3Provider = this.createWeb3Provider(this.chain);
-
-    return this.web3Provider;
-  }
-
-  @Logger('Provider:')
-  public setWeb3Provider(web3Provider: WalletClient): void {
-    invariant(web3Provider.chain === this.chain, 'Wrong chain');
-
-    this.web3Provider = web3Provider;
-  }
   // Balances
 
   @Logger('Balances:')
   public async balanceETH(address: Address): Promise<bigint> {
-    invariant(this.rpcProvider, 'RPC provider is not defined');
-
     return this.rpcProvider.getBalance({ address });
   }
 
@@ -159,8 +168,6 @@ export default class LidoSDKCore {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['chain.id'])
   public contractAddressLidoLocator(): Address {
-    invariant(this.chain, 'Chain is not defined');
-
     return LIDO_LOCATOR_BY_CHAIN[this.chain.id as CHAINS];
   }
 
@@ -201,26 +208,23 @@ export default class LidoSDKCore {
       spender,
       deadline = LidoSDKCore.INFINITY_DEADLINE_VALUE,
     } = props;
-    invariant(this.web3Provider, 'Web3 provider is not defined');
-
+    const web3Provider = this.useWeb3Provider();
+    const accountAddress = await this.getWeb3Address(account);
     const { contract, domain } = await this.getPermitContractData(token);
-    const nonce = await contract.read.nonces([account]);
+    const nonce = await contract.read.nonces([accountAddress]);
 
-    const message = {
-      owner: account,
-      spender,
-      value: amount.toString(),
-      nonce: numberToHex(nonce),
-      deadline: numberToHex(deadline),
-    };
-    const typedData = stringify(
-      { domain, primaryType: 'Permit', types: PERMIT_MESSAGE_TYPES, message },
-      (_, value) => (isHex(value) ? value.toLowerCase() : value),
-    );
-
-    const signature = await this.web3Provider.request({
-      method: 'eth_signTypedData_v4',
-      params: [account, typedData],
+    const signature = await web3Provider.signTypedData({
+      account: account ?? web3Provider.account ?? accountAddress,
+      domain,
+      types: PERMIT_MESSAGE_TYPES,
+      primaryType: 'Permit',
+      message: {
+        owner: accountAddress,
+        spender,
+        value: amount,
+        nonce,
+        deadline,
+      },
     });
     const { s, r, v } = splitSignature(signature);
 
@@ -230,9 +234,9 @@ export default class LidoSDKCore {
       s: s as `0x${string}`,
       value: amount,
       deadline,
-      chainId: BigInt(this.chain.id),
       nonce,
-      owner: account,
+      chainId: domain.chainId,
+      owner: accountAddress,
       spender,
     };
   }
@@ -255,7 +259,7 @@ export default class LidoSDKCore {
     let domain = {
       name: 'Wrapped liquid staked Ether 2.0',
       version: '1',
-      chainId: this.chain.id,
+      chainId: BigInt(this.chain.id),
       verifyingContract: tokenAddress,
     };
     if (token === LIDO_TOKENS.steth) {
@@ -264,7 +268,7 @@ export default class LidoSDKCore {
       domain = {
         name,
         version,
-        chainId: Number(chainId),
+        chainId,
         verifyingContract,
       };
     }
@@ -275,43 +279,63 @@ export default class LidoSDKCore {
   }
 
   @Logger('Utils:')
-  public async getFeeData(): Promise<FeeData> {
-    invariant(this.rpcProvider, 'RPC provider is not defined');
-    return getFeeData(this.rpcProvider);
+  public async getFeeData(): Promise<GetFeeDataResult> {
+    // we look back 5 blocks at fees of botton 25% txs
+    // if you want to increase maxPriorityFee output increase percentile
+    const feeHistory = await this.rpcProvider.getFeeHistory({
+      blockCount: 5,
+      blockTag: 'pending',
+      rewardPercentiles: [25],
+    });
+
+    // get average priority fee
+    const maxPriorityFeePerGas =
+      feeHistory.reward && feeHistory.reward.length > 0
+        ? feeHistory.reward
+            .map((fees) => (fees[0] ? BigInt(fees[0]) : 0n))
+            .reduce((sum, fee) => sum + fee) / BigInt(feeHistory.reward.length)
+        : 0n;
+
+    const lastBaseFeePerGas = feeHistory.baseFeePerGas[0]
+      ? BigInt(feeHistory.baseFeePerGas[0])
+      : 0n;
+
+    // we have to multiply by 2 until we find a reliable way to predict baseFee change
+    const maxFeePerGas = lastBaseFeePerGas * 2n + maxPriorityFeePerGas;
+
+    return {
+      lastBaseFeePerGas,
+      maxPriorityFeePerGas,
+      maxFeePerGas,
+      gasPrice: maxFeePerGas, // fallback
+    };
   }
 
   @Logger('Utils:')
-  public async getWeb3Address(): Promise<Address> {
-    invariant(this.web3Provider, 'Web3 provider is not defined');
+  public async getWeb3Address(accountValue?: AccountValue): Promise<Address> {
+    if (typeof accountValue === 'string') return accountValue;
+    if (accountValue) return accountValue.address;
+    const web3Provider = this.useWeb3Provider();
 
-    if (this.web3Provider.account) return this.web3Provider.account.address;
-    // For walletconnect
-    if ('getAddresses' in this.web3Provider) {
-      const [address] = await this.web3Provider.getAddresses();
-      invariant(address, 'Web3 address is not defined');
+    if (web3Provider.account) return web3Provider.account.address;
 
-      return address;
-    }
-
-    // TODO: fix type
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //@ts-ignore
-    const [account] = await window.ethereum.request({
-      method: 'eth_requestAccounts',
-    });
-
-    invariant(account, 'Web3 address is not defined');
-
+    const [account] = await web3Provider.requestAddresses();
+    invariant(
+      account,
+      'web3provider must have at least 1 account',
+      ERROR_CODE.PROVIDER_ERROR,
+    );
     return account;
   }
 
   @Logger('Utils:')
   @Cache(60 * 60 * 1000, ['chain.id'])
   public async isContract(address: Address): Promise<boolean> {
-    invariant(this.rpcProvider, 'RPC provider is not defined');
-    const { isContract } = await checkIsContract(this.rpcProvider, address);
-
-    return isContract;
+    // eth_getCode returns hex string of bytecode at address
+    // for accounts it's "0x"
+    // for contract it's potentially very long hex (can't be safely&quickly parsed)
+    const result = await this.rpcProvider.getBytecode({ address: address });
+    return result ? result !== '0x' : false;
   }
 
   @Logger('Utils:')
@@ -320,57 +344,117 @@ export default class LidoSDKCore {
   }
 
   @Logger('Utils:')
-  public getErrorMessage(error: unknown): {
-    message: ErrorMessage;
-    code: string | number;
-  } {
-    return getErrorMessage(error);
-  }
-
-  @Logger('Utils:')
   @Cache(30 * 60 * 1000, ['chain.id'])
   public async getContractAddress(
     contract: LIDO_CONTRACT_NAMES,
   ): Promise<Address> {
-    invariant(this.rpcProvider, 'RPC provider is not defined');
     const lidoLocator = this.getContractLidoLocator();
-
-    invariant(lidoLocator, 'Lido locator is not defined');
-
     if (contract === 'wsteth') {
       const withdrawalQueue = await lidoLocator.read.withdrawalQueue();
-      const contract = await this.getContractWQ(withdrawalQueue);
-      const wstethAddress = await contract.read.WSTETH?.();
+      const contract = this.getContractWQ(withdrawalQueue);
+      const wstethAddress = await contract.read.WSTETH();
 
-      invariant(wstethAddress, 'wstETH address is not defined');
-
-      return wstethAddress as Address;
+      return wstethAddress;
     } else {
-      invariant(lidoLocator.read[contract], 'Lido locator read is not defined');
-
       return lidoLocator.read[contract]();
     }
   }
 
   @Logger('Utils:')
   @Cache(30 * 60 * 1000, ['chain.id'])
-  public getSubgraphId(): string {
+  public getSubgraphId(): string | null {
     const id = SUBRGRAPH_ID_BY_CHAIN[this.chainId];
-    invariant(id, `Subgraph is not supported for chain ${this.chainId}`);
     return id;
   }
 
-  public async performTransaction(
-    props: PerformTransactionProps,
-    getGasLimit: (overrides: TransactionOptions) => Promise<bigint>,
-    sendTransaction: (override: TransactionOptions) => Promise<Hash>,
-  ): Promise<TransactionResult> {
-    invariant(this.web3Provider, 'Web3 provider is not defined');
-    const { account, callback } = props;
-    const isContract = await this.isContract(account);
+  @Cache(30 * 60, ['chain.id'])
+  public async getLatestBlockToTimestamp(
+    timestamp: bigint,
+  ): Promise<GetBlockReturnType<Chain, false, 'latest'>> {
+    const now = BigInt(Math.floor(Date.now() / 1000));
+    let latestBlock = await this.rpcProvider.getBlock({ blockTag: 'latest' });
+    if (latestBlock.timestamp < timestamp) {
+      return latestBlock;
+    }
+    let mid = latestBlock.number - (now - timestamp) / APPROX_SECONDS_PER_BLOCK;
+    invariantArgument(mid > 0n, 'No blocks at this timestamp');
 
+    let block = await this.rpcProvider.getBlock({ blockNumber: mid });
+    // feeling lucky?
+    if (block.timestamp === timestamp) return block;
+
+    const isOverShoot = block.timestamp < timestamp;
+    let left = isOverShoot ? block.number : 0n;
+    let right = isOverShoot ? latestBlock.number : block.number;
+
+    while (left <= right) {
+      mid = (left + right) / 2n;
+      block = await this.rpcProvider.getBlock({ blockNumber: mid });
+      if (block.timestamp === timestamp) {
+        return block;
+      } else if (block.timestamp < timestamp) {
+        latestBlock = block;
+        left = mid + 1n;
+      } else {
+        right = mid - 1n;
+      }
+    }
+    return latestBlock;
+  }
+
+  @Logger('Utils:')
+  public async toBlockNumber(arg: BlockArgumentType): Promise<bigint> {
+    if (arg.timestamp) {
+      const block = await this.getLatestBlockToTimestamp(arg.timestamp);
+      return block.number;
+    }
+    const { block } = arg;
+    if (typeof block === 'bigint') return block;
+    const { number } = await this.rpcProvider.getBlock({
+      blockTag: block,
+    });
+    invariantArgument(number !== null, 'block must not be pending');
+    return number;
+  }
+
+  @Logger('Utils:')
+  public async toBackBlock(
+    arg: BackArgumentType,
+    start: bigint,
+  ): Promise<bigint> {
+    if (arg.blocks) {
+      const end = start - arg.blocks;
+      invariantArgument(end >= 0n, 'Too many blocks back');
+      return end;
+    } else {
+      const { timestamp: startTimestamp } = await this.rpcProvider.getBlock({
+        blockNumber: start,
+      });
+      const diff = arg.days
+        ? arg.days * LidoSDKCore.SECONDS_PER_DAY
+        : arg.seconds;
+      invariantArgument(diff, 'must have at least something in back argument');
+      const endTimestamp = startTimestamp - diff;
+      const block = await this.getLatestBlockToTimestamp(endTimestamp);
+      return block.number;
+    }
+  }
+
+  // TODO separate test suit with multisig
+  public async performTransaction(
+    props: PerformTransactionOptions,
+  ): Promise<TransactionResult> {
+    const provider = this.useWeb3Provider();
+    const { account, callback = NOOP, getGasLimit, sendTransaction } = props;
+    const accountAddress = await this.getWeb3Address(account);
+    const isContract = await this.isContract(accountAddress);
+
+    // we need account to be defined for transactions so we fallback in this order
+    // 1. whatever user passed
+    // 2. hoisted account
+    // 3. just address (this will break on local accounts as per viem behavior)
     const overrides: TransactionOptions = {
-      account,
+      account: account ?? provider.account ?? accountAddress,
       chain: this.chain,
       gas: undefined,
       maxFeePerGas: undefined,
@@ -379,14 +463,34 @@ export default class LidoSDKCore {
 
     if (!isContract) {
       callback({ stage: TransactionCallbackStage.GAS_LIMIT });
-      overrides.gas = await getGasLimit(overrides);
       const feeData = await this.getFeeData();
       overrides.maxFeePerGas = feeData.maxFeePerGas;
       overrides.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
+      try {
+        overrides.gas = await getGasLimit(overrides);
+      } catch {
+        // we retry without fees to see if tx will go trough
+        await withSDKError(
+          getGasLimit({
+            ...overrides,
+            maxFeePerGas: undefined,
+            maxPriorityFeePerGas: undefined,
+          }),
+          ERROR_CODE.TRANSACTION_ERROR,
+        );
+        throw this.error({
+          code: ERROR_CODE.TRANSACTION_ERROR,
+          message: 'Not enough ether for gas',
+        });
+      }
     }
 
     callback({ stage: TransactionCallbackStage.SIGN, payload: overrides.gas });
-    const transactionHash = await sendTransaction(overrides);
+
+    const transactionHash = await withSDKError(
+      sendTransaction(overrides),
+      ERROR_CODE.TRANSACTION_ERROR,
+    );
 
     if (isContract) {
       callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
@@ -398,10 +502,11 @@ export default class LidoSDKCore {
       payload: transactionHash,
     });
 
-    const transactionReceipt = await this.rpcProvider.waitForTransactionReceipt(
-      {
+    const transactionReceipt = await withSDKError(
+      this.rpcProvider.waitForTransactionReceipt({
         hash: transactionHash,
-      },
+      }),
+      ERROR_CODE.TRANSACTION_ERROR,
     );
 
     callback({

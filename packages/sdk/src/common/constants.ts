@@ -7,6 +7,8 @@ export enum CHAINS {
   Holesky = 17000,
 }
 
+export const APPROX_BLOCKS_BY_DAY = 7600n;
+export const APPROX_SECONDS_PER_BLOCK = 12n;
 export const SUPPORTED_CHAINS: CHAINS[] = [
   CHAINS.Goerli,
   CHAINS.Mainnet,
@@ -14,6 +16,7 @@ export const SUPPORTED_CHAINS: CHAINS[] = [
 ];
 
 export const SUBMIT_EXTRA_GAS_TRANSACTION_RATIO = 1.05;
+export const GAS_TRANSACTION_RATIO_PRECISION = 10 ** 7;
 export const ESTIMATE_ACCOUNT = '0x87c0e047F4e4D3e289A56a36570D4CB957A37Ef1';
 
 export const LIDO_LOCATOR_BY_CHAIN: {
@@ -25,11 +28,11 @@ export const LIDO_LOCATOR_BY_CHAIN: {
 };
 
 export const SUBRGRAPH_ID_BY_CHAIN: {
-  [key in CHAINS]: string;
+  [key in CHAINS]: string | null;
 } = {
   [CHAINS.Mainnet]: 'HXfMc1jPHfFQoccWd7VMv66km75FoxVHDMvsJj5vG5vf',
   [CHAINS.Goerli]: 'QmeDfGTuNbSoZ71zi3Ch4WNRbzALfiFPnJMYUFPinLiFNa',
-  [CHAINS.Holesky]: '',
+  [CHAINS.Holesky]: null,
 };
 
 export const EARLIEST_TOKEN_REBASED_EVENT: {
