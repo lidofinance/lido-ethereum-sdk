@@ -57,6 +57,14 @@ Results:
 - type `ApprovedForProps` -> `UnstethApprovedForProps`
 - type `IsApprovedForAllProps` -> `UnstethIsApprovedForAllProps`
 
+Methods:
+
+- `setApprovalFor` -> `setSingleTokenApproval`
+- `getTokenApprovedFor`-> `getSingleTokenApproval`
+
+- `setApprovalForAll` -> `setAllTokensApproval`
+- `getIsApprovedForAll`-> `areAllTokensApproved`
+
 ## Withdraw
 
 - setters for `core`, `views` and others were removed
@@ -64,6 +72,7 @@ Results:
 ### Claim
 
 - hints are now optional, will be calculated on the spot
+- you can pass request ids in any order, they will be sorted alongside corresponding hints
 
 ### Approve
 

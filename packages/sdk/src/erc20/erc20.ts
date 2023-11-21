@@ -97,7 +97,7 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
       from = accountAddress,
     } = this.parseProps(props);
 
-    const isTransferFrom = from !== account;
+    const isTransferFrom = from !== accountAddress;
     const address = await this.contractAddress();
 
     return {
@@ -127,7 +127,7 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
       to,
       from = accountAddress,
     } = this.parseProps(props);
-    const isTransferFrom = from !== account;
+    const isTransferFrom = from !== accountAddress;
     const contract = await this.getContract();
     return isTransferFrom
       ? contract.simulate.transferFrom([from, to, amount], { account })
@@ -207,11 +207,12 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   @ErrorHandler()
   public async populateApprove(props: NoCallback<ApproveProps>) {
     const { account, amount, to } = this.parseProps(props);
+    const accountAddress = await this.core.getWeb3Address(account);
     const address = await this.contractAddress();
 
     return {
       to: address,
-      from: account,
+      from: accountAddress,
       data: encodeFunctionData({
         abi: erc20abi,
         functionName: 'approve',
@@ -224,9 +225,9 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   @ErrorHandler()
   public async simulateApprove(props: NoCallback<ApproveProps>) {
     const { account, amount, to } = this.parseProps(props);
-
+    const accountAddress = await this.core.getWeb3Address(account);
     const contract = await this.getContract();
-    return contract.simulate.approve([to, amount], { account });
+    return contract.simulate.approve([to, amount], { account: accountAddress });
   }
 
   @Logger('Views:')
