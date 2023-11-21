@@ -9,11 +9,11 @@ import type {
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import { erc20abi } from './abi/erc20abi.js';
 import {
-  Address,
-  GetContractReturnType,
-  Hash,
-  PublicClient,
-  WalletClient,
+  type Address,
+  type GetContractReturnType,
+  type Hash,
+  type PublicClient,
+  type WalletClient,
   encodeFunctionData,
   getContract,
 } from 'viem';
