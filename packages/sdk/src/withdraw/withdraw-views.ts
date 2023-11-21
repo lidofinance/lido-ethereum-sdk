@@ -1,21 +1,12 @@
 import { type Address } from 'viem';
-import invariant from 'tiny-invariant';
 
 import { Logger, Cache } from '../common/decorators/index.js';
-import { version } from '../version.js';
-import { type LidoSDKCoreProps } from '../core/index.js';
 
-import { Bus } from './bus.js';
+import { BusModule } from './bus-module.js';
 import { type RequestStatusWithId } from './types.js';
+import { invariantArgument } from '../index.js';
 
-export class LidoSDKWithdrawViews {
-  private readonly bus: Bus;
-
-  constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
-    if (props.bus) this.bus = props.bus;
-    else this.bus = new Bus(props, version);
-  }
-
+export class LidoSDKWithdrawViews extends BusModule {
   // Views
   @Logger('Views:')
   public async getWithdrawalRequestsIds(props: {
@@ -42,7 +33,10 @@ export class LidoSDKWithdrawViews {
     const contract = await this.bus.contract.getContractWithdrawalQueue();
     const requests = await contract.read.getWithdrawalStatus([requestsIds]);
 
-    invariant(requests.length === requestsIds.length, 'Invalid requests ids');
+    invariantArgument(
+      requests.length === requestsIds.length,
+      'Invalid requests ids',
+    );
 
     return requests.map((request, i) => ({
       ...request,
@@ -55,11 +49,13 @@ export class LidoSDKWithdrawViews {
   public async findCheckpointHints(props: {
     sortedIds: bigint[];
     firstIndex?: bigint;
-    lastIndex: bigint;
+    lastIndex?: bigint;
   }): Promise<readonly bigint[]> {
-    const { sortedIds, firstIndex = BigInt(1), lastIndex } = props;
+    const { sortedIds, firstIndex = BigInt(1), lastIndex: _lastIndex } = props;
+
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
+    const lastIndex = _lastIndex ?? (await this.getLastCheckpointIndex());
     return contract.read.findCheckpointHints([
       sortedIds,
       firstIndex,
@@ -88,10 +84,19 @@ export class LidoSDKWithdrawViews {
   // Constants
 
   @Logger('Views:')
+  @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async minStethWithdrawalAmount(): Promise<bigint> {
     const contract = await this.bus.contract.getContractWithdrawalQueue();
-
     return contract.read.MIN_STETH_WITHDRAWAL_AMOUNT();
+  }
+
+  @Logger('Views:')
+  public async minWStethWithdrawalAmount(): Promise<bigint> {
+    const [amount, contract] = await Promise.all([
+      this.minStethWithdrawalAmount(),
+      this.bus.contract.getContractWstETH(),
+    ]);
+    return contract.read.getWstETHByStETH([amount]);
   }
 
   @Logger('Views:')
@@ -100,6 +105,15 @@ export class LidoSDKWithdrawViews {
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     return contract.read.MAX_STETH_WITHDRAWAL_AMOUNT();
+  }
+
+  @Logger('Views:')
+  public async maxWStethWithdrawalAmount(): Promise<bigint> {
+    const [amount, contract] = await Promise.all([
+      this.maxStethWithdrawalAmount(),
+      this.bus.contract.getContractWstETH(),
+    ]);
+    return contract.read.getWstETHByStETH([amount]);
   }
 
   @Logger('Views:')
@@ -118,8 +132,10 @@ export class LidoSDKWithdrawViews {
 
   @Logger('Views:')
   public async isTurboModeActive(): Promise<boolean> {
-    const isBunkerMode = await this.isBunkerModeActive();
-    const isPaused = await this.isPaused();
+    const [isBunkerMode, isPaused] = await Promise.all([
+      this.isBunkerModeActive(),
+      await this.isPaused(),
+    ]);
 
     return !isPaused && !isBunkerMode;
   }

@@ -1,18 +1,17 @@
-import { LidoSDKCore } from '../core/index.js';
+import { CommonTransactionProps, TransactionResult } from '../core/index.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
-import { version } from '../version.js';
-import {
+
+import type {
   UnstethNFT,
-  type ApproveAllProps,
-  type ApproveProps,
-  type ApprovedForProps,
-  type IsApprovedForAllProps,
-  type LidoSDKUnstETHProps,
-  type ParsedProps,
-  type SafeTransferFromArguments,
-  type TransactionProps,
-  type TransferProps,
+  UnstethApproveAllProps,
+  UnstethApproveProps,
+  UnstethApprovedForProps,
+  UnstethIsApprovedForAllProps,
+  ParsedProps,
+  SafeTransferFromArguments,
+  UnstethTransferProps,
 } from './types.js';
+import type { NoCallback, PopulatedTransaction } from '../core/types.js';
 import {
   type Address,
   type GetContractReturnType,
@@ -20,27 +19,18 @@ import {
   type WalletClient,
   getContract,
   zeroAddress,
+  encodeFunctionData,
 } from 'viem';
 import { unstethAbi } from './abi/unsteth-abi.js';
-import invariant from 'tiny-invariant';
 import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 
-export class LidoSDKUnstETH {
-  readonly core: LidoSDKCore;
-
-  constructor(props: LidoSDKUnstETHProps) {
-    const { core, ...rest } = props;
-
-    if (core) this.core = core;
-    else this.core = new LidoSDKCore(rest, version);
-  }
-
+export class LidoSDKUnstETH extends LidoSDKModule {
   // Contract
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public contractAddress(): Promise<Address> {
-    invariant(this.core.chain, 'Chain is not defined');
     return this.core.getContractAddress(LIDO_CONTRACT_NAMES.withdrawalQueue);
   }
 
@@ -60,7 +50,7 @@ export class LidoSDKUnstETH {
 
   // Balance
   @Logger('Balances:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getNFTsByAccount(account: Address): Promise<UnstethNFT[]> {
     const contract = await this.getContract();
 
@@ -71,7 +61,7 @@ export class LidoSDKUnstETH {
   }
 
   @Logger('Balances:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getAccountByNFT(id: bigint): Promise<Address> {
     const contract = await this.getContract();
     return contract.read.ownerOf([id]);
@@ -79,75 +69,201 @@ export class LidoSDKUnstETH {
 
   // Transfer
   @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async transfer(props: TransferProps) {
+  @ErrorHandler()
+  public async transfer(
+    props: UnstethTransferProps,
+  ): Promise<TransactionResult> {
     const {
       account,
       callback,
       id,
       to,
-      from = props.account,
+      from: _from,
       data,
     } = this.parseProps(props);
-
+    const from = _from ?? (await this.core.getWeb3Address(account));
     const args = (
       data ? [from, to, id, data] : [from, to, id]
     ) as SafeTransferFromArguments;
 
     const contract = await this.getContract();
-    return this.core.performTransaction(
-      { callback, account },
-      (options) => contract.estimateGas.safeTransferFrom(args, options),
-      (options) => contract.write.safeTransferFrom(args, options),
-    );
+    return this.core.performTransaction({
+      callback,
+      account,
+      getGasLimit: (options) =>
+        contract.estimateGas.safeTransferFrom(args, options),
+      sendTransaction: (options) =>
+        contract.write.safeTransferFrom(args, options),
+    });
   }
 
-  // Approve
-
-  @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async setApprovalFor(props: ApproveProps) {
-    const { account, callback, to = zeroAddress, id } = this.parseProps(props);
-    const args = [to, id] as const;
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async transferSimulateTx(props: NoCallback<UnstethTransferProps>) {
+    const { account, id, to, from: _from, data } = this.parseProps(props);
+    const accountAddress = await this.core.getWeb3Address(account);
+    const from = _from ?? accountAddress;
+    const args = (
+      data ? [from, to, id, data] : [from, to, id]
+    ) as SafeTransferFromArguments;
     const contract = await this.getContract();
-    return this.core.performTransaction(
-      { callback, account },
-      (options) => contract.estimateGas.approve(args, options),
-      (options) => contract.write.approve(args, options),
-    );
+    return contract.simulate.safeTransferFrom(args, {
+      account: accountAddress,
+    });
   }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async transferPopulateTx(
+    props: NoCallback<UnstethTransferProps>,
+  ): Promise<PopulatedTransaction> {
+    const { account, id, to, from: _from, data } = this.parseProps(props);
+    const accountAddress = await this.core.getWeb3Address(account);
+    const from = _from ?? accountAddress;
+    const args = (
+      data ? [from, to, id, data] : [from, to, id]
+    ) as SafeTransferFromArguments;
+    const contract = await this.getContract();
+    return {
+      from: accountAddress,
+      to: contract.address,
+      data: encodeFunctionData({
+        abi: contract.abi,
+        functionName: 'safeTransferFrom',
+        args,
+      }),
+    };
+  }
+
+  // Approve Single
 
   @Logger('Views:')
-  @ErrorHandler('Error:')
-  public async getTokenApprovedFor({ id, account }: ApprovedForProps) {
+  @ErrorHandler()
+  public async getSingleTokenApproval({
+    id,
+    account,
+  }: UnstethApprovedForProps) {
     const contract = await this.getContract();
     return contract.read.getApproved([id], { account });
   }
 
   @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async setApprovalForAll(props: ApproveAllProps) {
+  @ErrorHandler()
+  public async setSingleTokenApproval(
+    props: UnstethApproveProps,
+  ): Promise<TransactionResult> {
+    const { account, callback, to = zeroAddress, id } = this.parseProps(props);
+    const args = [to, id] as const;
+    const contract = await this.getContract();
+    return this.core.performTransaction({
+      callback,
+      account,
+      getGasLimit: (options) => contract.estimateGas.approve(args, options),
+      sendTransaction: (options) => contract.write.approve(args, options),
+    });
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async setSingleTokenApprovalPopulateTx(
+    props: NoCallback<UnstethApproveProps>,
+  ): Promise<PopulatedTransaction> {
+    const { account, to = zeroAddress, id } = this.parseProps(props);
+    const accountAddress = await this.core.getWeb3Address(account);
+    const args = [to, id] as const;
+    const contract = await this.getContract();
+    return {
+      from: accountAddress,
+      to: contract.address,
+      data: encodeFunctionData({
+        abi: contract.abi,
+        functionName: 'approve',
+        args,
+      }),
+    };
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async setSingleTokenApprovalSimulateTx(
+    props: NoCallback<UnstethApproveProps>,
+  ) {
+    const { account, to = zeroAddress, id } = this.parseProps(props);
+    const accountAddress = await this.core.getWeb3Address(account);
+    const args = [to, id] as const;
+    const contract = await this.getContract();
+    return contract.simulate.approve(args, {
+      account: accountAddress,
+    });
+  }
+
+  // Approval All
+  @Logger('Views:')
+  @ErrorHandler()
+  public async areAllTokensApproved({
+    account,
+    to,
+  }: UnstethIsApprovedForAllProps) {
+    const contract = await this.getContract();
+    return contract.read.isApprovedForAll([account, to]);
+  }
+
+  @Logger('Call:')
+  @ErrorHandler()
+  public async setAllTokensApproval(
+    props: UnstethApproveAllProps,
+  ): Promise<TransactionResult> {
     const { account, callback, to, allow } = this.parseProps(props);
     const args = [to, allow] as const;
     const contract = await this.getContract();
-    return this.core.performTransaction(
-      { callback, account },
-      (options) => contract.estimateGas.setApprovalForAll(args, options),
-      (options) => contract.write.setApprovalForAll(args, options),
-    );
+    return this.core.performTransaction({
+      callback,
+      account,
+      getGasLimit: (options) =>
+        contract.estimateGas.setApprovalForAll(args, options),
+      sendTransaction: (options) =>
+        contract.write.setApprovalForAll(args, options),
+    });
   }
 
-  @Logger('Views:')
-  @ErrorHandler('Error:')
-  public async getIsApprovedForAll({ account, to }: IsApprovedForAllProps) {
+  @Logger('Call:')
+  @ErrorHandler()
+  public async setAllTokensApprovalPopulateTx(
+    props: NoCallback<UnstethApproveAllProps>,
+  ): Promise<PopulatedTransaction> {
+    const { account, to, allow } = this.parseProps(props);
+    const accountAddress = await this.core.getWeb3Address(account);
+    const args = [to, allow] as const;
     const contract = await this.getContract();
-    return contract.read.isApprovedForAll([account, to]);
+    return {
+      from: accountAddress,
+      to: contract.address,
+      data: encodeFunctionData({
+        abi: contract.abi,
+        functionName: 'setApprovalForAll',
+        args,
+      }),
+    };
+  }
+
+  @Logger('Call:')
+  @ErrorHandler()
+  public async setAllTokensApprovalSimulateTx(
+    props: NoCallback<UnstethApproveAllProps>,
+  ) {
+    const { account, to, allow } = this.parseProps(props);
+    const accountAddress = await this.core.getWeb3Address(account);
+    const args = [to, allow] as const;
+    const contract = await this.getContract();
+    return contract.simulate.setApprovalForAll(args, {
+      account: accountAddress,
+    });
   }
 
   // Metadata
 
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContractMetadata() {
     const address = await this.contractAddress();
@@ -183,13 +299,13 @@ export class LidoSDKUnstETH {
   }
 
   @Logger('Views:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getTokenMetadataURI(id: bigint): Promise<string> {
     const contract = await this.getContract();
     return contract.read.tokenURI([id]);
   }
 
-  private parseProps<TProps extends TransactionProps>(
+  private parseProps<TProps extends CommonTransactionProps>(
     props: TProps,
   ): ParsedProps<TProps> {
     return {

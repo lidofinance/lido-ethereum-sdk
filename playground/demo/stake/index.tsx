@@ -24,10 +24,12 @@ export const StakeDemo = () => {
     <Accordion summary="Staking">
       <Action
         title="Stake"
+        walletAction
         action={() =>
           stake.stakeEth({
             value: stakingValue,
             account,
+            referralAddress,
             callback: transactionToast,
           })
         }
@@ -47,6 +49,7 @@ export const StakeDemo = () => {
       </Action>
       <Action
         title="Stake Populate TX"
+        walletAction
         action={() =>
           stake.stakeEthPopulateTx({
             account,
@@ -57,6 +60,7 @@ export const StakeDemo = () => {
       />
       <Action
         title="Stake Simulate Tx"
+        walletAction
         action={() =>
           stake.stakeEthSimulateTx({
             account,
@@ -67,11 +71,11 @@ export const StakeDemo = () => {
       />
       <Action title="Stake Limit" action={() => stake.getStakeLimitInfo()} />
       <Action
-        title="Address Steth"
+        title="Address stETH"
         action={() => stake.contractAddressStETH()}
       />
       <Action
-        title="Get Contract Steth ABI"
+        title="Get Contract stETH ABI"
         action={async () => (await stake.getContractStETH()).abi}
       />
     </Accordion>

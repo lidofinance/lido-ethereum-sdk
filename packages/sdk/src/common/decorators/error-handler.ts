@@ -1,5 +1,6 @@
-import { callConsoleMessage, extractError } from './utils.js';
+import { callConsoleMessage } from './utils.js';
 import { type HeadMessage } from './types.js';
+import { SDKError } from '../index.js';
 
 export const ErrorHandler = function (headMessage: HeadMessage = 'Error:') {
   return function ErrorHandlerMethod<This, Args extends any[], Return>(
@@ -17,21 +18,19 @@ export const ErrorHandler = function (headMessage: HeadMessage = 'Error:') {
         const result = originalMethod.call(this, ...args);
 
         if (result instanceof Promise) {
-          return result
-            .then((resolvedResult) => resolvedResult)
-            .catch((error) => {
-              callConsoleMessage.call(
-                this,
-                headMessage,
-                `Error in method '${methodName}'.`,
-                'Error:',
-              );
+          return result.catch((error) => {
+            callConsoleMessage.call(
+              this,
+              headMessage,
+              `Error in method '${methodName}'.`,
+              'Error:',
+            );
 
-              let txError = extractError.call(this, error);
-              callback?.({ stage: 'error', payload: txError });
+            const txError = SDKError.from(error);
+            callback?.({ stage: 'error', payload: txError });
 
-              throw txError;
-            }) as Return;
+            throw txError;
+          }) as Return;
         } else {
           return result;
         }
@@ -43,7 +42,7 @@ export const ErrorHandler = function (headMessage: HeadMessage = 'Error:') {
           'Error:',
         );
 
-        let txError = extractError.call(this, error);
+        const txError = SDKError.from(error);
         callback?.({ stage: 'error', payload: txError });
 
         throw txError;

@@ -6,4 +6,4 @@ export const wqAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-];
+] as const;

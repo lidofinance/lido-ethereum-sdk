@@ -13,6 +13,7 @@ export const WithdrawalsViewsDemo = () => {
     <Accordion summary="Withdrawals views">
       <Action
         title="Get request ids"
+        walletAction
         action={() => withdraw.views.getWithdrawalRequestsIds({ account })}
       />
       <Action
@@ -32,6 +33,16 @@ export const WithdrawalsViewsDemo = () => {
       <Action
         title="Get MAX stETH withdrawal amount"
         action={() => withdraw.views.maxStethWithdrawalAmount()}
+        renderResult={renderTokenResult('stETH')}
+      />
+      <Action
+        title="Get MIN wstETH withdrawal amount"
+        action={() => withdraw.views.minWStethWithdrawalAmount()}
+        renderResult={renderTokenResult('stETH')}
+      />
+      <Action
+        title="Get MAX wstETH withdrawal amount"
+        action={() => withdraw.views.maxWStethWithdrawalAmount()}
         renderResult={renderTokenResult('stETH')}
       />
       <Action title="Is paused" action={() => withdraw.views.isPaused()} />

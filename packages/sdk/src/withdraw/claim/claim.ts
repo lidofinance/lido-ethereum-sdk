@@ -1,128 +1,113 @@
-import invariant from 'tiny-invariant';
+import { encodeFunctionData, type SimulateContractReturnType } from 'viem';
 
-import { type LidoSDKCoreProps } from '../../core/index.js';
-import { Logger, Cache, ErrorHandler } from '../../common/decorators/index.js';
-import { TransactionCallbackStage } from '../../core/types.js';
-import { version } from '../../version.js';
-
-import { Bus } from '../bus.js';
-
-import {
-  ClaimRequestsProps,
-  ClaimRequestsPropsWithoutCallback,
-} from './types.js';
+import { Logger, ErrorHandler } from '../../common/decorators/index.js';
+import type {
+  NoCallback,
+  PopulatedTransaction,
+  TransactionResult,
+} from '../../core/types.js';
 import { NOOP } from '../../common/constants.js';
 
-export class LidoSDKWithdrawClaim {
-  private readonly bus: Bus;
+import { BusModule } from '../bus-module.js';
+import type { ClaimRequestsProps } from './types.js';
+import { invariantArgument } from '../../index.js';
+import { bigintComparator } from '../../common/utils/bigint-comparator.js';
 
-  constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
-    if (props.bus) this.bus = props.bus;
-    else this.bus = new Bus(props, version);
-  }
-
+export class LidoSDKWithdrawClaim extends BusModule {
   // Calls
-
   @Logger('Call:')
-  @ErrorHandler('Error:')
-  public async claimRequests(props: ClaimRequestsProps) {
-    const { account } = props;
-    invariant(this.bus.core.web3Provider, 'Web3 provider is not defined');
-    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
-
-    const isContract = await this.bus.core.isContract(account);
-
-    if (isContract) return this.claimRequestsMultisig(props);
-    else return this.claimRequestsEOA(props);
+  @ErrorHandler()
+  public async claimRequests(
+    props: ClaimRequestsProps,
+  ): Promise<TransactionResult> {
+    const { account, callback = NOOP } = props;
+    const { requestsIds, hints } = await this.sortRequestsWithHints(
+      props.requestsIds,
+      props.hints,
+    );
+    const params = [requestsIds, hints] as const;
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
+    return this.bus.core.performTransaction({
+      account,
+      callback,
+      getGasLimit: (options) =>
+        contract.estimateGas.claimWithdrawals(params, options),
+      sendTransaction: (options) =>
+        contract.write.claimWithdrawals(params, options),
+    });
   }
 
-  @Logger('Call:')
-  private async claimRequestsEOA(props: ClaimRequestsProps) {
-    const { account, requestsIds, hints, callback = NOOP } = props;
+  @Logger('Views:')
+  @ErrorHandler()
+  public async claimRequestsSimulateTx(
+    props: NoCallback<ClaimRequestsProps>,
+  ): Promise<SimulateContractReturnType> {
+    const accountAddress = await this.bus.core.getWeb3Address(props.account);
+    const { requestsIds, hints } = await this.sortRequestsWithHints(
+      props.requestsIds,
+      props.hints,
+    );
 
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
-    callback({ stage: TransactionCallbackStage.GAS_LIMIT });
+    return contract.simulate.claimWithdrawals([requestsIds, hints], {
+      account: accountAddress,
+    });
+  }
 
-    const feeData = await this.bus.core.getFeeData();
-    const gasLimit = await this.claimGasLimit(props);
-    const overrides = {
-      account,
-      maxPriorityFeePerGas: feeData.maxPriorityFeePerGas ?? undefined,
-      maxFeePerGas: feeData.maxFeePerGas ?? undefined,
+  @Logger('Views:')
+  @ErrorHandler()
+  public async claimRequestsPopulateTx(
+    props: NoCallback<ClaimRequestsProps>,
+  ): Promise<PopulatedTransaction> {
+    const accountAddress = await this.bus.core.getWeb3Address(props.account);
+    const { requestsIds, hints } = await this.sortRequestsWithHints(
+      props.requestsIds,
+      props.hints,
+    );
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
+
+    return {
+      from: accountAddress,
+      to: contract.address,
+      data: encodeFunctionData({
+        abi: contract.abi,
+        functionName: 'claimWithdrawals',
+        args: [requestsIds, hints],
+      }),
     };
-
-    callback({ stage: TransactionCallbackStage.SIGN, payload: gasLimit });
-
-    const params = [requestsIds, hints] as const;
-    const transaction = await contract.write.claimWithdrawals(params, {
-      ...overrides,
-      gas: gasLimit,
-      chain: this.bus.core.chain,
-    });
-
-    callback({
-      stage: TransactionCallbackStage.RECEIPT,
-      payload: transaction,
-    });
-
-    const transactionReceipt =
-      await this.bus.core.rpcProvider.waitForTransactionReceipt({
-        hash: transaction,
-      });
-
-    callback({
-      stage: TransactionCallbackStage.CONFIRMATION,
-      payload: transactionReceipt,
-    });
-
-    const confirmations =
-      await this.bus.core.rpcProvider.getTransactionConfirmations({
-        hash: transactionReceipt.transactionHash,
-      });
-
-    callback({
-      stage: TransactionCallbackStage.DONE,
-      payload: confirmations,
-    });
-
-    return { hash: transaction, receipt: transactionReceipt, confirmations };
-  }
-
-  @Logger('Call:')
-  private async claimRequestsMultisig(props: ClaimRequestsProps) {
-    const { account, requestsIds, hints, callback = NOOP } = props;
-
-    const contract = await this.bus.contract.getContractWithdrawalQueue();
-
-    callback({ stage: TransactionCallbackStage.SIGN });
-
-    const params = [requestsIds, hints] as const;
-    const transaction = await contract.write.claimWithdrawals(params, {
-      account,
-      chain: this.bus.core.chain,
-    });
-
-    callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
-
-    return { hash: transaction };
   }
 
   @Logger('Utils:')
-  @Cache(30 * 1000, ['bus.core.chain.id'])
-  private async claimGasLimit(
-    props: ClaimRequestsPropsWithoutCallback,
-  ): Promise<bigint> {
-    const { account, requestsIds, hints } = props;
-    invariant(this.bus.core.rpcProvider, 'RPC provider is not defined');
-
-    const contract = await this.bus.contract.getContractWithdrawalQueue();
-
-    const params = [requestsIds, hints] as const;
-    const gasLimit = await contract.estimateGas.claimWithdrawals(params, {
-      account,
+  private async sortRequestsWithHints(
+    requestsIds: readonly bigint[],
+    hints?: readonly bigint[],
+  ) {
+    invariantArgument(requestsIds.length > 0, 'requests array is empty');
+    if (hints) {
+      return requestsIds
+        .map((request, index) => {
+          const hint = hints[index];
+          invariantArgument(hint, 'Hints array does not match request array');
+          return [request, hint] as const;
+        })
+        .sort(([r1], [r2]) => bigintComparator(r1, r2))
+        .reduce(
+          (acc, [request, hint]) => {
+            acc.requestsIds.push(request);
+            acc.hints.push(hint);
+            return acc;
+          },
+          { requestsIds: [] as bigint[], hints: [] as bigint[] },
+        );
+    }
+    const sortedRequestsIds = [...requestsIds].sort(bigintComparator);
+    const fetchedHints = await this.bus.views.findCheckpointHints({
+      sortedIds: sortedRequestsIds,
     });
-
-    return gasLimit;
+    return {
+      requestsIds: sortedRequestsIds,
+      hints: fetchedHints,
+    };
   }
 }

@@ -1,4 +1,3 @@
-import invariant from 'tiny-invariant';
 import {
   type Address,
   type GetContractReturnType,
@@ -6,17 +5,16 @@ import {
   getContract,
   zeroAddress,
 } from 'viem';
-import { LidoSDKCore } from '../core/index.js';
 import { Logger, ErrorHandler, Cache } from '../common/decorators/index.js';
-import { version } from '../version.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+
 import { rewardsEventsAbi } from './abi/rewardsEvents.js';
 import {
+  type GetRewardsFromChainOptions,
   type GetRewardsFromChainResult,
   type GetRewardsFromSubgraphOptions,
   type GetRewardsFromSubgraphResult,
   type GetRewardsOptions,
-  type LidoSDKRewardsProps,
-  type NonPendingBlockTag,
   type Reward,
   type RewardsChainEvents,
   type RewardsSubgraphEvents,
@@ -36,32 +34,30 @@ import {
 import { addressEqual } from '../common/utils/address-equal.js';
 import { getInitialData } from './subgraph/index.js';
 import { calcShareRate, requestWithBlockStep, sharesToSteth } from './utils.js';
+import {
+  ERROR_CODE,
+  invariant,
+  invariantArgument,
+  withSDKError,
+} from '../index.js';
+import { LidoSDKApr } from '../statistics/apr.js';
 
-export class LidoSDKRewards {
+export class LidoSDKRewards extends LidoSDKModule {
   private static readonly PRECISION = 10n ** 27n;
-  private static readonly DEFAULT_STEP = 1000;
-
-  readonly core: LidoSDKCore;
-
-  constructor(props: LidoSDKRewardsProps) {
-    if (props.core) this.core = props.core;
-    else this.core = new LidoSDKCore(props, version);
-  }
+  private static readonly DEFAULT_STEP_ENTITIES = 1000;
+  private static readonly DEFAULT_STEP_BLOCK = 50000;
 
   // Contracts
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   private async contractAddressStETH(): Promise<Address> {
-    invariant(this.core.chain, 'Chain is not defined');
-
     return await this.core.getContractAddress(LIDO_CONTRACT_NAMES.lido);
   }
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   private async contractAddressWithdrawalQueue(): Promise<Address> {
-    invariant(this.core.chain, 'Chain is not defined');
     return await this.core.getContractAddress(
       LIDO_CONTRACT_NAMES.withdrawalQueue,
     );
@@ -70,7 +66,6 @@ export class LidoSDKRewards {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   private earliestRebaseEventBlock(): bigint {
-    invariant(this.core.chain, 'Chain is not defined');
     return EARLIEST_TOKEN_REBASED_EVENT[this.core.chainId];
   }
 
@@ -91,10 +86,10 @@ export class LidoSDKRewards {
   @Logger('Rewards:')
   @ErrorHandler('Rewards:')
   public async getRewardsFromChain(
-    props: GetRewardsOptions,
+    props: GetRewardsFromChainOptions,
   ): Promise<GetRewardsFromChainResult> {
     const [
-      { address, fromBlock, toBlock, includeZeroRebases, step },
+      { address, fromBlock, toBlock, includeZeroRebases, includeOnlyRebases },
       stethContract,
       withdrawalQueueAddress,
     ] = await Promise.all([
@@ -102,12 +97,14 @@ export class LidoSDKRewards {
       this.getContractStETH(),
       this.contractAddressWithdrawalQueue(),
     ]);
-
+    const step = props.stepBlock ?? LidoSDKRewards.DEFAULT_STEP_BLOCK;
+    invariantArgument(step > 0, 'stepBlock must be a positive integer');
     const lowerBound = this.earliestRebaseEventBlock();
     if (fromBlock < lowerBound)
-      throw new Error(
-        `Cannot index events earlier than first TokenRebased event at block ${lowerBound.toString()}`,
-      );
+      throw this.core.error({
+        message: `Cannot index events earlier than first TokenRebased event at block ${lowerBound.toString()}`,
+        code: ERROR_CODE.NOT_SUPPORTED,
+      });
 
     const preBlock = fromBlock === 0n ? 0n : fromBlock - 1n;
 
@@ -118,34 +115,37 @@ export class LidoSDKRewards {
       transferOutEvents,
       transferInEvents,
       rebaseEvents,
-    ] = await Promise.all([
-      stethContract.read.sharesOf([address], {
-        blockNumber: preBlock,
-      }),
-      stethContract.read.getTotalPooledEther({ blockNumber: preBlock }),
-      stethContract.read.getTotalShares({ blockNumber: preBlock }),
-      requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
-        stethContract.getEvents.TransferShares(
-          { from: address },
-          { fromBlock, toBlock },
+    ] = await withSDKError(
+      Promise.all([
+        stethContract.read.sharesOf([address], {
+          blockNumber: preBlock,
+        }),
+        stethContract.read.getTotalPooledEther({ blockNumber: preBlock }),
+        stethContract.read.getTotalShares({ blockNumber: preBlock }),
+        requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
+          stethContract.getEvents.TransferShares(
+            { from: address },
+            { fromBlock, toBlock },
+          ),
         ),
-      ),
-      requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
-        stethContract.getEvents.TransferShares(
-          { to: address },
-          { fromBlock, toBlock },
+        requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
+          stethContract.getEvents.TransferShares(
+            { to: address },
+            { fromBlock, toBlock },
+          ),
         ),
-      ),
-      requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
-        stethContract.getEvents.TokenRebased(
-          {},
-          {
-            fromBlock,
-            toBlock,
-          },
+        requestWithBlockStep(step, fromBlock, toBlock, (fromBlock, toBlock) =>
+          stethContract.getEvents.TokenRebased(
+            {},
+            {
+              fromBlock,
+              toBlock,
+            },
+          ),
         ),
-      ),
-    ]);
+      ]),
+      ERROR_CODE.READ_ERROR,
+    );
 
     // concat types are broken
     const events = ([] as any[]).concat(
@@ -183,6 +183,7 @@ export class LidoSDKRewards {
     const baseBalance = getCurrentStethFromShares(baseBalanceShares);
     const baseShareRate = getCurrentShareRate();
 
+    let totalRewards = 0n;
     let shareRate = baseShareRate;
     let prevSharesBalance = baseBalanceShares;
     let rewards: Reward<RewardsChainEvents>[] = events.map((event) => {
@@ -220,10 +221,12 @@ export class LidoSDKRewards {
         currentTotalShares = postTotalShares;
         const newBalance = getCurrentStethFromShares(prevSharesBalance);
         shareRate = getCurrentShareRate();
-
+        const change = newBalance - oldBalance;
+        totalRewards += change;
         return {
           type: 'rebase',
-          change: newBalance - oldBalance,
+          change,
+          apr: LidoSDKApr.calculateAprFromRebaseEvent(event.args) / 100,
           changeShares: 0n,
           balance: newBalance,
           balanceShares: prevSharesBalance,
@@ -231,8 +234,12 @@ export class LidoSDKRewards {
           originalEvent: event,
         };
       }
-      throw new Error('Impossible event type');
+      invariant(false, 'Impossible event');
     });
+
+    if (includeOnlyRebases) {
+      rewards = rewards.filter((r) => r.type === 'rebase');
+    }
 
     if (!includeZeroRebases) {
       rewards = rewards.filter(
@@ -245,6 +252,7 @@ export class LidoSDKRewards {
       baseBalanceShares,
       baseShareRate,
       baseBalance,
+      totalRewards,
       fromBlock: fromBlock,
       toBlock: toBlock,
     };
@@ -256,14 +264,22 @@ export class LidoSDKRewards {
     props: GetRewardsFromSubgraphOptions,
   ): Promise<GetRewardsFromSubgraphResult> {
     const [
-      { getSubgraphUrl, address, fromBlock, toBlock, step, includeZeroRebases },
+      {
+        getSubgraphUrl,
+        address,
+        fromBlock,
+        toBlock,
+        includeZeroRebases,
+        includeOnlyRebases,
+      },
       withdrawalQueueAddress,
     ] = await Promise.all([
       this.parseProps(props),
       this.contractAddressWithdrawalQueue(),
     ]);
     const url = getSubgraphUrl(this.core.getSubgraphId(), this.core.chainId);
-
+    const step = props.stepEntities ?? LidoSDKRewards.DEFAULT_STEP_ENTITIES;
+    invariantArgument(step > 0, 'stepEntities must be a positive integer');
     // Cap toBlock to last indexed
     const lastIndexedBlock = BigInt(
       (await getLastIndexedBlock({ url })).number,
@@ -275,23 +291,26 @@ export class LidoSDKRewards {
     // fetch data from subgraph
     const [
       transfers,
-      totalRewards,
+      rebases,
       { transfer: initialTransfer, rebase: initialRebase },
-    ] = await Promise.all([
-      getTransfers({
-        url,
-        address,
-        fromBlock,
-        toBlock: cappedToBlock,
-        step,
-      }),
-      getTotalRewards({ url, fromBlock, toBlock: cappedToBlock, step }),
-      getInitialData({ url, address, block: preBlock }),
-    ]);
+    ] = await withSDKError(
+      Promise.all([
+        getTransfers({
+          url,
+          address,
+          fromBlock,
+          toBlock: cappedToBlock,
+          step,
+        }),
+        getTotalRewards({ url, fromBlock, toBlock: cappedToBlock, step }),
+        getInitialData({ url, address, block: preBlock }),
+      ]),
+      ERROR_CODE.READ_ERROR,
+    );
 
     // concat types are broken
     const events = ([] as (TransferEventEntity | TotalRewardEntity)[]).concat(
-      totalRewards,
+      rebases,
       transfers,
     );
 
@@ -352,6 +371,7 @@ export class LidoSDKRewards {
     const baseBalance = prevBalance;
     const baseBalanceShares = prevBalanceShares;
 
+    let totalRewards = 0n;
     let rewards: Reward<RewardsSubgraphEvents>[] = events.map((event) => {
       // it's a transfer
       if ('value' in event) {
@@ -409,10 +429,16 @@ export class LidoSDKRewards {
       }
       // it's a rebase
       if ('apr' in event) {
-        const { totalPooledEtherAfter, totalSharesAfter } = event;
+        const {
+          totalPooledEtherAfter,
+          totalSharesAfter,
+          apr: eventApr,
+        } = event;
 
         const totalEther = BigInt(totalPooledEtherAfter);
         const totalShares = BigInt(totalSharesAfter);
+
+        const apr = Number(eventApr);
         const newBalance = sharesToSteth(
           prevBalanceShares,
           totalEther,
@@ -420,10 +446,13 @@ export class LidoSDKRewards {
           LidoSDKRewards.PRECISION,
         );
         const change = newBalance - prevBalance;
+        totalRewards += change;
         prevBalance = newBalance;
+
         return {
           type: 'rebase',
           change,
+          apr,
           changeShares: 0n,
           balance: newBalance,
           balanceShares: prevBalanceShares,
@@ -435,8 +464,12 @@ export class LidoSDKRewards {
           originalEvent: event,
         };
       }
-      throw new Error('Impossible event');
+      invariant(false, 'impossible event');
     });
+
+    if (includeOnlyRebases) {
+      rewards = rewards.filter((r) => r.type === 'rebase');
+    }
 
     if (!includeZeroRebases) {
       rewards = rewards.filter(
@@ -449,6 +482,7 @@ export class LidoSDKRewards {
       baseBalance,
       lastIndexedBlock,
       baseBalanceShares,
+      totalRewards,
       baseShareRate,
       fromBlock,
       toBlock: cappedToBlock,
@@ -458,47 +492,30 @@ export class LidoSDKRewards {
   private async parseProps<TRewardsProps extends GetRewardsOptions>(
     props: TRewardsProps,
   ): Promise<
-    Omit<
-      TRewardsProps,
-      'toBlock' | 'fromBlock' | 'includeZeroRebases' | 'step'
-    > & {
+    Omit<TRewardsProps, 'toBlock' | 'fromBlock' | 'includeZeroRebases'> & {
       toBlock: bigint;
       fromBlock: bigint;
-      step: number;
       includeZeroRebases: boolean;
+      includeOnlyRebases: boolean;
     }
   > {
-    const toBlock = await this.toBlockNumber(props.toBlock ?? 'latest');
-    if (props.fromBlock == undefined) {
-      invariant(toBlock - props.blocksBack >= 0n, 'blockBack too far');
-    }
-    const fromBlock = await this.toBlockNumber(
-      props.fromBlock ?? toBlock - props.blocksBack,
+    const toBlock = await this.core.toBlockNumber(
+      props.to ?? { block: 'latest' },
     );
-    invariant(toBlock >= fromBlock, 'toBlock is higher than fromBlock');
+    const fromBlock = props.from
+      ? await this.core.toBlockNumber(props.from)
+      : await this.core.toBackBlock(props.back, toBlock);
 
-    const { step = LidoSDKRewards.DEFAULT_STEP, includeZeroRebases = false } =
-      props;
-    invariant(step > 0, 'steps must be a positive integer');
+    invariantArgument(toBlock >= fromBlock, 'toBlock is lower than fromBlock');
+
+    const { includeZeroRebases = false, includeOnlyRebases = false } = props;
 
     return {
       ...props,
       fromBlock,
-      step,
       includeZeroRebases,
+      includeOnlyRebases,
       toBlock,
     };
-  }
-
-  @Logger('Utils:')
-  private async toBlockNumber(
-    block: bigint | NonPendingBlockTag,
-  ): Promise<bigint> {
-    if (typeof block === 'bigint') return block;
-    const { number } = await this.core.rpcProvider.getBlock({
-      blockTag: block,
-    });
-    invariant(number, 'block must not be pending');
-    return number;
   }
 }

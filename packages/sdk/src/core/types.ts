@@ -1,44 +1,52 @@
-import {
+import type {
   WalletClient,
   PublicClient,
   Hash,
   TransactionReceipt,
   Address,
   Chain,
+  FormattedTransactionRequest,
+  BlockTag,
+  Account,
 } from 'viem';
 
 import { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
-import { SDKError } from '../index.js';
+import { SDKError } from '../common/utils/sdk-error.js';
 import type LidoSDKCore from './core.js';
 
-export type LOG_MODE = 'info' | 'debug';
+// Constructor Props
 
-type LidoSDKCorePropsRpcUrls = {
+export type LOG_MODE = 'info' | 'debug' | 'none';
+
+type LidoSDKCorePropsRpcProps =
+  | {
+      rpcUrls: string[];
+      rpcProvider?: undefined;
+    }
+  | {
+      rpcUrls?: undefined;
+      rpcProvider: PublicClient;
+    };
+
+export type LidoSDKCoreProps = {
   chainId: (typeof SUPPORTED_CHAINS)[number];
   rpcUrls: string[];
   web3Provider?: WalletClient;
   rpcProvider?: undefined;
   logMode?: LOG_MODE;
-};
-type LidoSDKCorePropsRpcProvider = {
-  chainId: (typeof SUPPORTED_CHAINS)[number];
-  rpcUrls: undefined;
-  web3Provider?: WalletClient;
-  rpcProvider: PublicClient;
-  logMode?: LOG_MODE;
-};
-
-export type LidoSDKCoreProps =
-  | LidoSDKCorePropsRpcUrls
-  | LidoSDKCorePropsRpcProvider;
+} & LidoSDKCorePropsRpcProps;
 
 export type LidoSDKCommonProps =
   | {
       core: LidoSDKCore;
     }
-  | ({ core: undefined } & LidoSDKCoreProps);
+  | ({ core?: undefined } & LidoSDKCoreProps);
+
+// Method Props primitives
 
 export type EtherValue = string | bigint;
+
+export type AccountValue = Address | Account;
 
 export enum TransactionCallbackStage {
   'PERMIT' = 'permit',
@@ -51,13 +59,26 @@ export enum TransactionCallbackStage {
   'ERROR' = 'error',
 }
 
-export type PerformTransactionOptions = {
-  callback: TransactionCallback;
-  account: Address;
+export type CommonTransactionProps = {
+  callback?: TransactionCallback;
+  account?: AccountValue;
+};
+
+export type PerformTransactionGasLimit = (
+  overrides: TransactionOptions,
+) => Promise<bigint>;
+
+export type PerformTransactionSendTransaction = (
+  override: TransactionOptions,
+) => Promise<Hash>;
+
+export type PerformTransactionOptions = CommonTransactionProps & {
+  getGasLimit: PerformTransactionGasLimit;
+  sendTransaction: PerformTransactionSendTransaction;
 };
 
 export type TransactionOptions = {
-  account: Address;
+  account: AccountValue;
   chain: Chain;
   gas?: bigint;
   maxFeePerGas?: bigint;
@@ -69,6 +90,11 @@ export type TransactionResult = {
   receipt?: TransactionReceipt;
   confirmations?: bigint;
 };
+
+export type PopulatedTransaction = Omit<FormattedTransactionRequest, 'type'>;
+
+export type NoCallback<TProps extends { callback?: TransactionCallback }> =
+  Omit<TProps, 'callback'>;
 
 export type TransactionCallbackProps =
   | { stage: TransactionCallbackStage.PERMIT; payload?: undefined }
@@ -107,7 +133,45 @@ export type PermitSignature = {
 export type SignPermitProps = {
   token: (typeof LIDO_TOKENS)['steth'] | (typeof LIDO_TOKENS)['wsteth'];
   amount: bigint;
-  account: Address;
+  account?: AccountValue;
   spender: Address;
   deadline?: bigint;
+};
+
+export type NonPendingBlockTag = Exclude<BlockTag, 'pending'>;
+
+export type BlockArgumentType =
+  | {
+      block: bigint | NonPendingBlockTag;
+      timestamp?: undefined;
+    }
+  | {
+      block?: undefined;
+      timestamp: bigint;
+    };
+
+export type BackArgumentType =
+  | {
+      seconds: bigint;
+      days?: undefined;
+      blocks?: undefined;
+    }
+  | {
+      seconds?: undefined;
+      days: bigint;
+      blocks?: undefined;
+    }
+  | {
+      days?: undefined;
+      seconds?: undefined;
+      blocks: bigint;
+    };
+
+// Core methods
+
+export type GetFeeDataResult = {
+  lastBaseFeePerGas: bigint;
+  maxFeePerGas: bigint;
+  maxPriorityFeePerGas: bigint;
+  gasPrice: bigint;
 };

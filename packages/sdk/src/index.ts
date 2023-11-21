@@ -1,20 +1,13 @@
 export { LidoSDK } from './sdk.js';
-export { type SDKError } from './common/utils/SDKError.js';
-export * from './common/decorators/index.js';
-export {
-  TransactionCallbackStage,
-  type TransactionCallback,
-} from './core/index.js';
-export { type StakeProps } from './stake/index.js';
-export {
-  type ClaimRequestsProps,
-  type RequestProps,
-  type RequestWithPermitProps,
-  type ApproveCallbackStages,
-  type ApproveStageCallback,
-  type RequestStatusWithId,
-} from './withdraw/index.js';
-export { LIDO_CONTRACT_NAMES } from './common/constants.js';
-export { type WrapProps } from './wrap/index.js';
-export { LidoSDKEvents, RebaseEvent } from './events/index.js';
-export { LidoSDKStatistics } from './statistics/index.js';
+
+export * from './common/index.js';
+export * from './core/index.js';
+export * from './erc20/index.js';
+export * from './shares/index.js';
+export * from './events/index.js';
+export * from './rewards/index.js';
+export * from './stake/index.js';
+export * from './statistics/index.js';
+export * from './unsteth/index.js';
+export * from './withdraw/index.js';
+export * from './wrap/index.js';

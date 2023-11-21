@@ -1,26 +1,16 @@
-import { type Address } from 'viem';
-
 import { Logger, ErrorHandler } from '../common/decorators/index.js';
 import { isBigint } from '../common/utils/index.js';
-import { version } from '../version.js';
-import { type LidoSDKCoreProps } from '../core/index.js';
 
-import { Bus } from './bus.js';
+import { BusModule } from './bus-module.js';
 import { type RequestStatusWithId } from './types.js';
+import { AccountValue } from '../index.js';
 
-export class LidoSDKWithdrawRequestsInfo {
-  private readonly bus: Bus;
-
-  constructor(props: LidoSDKCoreProps & { bus?: Bus }) {
-    if (props.bus) this.bus = props.bus;
-    else this.bus = new Bus(props, version);
-  }
-
+export class LidoSDKWithdrawRequestsInfo extends BusModule {
   // Utils
 
   @Logger('Utils:')
-  @ErrorHandler('Error:')
-  public async getWithdrawalRequestsInfo(props: { account: Address }) {
+  @ErrorHandler()
+  public async getWithdrawalRequestsInfo(props: { account: AccountValue }) {
     const claimableInfo = await this.getClaimableRequestsInfo(props);
     const claimableETH = await this.getClaimableRequestsETHByAccount(props);
     const pendingInfo = await this.getPendingRequestsInfo(props);
@@ -33,20 +23,22 @@ export class LidoSDKWithdrawRequestsInfo {
   }
 
   @Logger('Utils:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getWithdrawalRequestsStatus(props: {
-    account: Address;
+    account: AccountValue;
   }): Promise<readonly RequestStatusWithId[]> {
     const requestsIds = await this.bus.views.getWithdrawalRequestsIds({
-      account: props.account,
+      account: await this.bus.core.getWeb3Address(props.account),
     });
 
     return this.bus.views.getWithdrawalStatus({ requestsIds });
   }
 
   @Logger('Utils:')
-  @ErrorHandler('Error:')
-  public async getClaimableRequestsInfo(props: { account: Address }): Promise<{
+  @ErrorHandler()
+  public async getClaimableRequestsInfo(props: {
+    account: AccountValue;
+  }): Promise<{
     claimableRequests: RequestStatusWithId[];
     claimableAmountStETH: bigint;
   }> {
@@ -68,7 +60,7 @@ export class LidoSDKWithdrawRequestsInfo {
   }
 
   @Logger('Utils:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getClaimableRequestsETHByIds(props: {
     claimableRequestsIds: (bigint | RequestStatusWithId)[];
   }): Promise<{
@@ -104,9 +96,9 @@ export class LidoSDKWithdrawRequestsInfo {
   }
 
   @Logger('Utils:')
-  @ErrorHandler('Error:')
+  @ErrorHandler()
   public async getClaimableRequestsETHByAccount(props: {
-    account: Address;
+    account: AccountValue;
   }): Promise<{
     ethByRequests: readonly bigint[];
     ethSum: bigint;
@@ -135,8 +127,10 @@ export class LidoSDKWithdrawRequestsInfo {
   }
 
   @Logger('Utils:')
-  @ErrorHandler('Error:')
-  public async getPendingRequestsInfo(props: { account: Address }): Promise<{
+  @ErrorHandler()
+  public async getPendingRequestsInfo(props: {
+    account: AccountValue;
+  }): Promise<{
     pendingRequests: RequestStatusWithId[];
     pendingAmountStETH: bigint;
   }> {

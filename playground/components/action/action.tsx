@@ -1,3 +1,9 @@
+import dynamic from 'next/dynamic';
+
+const ReactJSON = dynamic(() => import('react-json-view'), {
+  ssr: false,
+});
+
 import { Button, Accordion } from '@lidofinance/lido-ui';
 import { PropsWithChildren, useReducer } from 'react';
 import { type SDKError } from '@lidofinance/lido-ethereum-sdk';
@@ -8,12 +14,14 @@ import {
   ResultCode,
   SuccessMessage,
 } from './styles';
+import { useWeb3 } from '@reef-knot/web3-react';
 
 type ActionProps<TResult> = PropsWithChildren<{
   action: () => Promise<TResult> | TResult;
   title: string;
   renderResult?: (result: TResult) => JSX.Element;
   renderError?: (error: SDKError) => JSX.Element;
+  walletAction?: boolean;
 }>;
 
 type ReducerAction<TResult> =
@@ -78,7 +86,7 @@ const defaultRenderError = (error: SDKError) => {
     <Accordion
       summary={
         <ErrorMessage>
-          {String(error.errorMessage).slice(0, 30) + '...'}
+          {error.code}:{String(error.errorMessage).slice(0, 30) + '...'}
         </ErrorMessage>
       }
     >
@@ -88,15 +96,24 @@ const defaultRenderError = (error: SDKError) => {
 };
 
 const defaultRenderResult = <TResult,>(result: TResult) => {
+  const stringfyed = JSON.stringify(
+    result,
+    (_, value) => (typeof value === 'bigint' ? value.toString() : value),
+    2,
+  );
+
+  if (typeof result !== 'object') {
+    return <ResultCode>{stringfyed}</ResultCode>;
+  }
   return (
     <Accordion summary={<SuccessMessage>Success</SuccessMessage>}>
-      <ResultCode>
-        {JSON.stringify(
-          result,
-          (_, value) => (typeof value === 'bigint' ? value.toString() : value),
-          2,
-        )}
-      </ResultCode>
+      <ReactJSON
+        theme={'pop'}
+        name={null}
+        displayDataTypes={false}
+        src={JSON.parse(stringfyed)}
+        collapseStringsAfterLength={30}
+      />
     </Accordion>
   );
 };
@@ -104,10 +121,12 @@ const defaultRenderResult = <TResult,>(result: TResult) => {
 export const Action = <TResult,>({
   action,
   title,
+  walletAction = false,
   renderResult = defaultRenderResult,
   renderError = defaultRenderError,
   children,
 }: ActionProps<TResult>) => {
+  const { active } = useWeb3();
   const [{ result, error, loading }, dispatch] = useReducer(
     reducer<TResult>,
     {
@@ -133,7 +152,11 @@ export const Action = <TResult,>({
     <ActionBlock>
       {children && <Controls>{children}</Controls>}
       <Controls>
-        <Button loading={loading} onClick={startLoading}>
+        <Button
+          disabled={walletAction && !active}
+          loading={loading}
+          onClick={startLoading}
+        >
           {title}
         </Button>
         {result !== undefined && renderResult(result)}
