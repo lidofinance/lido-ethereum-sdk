@@ -72,7 +72,7 @@ export const WrapDemo = () => {
       />
       <Action
         walletAction
-        title="Approve Steth For Wrap"
+        title="Approve stETH For Wrap"
         action={() =>
           wrap.approveStethForWrap({
             value: approveValue ?? ZERO,

@@ -26,11 +26,13 @@ export const ShareDemo = () => {
   return (
     <Accordion summary={'Shares'}>
       <Action
+        walletAction
         title="Balance Shares"
         action={() => shares.balance(account)}
         renderResult={renderTokenResult('shares')}
       />
       <Action
+        walletAction
         title="Transfer"
         action={() =>
           shares.transfer({
@@ -62,6 +64,7 @@ export const ShareDemo = () => {
         />
       </Action>
       <Action
+        walletAction
         title="Simulate Transfer"
         action={() =>
           shares.simulateTransfer({
@@ -73,6 +76,7 @@ export const ShareDemo = () => {
         }
       />
       <Action
+        walletAction
         title="Populate Transfer"
         action={() =>
           shares.populateTransfer({
