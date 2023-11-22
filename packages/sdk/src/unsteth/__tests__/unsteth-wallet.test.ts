@@ -80,9 +80,11 @@ describe('unsteth wallet tests', () => {
     nftId = nftIds.pop() as bigint;
   });
 
-  testSpending.each(nftIds)('owner is correct for nft $#', async (nftId) => {
-    const owner = await unsteth.getAccountByNFT(nftId);
-    expectAddress(owner, account.address);
+  testSpending('owner is correct for every nft ', async () => {
+    for (const id of nftIds) {
+      const owner = await unsteth.getAccountByNFT(id);
+      expectAddress(owner, account.address);
+    }
   });
 
   testSpending('can populate transfer token', async () => {
@@ -163,6 +165,7 @@ describe('unsteth wallet tests', () => {
     const tx = await unsteth.setSingleTokenApproval({
       id: nftId,
       to: altAccount.address,
+      callback: mock,
     });
     expectTxCallback(mock, tx);
 
@@ -188,6 +191,7 @@ describe('unsteth wallet tests', () => {
     const mock = jest.fn();
     const tx = await unsteth.setSingleTokenApproval({
       id: nftId,
+      callback: mock,
     });
     expectTxCallback(mock, tx);
 
@@ -247,6 +251,7 @@ describe('unsteth wallet tests', () => {
     const tx = await unsteth.setAllTokensApproval({
       to: altAccount.address,
       allow: true,
+      callback: mock,
     });
     expectTxCallback(mock, tx);
 
@@ -274,6 +279,7 @@ describe('unsteth wallet tests', () => {
     const tx = await unsteth.setAllTokensApproval({
       to: altAccount.address,
       allow: false,
+      callback: mock,
     });
 
     expectTxCallback(mock, tx);
