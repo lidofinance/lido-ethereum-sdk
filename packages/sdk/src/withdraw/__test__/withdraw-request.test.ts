@@ -1,4 +1,4 @@
-import { expect, describe, jest, beforeAll } from '@jest/globals';
+import { expect, describe, jest, beforeAll, test } from '@jest/globals';
 import { useWithdraw } from '../../../tests/utils/fixtures/use-withdraw.js';
 import { expectAlmostEqualBn } from '../../../tests/utils/expect/expect-bn.js';
 import { Address } from 'viem';
@@ -6,7 +6,7 @@ import { useWrap } from '../../../tests/utils/fixtures/use-wrap.js';
 import { useAccount } from '../../../tests/utils/fixtures/use-wallet-client.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
 import { useWeb3Core } from '../../../tests/utils/fixtures/use-core.js';
-import { PermitSignature } from '../../index.js';
+import { ERROR_CODE, PermitSignature } from '../../index.js';
 import { useStake } from '../../../tests/utils/fixtures/use-stake.js';
 import {
   expectPopulatedTx,
@@ -21,6 +21,7 @@ import { useSteth } from '../../../tests/utils/fixtures/use-steth.js';
 import { useUnsteth } from '../../../tests/utils/fixtures/use-unsteth.js';
 import { WithdrawableTokens } from '../request/types.js';
 import { useWsteth } from '../../../tests/utils/fixtures/use-wsteth.js';
+import { expectSDKError } from '../../../tests/utils/expect/expect-sdk-error.js';
 
 const ethAmount = 110n;
 
@@ -285,4 +286,76 @@ describe('withdraw stETH request', () => {
 
 describe('withdraw wstETH request', () => {
   testWithdrawals('wstETH', ethAmount);
+});
+
+type ExpectSplitArgs = {
+  requests: bigint[];
+  token: WithdrawableTokens;
+  shouldFail?: boolean;
+};
+
+const testSplit = async (token: WithdrawableTokens) => {
+  const { views, request } = useWithdraw();
+  const tableSuccess: Array<bigint[]> = [],
+    tableFail: Array<bigint[]> = [];
+
+  beforeAll(async () => {
+    const isSteth = token === 'stETH';
+    const [min, max] = await Promise.all([
+      isSteth
+        ? views.minStethWithdrawalAmount()
+        : views.minWStethWithdrawalAmount(),
+      isSteth
+        ? views.maxStethWithdrawalAmount()
+        : views.maxWStethWithdrawalAmount(),
+    ]);
+
+    tableSuccess.push(
+      [min],
+      [min * 2n],
+      [max],
+      [max, max],
+      [max, min],
+      [max, max, max, max, min],
+      [max, max, max, min * 3n],
+    );
+
+    tableFail.push(
+      [min - 1n],
+      [max, min - 1n],
+      [max, max, max, max, min - 1n],
+      [max, max, max, 1n],
+    );
+  });
+
+  const expectSplit = async ({
+    requests,
+    token,
+    shouldFail = false,
+  }: ExpectSplitArgs) => {
+    const amount = requests.reduce((r1, r2) => r1 + r2);
+    const test = () => request.splitAmountToRequests({ amount, token });
+    if (shouldFail) {
+      await expectSDKError(test, ERROR_CODE.INVALID_ARGUMENT);
+    } else {
+      await expect(test()).resolves.toEqual(requests);
+    }
+  };
+
+  test(`splits correctly ${token}`, async () => {
+    for (const requests of tableSuccess) await expectSplit({ requests, token });
+  });
+
+  test(`throws for incorrect splits ${token}`, async () => {
+    for (const requests of tableFail)
+      await expectSplit({ requests, token, shouldFail: true });
+  });
+};
+
+describe('split amount to requests stETH', () => {
+  testSplit('stETH');
+});
+
+describe('split amount to requests wstETH', () => {
+  testSplit('wstETH');
 });
