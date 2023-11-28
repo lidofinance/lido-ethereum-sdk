@@ -294,7 +294,7 @@ type ExpectSplitArgs = {
   shouldFail?: boolean;
 };
 
-const testSplit = async (token: WithdrawableTokens) => {
+const testSplit = (token: WithdrawableTokens) => {
   const { views, request } = useWithdraw();
   const tableSuccess: Array<bigint[]> = [],
     tableFail: Array<bigint[]> = [];
