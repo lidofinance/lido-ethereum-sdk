@@ -109,10 +109,10 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
     props: PropsWithAccount,
   ): Promise<GetClaimableRequestsETHByAccountReturnType> {
     const requests = await this.getWithdrawalRequestsStatus(props);
-
-    const sortedIds = requests
-      .map((req) => req.id)
-      .sort((aReq, bReq) => (aReq > bReq ? 1 : -1));
+    const sortedRequests = [...requests].sort((aReq, bReq) =>
+      aReq.id > bReq.id ? 1 : -1,
+    );
+    const sortedIds = sortedRequests.map((req) => req.id);
 
     const hints = await this.bus.views.findCheckpointHints({
       sortedIds,
@@ -125,7 +125,13 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
     });
     const ethSum = ethByRequests.reduce((acc, eth) => acc + eth, BigInt(0));
 
-    return { ethByRequests, ethSum, hints, requests, sortedIds };
+    return {
+      ethByRequests,
+      ethSum,
+      hints,
+      requests: sortedRequests,
+      sortedIds,
+    };
   }
 
   @Logger('Utils:')
