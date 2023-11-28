@@ -51,7 +51,7 @@ export class LidoSDKWithdrawViews extends BusModule {
     firstIndex?: bigint;
     lastIndex?: bigint;
   }): Promise<readonly bigint[]> {
-    const { sortedIds, firstIndex = BigInt(1), lastIndex: _lastIndex } = props;
+    const { sortedIds, firstIndex = 1n, lastIndex: _lastIndex } = props;
 
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
