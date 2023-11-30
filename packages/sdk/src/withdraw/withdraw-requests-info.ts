@@ -57,9 +57,9 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
         }
         return acc;
       },
-      { claimableRequests: [], claimableAmountStETH: BigInt(0) } as {
-        claimableRequests: RequestStatusWithId[];
-        claimableAmountStETH: bigint;
+      {
+        claimableRequests: [] as RequestStatusWithId[],
+        claimableAmountStETH: 0n,
       },
     );
   }
@@ -109,7 +109,8 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
     props: PropsWithAccount,
   ): Promise<GetClaimableRequestsETHByAccountReturnType> {
     const requests = await this.getWithdrawalRequestsStatus(props);
-    const sortedRequests = [...requests].sort((aReq, bReq) =>
+    const claimableRequests = requests.filter((req) => req.isFinalized);
+    const sortedRequests = claimableRequests.sort((aReq, bReq) =>
       aReq.id > bReq.id ? 1 : -1,
     );
     const sortedIds = sortedRequests.map((req) => req.id);

@@ -24,12 +24,15 @@ export const LidoSDKProvider: React.FC<PropsWithChildren> = ({ children }) => {
             transport: custom(providerWeb3.provider as any),
           })
         : undefined;
-    return new LidoSDK({
+    const sdk = new LidoSDK({
       chainId: chainId as any,
       rpcUrls: [getBackendRPCPath(chainId)],
       web3Provider: client as any,
       logMode: 'debug',
     });
+    // inject lido_sdk for console access
+    if (typeof window !== 'undefined') (window as any).lido_sdk = sdk;
+    return sdk;
   }, [providerWeb3, chainId, account]);
 
   return <context.Provider value={value}>{children}</context.Provider>;
