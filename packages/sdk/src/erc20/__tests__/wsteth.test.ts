@@ -18,6 +18,6 @@ describe('LidoSDKStake', () => {
     contractName: LIDO_CONTRACT_NAMES.wsteth,
     constructedWithRpcCore,
     constructedWithWeb3Core,
-    Ctor: LidoSDKwstETH,
+    ModulePrototype: LidoSDKwstETH,
   });
 });
