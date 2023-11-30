@@ -14,12 +14,12 @@ export const expectERC20 = <I extends AbstractLidoSDKErc20>({
   contractName,
   constructedWithRpcCore,
   constructedWithWeb3Core,
-  Ctor,
+  ModulePrototype,
 }: {
   contractName: LIDO_CONTRACT_NAMES;
   constructedWithRpcCore: I;
   constructedWithWeb3Core: I;
-  Ctor: new (props: LidoSDKCommonProps) => I;
+  ModulePrototype: new (props: LidoSDKCommonProps) => I;
 }) => {
   const token = constructedWithWeb3Core;
   const tokenRpc = constructedWithRpcCore;
@@ -42,9 +42,9 @@ export const expectERC20 = <I extends AbstractLidoSDKErc20>({
     });
   };
 
-  describe('constructor', () => {
+  describe('construModulePrototype', () => {
     test('is correct module', () => {
-      expectSDKModule(Ctor);
+      expectSDKModule(ModulePrototype);
     });
   });
 
