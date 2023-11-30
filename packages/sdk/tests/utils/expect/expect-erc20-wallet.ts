@@ -1,7 +1,10 @@
 import { encodeFunctionData, getContract } from 'viem';
 import { expect, describe, test, jest } from '@jest/globals';
-import { AbstractLidoSDKErc20 } from '../erc20.js';
-import { LIDO_CONTRACT_NAMES, PERMIT_MESSAGE_TYPES } from '../../index.js';
+import { AbstractLidoSDKErc20 } from '../../../src/erc20/erc20.js';
+import {
+  LIDO_CONTRACT_NAMES,
+  PERMIT_MESSAGE_TYPES,
+} from '../../../src/index.js';
 import {
   useAccount,
   useAltAccount,
@@ -10,7 +13,7 @@ import {
   expectPopulatedTx,
   expectPopulatedTxToRun,
 } from '../../../tests/utils/expect/expect-populated-tx.js';
-import { erc20abi } from '../abi/erc20abi.js';
+import { erc20abi } from '../../../src/erc20/abi/erc20abi.js';
 import { expectTxCallback } from '../../../tests/utils/expect/expect-tx-callback.js';
 import { expectAlmostEqualBn } from '../../../tests/utils/expect/expect-bn.js';
 import {
@@ -18,12 +21,6 @@ import {
   testSpending,
 } from '../../../tests/utils/test-spending.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
-
-describe('erc20 tokens should be tested with this abstract helper', () => {
-  test('bypassing abstract', async () => {
-    expect(true);
-  });
-});
 
 const expectPermitMessage = (
   permitMessageData: Awaited<
@@ -50,7 +47,7 @@ const expectPermitMessage = (
   expect(permitMessageData.deadline).toBe(checks.deadline);
 };
 
-export const testERC20Wallet = <I extends AbstractLidoSDKErc20>({
+export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
   contractName,
   constructedWithRpcCore,
   constructedWithWeb3Core,
@@ -189,7 +186,7 @@ export const testERC20Wallet = <I extends AbstractLidoSDKErc20>({
         const { address } = useAccount();
         const { address: altAddress } = useAltAccount();
         const params = {
-          account: address, // TODO: check necesserity of this field
+          account: address,
           to: altAddress,
           from: address,
           amount: 100n,
@@ -213,7 +210,7 @@ export const testERC20Wallet = <I extends AbstractLidoSDKErc20>({
           const { address: altAddress } = useAltAccount();
 
           const params = {
-            account: altAddress, // TODO: check necesserity of this field
+            account: altAddress,
             to: altAddress,
             from: address,
             amount: 100n,
@@ -242,7 +239,7 @@ export const testERC20Wallet = <I extends AbstractLidoSDKErc20>({
         const { address: altAddress } = useAltAccount();
         const contractAddress = await getTokenAddress();
         const params = {
-          account: address, // TODO: check necesserity of this field
+          account: address,
           to: altAddress,
           from: address,
           amount: 100n,
@@ -261,7 +258,7 @@ export const testERC20Wallet = <I extends AbstractLidoSDKErc20>({
         const { address: altAddress } = useAltAccount();
         const contractAddress = await getTokenAddress();
         const params = {
-          account: altAddress, // TODO: check necesserity of this field
+          account: altAddress,
           to: altAddress,
           from: address,
           amount: 100n,

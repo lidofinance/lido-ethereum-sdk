@@ -1,29 +1,25 @@
 import { getContract } from 'viem';
 import { expect, describe, test } from '@jest/globals';
-import { AbstractLidoSDKErc20 } from '../erc20.js';
-import { LIDO_CONTRACT_NAMES, LidoSDKCore } from '../../index.js';
+import { AbstractLidoSDKErc20 } from '../../../src/erc20/erc20.js';
+import { LIDO_CONTRACT_NAMES } from '../../../src/index.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
 import { expectContract } from '../../../tests/utils/expect/expect-contract.js';
 import { useAccount } from '../../../tests/utils/fixtures/use-wallet-client.js';
-import { erc20abi } from '../abi/erc20abi.js';
+import { erc20abi } from '../../../src/erc20/abi/erc20abi.js';
 import { expectBn } from '../../../tests/utils/expect/expect-bn.js';
+import { expectSDKModule } from '../../../tests/utils/expect/expect-sdk-module.js';
+import { LidoSDKCommonProps } from '../../../src/core/types.js';
 
-describe('erc20 tokens should be tested with this abstract helper', () => {
-  test('bypassing abstract', async () => {
-    expect(true);
-  });
-});
-
-export const testERC20 = <I extends AbstractLidoSDKErc20>({
+export const expectERC20 = <I extends AbstractLidoSDKErc20>({
   contractName,
   constructedWithRpcCore,
   constructedWithWeb3Core,
-  constructedWithRpc,
+  Ctor,
 }: {
   contractName: LIDO_CONTRACT_NAMES;
   constructedWithRpcCore: I;
   constructedWithWeb3Core: I;
-  constructedWithRpc: I;
+  Ctor: new (props: LidoSDKCommonProps) => I;
 }) => {
   const token = constructedWithWeb3Core;
   const tokenRpc = constructedWithRpcCore;
@@ -47,16 +43,8 @@ export const testERC20 = <I extends AbstractLidoSDKErc20>({
   };
 
   describe('constructor', () => {
-    test('can be constructed with core', () => {
-      const token = constructedWithRpcCore;
-      expect(token).toBeInstanceOf(AbstractLidoSDKErc20);
-      expect(token.core).toBeInstanceOf(LidoSDKCore);
-    });
-
-    test('can be constructed with rpc', () => {
-      const token = constructedWithRpc;
-      expect(token).toBeInstanceOf(AbstractLidoSDKErc20);
-      expect(token.core).toBeInstanceOf(LidoSDKCore);
+    test('is correct module', () => {
+      expectSDKModule(Ctor);
     });
   });
 

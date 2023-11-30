@@ -4,7 +4,7 @@ import {
   useRpcCore,
   useWeb3Core,
 } from '../../../tests/utils/fixtures/use-core.js';
-import { testERC20Wallet } from './erc20-wallet-abstract.js';
+import { expectERC20Wallet } from '../../../tests/utils/expect/expect-erc20-wallet.js';
 import { LIDO_CONTRACT_NAMES } from '../../index.js';
 
 describe('LidoSDKStake', () => {
@@ -14,7 +14,7 @@ describe('LidoSDKStake', () => {
   const constructedWithRpcCore = new LidoSDKstETH({ core: rpcCore });
   const constructedWithWeb3Core = new LidoSDKstETH({ core: web3Core });
 
-  testERC20Wallet({
+  expectERC20Wallet({
     contractName: LIDO_CONTRACT_NAMES.lido,
     constructedWithRpcCore,
     constructedWithWeb3Core,
