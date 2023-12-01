@@ -121,7 +121,6 @@ export class LidoSDKWithdrawRequest extends BusModule {
     const accountAddress = await this.bus.core.getWeb3Address(props.account);
     const {
       token,
-      account,
       receiver = accountAddress,
       amount = 0n,
       requests: _requests,
@@ -133,8 +132,10 @@ export class LidoSDKWithdrawRequest extends BusModule {
 
     const args = [requests, receiver] as const;
     const result = await (isSteth
-      ? contract.simulate.requestWithdrawals(args, { account })
-      : contract.simulate.requestWithdrawalsWstETH(args, { account }));
+      ? contract.simulate.requestWithdrawals(args, { account: accountAddress })
+      : contract.simulate.requestWithdrawalsWstETH(args, {
+          account: accountAddress,
+        }));
 
     return result;
   }
@@ -254,7 +255,6 @@ export class LidoSDKWithdrawRequest extends BusModule {
     const accountAddress = await this.bus.core.getWeb3Address(props.account);
     const {
       token,
-      account,
       receiver = accountAddress,
       permit,
       amount = 0n,
@@ -267,9 +267,11 @@ export class LidoSDKWithdrawRequest extends BusModule {
 
     const args = [requests, receiver, permit] as const;
     const result = await (isSteth
-      ? contract.simulate.requestWithdrawalsWithPermit(args, { account })
+      ? contract.simulate.requestWithdrawalsWithPermit(args, {
+          account: accountAddress,
+        })
       : contract.simulate.requestWithdrawalsWstETHWithPermit(args, {
-          account,
+          account: accountAddress,
         }));
 
     return result;

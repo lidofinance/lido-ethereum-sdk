@@ -7,8 +7,10 @@ export const expectSDKError = async (
 ) => {
   try {
     await callback();
-    throw new Error('expected callback to trow');
+    throw new Error('expected callback to throw');
   } catch (error) {
+    if (typeof error === 'object' && error && 'message' in error)
+      expect(error.message).not.toBe('expected callback to throw');
     expect(error).toBeInstanceOf(SDKError);
     const sdkError = error as SDKError;
     code && expect(sdkError.code).toBe(code);

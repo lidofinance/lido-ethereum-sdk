@@ -4,18 +4,17 @@ import {
   SPENDING_TIMEOUT,
   testSpending,
 } from '../../../tests/utils/test-spending.js';
-import { LidoSDKstETH } from '../../index.js';
 import { expectTxCallback } from '../../../tests/utils/expect/expect-tx-callback.js';
 import { expectAlmostEqualBn } from '../../../tests/utils/expect/expect-bn.js';
+import { useSteth } from '../../../tests/utils/fixtures/use-steth.js';
 
 describe('LidoSDKStake wallet methods', () => {
   const stake = useStake();
-
+  const steth = useSteth();
   testSpending(
     'can stake',
     async () => {
       const address = await stake.core.getWeb3Address();
-      const steth = new LidoSDKstETH({ core: stake.core });
       const stakeValue = 100n;
       const balanceBefore = await steth.balance(address);
       const mockTxCallback = jest.fn();
