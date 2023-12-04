@@ -56,7 +56,8 @@ export class LidoSDKWithdrawApprove extends BusModule {
   public async approveSimulateTx(
     props: NoCallback<WithdrawApproveProps>,
   ): Promise<SimulateContractReturnType> {
-    const { token, account, amount: _amount } = props;
+    const accountAddress = await this.bus.core.getWeb3Address(props.account);
+    const { token, amount: _amount } = props;
     const amount = parseValue(_amount);
     const isSteth = token === 'stETH';
     const addressWithdrawalsQueue =
@@ -70,7 +71,7 @@ export class LidoSDKWithdrawApprove extends BusModule {
 
     const result = contract.simulate.approve(
       [addressWithdrawalsQueue, amount],
-      { account },
+      { account: accountAddress },
     );
 
     return result;

@@ -1,16 +1,24 @@
 import { Logger, ErrorHandler } from '../common/decorators/index.js';
-import { isBigint } from '../common/utils/index.js';
+import { ERROR_CODE, isBigint } from '../common/utils/index.js';
 
 import { BusModule } from './bus-module.js';
-import { type RequestStatusWithId } from './types.js';
-import { AccountValue } from '../index.js';
+import type {
+  RequestStatusWithId,
+  GetPendingRequestsInfoReturnType,
+  PropsWithAccount,
+  GetClaimableRequestsETHByAccountReturnType,
+  GetClaimableRequestsInfoReturnType,
+  GetWithdrawalRequestsInfoReturnType,
+} from './types.js';
 
 export class LidoSDKWithdrawRequestsInfo extends BusModule {
   // Utils
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async getWithdrawalRequestsInfo(props: { account: AccountValue }) {
+  public async getWithdrawalRequestsInfo(
+    props: PropsWithAccount,
+  ): Promise<GetWithdrawalRequestsInfoReturnType> {
     const claimableInfo = await this.getClaimableRequestsInfo(props);
     const claimableETH = await this.getClaimableRequestsETHByAccount(props);
     const pendingInfo = await this.getPendingRequestsInfo(props);
@@ -24,9 +32,9 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async getWithdrawalRequestsStatus(props: {
-    account: AccountValue;
-  }): Promise<readonly RequestStatusWithId[]> {
+  public async getWithdrawalRequestsStatus(
+    props: PropsWithAccount,
+  ): Promise<readonly RequestStatusWithId[]> {
     const requestsIds = await this.bus.views.getWithdrawalRequestsIds({
       account: await this.bus.core.getWeb3Address(props.account),
     });
@@ -36,12 +44,9 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async getClaimableRequestsInfo(props: {
-    account: AccountValue;
-  }): Promise<{
-    claimableRequests: RequestStatusWithId[];
-    claimableAmountStETH: bigint;
-  }> {
+  public async getClaimableRequestsInfo(
+    props: PropsWithAccount,
+  ): Promise<GetClaimableRequestsInfoReturnType> {
     const requests = await this.getWithdrawalRequestsStatus(props);
 
     return requests.reduce(
@@ -52,9 +57,9 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
         }
         return acc;
       },
-      { claimableRequests: [], claimableAmountStETH: BigInt(0) } as {
-        claimableRequests: RequestStatusWithId[];
-        claimableAmountStETH: bigint;
+      {
+        claimableRequests: [] as RequestStatusWithId[],
+        claimableAmountStETH: 0n,
       },
     );
   }
@@ -77,7 +82,10 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
           return aReq.id > bReq.id ? 1 : -1;
         }
 
-        return 0;
+        throw this.bus.core.error({
+          code: ERROR_CODE.INVALID_ARGUMENT,
+          message: 'Mixing bigint types and object types',
+        });
       })
       .map((req) => (isBigint(req) ? req : req.id));
 
@@ -97,20 +105,15 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async getClaimableRequestsETHByAccount(props: {
-    account: AccountValue;
-  }): Promise<{
-    ethByRequests: readonly bigint[];
-    ethSum: bigint;
-    hints: readonly bigint[];
-    requests: readonly RequestStatusWithId[];
-    sortedIds: readonly bigint[];
-  }> {
+  public async getClaimableRequestsETHByAccount(
+    props: PropsWithAccount,
+  ): Promise<GetClaimableRequestsETHByAccountReturnType> {
     const requests = await this.getWithdrawalRequestsStatus(props);
-
-    const sortedIds = requests
-      .map((req) => req.id)
-      .sort((aReq, bReq) => (aReq > bReq ? 1 : -1));
+    const claimableRequests = requests.filter((req) => req.isFinalized);
+    const sortedRequests = claimableRequests.sort((aReq, bReq) =>
+      aReq.id > bReq.id ? 1 : -1,
+    );
+    const sortedIds = sortedRequests.map((req) => req.id);
 
     const hints = await this.bus.views.findCheckpointHints({
       sortedIds,
@@ -123,17 +126,20 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
     });
     const ethSum = ethByRequests.reduce((acc, eth) => acc + eth, BigInt(0));
 
-    return { ethByRequests, ethSum, hints, requests, sortedIds };
+    return {
+      ethByRequests,
+      ethSum,
+      hints,
+      requests: sortedRequests,
+      sortedIds,
+    };
   }
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async getPendingRequestsInfo(props: {
-    account: AccountValue;
-  }): Promise<{
-    pendingRequests: RequestStatusWithId[];
-    pendingAmountStETH: bigint;
-  }> {
+  public async getPendingRequestsInfo(
+    props: PropsWithAccount,
+  ): Promise<GetPendingRequestsInfoReturnType> {
     const requests = await this.getWithdrawalRequestsStatus(props);
 
     return requests.reduce(
