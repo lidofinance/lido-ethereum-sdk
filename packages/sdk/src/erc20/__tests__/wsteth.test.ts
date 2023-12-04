@@ -7,7 +7,7 @@ import {
 import { expectERC20 } from '../../../tests/utils/expect/expect-erc20.js';
 import { LIDO_CONTRACT_NAMES } from '../../index.js';
 
-describe('LidoSDKStake', () => {
+describe('LidoSDKWsteth', () => {
   const rpcCore = useRpcCore();
   const web3Core = useWeb3Core();
 
