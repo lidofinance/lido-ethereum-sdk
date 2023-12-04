@@ -22,13 +22,10 @@ export const useWalletClient = (_account?: PrivateKeyAccount) => {
 
   const chain = VIEM_CHAINS[chainId as CHAINS];
 
-  // TODO: research, for some reason, private rpc does not work as wallet rpc in CI
-  const rpc =
-    chainId === 17000 ? 'https://ethereum-holesky.publicnode.com' : rpcUrl;
-
   return createWalletClient({
     account,
     chain,
-    transport: http(rpc),
+    transport: http(rpcUrl),
+    pollingInterval: 10_000,
   });
 };

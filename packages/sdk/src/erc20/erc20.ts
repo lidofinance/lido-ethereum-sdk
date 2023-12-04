@@ -163,6 +163,7 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
       spender,
       deadline = LidoSDKCore.INFINITY_DEADLINE_VALUE,
     } = props;
+    const web3Provider = this.core.useWeb3Provider();
     const contract = await this.getContract();
     const domain = await this.erc721Domain();
     const accountAddress = await this.core.getWeb3Address(account);
@@ -177,7 +178,7 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
     };
 
     return {
-      account: account ?? accountAddress,
+      account: account ?? web3Provider.account ?? accountAddress,
       domain,
       types: PERMIT_MESSAGE_TYPES,
       primaryType: 'Permit',

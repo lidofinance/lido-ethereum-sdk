@@ -1,4 +1,4 @@
-import { describe, expect, jest } from '@jest/globals';
+import { beforeAll, describe, expect, jest } from '@jest/globals';
 import { useUnsteth } from '../../../tests/utils/fixtures/use-unsteth.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
 import { expectPositiveBn } from '../../../tests/utils/expect/expect-bn.js';
@@ -36,6 +36,13 @@ describe('unsteth wallet tests', () => {
   let nftId = 0n;
 
   jest.setTimeout(SPENDING_TIMEOUT);
+
+  beforeAll(async () => {
+    await unsteth.setAllTokensApproval({
+      to: altAccount.address,
+      allow: false,
+    });
+  });
 
   testSpending('stake', async () => {
     const tx = await stake.stakeEth({ value: (value + 2n) * BigInt(nftCount) });
