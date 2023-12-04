@@ -505,6 +505,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     const transactionReceipt = await withSDKError(
       this.rpcProvider.waitForTransactionReceipt({
         hash: transactionHash,
+        timeout: 120_000,
       }),
       ERROR_CODE.TRANSACTION_ERROR,
     );
