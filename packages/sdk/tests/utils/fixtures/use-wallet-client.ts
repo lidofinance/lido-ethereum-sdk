@@ -21,13 +21,13 @@ export const useWalletClient = (_account?: PrivateKeyAccount) => {
   const { chainId } = useTestsEnvs();
   const account = _account ?? useAccount();
 
-  const testRpcProvider = useTestRpcProvider();
+  const { ganacheProvider } = useTestRpcProvider();
 
   const chain = VIEM_CHAINS[chainId as CHAINS];
 
   return createWalletClient({
     account,
     chain,
-    transport: custom(testRpcProvider.transport),
+    transport: custom(ganacheProvider),
   });
 };
