@@ -21,6 +21,7 @@ module.exports = async function () {
 
   const ganacheProvider = ganache.provider({
     fork: { url: rpcUrl },
+    logging: { quiet: true },
     chain: { chainId, asyncRequestProcessing: false },
   });
 

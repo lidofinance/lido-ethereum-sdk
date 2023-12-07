@@ -1,9 +1,8 @@
 import type { EthereumProvider } from 'ganache';
 import {
-  createPublicClient,
   createTestClient,
   custom,
-  CustomTransport,
+  publicActions,
   PublicClient,
   TestClient,
 } from 'viem';
@@ -11,7 +10,7 @@ import { useTestsEnvs } from './use-test-envs.js';
 import { CHAINS, VIEM_CHAINS } from '../../../src/index.js';
 
 let cached: {
-  testClient: TestClient<'ganache', CustomTransport>;
+  testClient: TestClient<'ganache'>;
   ganacheProvider: EthereumProvider;
 } | null = null;
 
@@ -24,24 +23,27 @@ export const useTestRpcProvider = () => {
 
   const testClient = createTestClient({
     mode: 'ganache',
-    transport: custom(ganacheProvider),
+    transport: custom({
+      async request(args) {
+        if (args.method === 'eth_estimateGas') {
+          delete args.params[0].gas;
+        }
+        return ganacheProvider.request(args);
+      },
+    }),
+    name: 'testClient',
     chain: VIEM_CHAINS[chainId as CHAINS],
   });
   cached = { ganacheProvider, testClient };
   return cached;
 };
 
-let cachedPublicProvider: PublicClient<CustomTransport> | null = null;
+let cachedPublicProvider: PublicClient | null = null;
 
 export const usePublicRpcProvider = () => {
   if (cachedPublicProvider) return cachedPublicProvider;
-  const { chainId } = useTestsEnvs();
-  const { ganacheProvider } = useTestRpcProvider();
-  const rpcProvider = createPublicClient({
-    chain: VIEM_CHAINS[chainId as CHAINS],
-    transport: custom(ganacheProvider),
-    batch: { multicall: true },
-  });
+  const { testClient } = useTestRpcProvider();
+  const rpcProvider = testClient.extend(publicActions) as PublicClient;
   cachedPublicProvider = rpcProvider;
   return rpcProvider;
 };

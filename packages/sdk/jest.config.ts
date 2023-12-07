@@ -1,10 +1,11 @@
 import type { JestConfigWithTsJest } from 'ts-jest';
 
 const jestConfig: JestConfigWithTsJest = {
+  displayName: 'LidoSDK tests',
   testEnvironment: 'node',
   preset: 'ts-jest',
-  randomize: true,
   verbose: true,
+
   detectOpenHandles: true,
   extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
