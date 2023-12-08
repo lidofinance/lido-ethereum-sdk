@@ -73,8 +73,8 @@ export class LidoSDKStethEvents extends LidoSDKModule {
 
     const contract = await this.getContractStETH();
 
-    for (let day = 1; day <= DAYS_LIMIT; day++) {
-      const from = fromBlockNumber - BigInt(days + 1 - day) * BLOCKS_BY_DAY;
+    for (let dayOffset = 0; dayOffset < DAYS_LIMIT; dayOffset++) {
+      const from = fromBlockNumber - BigInt(days - dayOffset) * BLOCKS_BY_DAY;
       invariantArgument(from >= 0n, 'Days range precedes first block');
       const to = from + BLOCKS_BY_DAY;
 
