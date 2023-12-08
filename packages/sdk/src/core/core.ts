@@ -467,7 +467,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       overrides.maxFeePerGas = feeData.maxFeePerGas;
       overrides.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
       try {
-        overrides.gas = await getGasLimit(overrides);
+        overrides.gas = await getGasLimit({ ...overrides });
       } catch {
         // we retry without fees to see if tx will go trough
         await withSDKError(
@@ -488,7 +488,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     callback({ stage: TransactionCallbackStage.SIGN, payload: overrides.gas });
 
     const transactionHash = await withSDKError(
-      sendTransaction(overrides),
+      sendTransaction({ ...overrides }),
       ERROR_CODE.TRANSACTION_ERROR,
     );
 

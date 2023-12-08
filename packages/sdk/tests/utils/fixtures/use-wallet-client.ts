@@ -1,7 +1,8 @@
 import { privateKeyToAccount } from 'viem/accounts';
-import { Hash, PrivateKeyAccount, createWalletClient, http } from 'viem';
+import { Hash, PrivateKeyAccount, createWalletClient, custom } from 'viem';
 import { useTestsEnvs } from './use-test-envs.js';
 import { CHAINS, VIEM_CHAINS } from '../../../src/index.js';
+import { useTestRpcProvider } from './use-test-rpc-provider.js';
 
 export const useAccount = () => {
   const { privateKey } = useTestsEnvs();
@@ -17,7 +18,8 @@ export const useAltAccount = () => {
 };
 
 export const useWalletClient = (_account?: PrivateKeyAccount) => {
-  const { chainId, rpcUrl } = useTestsEnvs();
+  const { chainId } = useTestsEnvs();
+  const { testClient } = useTestRpcProvider();
   const account = _account ?? useAccount();
 
   const chain = VIEM_CHAINS[chainId as CHAINS];
@@ -25,7 +27,6 @@ export const useWalletClient = (_account?: PrivateKeyAccount) => {
   return createWalletClient({
     account,
     chain,
-    transport: http(rpcUrl),
-    pollingInterval: 10_000,
+    transport: custom({ request: testClient.request }),
   });
 };
