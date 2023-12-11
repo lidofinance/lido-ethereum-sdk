@@ -4,7 +4,7 @@ import { Logger, ErrorHandler } from '../common/decorators/index.js';
 import { ERROR_CODE, invariant } from '../common/utils/sdk-error.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 import { LidoSDKCommonProps } from '../core/types.js';
-import { AprRebaseEvent } from './types.js';
+import type { AprRebaseEvent } from './types.js';
 
 export class LidoSDKApr extends LidoSDKModule {
   readonly events: LidoSDKEvents;
@@ -32,17 +32,6 @@ export class LidoSDKApr extends LidoSDKModule {
         ((postShareRate - preShareRate) * BigInt(mulForPrecision))) /
       preShareRate /
       timeElapsed;
-
-    console.log([
-      {
-        preTotalEther,
-        preTotalShares,
-        postTotalEther,
-        postTotalShares,
-        timeElapsed,
-      },
-      (Number(userAPR) * 100) / mulForPrecision,
-    ]);
 
     return (Number(userAPR) * 100) / mulForPrecision;
   }
