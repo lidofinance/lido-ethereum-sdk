@@ -2,7 +2,6 @@ import type { EthereumProvider } from 'ganache';
 import {
   createTestClient,
   custom,
-  http,
   publicActions,
   PublicClient,
   TestClient,
@@ -22,8 +21,6 @@ export const useTestRpcProvider = () => {
   const ganacheProvider = (globalThis as any)
     .__ganache_provider__ as EthereumProvider;
 
-  const localhost = http('http://localhost:3333');
-
   const testClient = createTestClient({
     mode: 'ganache',
     transport: custom({
@@ -31,7 +28,7 @@ export const useTestRpcProvider = () => {
         if (args.method === 'eth_estimateGas') {
           delete args.params[0].gas;
         }
-        return localhost({}).request(args);
+        return ganacheProvider.request(args);
       },
     }),
     name: 'testClient',
