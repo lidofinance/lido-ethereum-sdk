@@ -8,7 +8,7 @@ import { LIDO_CONTRACT_NAMES } from '../../index.js';
 import { expectRebaseEvent } from '../../../tests/utils/expect/expect-rebase-event.js';
 
 describe('LidoSDKEvents', () => {
-  const { stethEvents, core } = useEvents();
+  const { stethEvents, core } = useEvents({ useDirectRpc: true });
   let lidoAddress = '';
 
   beforeAll(async () => {

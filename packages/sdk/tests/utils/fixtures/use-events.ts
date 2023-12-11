@@ -1,8 +1,12 @@
 import { LidoSDKEvents } from '../../../src/index.js';
-import { useRpcCore } from './use-core.js';
+import { useDirectRpcCore, useRpcCore } from './use-core.js';
 
-export const useEvents = () => {
-  const core = useRpcCore();
+type UseModuleOptions = {
+  useDirectRpc?: boolean;
+};
+
+export const useEvents = ({ useDirectRpc = false }: UseModuleOptions = {}) => {
+  const core = useDirectRpc ? useDirectRpcCore() : useRpcCore();
   const events = new LidoSDKEvents({ core });
   return events;
 };

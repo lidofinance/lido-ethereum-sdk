@@ -4,6 +4,7 @@ import { Logger, ErrorHandler } from '../common/decorators/index.js';
 import { ERROR_CODE, invariant } from '../common/utils/sdk-error.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 import { LidoSDKCommonProps } from '../core/types.js';
+import { AprRebaseEvent } from './types.js';
 
 export class LidoSDKApr extends LidoSDKModule {
   readonly events: LidoSDKEvents;
@@ -14,21 +15,13 @@ export class LidoSDKApr extends LidoSDKModule {
     this.events = new LidoSDKEvents({ ...props, core: this.core });
   }
 
-  public static calculateAprFromRebaseEvent(props: {
-    preTotalEther: bigint;
-    preTotalShares: bigint;
-    postTotalEther: bigint;
-    postTotalShares: bigint;
-    timeElapsed: bigint;
-  }): number {
-    const {
-      preTotalEther,
-      preTotalShares,
-      postTotalEther,
-      postTotalShares,
-      timeElapsed,
-    } = props;
-
+  public static calculateAprFromRebaseEvent({
+    preTotalEther,
+    preTotalShares,
+    postTotalEther,
+    postTotalShares,
+    timeElapsed,
+  }: AprRebaseEvent): number {
     const preShareRate = (preTotalEther * BigInt(10 ** 27)) / preTotalShares;
     const postShareRate = (postTotalEther * BigInt(10 ** 27)) / postTotalShares;
     const mulForPrecision = 1000;
@@ -39,6 +32,17 @@ export class LidoSDKApr extends LidoSDKModule {
         ((postShareRate - preShareRate) * BigInt(mulForPrecision))) /
       preShareRate /
       timeElapsed;
+
+    console.log([
+      {
+        preTotalEther,
+        preTotalShares,
+        postTotalEther,
+        postTotalShares,
+        timeElapsed,
+      },
+      (Number(userAPR) * 100) / mulForPrecision,
+    ]);
 
     return (Number(userAPR) * 100) / mulForPrecision;
   }
