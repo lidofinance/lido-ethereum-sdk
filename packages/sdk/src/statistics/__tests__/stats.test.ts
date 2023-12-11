@@ -1,8 +1,16 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, test, expect } from '@jest/globals';
 import { expectSDKModule } from '../../../tests/utils/expect/expect-sdk-module.js';
-import { AprRebaseEvent, LidoSDKApr, LidoSDKStatistics } from '../../index.js';
+import {
+  AprRebaseEvent,
+  LidoSDKApr,
+  LidoSDKStatistics,
+  invariant,
+} from '../../index.js';
 
 import { useStats } from '../../../tests/utils/fixtures/use-stats.js';
+import { useTestsEnvs } from '../../../tests/utils/fixtures/use-test-envs.js';
+import { useEvents } from '../../../tests/utils/fixtures/use-events.js';
 
 const APR_SPEC: Array<[AprRebaseEvent, number]> = [
   [
@@ -67,7 +75,40 @@ const APR_SPEC: Array<[AprRebaseEvent, number]> = [
   ],
 ];
 
+const APR_SPEC_BLOCK: Record<string, { block: bigint; apr: number }[]> = {
+  '17000': [
+    {
+      block: 500726n,
+      apr: 1.7,
+    },
+    {
+      block: 493967n,
+      apr: 1.9,
+    },
+    {
+      block: 491753n,
+      apr: 1.5,
+    },
+    {
+      block: 94120n,
+      apr: 1.3,
+    },
+
+    {
+      block: 103607n,
+      apr: 6.3,
+    },
+
+    {
+      block: 77212n,
+      apr: 1.3,
+    },
+  ],
+};
+
 describe('LidoSDKStats', () => {
+  const { chainId } = useTestsEnvs();
+  const { stethEvents } = useEvents({ useDirectRpc: true });
   const { apr } = useStats({ useDirectRpc: true });
 
   test('is correct module', () => {
@@ -93,4 +134,21 @@ describe('LidoSDKStats', () => {
   test.each(APR_SPEC)('calculateAprFromRebaseEvent %#', (props, result) => {
     expect(LidoSDKApr.calculateAprFromRebaseEvent(props)).toBe(result);
   });
+
+  test('has apr by block spec for current chain', () => {
+    expect(APR_SPEC_BLOCK[chainId]).toBeDefined();
+  });
+
+  test.each(APR_SPEC_BLOCK[chainId]!)(
+    'calculateAprFromRebaseEvent for $block block',
+    async ({ apr, block }) => {
+      const events = await stethEvents.getRebaseEvents({
+        from: { block },
+        to: { block },
+      });
+      expect(events[0]).toBeDefined();
+      invariant(events[0], 'no rebase event');
+      expect(LidoSDKApr.calculateAprFromRebaseEvent(events[0].args)).toBe(apr);
+    },
+  );
 });
