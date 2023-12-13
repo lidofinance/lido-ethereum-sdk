@@ -19,6 +19,10 @@
 
 The project is currently under active development and may experience breaking changes in the future.
 
+## Changelog
+
+For changes between versions see [CHANGELOG.MD](CHANGELOG.md)
+
 ## Migration
 
 For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
