@@ -2,6 +2,7 @@ import type { Address, Log } from 'viem';
 import type { rewardsEventsAbi } from './abi/rewardsEvents.js';
 import type { BackArgumentType, BlockArgumentType } from '../core/types.js';
 import type {
+  SubgraphUrl,
   TotalRewardEntity,
   TransferEventEntity,
 } from './subgraph/types.js';
@@ -77,7 +78,7 @@ type GetRewardsCommonResult = {
 
 export type GetRewardsFromSubgraphOptions = GetRewardsOptions & {
   stepEntities?: number;
-  getSubgraphUrl: (id: string | null, chainId: number) => string;
+  getSubgraphUrl: (id: string | null, chainId: number) => SubgraphUrl;
 };
 
 export type GetRewardsFromSubgraphResult = {
