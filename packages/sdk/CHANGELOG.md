@@ -1,10 +1,8 @@
 # 3.0.1
 
-Added:
+## SDK
 
-- Unit tests for all modules!
-
-Fixed:
+### Fixed
 
 - modules constructors types did not allow `rpcProvider` passage
 - increased default timeout on transaction confirmation
@@ -17,4 +15,11 @@ Fixed:
   - now has more exported types
   - `approveSimulateTx`,`requestWithdrawalSimulateTx`,`requestWithdrawalWithPermitSimulateTx` fixed account hoisting
   - `getClaimableRequestsETHByAccount` now returns only claimable requests
+
+## Playground
+
 - Playground now has custom RPC input
+
+## Tests
+
+- All modules are covered by unit tests
