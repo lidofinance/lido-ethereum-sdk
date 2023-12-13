@@ -1,5 +1,7 @@
 // Base entities
 
+import type { RequestExtendedOptions } from 'graphql-request';
+
 export type TransferEventEntity = {
   from: string;
   to: string;
@@ -39,11 +41,19 @@ export type TotalRewardEntity = {
   logIndex: string;
 };
 
+export type SubgraphUrl =
+  | string
+  | {
+      url: string;
+      requestHeaders?: RequestExtendedOptions['requestHeaders'];
+    };
+
 // Queries
 
 export type LidoTransfersQueryResult = {
   lidoTransfers: TransferEventEntity[];
 };
+
 export type TotalRewardsQueryResult = { totalRewards: TotalRewardEntity[] };
 
 export type LidoTransfersQueryVariablesNoPagination = {
@@ -72,7 +82,7 @@ export type InitialDataQueryResult = {
 // Requests
 
 export type SubgraphRequestOptions = {
-  url: string;
+  url: SubgraphUrl;
   step: number;
   fromBlock: bigint;
   toBlock: bigint;
@@ -80,7 +90,7 @@ export type SubgraphRequestOptions = {
 
 // last indexed
 
-export type GetLastIndexedBlockOptions = Pick<SubgraphRequestOptions, 'url'>;
+export type GetLastIndexedBlockOptions = { url: SubgraphUrl };
 
 export type GetLastIndexedBlockResult = StatusQueryResult['_meta']['block'];
 
@@ -89,7 +99,7 @@ export type GetLastIndexedBlockResult = StatusQueryResult['_meta']['block'];
 export type GetInitialDataOptions = {
   address: string;
   block: bigint;
-  url: string;
+  url: SubgraphUrl;
 };
 
 export type GetInitialDataResult = {

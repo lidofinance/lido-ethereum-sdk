@@ -38,3 +38,4 @@ jobs:
           TEST_PRIVATE_KEY: ${{ secrets.TEST_PRIVATE_KEY }}
           TEST_CHAIN_ID: ${{ vars.TEST_CHAIN_ID }}
           TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
+          TEST_SUBGRAPH_URL: ${{ secrets.TEST_SUBGRAPH_URL }}

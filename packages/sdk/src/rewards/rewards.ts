@@ -438,7 +438,7 @@ export class LidoSDKRewards extends LidoSDKModule {
         const totalEther = BigInt(totalPooledEtherAfter);
         const totalShares = BigInt(totalSharesAfter);
 
-        const apr = Number(eventApr);
+        const apr = Number(eventApr) / 100;
         const newBalance = sharesToSteth(
           prevBalanceShares,
           totalEther,
