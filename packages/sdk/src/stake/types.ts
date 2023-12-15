@@ -1,4 +1,4 @@
-import { type Address, type Hash, type TransactionReceipt } from 'viem';
+import type { Account, Address, Hash, TransactionReceipt } from 'viem';
 import { CommonTransactionProps } from '../core/types.js';
 import { EtherValue } from '../core/types.js';
 
@@ -10,6 +10,7 @@ export type StakeProps = CommonTransactionProps & {
 export type StakeInnerProps = CommonTransactionProps & {
   value: bigint;
   referralAddress: Address;
+  account: Account;
 };
 
 export type StakeResult = {

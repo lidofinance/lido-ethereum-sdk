@@ -56,7 +56,7 @@ export class LidoSDKWithdrawApprove extends BusModule {
   public async approveSimulateTx(
     props: NoCallback<WithdrawApproveProps>,
   ): Promise<SimulateContractReturnType> {
-    const accountAddress = await this.bus.core.getWeb3Address(props.account);
+    const account = await this.bus.core.useAccount(props.account);
     const { token, amount: _amount } = props;
     const amount = parseValue(_amount);
     const isSteth = token === 'stETH';
@@ -71,7 +71,7 @@ export class LidoSDKWithdrawApprove extends BusModule {
 
     const result = contract.simulate.approve(
       [addressWithdrawalsQueue, amount],
-      { account: accountAddress },
+      { account },
     );
 
     return result;
@@ -82,8 +82,8 @@ export class LidoSDKWithdrawApprove extends BusModule {
   public async approvePopulateTx(
     props: NoCallback<WithdrawApproveProps>,
   ): Promise<PopulatedTransaction> {
-    const { token, account, amount: _amount } = props;
-    const accountAddress = await this.bus.core.getWeb3Address(account);
+    const { token, amount: _amount } = props;
+    const account = await this.bus.core.useAccount(props.account);
     const amount = parseValue(_amount);
     const isSteth = token === 'stETH';
 
@@ -96,7 +96,7 @@ export class LidoSDKWithdrawApprove extends BusModule {
     ) as Awaited<ReturnType<typeof this.bus.contract.getContractStETH>>;
 
     return {
-      from: accountAddress,
+      from: account.address,
       to: contract.address,
       data: encodeFunctionData({
         abi: contract.abi,
@@ -141,9 +141,10 @@ export class LidoSDKWithdrawApprove extends BusModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async getAllowance({
-    account,
+    account: accountProp,
     token,
   }: GetAllowanceProps): Promise<bigint> {
+    const account = await this.bus.core.useAccount(accountProp);
     const isSteth = token === 'stETH';
     let allowanceMethod;
 
@@ -159,7 +160,7 @@ export class LidoSDKWithdrawApprove extends BusModule {
 
     const allowance = await allowanceMethod.call(
       this,
-      [account, addressWithdrawalsQueue],
+      [account.address, addressWithdrawalsQueue],
       { account },
     );
 
@@ -170,9 +171,10 @@ export class LidoSDKWithdrawApprove extends BusModule {
   @ErrorHandler()
   public async checkAllowance({
     amount: _amount,
-    account,
+    account: accountProp,
     token,
   }: CheckAllowanceProps): Promise<CheckAllowanceResult> {
+    const account = await this.bus.core.useAccount(accountProp);
     const amount = parseValue(_amount);
     const isSteth = token === 'stETH';
     let allowanceMethod;
@@ -189,7 +191,7 @@ export class LidoSDKWithdrawApprove extends BusModule {
 
     const allowance = await allowanceMethod.call(
       this,
-      [account, addressWithdrawalsQueue],
+      [account.address, addressWithdrawalsQueue],
       { account },
     );
     const needsApprove = allowance < amount;

@@ -1,12 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`LidoSDKRewards rewards snapshot 0: --graph 1`] = `
+exports[`LidoSDKRewards rewards snapshot 0 1`] = `
 {
   "baseBalance": 3002002200487658323n,
   "baseBalanceShares": 2994045064012816908n,
   "baseShareRate": 1.0026576542118497,
   "fromBlock": 452867n,
-  "lastIndexedBlock": 499525n,
+  "lastIndexedBlock": Any<BigInt>,
   "rewards": [
     {
       "balance": 3002002200487658432n,
@@ -2031,13 +2031,13 @@ exports[`LidoSDKRewards rewards snapshot 0: -chain 1`] = `
 }
 `;
 
-exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
+exports[`LidoSDKRewards rewards snapshot 1 1`] = `
 {
   "baseBalance": 3002278416948510246n,
   "baseBalanceShares": 2994045064012817960n,
   "baseShareRate": 1.0027499094902257,
   "fromBlock": 466414n,
-  "lastIndexedBlock": 499525n,
+  "lastIndexedBlock": Any<BigInt>,
   "rewards": [
     {
       "balance": 3002278416948510356n,
@@ -4676,13 +4676,13 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
 }
 `;
 
-exports[`LidoSDKRewards rewards snapshot 2: --graph 1`] = `
+exports[`LidoSDKRewards rewards snapshot 2 1`] = `
 {
   "baseBalance": 0n,
   "baseBalanceShares": 0n,
   "baseShareRate": 1.0005001464301024,
   "fromBlock": 142174n,
-  "lastIndexedBlock": 499525n,
+  "lastIndexedBlock": Any<BigInt>,
   "rewards": [],
   "toBlock": 152174n,
   "totalRewards": 0n,
@@ -4701,13 +4701,13 @@ exports[`LidoSDKRewards rewards snapshot 2: -chain 1`] = `
 }
 `;
 
-exports[`LidoSDKRewards rewards snapshot 3: --graph 1`] = `
+exports[`LidoSDKRewards rewards snapshot 3 1`] = `
 {
   "baseBalance": 3002278416948510343n,
   "baseBalanceShares": 2994045064012818056n,
   "baseShareRate": 1.0027499094902257,
   "fromBlock": 466400n,
-  "lastIndexedBlock": 499525n,
+  "lastIndexedBlock": Any<BigInt>,
   "rewards": [
     {
       "apr": 0.017484555972814887,
@@ -4887,13 +4887,13 @@ exports[`LidoSDKRewards rewards snapshot 3: -chain 1`] = `
 }
 `;
 
-exports[`LidoSDKRewards rewards snapshot 4: --graph 1`] = `
+exports[`LidoSDKRewards rewards snapshot 4 1`] = `
 {
   "baseBalance": 0n,
   "baseBalanceShares": 0n,
   "baseShareRate": 1.0000003873432453,
   "fromBlock": 60000n,
-  "lastIndexedBlock": 499525n,
+  "lastIndexedBlock": Any<BigInt>,
   "rewards": [],
   "toBlock": 70000n,
   "totalRewards": 0n,
@@ -4912,13 +4912,13 @@ exports[`LidoSDKRewards rewards snapshot 4: -chain 1`] = `
 }
 `;
 
-exports[`LidoSDKRewards rewards snapshot 5: --graph 1`] = `
+exports[`LidoSDKRewards rewards snapshot 5 1`] = `
 {
   "baseBalance": 0n,
   "baseBalanceShares": 0n,
   "baseShareRate": 1.0000003873432453,
   "fromBlock": 60000n,
-  "lastIndexedBlock": 499525n,
+  "lastIndexedBlock": Any<BigInt>,
   "rewards": [
     {
       "apr": 0.013782142362888264,

@@ -42,7 +42,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
   public async claimRequestsSimulateTx(
     props: NoCallback<ClaimRequestsProps>,
   ): Promise<SimulateContractReturnType> {
-    const accountAddress = await this.bus.core.getWeb3Address(props.account);
+    const account = await this.bus.core.useAccount(props.account);
     const { requestsIds, hints } = await this.sortRequestsWithHints(
       props.requestsIds,
       props.hints,
@@ -51,7 +51,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     return contract.simulate.claimWithdrawals([requestsIds, hints], {
-      account: accountAddress,
+      account,
     });
   }
 
@@ -60,7 +60,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
   public async claimRequestsPopulateTx(
     props: NoCallback<ClaimRequestsProps>,
   ): Promise<PopulatedTransaction> {
-    const accountAddress = await this.bus.core.getWeb3Address(props.account);
+    const account = await this.bus.core.useAccount(props.account);
     const { requestsIds, hints } = await this.sortRequestsWithHints(
       props.requestsIds,
       props.hints,
@@ -68,7 +68,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     return {
-      from: accountAddress,
+      from: account.address,
       to: contract.address,
       data: encodeFunctionData({
         abi: contract.abi,

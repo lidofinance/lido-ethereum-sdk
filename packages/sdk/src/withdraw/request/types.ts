@@ -1,6 +1,10 @@
 import type { Hash, Address } from 'viem';
 
-import type { CommonTransactionProps, EtherValue } from '../../core/index.js';
+import type {
+  AccountValue,
+  CommonTransactionProps,
+  EtherValue,
+} from '../../core/index.js';
 import { LIDO_TOKENS } from '../../common/constants.js';
 
 export type WithdrawableTokens =
@@ -59,7 +63,7 @@ export type WithdrawApproveProps = CommonTransactionProps & {
 };
 
 export type GetAllowanceProps = {
-  account: Address;
+  account?: AccountValue;
   token: WithdrawableTokens;
 };
 

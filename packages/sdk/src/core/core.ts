@@ -5,6 +5,7 @@ import {
   type Chain,
   type GetContractReturnType,
   type CustomTransportConfig,
+  type GetBlockReturnType,
   createPublicClient,
   createWalletClient,
   fallback,
@@ -12,7 +13,7 @@ import {
   custom,
   getContract,
   maxUint256,
-  GetBlockReturnType,
+  Account,
 } from 'viem';
 import {
   ERROR_CODE,
@@ -159,8 +160,9 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   // Balances
 
   @Logger('Balances:')
-  public async balanceETH(address: Address): Promise<bigint> {
-    return this.rpcProvider.getBalance({ address });
+  public async balanceETH(address?: AccountValue): Promise<bigint> {
+    const parsedAddress = await this.useAccount(address);
+    return this.rpcProvider.getBalance({ address: parsedAddress });
   }
 
   // Contracts
@@ -204,22 +206,22 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     const {
       token,
       amount,
-      account,
+      account: accountProp,
       spender,
       deadline = LidoSDKCore.INFINITY_DEADLINE_VALUE,
     } = props;
     const web3Provider = this.useWeb3Provider();
-    const accountAddress = await this.getWeb3Address(account);
+    const account = await this.useAccount(accountProp);
     const { contract, domain } = await this.getPermitContractData(token);
-    const nonce = await contract.read.nonces([accountAddress]);
+    const nonce = await contract.read.nonces([account.address]);
 
     const signature = await web3Provider.signTypedData({
-      account: account ?? web3Provider.account ?? accountAddress,
+      account,
       domain,
       types: PERMIT_MESSAGE_TYPES,
       primaryType: 'Permit',
       message: {
-        owner: accountAddress,
+        owner: account.address,
         spender,
         value: amount,
         nonce,
@@ -236,7 +238,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       deadline,
       nonce,
       chainId: domain.chainId,
-      owner: accountAddress,
+      owner: account.address,
       spender,
     };
   }
@@ -326,6 +328,31 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       ERROR_CODE.PROVIDER_ERROR,
     );
     return account;
+  }
+
+  @Logger('Utils:')
+  public async useAccount(accountValue?: AccountValue): Promise<Account> {
+    if (accountValue) {
+      if (typeof accountValue === 'string')
+        return { address: accountValue, type: 'json-rpc' };
+      else return accountValue;
+    }
+    if (this.web3Provider) {
+      if (!this.web3Provider.account) {
+        const [account] = await withSDKError(
+          this.web3Provider.requestAddresses(),
+          ERROR_CODE.READ_ERROR,
+        );
+        invariant(
+          account,
+          'web3provider must have at least 1 account',
+          ERROR_CODE.PROVIDER_ERROR,
+        );
+        this.web3Provider.account = { address: account, type: 'json-rpc' };
+      }
+      return this.web3Provider.account;
+    }
+    invariantArgument(false, 'No account or web3Provider is available');
   }
 
   @Logger('Utils:')
@@ -440,21 +467,23 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     }
   }
 
-  // TODO separate test suit with multisig
+  // TODO separate test suit  with multisig
   public async performTransaction(
     props: PerformTransactionOptions,
   ): Promise<TransactionResult> {
-    const provider = this.useWeb3Provider();
-    const { account, callback = NOOP, getGasLimit, sendTransaction } = props;
-    const accountAddress = await this.getWeb3Address(account);
-    const isContract = await this.isContract(accountAddress);
+    //
+    this.useWeb3Provider();
+    const {
+      account: accountProp,
+      callback = NOOP,
+      getGasLimit,
+      sendTransaction,
+    } = props;
+    const account = await this.useAccount(accountProp);
+    const isContract = await this.isContract(account.address);
 
-    // we need account to be defined for transactions so we fallback in this order
-    // 1. whatever user passed
-    // 2. hoisted account
-    // 3. just address (this will break on local accounts as per viem behavior)
     const overrides: TransactionOptions = {
-      account: account ?? provider.account ?? accountAddress,
+      account,
       chain: this.chain,
       gas: undefined,
       maxFeePerGas: undefined,
