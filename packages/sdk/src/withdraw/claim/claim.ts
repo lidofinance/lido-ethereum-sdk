@@ -10,8 +10,8 @@ import { NOOP } from '../../common/constants.js';
 
 import { BusModule } from '../bus-module.js';
 import type { ClaimRequestsProps } from './types.js';
-import { invariantArgument } from '../../index.js';
 import { bigintComparator } from '../../common/utils/bigint-comparator.js';
+import { invariantArgument } from '../../common/index.js';
 
 export class LidoSDKWithdrawClaim extends BusModule {
   // Calls
