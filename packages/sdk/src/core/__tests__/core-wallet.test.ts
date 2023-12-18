@@ -1,11 +1,20 @@
-import { test, expect, describe } from '@jest/globals';
+import { test, expect, describe, jest } from '@jest/globals';
 
 import { useWeb3Core } from '../../../tests/utils/fixtures/use-core.js';
-import { getContract, maxUint256, parseEther } from 'viem';
+import {
+  WalletClient,
+  createWalletClient,
+  getContract,
+  http,
+  maxUint256,
+  parseEther,
+} from 'viem';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
 import { useTestsEnvs } from '../../../tests/utils/fixtures/use-test-envs.js';
 import { expectNonNegativeBn } from '../../../tests/utils/expect/expect-bn.js';
-import { LIDO_CONTRACT_NAMES } from '../../index.js';
+import { LIDO_CONTRACT_NAMES, LidoSDKCore } from '../../index.js';
+import { useAltAccount } from '../../../tests/utils/fixtures/use-wallet-client.js';
+import { useMockTransport } from '../../../tests/utils/fixtures/use-mock-transport.js';
 
 const permitAbi = [
   {
@@ -87,7 +96,7 @@ describe('Core Wallet Tests', () => {
     expect(provider).toBeDefined();
   });
 
-  test('account is available', async () => {
+  test('getWeb3Address works', async () => {
     const address = await web3Core.getWeb3Address();
     expect(address).toBeDefined();
     expectAddress(address);
@@ -105,5 +114,72 @@ describe('Core Wallet Tests', () => {
 
   test('sign permit for wstETH', async () => {
     await expect(testPermit(false)).resolves.not.toThrow();
+  });
+});
+
+describe('Account hoisting', () => {
+  const altAccount = useAltAccount();
+  const { chainId, rpcUrl } = useTestsEnvs();
+  const createCore = (walletClient?: WalletClient) => {
+    return new LidoSDKCore({
+      chainId,
+      logMode: 'none',
+      rpcUrls: [rpcUrl],
+      web3Provider: walletClient,
+    });
+  };
+
+  test('useAccount returns from prop address', async () => {
+    const core = createCore();
+    const account = await core.useAccount(altAccount.address);
+    expectAddress(account.address, altAccount.address);
+    expect(account.type).toBe('json-rpc');
+  });
+
+  test('useAccount returns from prop account', async () => {
+    const core = createCore();
+    const account = await core.useAccount(altAccount);
+    expect(account).toBe(altAccount);
+  });
+
+  test('useAccount returns hoisted account', async () => {
+    const walletClient = createWalletClient({
+      account: altAccount,
+      transport: http(rpcUrl),
+    });
+    const core = createCore(walletClient);
+    const account = await core.useAccount();
+    expect(account).toBe(altAccount);
+  });
+
+  test('useAccount requests account from web3Provider', async () => {
+    const mockFn = jest.fn();
+    const mockTransport = useMockTransport(async (args, originalRequest) => {
+      mockFn(args.method);
+      if (args.method === 'eth_requestAccounts') {
+        return [altAccount.address];
+      }
+      return originalRequest();
+    });
+
+    // setup, no account
+    const walletClient = createWalletClient({
+      transport: mockTransport,
+    });
+    const core = createCore(walletClient);
+    expect(core.useWeb3Provider().account).toBeUndefined();
+
+    // first call, account hoisted
+    const account = await core.useAccount();
+    expect(account.address).toBe(altAccount.address);
+    expect(account.type).toBe('json-rpc');
+    expect(core.web3Provider?.account).toBe(account);
+    expect(mockFn).toHaveBeenCalledTimes(1);
+    expect(mockFn.mock.calls[0]?.[0]).toBe('eth_requestAccounts');
+
+    // second call, account reused
+    const accountReused = await core.useAccount();
+    expect(accountReused).toBe(account);
+    expect(mockFn).toHaveBeenCalledTimes(1);
   });
 });

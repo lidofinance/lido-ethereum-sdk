@@ -8,6 +8,7 @@ export const ConsoleCss: Record<HeadMessage, string> = {
   'Views:': 'color: aquamarine',
   'Call:': 'color: orange',
   'Error:': 'color: red',
+  'Deprecation:': 'color: red',
   'LOG:': 'color: lightblue',
   'Cache:': 'color: mediumvioletred',
   'Permit:': 'color: lime',

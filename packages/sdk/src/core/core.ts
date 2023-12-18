@@ -313,7 +313,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     };
   }
 
-  @Logger('Utils:')
+  @Logger('Deprecation:')
   public async getWeb3Address(accountValue?: AccountValue): Promise<Address> {
     if (typeof accountValue === 'string') return accountValue;
     if (accountValue) return accountValue.address;

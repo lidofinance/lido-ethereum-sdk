@@ -12,6 +12,13 @@ export const Logger = function (headMessage: HeadMessage = 'LOG:') {
     const methodName = String(context.name);
 
     const replacementMethod = function (this: This, ...args: Args): Return {
+      if (headMessage === 'Deprecation:')
+        callConsoleMessage.call(
+          this,
+          headMessage,
+          `Method '${methodName}' is being deprecated in the next major version`,
+        );
+
       callConsoleMessage.call(
         this,
         headMessage,
