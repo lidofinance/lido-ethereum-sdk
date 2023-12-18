@@ -146,9 +146,10 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   @ErrorHandler()
   public async getSingleTokenApproval({
     id,
-    account,
+    account: accountProp,
   }: UnstethApprovedForProps) {
     const contract = await this.getContract();
+    const account = await this.core.useAccount(accountProp);
     return contract.read.getApproved([id], { account });
   }
 

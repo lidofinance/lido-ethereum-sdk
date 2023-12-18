@@ -161,8 +161,8 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
   @Logger('Balances:')
   public async balanceETH(address?: AccountValue): Promise<bigint> {
-    const parsedAddress = await this.useAccount(address);
-    return this.rpcProvider.getBalance({ address: parsedAddress });
+    const parsedAccount = await this.useAccount(address);
+    return this.rpcProvider.getBalance({ address: parsedAccount.address });
   }
 
   // Contracts
@@ -473,13 +473,8 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   ): Promise<TransactionResult> {
     //
     this.useWeb3Provider();
-    const {
-      account: accountProp,
-      callback = NOOP,
-      getGasLimit,
-      sendTransaction,
-    } = props;
-    const account = await this.useAccount(accountProp);
+    const { callback = NOOP, getGasLimit, sendTransaction } = props;
+    const account = await this.useAccount(props.account);
     const isContract = await this.isContract(account.address);
 
     const overrides: TransactionOptions = {

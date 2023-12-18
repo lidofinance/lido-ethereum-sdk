@@ -111,10 +111,11 @@ export class LidoSDKWithdrawApprove extends BusModule {
   @Logger('Utils:')
   @Cache(30 * 1000, ['bus.core.chain.id'])
   public async approveGasLimit({
-    account,
+    account: accountProp,
     token,
     amount,
   }: Required<NoCallback<WithdrawApproveProps>>): Promise<bigint> {
+    const account = await this.bus.core.useAccount(accountProp);
     const value = parseValue(amount);
     const isSteth = token === 'stETH';
     let estimateGasMethod;
