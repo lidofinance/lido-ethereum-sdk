@@ -36,7 +36,10 @@ export const expectRewardsSnapshot = async (
       }),
     });
     expectRewardsResult(subgraphRewards, params);
-    expect(subgraphRewards).toMatchSnapshot('--graph');
+    expect(subgraphRewards).toMatchSnapshot(
+      { lastIndexedBlock: expect.any(BigInt) },
+      '--graph',
+    );
 
     // match for common initial values
     expect({
