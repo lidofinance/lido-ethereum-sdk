@@ -19,6 +19,10 @@
 
 The project is currently under active development and may experience breaking changes in the future.
 
+## Changelog
+
+For changes between versions see [CHANGELOG.MD](CHANGELOG.md)
+
 ## Migration
 
 For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
@@ -1348,7 +1352,8 @@ This method requires you to provide API URL to send subgraph requests to. It's b
 
 #### Important notes
 
-**to** is capped by last indexed block in subgraph. Block number is available in result object by `lastIndexedBlock`.
+- **to** is capped by last indexed block in subgraph. Block number is available in result object by `lastIndexedBlock`.
+- **getSubgraphUrl** can also return object of type `{url:string,requestHeaders?: Record<string,string> }` that is passed to `graphql-request` for extra configurability
 
 ```ts
 const lidoSDK = new LidoSDK({

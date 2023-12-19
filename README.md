@@ -21,11 +21,17 @@
 
 The project is currently under development and may change in the future.
 
+## Changelog
+
+For changes between versions see [CHANGELOG.MD](packages/sdk/CHANGELOG.md)
+
+## Migration
+
 ## Installation
 
 You can install the Lido Ethereum SDK using npm or yarn:
 
-[Docs SDK package](./packages/sdk/README.md)
+[Docs SDK package](packages/sdk/README.md)
 
 ```bash
 // SDK (stakes, wrap, withdrawals)
@@ -80,7 +86,7 @@ Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address
 
 ## Examples
 
-All examples and usage instructions can be found in the [Docs SDK package](./packages/sdk/README.md).
+All examples and usage instructions can be found in the [Docs SDK package](packages/sdk/README.md).
 
 ```ts
 const lidoSDK = new LidoSDK({

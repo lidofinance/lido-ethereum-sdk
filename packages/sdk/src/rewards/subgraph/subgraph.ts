@@ -5,24 +5,30 @@ import {
   TotalRewardsQuery,
   InitialStateQuery,
 } from './queries.js';
-import {
-  type SubgraphRequestOptions,
-  type GetLastIndexedBlockOptions,
-  type StatusQueryResult,
-  type GetTransfersOptions,
-  type TransferEventEntity,
-  type LidoTransfersQueryVariablesNoPagination,
-  type GetTotalRewardsOptions,
-  type TotalRewardEntity,
-  type GetTotalRewardsResult,
-  type GetTransfersResult,
-  type LidoTransfersQueryResult,
-  type TotalRewardsQueryResult,
-  type GetInitialDataOptions,
-  type GetInitialDataResult,
-  type InitialDataQueryVariables,
-  type InitialDataQueryResult,
+import type {
+  SubgraphRequestOptions,
+  GetLastIndexedBlockOptions,
+  StatusQueryResult,
+  GetTransfersOptions,
+  TransferEventEntity,
+  LidoTransfersQueryVariablesNoPagination,
+  GetTotalRewardsOptions,
+  TotalRewardEntity,
+  GetTotalRewardsResult,
+  GetTransfersResult,
+  LidoTransfersQueryResult,
+  TotalRewardsQueryResult,
+  GetInitialDataOptions,
+  GetInitialDataResult,
+  InitialDataQueryVariables,
+  InitialDataQueryResult,
+  SubgraphUrl,
 } from './types.js';
+
+const parseSubgraphUrl = (value: SubgraphUrl) => {
+  if (typeof value === 'string') return { url: value };
+  else return value;
+};
 
 const requestAllWithStep = async <TResult, TResultEntry, TVariables>({
   url,
@@ -42,7 +48,7 @@ const requestAllWithStep = async <TResult, TResultEntry, TVariables>({
   // eslint-disable-next-line no-constant-condition
   while (true) {
     const partialResult = await request<TResult>({
-      url,
+      ...parseSubgraphUrl(url),
       document,
       variables: {
         ...variables,
@@ -66,8 +72,12 @@ export const getLastIndexedBlock = async ({
 }: GetLastIndexedBlockOptions): Promise<
   StatusQueryResult['_meta']['block']
 > => {
-  return (await request<StatusQueryResult>({ url, document: StatusQuery }))
-    ._meta.block;
+  return (
+    await request<StatusQueryResult>({
+      ...parseSubgraphUrl(url),
+      document: StatusQuery,
+    })
+  )._meta.block;
 };
 
 export const getInitialData = async ({
@@ -79,8 +89,8 @@ export const getInitialData = async ({
     InitialDataQueryResult,
     InitialDataQueryVariables
   >({
+    ...parseSubgraphUrl(url),
     document: InitialStateQuery,
-    url,
     variables: { address, block: Number(block) },
   });
   return {

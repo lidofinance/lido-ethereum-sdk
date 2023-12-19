@@ -30,9 +30,7 @@ type LidoSDKCorePropsRpcProps =
 
 export type LidoSDKCoreProps = {
   chainId: (typeof SUPPORTED_CHAINS)[number];
-  rpcUrls: string[];
   web3Provider?: WalletClient;
-  rpcProvider?: undefined;
   logMode?: LOG_MODE;
 } & LidoSDKCorePropsRpcProps;
 

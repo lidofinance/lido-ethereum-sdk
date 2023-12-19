@@ -10,4 +10,11 @@ export type {
   SplitAmountToRequestsProps,
   PermitWstETHStETHProps,
 } from './request/types.js';
-export type { RequestStatusWithId } from './types.js';
+export type {
+  RequestStatusWithId,
+  GetPendingRequestsInfoReturnType,
+  GetClaimableRequestsETHByAccountReturnType,
+  GetClaimableRequestsInfoReturnType,
+  GetWithdrawalRequestsInfoReturnType,
+  PropsWithAccount,
+} from './types.js';
