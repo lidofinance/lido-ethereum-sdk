@@ -6,7 +6,7 @@ exports[`LidoSDKRewards rewards snapshot 0: --graph 1`] = `
   "baseBalanceShares": 2994045064012816908n,
   "baseShareRate": 1.0026576542118497,
   "fromBlock": 452867n,
-  "lastIndexedBlock": 499525n,
+  "lastIndexedBlock": Any<BigInt>,
   "rewards": [
     {
       "balance": 3002002200487658432n,
@@ -2037,7 +2037,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
   "baseBalanceShares": 2994045064012817960n,
   "baseShareRate": 1.0027499094902257,
   "fromBlock": 466414n,
-  "lastIndexedBlock": 499525n,
+  "lastIndexedBlock": Any<BigInt>,
   "rewards": [
     {
       "balance": 3002278416948510356n,
@@ -4682,7 +4682,7 @@ exports[`LidoSDKRewards rewards snapshot 2: --graph 1`] = `
   "baseBalanceShares": 0n,
   "baseShareRate": 1.0005001464301024,
   "fromBlock": 142174n,
-  "lastIndexedBlock": 499525n,
+  "lastIndexedBlock": Any<BigInt>,
   "rewards": [],
   "toBlock": 152174n,
   "totalRewards": 0n,
@@ -4707,7 +4707,7 @@ exports[`LidoSDKRewards rewards snapshot 3: --graph 1`] = `
   "baseBalanceShares": 2994045064012818056n,
   "baseShareRate": 1.0027499094902257,
   "fromBlock": 466400n,
-  "lastIndexedBlock": 499525n,
+  "lastIndexedBlock": Any<BigInt>,
   "rewards": [
     {
       "apr": 0.017484555972814887,
@@ -4893,7 +4893,7 @@ exports[`LidoSDKRewards rewards snapshot 4: --graph 1`] = `
   "baseBalanceShares": 0n,
   "baseShareRate": 1.0000003873432453,
   "fromBlock": 60000n,
-  "lastIndexedBlock": 499525n,
+  "lastIndexedBlock": Any<BigInt>,
   "rewards": [],
   "toBlock": 70000n,
   "totalRewards": 0n,
@@ -4918,7 +4918,7 @@ exports[`LidoSDKRewards rewards snapshot 5: --graph 1`] = `
   "baseBalanceShares": 0n,
   "baseShareRate": 1.0000003873432453,
   "fromBlock": 60000n,
-  "lastIndexedBlock": 499525n,
+  "lastIndexedBlock": Any<BigInt>,
   "rewards": [
     {
       "apr": 0.013782142362888264,
