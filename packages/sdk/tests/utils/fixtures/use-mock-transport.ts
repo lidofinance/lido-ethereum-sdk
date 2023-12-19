@@ -10,7 +10,12 @@ type MockTransportCallback = (
 type MockTransportOptions = {
   useDirectRpc?: boolean;
 };
-
+// provides mockTransport to pass to Public/Wallet client
+// async callback is called instead of provider.request
+// first argument for callback is args as passed to provider.request
+// second argument for callback is default request handler
+// call it to invoke default handler with custom args if needed
+// callback must return suitable rpc response
 export const useMockTransport = (
   callback: MockTransportCallback,
   options: MockTransportOptions = {},
@@ -18,8 +23,8 @@ export const useMockTransport = (
   const { useDirectRpc = false } = options;
   const { rpcUrl } = useTestsEnvs();
   const originalRequest: (args: any) => Promise<any> = useDirectRpc
-    ? http(rpcUrl)({}).request
-    : useTestRpcProvider().ganacheProvider.request;
+    ? (args: any) => http(rpcUrl)({}).request(args)
+    : (args: any) => useTestRpcProvider().ganacheProvider.request(args);
   return custom({
     async request(args) {
       return callback(args, async (customArgs: any = args) =>
