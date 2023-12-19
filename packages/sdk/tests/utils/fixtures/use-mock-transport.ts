@@ -2,7 +2,7 @@ import { custom, http } from 'viem';
 import { useTestRpcProvider } from './use-test-rpc-provider.js';
 import { useTestsEnvs } from './use-test-envs.js';
 
-type MockTransportCallback = (
+export type MockTransportCallback = (
   args: any,
   originalRequest: (args?: any) => Promise<any>,
 ) => Promise<any>;
