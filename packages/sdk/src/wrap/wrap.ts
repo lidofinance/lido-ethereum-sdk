@@ -76,13 +76,14 @@ export class LidoSDKWrap extends LidoSDKModule {
   @Logger('Call:')
   @ErrorHandler()
   public async wrapEth(props: WrapProps): Promise<TransactionResult> {
-    const { account, callback, value } = await this.parseProps(props);
+    const { account, callback, value, ...rest } = await this.parseProps(props);
     const web3Provider = this.core.useWeb3Provider();
     const contract = await this.getContractWstETH();
 
     await this.validateStakeLimit(value);
 
     return this.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit: (options) =>
@@ -135,10 +136,11 @@ export class LidoSDKWrap extends LidoSDKModule {
   @ErrorHandler()
   public async wrapSteth(props: WrapProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
-    const { account, callback, value } = await this.parseProps(props);
+    const { account, callback, value, ...rest } = await this.parseProps(props);
     const contract = await this.getContractWstETH();
 
     return this.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit: (options) => contract.estimateGas.wrap([value], options),
@@ -187,11 +189,12 @@ export class LidoSDKWrap extends LidoSDKModule {
     props: WrapProps,
   ): Promise<TransactionResult> {
     this.core.useWeb3Provider();
-    const { account, callback, value } = await this.parseProps(props);
+    const { account, callback, value, ...rest } = await this.parseProps(props);
     const stethContract = await this.getPartialContractSteth();
     const wstethContractAddress = await this.contractAddressWstETH();
 
     return this.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit: (options) =>
@@ -260,10 +263,11 @@ export class LidoSDKWrap extends LidoSDKModule {
   @ErrorHandler()
   public async unwrap(props: WrapProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
-    const { account, callback, value } = await this.parseProps(props);
+    const { account, callback, value, ...rest } = await this.parseProps(props);
     const contract = await this.getContractWstETH();
 
     return this.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit: (options) => contract.estimateGas.unwrap([value], options),

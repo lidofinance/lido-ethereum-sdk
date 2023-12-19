@@ -67,6 +67,7 @@ export class LidoSDKShares extends LidoSDKModule {
     amount: _amount,
     callback = NOOP,
     from: _from,
+    ...rest
   }: SharesTransferProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
     const account = await this.core.useAccount(accountProp);
@@ -87,6 +88,7 @@ export class LidoSDKShares extends LidoSDKModule {
         : contract.write.transferShares([to, amount], overrides);
 
     return this.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit,

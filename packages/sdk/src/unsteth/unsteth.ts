@@ -87,6 +87,7 @@ export class LidoSDKUnstETH extends LidoSDKModule {
       to,
       from: _from,
       data,
+      ...rest
     } = await this.parseProps(props);
     const from = _from ?? account.address;
     const args = (
@@ -95,6 +96,7 @@ export class LidoSDKUnstETH extends LidoSDKModule {
 
     const contract = await this.getContract();
     return this.core.performTransaction({
+      ...rest,
       callback,
       account,
       getGasLimit: (options) =>
@@ -163,10 +165,12 @@ export class LidoSDKUnstETH extends LidoSDKModule {
       callback,
       to = zeroAddress,
       id,
+      ...rest
     } = await this.parseProps(props);
     const args = [to, id] as const;
     const contract = await this.getContract();
     return this.core.performTransaction({
+      ...rest,
       callback,
       account,
       getGasLimit: (options) => contract.estimateGas.approve(args, options),
@@ -223,10 +227,12 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   public async setAllTokensApproval(
     props: UnstethApproveAllProps,
   ): Promise<TransactionResult> {
-    const { account, callback, to, allow } = await this.parseProps(props);
+    const { account, callback, to, allow, ...rest } =
+      await this.parseProps(props);
     const args = [to, allow] as const;
     const contract = await this.getContract();
     return this.core.performTransaction({
+      ...rest,
       callback,
       account,
       getGasLimit: (options) =>

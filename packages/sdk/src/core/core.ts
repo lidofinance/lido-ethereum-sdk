@@ -473,7 +473,12 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   ): Promise<TransactionResult> {
     //
     this.useWeb3Provider();
-    const { callback = NOOP, getGasLimit, sendTransaction } = props;
+    const {
+      callback = NOOP,
+      getGasLimit,
+      sendTransaction,
+      waitForTransactionReceiptParameters = {},
+    } = props;
     const account = await this.useAccount(props.account);
     const isContract = await this.isContract(account.address);
 
@@ -530,6 +535,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       this.rpcProvider.waitForTransactionReceipt({
         hash: transactionHash,
         timeout: 120_000,
+        ...waitForTransactionReceiptParameters,
       }),
       ERROR_CODE.TRANSACTION_ERROR,
     );

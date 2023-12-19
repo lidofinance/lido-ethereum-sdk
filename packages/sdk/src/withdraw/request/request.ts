@@ -78,7 +78,12 @@ export class LidoSDKWithdrawRequest extends BusModule {
     props: RequestProps,
   ): Promise<TransactionResult> {
     const account = await this.bus.core.useAccount(props.account);
-    const { token, receiver = account.address, callback = NOOP } = props;
+    const {
+      token,
+      receiver = account.address,
+      callback = NOOP,
+      ...rest
+    } = props;
 
     const requests =
       props.requests ?? (await this.splitAmountToRequests(props));
@@ -101,6 +106,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
           );
 
     return this.bus.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit,
@@ -179,6 +185,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
       receiver = account.address,
       callback = NOOP,
       permit: permitProp,
+      ...rest
     } = props;
     const requests =
       props.requests ?? (await this.splitAmountToRequests(props));
@@ -234,6 +241,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
           );
 
     return this.bus.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit,

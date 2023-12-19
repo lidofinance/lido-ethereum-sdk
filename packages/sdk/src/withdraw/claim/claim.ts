@@ -20,7 +20,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
   public async claimRequests(
     props: ClaimRequestsProps,
   ): Promise<TransactionResult> {
-    const { account, callback = NOOP } = props;
+    const { account, callback = NOOP, ...rest } = props;
     const { requestsIds, hints } = await this.sortRequestsWithHints(
       props.requestsIds,
       props.hints,
@@ -28,6 +28,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
     const params = [requestsIds, hints] as const;
     const contract = await this.bus.contract.getContractWithdrawalQueue();
     return this.bus.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit: (options) =>

@@ -24,7 +24,7 @@ export class LidoSDKWithdrawApprove extends BusModule {
     props: WithdrawApproveProps,
   ): Promise<TransactionResult> {
     this.bus.core.useWeb3Provider();
-    const { account, token, callback = NOOP, amount: _amount } = props;
+    const { account, token, callback = NOOP, amount: _amount, ...rest } = props;
     const amount = parseValue(_amount);
     const addressWithdrawalsQueue =
       await this.bus.contract.contractAddressWithdrawalQueue();
@@ -39,6 +39,7 @@ export class LidoSDKWithdrawApprove extends BusModule {
     ) as Awaited<ReturnType<typeof this.bus.contract.getContractStETH>>;
 
     return this.bus.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit: (options) =>

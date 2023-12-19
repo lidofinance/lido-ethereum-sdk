@@ -62,13 +62,14 @@ export class LidoSDKStake extends LidoSDKModule {
   @ErrorHandler()
   public async stakeEth(props: StakeProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
-    const { callback, account, referralAddress, value } =
+    const { callback, account, referralAddress, value, ...rest } =
       await this.parseProps(props);
 
     await this.validateStakeLimit(value);
 
     const contract = await this.getContractStETH();
     return this.core.performTransaction({
+      ...rest,
       callback,
       account,
       getGasLimit: async (options) =>
