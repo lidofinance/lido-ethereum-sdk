@@ -84,6 +84,7 @@ export type TransactionOptions = {
   gas?: bigint;
   maxFeePerGas?: bigint;
   maxPriorityFeePerGas?: bigint;
+  nonce?: number;
 };
 
 export type TransactionResult = {

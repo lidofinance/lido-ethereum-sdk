@@ -467,7 +467,6 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     }
   }
 
-  // TODO separate test suit  with multisig
   public async performTransaction(
     props: PerformTransactionOptions,
   ): Promise<TransactionResult> {
@@ -517,7 +516,14 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     callback({ stage: TransactionCallbackStage.SIGN, payload: overrides.gas });
 
     const transactionHash = await withSDKError(
-      sendTransaction({ ...overrides }),
+      sendTransaction({
+        ...overrides,
+        // passing these stub params prevent unnecessary errorish RPC calls
+        gas: 1n,
+        maxFeePerGas: 1n,
+        maxPriorityFeePerGas: 1n,
+        nonce: 1,
+      }),
       ERROR_CODE.TRANSACTION_ERROR,
     );
 

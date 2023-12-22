@@ -1,6 +1,9 @@
 import { test, expect, describe, jest } from '@jest/globals';
 
-import { useWeb3Core } from '../../../tests/utils/fixtures/use-core.js';
+import {
+  useRpcCore,
+  useWeb3Core,
+} from '../../../tests/utils/fixtures/use-core.js';
 import {
   WalletClient,
   createWalletClient,
@@ -207,8 +210,10 @@ describe('Account hoisting', () => {
 
 describe('Perform Transaction', () => {
   const { chainId } = useTestsEnvs();
+  const mockMultisigAddress = useRpcCore().getContractLidoLocator().address;
   const account = useAccount();
   const value = 100n;
+  const testHash = '0xaaaaaabbbbbbb';
 
   testSpending('perform transaction works with EOA', async () => {
     const mockTransportCallback = jest.fn<MockTransportCallback>((_, next) =>
@@ -262,6 +267,68 @@ describe('Perform Transaction', () => {
     expect(mockTransportCallback).toHaveBeenLastCalledWith(
       {
         method: 'eth_sendRawTransaction',
+        params: expect.any(Array),
+      },
+      expect.anything(),
+    );
+  });
+
+  testSpending('perform transaction works with Multisig', async () => {
+    const mockTransportCallback = jest.fn<MockTransportCallback>(
+      async (args, next) => {
+        if (args.method === 'eth_sendTransaction') {
+          return testHash;
+        }
+        return next();
+      },
+    );
+    const core = createCore(
+      createWalletClient({
+        account: mockMultisigAddress,
+        chain: VIEM_CHAINS[chainId as CHAINS],
+        transport: useMockTransport(mockTransportCallback),
+      }),
+    );
+
+    const stake = new LidoSDKStake({ core });
+    const rawContract = await stake.getContractStETH();
+
+    const mockGetGasLimit = jest.fn<PerformTransactionGasLimit>((options) =>
+      rawContract.estimateGas.submit([zeroAddress], {
+        ...options,
+        value,
+      }),
+    );
+    const mockSendTransaction = jest.fn<PerformTransactionSendTransaction>(
+      (options) =>
+        rawContract.write.submit([zeroAddress], { ...options, value }),
+    );
+    const mockTxCallback = jest.fn();
+
+    const txResult = await core.performTransaction({
+      getGasLimit: mockGetGasLimit,
+      sendTransaction: mockSendTransaction,
+      callback: mockTxCallback,
+    });
+
+    expect(txResult.hash).toBe(testHash);
+
+    expectTxCallback(mockTxCallback, { ...txResult, isMultisig: true });
+    expect(mockGetGasLimit).not.toHaveBeenCalled();
+    expect(mockSendTransaction).toHaveBeenCalledWith({
+      chain: core.chain,
+      account: { address: mockMultisigAddress, type: 'json-rpc' },
+      gas: 1n,
+      maxFeePerGas: 1n,
+      maxPriorityFeePerGas: 1n,
+      nonce: 1,
+    });
+
+    // first call is chainId cross-check
+    expect(mockTransportCallback).toHaveBeenCalledTimes(2);
+    expect(mockTransportCallback).toHaveBeenLastCalledWith(
+      {
+        method: 'eth_sendTransaction',
         params: expect.any(Array),
       },
       expect.anything(),
