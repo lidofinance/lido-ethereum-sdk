@@ -318,7 +318,7 @@ describe('Perform Transaction', () => {
     expect(mockSendTransaction).toHaveBeenCalledWith({
       chain: core.chain,
       account: { address: mockMultisigAddress, type: 'json-rpc' },
-      gas: 1n,
+      gas: 21000n,
       maxFeePerGas: 1n,
       maxPriorityFeePerGas: 1n,
       nonce: 1,
