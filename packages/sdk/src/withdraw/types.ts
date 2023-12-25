@@ -25,7 +25,7 @@ export type RequestStatusWithId = {
 };
 
 export type PropsWithAccount = {
-  account: AccountValue;
+  account?: AccountValue;
 };
 
 export type GetPendingRequestsInfoReturnType = {

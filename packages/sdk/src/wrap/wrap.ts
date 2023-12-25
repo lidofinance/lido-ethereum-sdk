@@ -76,13 +76,14 @@ export class LidoSDKWrap extends LidoSDKModule {
   @Logger('Call:')
   @ErrorHandler()
   public async wrapEth(props: WrapProps): Promise<TransactionResult> {
-    const { account, callback, value } = this.parseProps(props);
+    const { account, callback, value, ...rest } = await this.parseProps(props);
     const web3Provider = this.core.useWeb3Provider();
     const contract = await this.getContractWstETH();
 
     await this.validateStakeLimit(value);
 
     return this.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit: (options) =>
@@ -104,13 +105,12 @@ export class LidoSDKWrap extends LidoSDKModule {
   public async wrapEthPopulateTx(
     props: WrapPropsWithoutCallback,
   ): Promise<PopulatedTransaction> {
-    const { value, account } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { value, account } = await this.parseProps(props);
     const address = await this.contractAddressWstETH();
 
     return {
       to: address,
-      from: accountAddress,
+      from: account.address,
       value,
     };
   }
@@ -120,12 +120,11 @@ export class LidoSDKWrap extends LidoSDKModule {
   public async wrapEthEstimateGas(
     props: WrapPropsWithoutCallback,
   ): Promise<bigint> {
-    const { value, account } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { value, account } = await this.parseProps(props);
 
     const address = await this.contractAddressWstETH();
     return this.core.rpcProvider.estimateGas({
-      account: accountAddress,
+      account,
       to: address,
       value,
     });
@@ -137,10 +136,11 @@ export class LidoSDKWrap extends LidoSDKModule {
   @ErrorHandler()
   public async wrapSteth(props: WrapProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
-    const { account, callback, value } = this.parseProps(props);
+    const { account, callback, value, ...rest } = await this.parseProps(props);
     const contract = await this.getContractWstETH();
 
     return this.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit: (options) => contract.estimateGas.wrap([value], options),
@@ -152,13 +152,12 @@ export class LidoSDKWrap extends LidoSDKModule {
   public async wrapStethPopulateTx(
     props: WrapPropsWithoutCallback,
   ): Promise<PopulatedTransaction> {
-    const { value, account } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { value, account } = await this.parseProps(props);
     const address = await this.contractAddressWstETH();
 
     return {
       to: address,
-      from: accountAddress,
+      from: account.address,
       data: encodeFunctionData({
         abi,
         functionName: 'wrap',
@@ -172,15 +171,11 @@ export class LidoSDKWrap extends LidoSDKModule {
   public async wrapStethSimulateTx(
     props: WrapPropsWithoutCallback,
   ): Promise<WriteContractParameters> {
-    const { value, account } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
-    const address = await this.contractAddressWstETH();
-    const { request } = await this.core.rpcProvider.simulateContract({
-      address,
-      abi,
-      account: accountAddress,
-      functionName: 'wrap',
-      args: [value],
+    const { value, account } = await this.parseProps(props);
+    const contract = await this.getContractWstETH();
+
+    const { request } = await contract.simulate.wrap([value], {
+      account,
     });
 
     return request;
@@ -194,11 +189,12 @@ export class LidoSDKWrap extends LidoSDKModule {
     props: WrapProps,
   ): Promise<TransactionResult> {
     this.core.useWeb3Provider();
-    const { account, callback, value } = this.parseProps(props);
+    const { account, callback, value, ...rest } = await this.parseProps(props);
     const stethContract = await this.getPartialContractSteth();
     const wstethContractAddress = await this.contractAddressWstETH();
 
     return this.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit: (options) =>
@@ -216,25 +212,24 @@ export class LidoSDKWrap extends LidoSDKModule {
   public async getStethForWrapAllowance(
     account?: AccountValue,
   ): Promise<bigint> {
-    const accountAddress = await this.core.getWeb3Address(account);
+    const parsedAccount = await this.core.useAccount(account);
     const stethContract = await this.getPartialContractSteth();
     const wstethAddress = await this.contractAddressWstETH();
-    return stethContract.read.allowance([accountAddress, wstethAddress]);
+    return stethContract.read.allowance([parsedAccount.address, wstethAddress]);
   }
 
   @Logger('Utils:')
   public async approveStethForWrapPopulateTx(
     props: WrapPropsWithoutCallback,
   ): Promise<Omit<FormattedTransactionRequest, 'type'>> {
-    const { value, account } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { value, account } = await this.parseProps(props);
 
     const stethContract = await this.getPartialContractSteth();
     const wstethContractAddress = await this.contractAddressWstETH();
 
     return {
       to: stethContract.address,
-      from: accountAddress,
+      from: account.address,
       data: encodeFunctionData({
         abi: stethPartialAbi,
         functionName: 'approve',
@@ -248,19 +243,17 @@ export class LidoSDKWrap extends LidoSDKModule {
   public async approveStethForWrapSimulateTx(
     props: WrapPropsWithoutCallback,
   ): Promise<WriteContractParameters> {
-    const { value, account } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { value, account } = await this.parseProps(props);
     const stethContract = await this.getPartialContractSteth();
     const wstethContractAddress = await this.contractAddressWstETH();
 
-    const { request } = await this.core.rpcProvider.simulateContract({
-      address: stethContract.address,
-      abi: stethPartialAbi,
-      account: accountAddress,
-      functionName: 'approve',
-      args: [wstethContractAddress, value],
-    });
-
+    const { request } = await stethContract.simulate.approve(
+      [wstethContractAddress, value],
+      {
+        account,
+        functionName: 'approve',
+      },
+    );
     return request;
   }
 
@@ -270,10 +263,11 @@ export class LidoSDKWrap extends LidoSDKModule {
   @ErrorHandler()
   public async unwrap(props: WrapProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
-    const { account, callback, value } = this.parseProps(props);
+    const { account, callback, value, ...rest } = await this.parseProps(props);
     const contract = await this.getContractWstETH();
 
     return this.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit: (options) => contract.estimateGas.unwrap([value], options),
@@ -285,13 +279,12 @@ export class LidoSDKWrap extends LidoSDKModule {
   public async unwrapPopulateTx(
     props: Omit<WrapProps, 'callback'>,
   ): Promise<PopulatedTransaction> {
-    const { value, account } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { value, account } = await this.parseProps(props);
     const to = await this.contractAddressWstETH();
 
     return {
       to,
-      from: accountAddress,
+      from: account.address,
       data: encodeFunctionData({
         abi: abi,
         functionName: 'unwrap',
@@ -305,16 +298,11 @@ export class LidoSDKWrap extends LidoSDKModule {
   public async unwrapSimulateTx(
     props: Omit<WrapProps, 'callback'>,
   ): Promise<WriteContractParameters> {
-    const { value, account } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
-    const wstethContractAddress = await this.contractAddressWstETH();
+    const { value, account } = await this.parseProps(props);
+    const contract = await this.getContractWstETH();
 
-    const { request } = await this.core.rpcProvider.simulateContract({
-      address: wstethContractAddress,
-      abi,
-      account: accountAddress,
-      functionName: 'unwrap',
-      args: [value],
+    const { request } = await contract.simulate.unwrap([value], {
+      account,
     });
 
     return request;
@@ -356,9 +344,10 @@ export class LidoSDKWrap extends LidoSDKModule {
   }
 
   @Logger('Utils:')
-  private parseProps(props: WrapProps): WrapInnerProps {
+  private async parseProps(props: WrapProps): Promise<WrapInnerProps> {
     return {
       ...props,
+      account: await this.core.useAccount(props.account),
       value: parseValue(props.value),
       callback: props.callback ?? NOOP,
     };

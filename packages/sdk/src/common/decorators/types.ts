@@ -12,4 +12,5 @@ export type HeadMessage =
   | 'Permit:'
   | 'Events:'
   | 'Statistic:'
-  | 'Rewards:';
+  | 'Rewards:'
+  | 'Deprecation:';

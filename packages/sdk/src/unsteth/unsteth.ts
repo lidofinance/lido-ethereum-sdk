@@ -11,7 +11,11 @@ import type {
   SafeTransferFromArguments,
   UnstethTransferProps,
 } from './types.js';
-import type { NoCallback, PopulatedTransaction } from '../core/types.js';
+import type {
+  AccountValue,
+  NoCallback,
+  PopulatedTransaction,
+} from '../core/types.js';
 import {
   type Address,
   type GetContractReturnType,
@@ -51,10 +55,13 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   // Balance
   @Logger('Balances:')
   @ErrorHandler()
-  public async getNFTsByAccount(account: Address): Promise<UnstethNFT[]> {
+  public async getNFTsByAccount(account?: AccountValue): Promise<UnstethNFT[]> {
+    const parsedAccount = await this.core.useAccount(account);
     const contract = await this.getContract();
 
-    const ids = await contract.read.getWithdrawalRequests([account]);
+    const ids = await contract.read.getWithdrawalRequests([
+      parsedAccount.address,
+    ]);
     const statuses = await contract.read.getWithdrawalStatus([ids]);
 
     return ids.map((id, index) => ({ ...statuses[index], id }) as UnstethNFT);
@@ -80,14 +87,16 @@ export class LidoSDKUnstETH extends LidoSDKModule {
       to,
       from: _from,
       data,
-    } = this.parseProps(props);
-    const from = _from ?? (await this.core.getWeb3Address(account));
+      ...rest
+    } = await this.parseProps(props);
+    const from = _from ?? account.address;
     const args = (
       data ? [from, to, id, data] : [from, to, id]
     ) as SafeTransferFromArguments;
 
     const contract = await this.getContract();
     return this.core.performTransaction({
+      ...rest,
       callback,
       account,
       getGasLimit: (options) =>
@@ -100,15 +109,14 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async transferSimulateTx(props: NoCallback<UnstethTransferProps>) {
-    const { account, id, to, from: _from, data } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
-    const from = _from ?? accountAddress;
+    const { account, id, to, from: _from, data } = await this.parseProps(props);
+    const from = _from ?? account.address;
     const args = (
       data ? [from, to, id, data] : [from, to, id]
     ) as SafeTransferFromArguments;
     const contract = await this.getContract();
     return contract.simulate.safeTransferFrom(args, {
-      account: accountAddress,
+      account,
     });
   }
 
@@ -117,15 +125,14 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   public async transferPopulateTx(
     props: NoCallback<UnstethTransferProps>,
   ): Promise<PopulatedTransaction> {
-    const { account, id, to, from: _from, data } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
-    const from = _from ?? accountAddress;
+    const { account, id, to, from: _from, data } = await this.parseProps(props);
+    const from = _from ?? account.address;
     const args = (
       data ? [from, to, id, data] : [from, to, id]
     ) as SafeTransferFromArguments;
     const contract = await this.getContract();
     return {
-      from: accountAddress,
+      from: account.address,
       to: contract.address,
       data: encodeFunctionData({
         abi: contract.abi,
@@ -141,9 +148,10 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   @ErrorHandler()
   public async getSingleTokenApproval({
     id,
-    account,
+    account: accountProp,
   }: UnstethApprovedForProps) {
     const contract = await this.getContract();
+    const account = await this.core.useAccount(accountProp);
     return contract.read.getApproved([id], { account });
   }
 
@@ -152,10 +160,17 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   public async setSingleTokenApproval(
     props: UnstethApproveProps,
   ): Promise<TransactionResult> {
-    const { account, callback, to = zeroAddress, id } = this.parseProps(props);
+    const {
+      account,
+      callback,
+      to = zeroAddress,
+      id,
+      ...rest
+    } = await this.parseProps(props);
     const args = [to, id] as const;
     const contract = await this.getContract();
     return this.core.performTransaction({
+      ...rest,
       callback,
       account,
       getGasLimit: (options) => contract.estimateGas.approve(args, options),
@@ -168,12 +183,11 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   public async setSingleTokenApprovalPopulateTx(
     props: NoCallback<UnstethApproveProps>,
   ): Promise<PopulatedTransaction> {
-    const { account, to = zeroAddress, id } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { account, to = zeroAddress, id } = await this.parseProps(props);
     const args = [to, id] as const;
     const contract = await this.getContract();
     return {
-      from: accountAddress,
+      from: account.address,
       to: contract.address,
       data: encodeFunctionData({
         abi: contract.abi,
@@ -188,12 +202,11 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   public async setSingleTokenApprovalSimulateTx(
     props: NoCallback<UnstethApproveProps>,
   ) {
-    const { account, to = zeroAddress, id } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { account, to = zeroAddress, id } = await this.parseProps(props);
     const args = [to, id] as const;
     const contract = await this.getContract();
     return contract.simulate.approve(args, {
-      account: accountAddress,
+      account,
     });
   }
 
@@ -204,8 +217,9 @@ export class LidoSDKUnstETH extends LidoSDKModule {
     account,
     to,
   }: UnstethIsApprovedForAllProps) {
+    const parsedAccount = await this.core.useAccount(account);
     const contract = await this.getContract();
-    return contract.read.isApprovedForAll([account, to]);
+    return contract.read.isApprovedForAll([parsedAccount.address, to]);
   }
 
   @Logger('Call:')
@@ -213,10 +227,12 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   public async setAllTokensApproval(
     props: UnstethApproveAllProps,
   ): Promise<TransactionResult> {
-    const { account, callback, to, allow } = this.parseProps(props);
+    const { account, callback, to, allow, ...rest } =
+      await this.parseProps(props);
     const args = [to, allow] as const;
     const contract = await this.getContract();
     return this.core.performTransaction({
+      ...rest,
       callback,
       account,
       getGasLimit: (options) =>
@@ -231,12 +247,11 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   public async setAllTokensApprovalPopulateTx(
     props: NoCallback<UnstethApproveAllProps>,
   ): Promise<PopulatedTransaction> {
-    const { account, to, allow } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { account, to, allow } = await this.parseProps(props);
     const args = [to, allow] as const;
     const contract = await this.getContract();
     return {
-      from: accountAddress,
+      from: account.address,
       to: contract.address,
       data: encodeFunctionData({
         abi: contract.abi,
@@ -251,12 +266,11 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   public async setAllTokensApprovalSimulateTx(
     props: NoCallback<UnstethApproveAllProps>,
   ) {
-    const { account, to, allow } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { account, to, allow } = await this.parseProps(props);
     const args = [to, allow] as const;
     const contract = await this.getContract();
     return contract.simulate.setApprovalForAll(args, {
-      account: accountAddress,
+      account,
     });
   }
 
@@ -305,12 +319,13 @@ export class LidoSDKUnstETH extends LidoSDKModule {
     return contract.read.tokenURI([id]);
   }
 
-  private parseProps<TProps extends CommonTransactionProps>(
+  private async parseProps<TProps extends CommonTransactionProps>(
     props: TProps,
-  ): ParsedProps<TProps> {
+  ): Promise<ParsedProps<TProps>> {
     return {
       ...props,
       callback: props.callback ?? NOOP,
+      account: await this.core.useAccount(props.account),
     };
   }
 }

@@ -39,7 +39,7 @@ describe('getLatestBlockToTimestamp', () => {
 
   // eslint-disable-next-line jest/no-disabled-tests
   test.skip('throws error at invalid timestamp', async () => {
-    // TODO: research for some reason expectSDKError does not work here
+    // TODO: research for some reason jest prints this error and abruptly exits
     await expect(core.getLatestBlockToTimestamp(0n)).rejects.toThrow(
       'No blocks at this timestamp',
     );

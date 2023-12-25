@@ -10,8 +10,8 @@ import { NOOP } from '../../common/constants.js';
 
 import { BusModule } from '../bus-module.js';
 import type { ClaimRequestsProps } from './types.js';
-import { invariantArgument } from '../../index.js';
 import { bigintComparator } from '../../common/utils/bigint-comparator.js';
+import { invariantArgument } from '../../common/index.js';
 
 export class LidoSDKWithdrawClaim extends BusModule {
   // Calls
@@ -20,7 +20,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
   public async claimRequests(
     props: ClaimRequestsProps,
   ): Promise<TransactionResult> {
-    const { account, callback = NOOP } = props;
+    const { account, callback = NOOP, ...rest } = props;
     const { requestsIds, hints } = await this.sortRequestsWithHints(
       props.requestsIds,
       props.hints,
@@ -28,6 +28,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
     const params = [requestsIds, hints] as const;
     const contract = await this.bus.contract.getContractWithdrawalQueue();
     return this.bus.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit: (options) =>
@@ -42,7 +43,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
   public async claimRequestsSimulateTx(
     props: NoCallback<ClaimRequestsProps>,
   ): Promise<SimulateContractReturnType> {
-    const accountAddress = await this.bus.core.getWeb3Address(props.account);
+    const account = await this.bus.core.useAccount(props.account);
     const { requestsIds, hints } = await this.sortRequestsWithHints(
       props.requestsIds,
       props.hints,
@@ -51,7 +52,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     return contract.simulate.claimWithdrawals([requestsIds, hints], {
-      account: accountAddress,
+      account,
     });
   }
 
@@ -60,7 +61,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
   public async claimRequestsPopulateTx(
     props: NoCallback<ClaimRequestsProps>,
   ): Promise<PopulatedTransaction> {
-    const accountAddress = await this.bus.core.getWeb3Address(props.account);
+    const account = await this.bus.core.useAccount(props.account);
     const { requestsIds, hints } = await this.sortRequestsWithHints(
       props.requestsIds,
       props.hints,
@@ -68,7 +69,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
     const contract = await this.bus.contract.getContractWithdrawalQueue();
 
     return {
-      from: accountAddress,
+      from: account.address,
       to: contract.address,
       data: encodeFunctionData({
         abi: contract.abi,

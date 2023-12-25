@@ -35,8 +35,9 @@ export class LidoSDKWithdrawRequestsInfo extends BusModule {
   public async getWithdrawalRequestsStatus(
     props: PropsWithAccount,
   ): Promise<readonly RequestStatusWithId[]> {
+    const account = await this.bus.core.useAccount(props.account);
     const requestsIds = await this.bus.views.getWithdrawalRequestsIds({
-      account: await this.bus.core.getWeb3Address(props.account),
+      account,
     });
 
     return this.bus.views.getWithdrawalStatus({ requestsIds });

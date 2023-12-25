@@ -14,16 +14,15 @@ describe('LidoSDKStake wallet methods', () => {
   testSpending(
     'can stake',
     async () => {
-      const address = await stake.core.getWeb3Address();
       const stakeValue = 100n;
-      const balanceBefore = await steth.balance(address);
+      const balanceBefore = await steth.balance();
       const mockTxCallback = jest.fn();
       const tx = await stake.stakeEth({
         value: stakeValue,
         callback: mockTxCallback,
       });
       expectTxCallback(mockTxCallback, tx);
-      const balanceAfter = await steth.balance(address);
+      const balanceAfter = await steth.balance();
       // due to protocol rounding error this can happen
       expectAlmostEqualBn(balanceAfter - balanceBefore, stakeValue);
     },

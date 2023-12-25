@@ -38,7 +38,10 @@ export class SDKError extends Error {
 
   constructor({ code, error = {}, message }: SDKErrorProps) {
     super(message);
-    Object.assign(this, error);
+    if (error instanceof Error) {
+      this.cause = error.cause;
+      this.stack = error.stack;
+    }
     this.code = code ?? ERROR_CODE.UNKNOWN_ERROR;
     this.errorMessage = message;
   }

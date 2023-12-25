@@ -1,9 +1,9 @@
 import { getContract } from 'viem';
-import {
-  type Address,
-  type GetContractReturnType,
-  type PublicClient,
-  type WalletClient,
+import type {
+  Address,
+  GetContractReturnType,
+  PublicClient,
+  WalletClient,
 } from 'viem';
 import { Logger, Cache } from '../common/decorators/index.js';
 import { LIDO_CONTRACT_NAMES } from '../common/constants.js';

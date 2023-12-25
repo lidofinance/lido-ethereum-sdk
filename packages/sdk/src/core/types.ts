@@ -8,6 +8,7 @@ import type {
   FormattedTransactionRequest,
   BlockTag,
   Account,
+  WaitForTransactionReceiptParameters,
 } from 'viem';
 
 import { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
@@ -60,6 +61,7 @@ export enum TransactionCallbackStage {
 export type CommonTransactionProps = {
   callback?: TransactionCallback;
   account?: AccountValue;
+  waitForTransactionReceiptParameters?: WaitForTransactionReceiptParameters;
 };
 
 export type PerformTransactionGasLimit = (
@@ -73,6 +75,7 @@ export type PerformTransactionSendTransaction = (
 export type PerformTransactionOptions = CommonTransactionProps & {
   getGasLimit: PerformTransactionGasLimit;
   sendTransaction: PerformTransactionSendTransaction;
+  waitForTransactionReceiptParameters?: WaitForTransactionReceiptParameters;
 };
 
 export type TransactionOptions = {
@@ -81,6 +84,7 @@ export type TransactionOptions = {
   gas?: bigint;
   maxFeePerGas?: bigint;
   maxPriorityFeePerGas?: bigint;
+  nonce?: number;
 };
 
 export type TransactionResult = {
