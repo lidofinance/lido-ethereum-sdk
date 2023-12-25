@@ -37,7 +37,7 @@ export const expectTxCallback = (
       'stage',
       TransactionCallbackStage.SIGN,
     );
-    expect(callback.mock.calls[callIndex]?.[0].payload).toBeUndefined();
+    expectPositiveBn(callback.mock.calls[callIndex]?.[0].payload);
     callIndex++;
 
     // DONE

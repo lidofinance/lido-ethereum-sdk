@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`LidoSDKRewards rewards snapshot 0 1`] = `
+exports[`LidoSDKRewards rewards snapshot 0: --graph 1`] = `
 {
   "baseBalance": 3002002200487658323n,
   "baseBalanceShares": 2994045064012816908n,
@@ -2031,7 +2031,7 @@ exports[`LidoSDKRewards rewards snapshot 0: -chain 1`] = `
 }
 `;
 
-exports[`LidoSDKRewards rewards snapshot 1 1`] = `
+exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
 {
   "baseBalance": 3002278416948510246n,
   "baseBalanceShares": 2994045064012817960n,
@@ -4676,7 +4676,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
 }
 `;
 
-exports[`LidoSDKRewards rewards snapshot 2 1`] = `
+exports[`LidoSDKRewards rewards snapshot 2: --graph 1`] = `
 {
   "baseBalance": 0n,
   "baseBalanceShares": 0n,
@@ -4701,7 +4701,7 @@ exports[`LidoSDKRewards rewards snapshot 2: -chain 1`] = `
 }
 `;
 
-exports[`LidoSDKRewards rewards snapshot 3 1`] = `
+exports[`LidoSDKRewards rewards snapshot 3: --graph 1`] = `
 {
   "baseBalance": 3002278416948510343n,
   "baseBalanceShares": 2994045064012818056n,
@@ -4887,7 +4887,7 @@ exports[`LidoSDKRewards rewards snapshot 3: -chain 1`] = `
 }
 `;
 
-exports[`LidoSDKRewards rewards snapshot 4 1`] = `
+exports[`LidoSDKRewards rewards snapshot 4: --graph 1`] = `
 {
   "baseBalance": 0n,
   "baseBalanceShares": 0n,
@@ -4912,7 +4912,7 @@ exports[`LidoSDKRewards rewards snapshot 4: -chain 1`] = `
 }
 `;
 
-exports[`LidoSDKRewards rewards snapshot 5 1`] = `
+exports[`LidoSDKRewards rewards snapshot 5: --graph 1`] = `
 {
   "baseBalance": 0n,
   "baseBalanceShares": 0n,
