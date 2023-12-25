@@ -64,7 +64,7 @@ jobs:
         env:
           NODE_NO_BUILD_DYNAMICS: true
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./playground/out
 
