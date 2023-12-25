@@ -481,7 +481,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     const account = await this.useAccount(props.account);
     const isContract = await this.isContract(account.address);
 
-    const overrides: TransactionOptions = {
+    let overrides: TransactionOptions = {
       account,
       chain: this.chain,
       gas: undefined,
@@ -489,7 +489,16 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       maxPriorityFeePerGas: undefined,
     };
 
-    if (!isContract) {
+    if (isContract) {
+      // passing these stub params prevent unnecessary possibly errorish RPC calls
+      overrides = {
+        ...overrides,
+        gas: 21000n,
+        maxFeePerGas: 1n,
+        maxPriorityFeePerGas: 1n,
+        nonce: 1,
+      };
+    } else {
       callback({ stage: TransactionCallbackStage.GAS_LIMIT });
       const feeData = await this.getFeeData();
       overrides.maxFeePerGas = feeData.maxFeePerGas;
@@ -518,11 +527,6 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     const transactionHash = await withSDKError(
       sendTransaction({
         ...overrides,
-        // passing these stub params prevent unnecessary errorish RPC calls
-        gas: 1n,
-        maxFeePerGas: 1n,
-        maxPriorityFeePerGas: 1n,
-        nonce: 1,
       }),
       ERROR_CODE.TRANSACTION_ERROR,
     );
