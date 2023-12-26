@@ -1,4 +1,9 @@
-import { zeroAddress, getContract, encodeFunctionData } from 'viem';
+import {
+  zeroAddress,
+  getContract,
+  encodeFunctionData,
+  decodeEventLog,
+} from 'viem';
 import type {
   Address,
   GetContractReturnType,
@@ -6,6 +11,7 @@ import type {
   WalletClient,
   Hash,
   WriteContractParameters,
+  TransactionReceipt,
 } from 'viem';
 
 import {
@@ -13,7 +19,7 @@ import {
   type PopulatedTransaction,
   TransactionOptions,
 } from '../core/index.js';
-import { ERROR_CODE } from '../common/utils/sdk-error.js';
+import { ERROR_CODE, invariant } from '../common/utils/sdk-error.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import {
   SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
@@ -29,8 +35,10 @@ import type {
   StakeEncodeDataProps,
   StakeInnerProps,
   StakeLimitResult,
+  StakeResult,
 } from './types.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import { addressEqual } from '../common/utils/address-equal.js';
 
 export class LidoSDKStake extends LidoSDKModule {
   // Contracts
@@ -60,15 +68,17 @@ export class LidoSDKStake extends LidoSDKModule {
 
   @Logger('Call:')
   @ErrorHandler()
-  public async stakeEth(props: StakeProps): Promise<TransactionResult> {
+  public async stakeEth(
+    props: StakeProps,
+  ): Promise<TransactionResult<StakeResult>> {
     this.core.useWeb3Provider();
     const { callback, account, referralAddress, value, ...rest } =
       await this.parseProps(props);
 
     await this.validateStakeLimit(value);
-
+    const { address } = await this.core.useAccount(account);
     const contract = await this.getContractStETH();
-    return this.core.performTransaction({
+    return this.core.performTransaction<StakeResult>({
       ...rest,
       callback,
       account,
@@ -76,6 +86,7 @@ export class LidoSDKStake extends LidoSDKModule {
         this.submitGasLimit(value, referralAddress, options),
       sendTransaction: (options) =>
         contract.write.submit([referralAddress], { ...options, value }),
+      decodeResult: async (receipt) => this.submitParseEvents(receipt, address),
     });
   }
 
@@ -143,6 +154,44 @@ export class LidoSDKStake extends LidoSDKModule {
       BigInt(GAS_TRANSACTION_RATIO_PRECISION);
 
     return gasLimit;
+  }
+
+  @Logger('Utils:')
+  private submitParseEvents(
+    receipt: TransactionReceipt,
+    address: Address,
+  ): StakeResult {
+    let stethReceived: bigint | undefined;
+    let sharesReceived: bigint | undefined;
+    for (const log of receipt.logs) {
+      const parsedLog = decodeEventLog({
+        abi: StethAbi,
+        strict: true,
+        ...log,
+      });
+      if (
+        parsedLog.eventName === 'Transfer' &&
+        addressEqual(parsedLog.args.to, address)
+      ) {
+        stethReceived = parsedLog.args.value;
+      } else if (
+        parsedLog.eventName === 'TransferShares' &&
+        addressEqual(parsedLog.args.to, address)
+      ) {
+        sharesReceived = parsedLog.args.sharesValue;
+      }
+    }
+    invariant(
+      stethReceived,
+      'could not find Transfer event in stake transaction',
+      ERROR_CODE.TRANSACTION_ERROR,
+    );
+    invariant(
+      sharesReceived,
+      'could not find TransferShares event in stake transaction',
+      ERROR_CODE.TRANSACTION_ERROR,
+    );
+    return { sharesReceived, stethReceived };
   }
 
   @Logger('Utils:')

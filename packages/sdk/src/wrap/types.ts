@@ -5,6 +5,11 @@ export type WrapProps = CommonTransactionProps & {
   value: EtherValue;
 };
 
+export type WrapResults = {
+  stethWrapped: bigint;
+  wstethReceived: bigint;
+};
+
 export type WrapPropsWithoutCallback = Omit<WrapProps, 'callback'>;
 
 export type WrapInnerProps = Omit<CommonTransactionProps, 'account'> & {
