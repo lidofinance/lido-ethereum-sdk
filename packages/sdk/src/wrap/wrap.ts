@@ -7,6 +7,8 @@ import {
   type WalletClient,
   type FormattedTransactionRequest,
   type WriteContractParameters,
+  TransactionReceipt,
+  decodeEventLog,
 } from 'viem';
 
 import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
@@ -23,12 +25,14 @@ import type {
   WrapProps,
   WrapInnerProps,
   WrapPropsWithoutCallback,
+  WrapResults,
 } from './types.js';
 
 import { abi } from './abi/wsteth.js';
 import { stethPartialAbi } from './abi/steth-partial.js';
-import { ERROR_CODE } from '../common/utils/sdk-error.js';
+import { ERROR_CODE, invariant } from '../common/utils/sdk-error.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import { addressEqual } from '../common/utils/address-equal.js';
 
 export class LidoSDKWrap extends LidoSDKModule {
   // Contracts
@@ -75,7 +79,9 @@ export class LidoSDKWrap extends LidoSDKModule {
 
   @Logger('Call:')
   @ErrorHandler()
-  public async wrapEth(props: WrapProps): Promise<TransactionResult> {
+  public async wrapEth(
+    props: WrapProps,
+  ): Promise<TransactionResult<WrapResults>> {
     const { account, callback, value, ...rest } = await this.parseProps(props);
     const web3Provider = this.core.useWeb3Provider();
     const contract = await this.getContractWstETH();
@@ -98,6 +104,7 @@ export class LidoSDKWrap extends LidoSDKModule {
           to: contract.address,
           ...options,
         }),
+      decodeResult: (receipt) => this.wrapParseEvents(receipt, account.address),
     });
   }
 
@@ -134,17 +141,20 @@ export class LidoSDKWrap extends LidoSDKModule {
 
   @Logger('Call:')
   @ErrorHandler()
-  public async wrapSteth(props: WrapProps): Promise<TransactionResult> {
+  public async wrapSteth(
+    props: WrapProps,
+  ): Promise<TransactionResult<WrapResults>> {
     this.core.useWeb3Provider();
     const { account, callback, value, ...rest } = await this.parseProps(props);
     const contract = await this.getContractWstETH();
 
-    return this.core.performTransaction({
+    return this.core.performTransaction<WrapResults>({
       ...rest,
       account,
       callback,
       getGasLimit: (options) => contract.estimateGas.wrap([value], options),
       sendTransaction: (options) => contract.write.wrap([value], options),
+      decodeResult: (receipt) => this.wrapParseEvents(receipt, account.address),
     });
   }
 
@@ -350,6 +360,48 @@ export class LidoSDKWrap extends LidoSDKModule {
       account: await this.core.useAccount(props.account),
       value: parseValue(props.value),
       callback: props.callback ?? NOOP,
+    };
+  }
+
+  @Logger('Utils:')
+  private async wrapParseEvents(
+    receipt: TransactionReceipt,
+    address: Address,
+  ): Promise<WrapResults> {
+    const wstethAddress = await this.contractAddressWstETH();
+    let stethWrapped: bigint | undefined;
+    let wstethReceived: bigint | undefined;
+    for (const log of receipt.logs) {
+      const parsedLog = decodeEventLog({
+        abi,
+        strict: true,
+        ...log,
+      });
+      if (
+        parsedLog.eventName === 'Transfer' &&
+        addressEqual(parsedLog.args.to, address)
+      ) {
+        wstethReceived = parsedLog.args.value;
+      } else if (
+        parsedLog.eventName === 'Transfer' &&
+        addressEqual(parsedLog.args.to, wstethAddress)
+      ) {
+        stethWrapped = parsedLog.args.value;
+      }
+    }
+    invariant(
+      stethWrapped,
+      'could not find Transfer event in wrap transaction',
+      ERROR_CODE.TRANSACTION_ERROR,
+    );
+    invariant(
+      wstethReceived,
+      'could not find Transfer event in wrap transaction',
+      ERROR_CODE.TRANSACTION_ERROR,
+    );
+    return {
+      stethWrapped,
+      wstethReceived,
     };
   }
 }

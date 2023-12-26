@@ -467,15 +467,16 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     }
   }
 
-  public async performTransaction(
-    props: PerformTransactionOptions,
-  ): Promise<TransactionResult> {
+  public async performTransaction<TDecodedResult = undefined>(
+    props: PerformTransactionOptions<TDecodedResult>,
+  ): Promise<TransactionResult<TDecodedResult>> {
     //
     this.useWeb3Provider();
     const {
       callback = NOOP,
       getGasLimit,
       sendTransaction,
+      decodeResult,
       waitForTransactionReceiptParameters = {},
     } = props;
     const account = await this.useAccount(props.account);
@@ -524,7 +525,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
     callback({ stage: TransactionCallbackStage.SIGN, payload: overrides.gas });
 
-    const transactionHash = await withSDKError(
+    const hash = await withSDKError(
       sendTransaction({
         ...overrides,
       }),
@@ -533,17 +534,17 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
     if (isContract) {
       callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
-      return { hash: transactionHash };
+      return { hash: hash };
     }
 
     callback({
       stage: TransactionCallbackStage.RECEIPT,
-      payload: transactionHash,
+      payload: hash,
     });
 
-    const transactionReceipt = await withSDKError(
+    const receipt = await withSDKError(
       this.rpcProvider.waitForTransactionReceipt({
-        hash: transactionHash,
+        hash: hash,
         timeout: 120_000,
         ...waitForTransactionReceiptParameters,
       }),
@@ -552,12 +553,14 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
     callback({
       stage: TransactionCallbackStage.CONFIRMATION,
-      payload: transactionReceipt,
+      payload: receipt,
     });
 
     const confirmations = await this.rpcProvider.getTransactionConfirmations({
-      hash: transactionReceipt.transactionHash,
+      hash: receipt.transactionHash,
     });
+
+    const result = await decodeResult?.(receipt);
 
     callback({
       stage: TransactionCallbackStage.DONE,
@@ -565,8 +568,9 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     });
 
     return {
-      hash: transactionHash,
-      receipt: transactionReceipt,
+      hash,
+      receipt,
+      result,
       confirmations,
     };
   }
