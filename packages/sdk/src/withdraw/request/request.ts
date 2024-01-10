@@ -17,6 +17,8 @@ import type {
   SignedPermit,
   SplitAmountToRequestsProps,
   RequirePermit,
+  WithdrawalResult,
+  WithdrawalEventRequest,
 } from './types.js';
 import {
   invariant,
@@ -25,10 +27,13 @@ import {
 } from '../../common/utils/sdk-error.js';
 import {
   SimulateContractReturnType,
+  TransactionReceipt,
+  decodeEventLog,
   encodeFunctionData,
   formatEther,
 } from 'viem';
 import { parseValue } from '../../common/utils/parse-value.js';
+import { WithdrawalQueueAbi } from '../abi/withdrawalQueue.js';
 
 export class LidoSDKWithdrawRequest extends BusModule {
   @Logger('Views:')
@@ -76,7 +81,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
   @ErrorHandler('Error:')
   public async requestWithdrawal(
     props: RequestProps,
-  ): Promise<TransactionResult> {
+  ): Promise<TransactionResult<WithdrawalResult>> {
     const account = await this.bus.core.useAccount(props.account);
     const {
       token,
@@ -111,6 +116,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
       callback,
       getGasLimit,
       sendTransaction,
+      decodeResult: (receipt) => this.decodeWithdrawEvents(receipt),
     });
   }
 
@@ -178,7 +184,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
   @ErrorHandler('Error:')
   public async requestWithdrawalWithPermit(
     props: RequestWithPermitProps,
-  ): Promise<TransactionResult> {
+  ): Promise<TransactionResult<WithdrawalResult>> {
     const account = await this.bus.core.useAccount(props.account);
     const {
       token,
@@ -246,6 +252,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
       callback,
       getGasLimit,
       sendTransaction,
+      decodeResult: (receipt) => this.decodeWithdrawEvents(receipt),
     });
   }
 
@@ -311,5 +318,24 @@ export class LidoSDKWithdrawRequest extends BusModule {
         args,
       }),
     };
+  }
+
+  @Logger('Utils:')
+  private async decodeWithdrawEvents(
+    receipt: TransactionReceipt,
+  ): Promise<WithdrawalResult> {
+    const requests: WithdrawalEventRequest[] = [];
+    for (const log of receipt.logs) {
+      const parsedLog = decodeEventLog({
+        // fits both wsteth and steth events
+        abi: WithdrawalQueueAbi,
+        strict: true,
+        ...log,
+      });
+      if (parsedLog.eventName === 'WithdrawalRequested') {
+        requests.push({ ...parsedLog.args });
+      }
+    }
+    return { requests };
   }
 }

@@ -1,4 +1,9 @@
-import { encodeFunctionData, type SimulateContractReturnType } from 'viem';
+import {
+  encodeFunctionData,
+  TransactionReceipt,
+  type SimulateContractReturnType,
+  decodeEventLog,
+} from 'viem';
 
 import { Logger, ErrorHandler } from '../../common/decorators/index.js';
 import type {
@@ -9,9 +14,14 @@ import type {
 import { NOOP } from '../../common/constants.js';
 
 import { BusModule } from '../bus-module.js';
-import type { ClaimRequestsProps } from './types.js';
+import type {
+  ClaimRequestsProps,
+  ClaimResult,
+  ClaimResultEvent,
+} from './types.js';
 import { bigintComparator } from '../../common/utils/bigint-comparator.js';
 import { invariantArgument } from '../../common/index.js';
+import { WithdrawalQueueAbi } from '../abi/withdrawalQueue.js';
 
 export class LidoSDKWithdrawClaim extends BusModule {
   // Calls
@@ -19,7 +29,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
   @ErrorHandler()
   public async claimRequests(
     props: ClaimRequestsProps,
-  ): Promise<TransactionResult> {
+  ): Promise<TransactionResult<ClaimResult>> {
     const { account, callback = NOOP, ...rest } = props;
     const { requestsIds, hints } = await this.sortRequestsWithHints(
       props.requestsIds,
@@ -35,6 +45,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
         contract.estimateGas.claimWithdrawals(params, options),
       sendTransaction: (options) =>
         contract.write.claimWithdrawals(params, options),
+      decodeResult: (receipt) => this.decodeClaimEvents(receipt),
     });
   }
 
@@ -110,5 +121,24 @@ export class LidoSDKWithdrawClaim extends BusModule {
       requestsIds: sortedRequestsIds,
       hints: fetchedHints,
     };
+  }
+
+  @Logger('Utils:')
+  private async decodeClaimEvents(
+    receipt: TransactionReceipt,
+  ): Promise<ClaimResult> {
+    const requests: ClaimResultEvent[] = [];
+    for (const log of receipt.logs) {
+      const parsedLog = decodeEventLog({
+        // fits both wsteth and steth events
+        abi: WithdrawalQueueAbi,
+        strict: true,
+        ...log,
+      });
+      if (parsedLog.eventName === 'WithdrawalClaimed') {
+        requests.push({ ...parsedLog.args });
+      }
+    }
+    return { requests };
   }
 }

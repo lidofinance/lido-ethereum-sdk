@@ -10,6 +10,11 @@ export type WrapResults = {
   wstethReceived: bigint;
 };
 
+export type UnwrapResults = {
+  wstethUnwrapped: bigint;
+  stethReceived: bigint;
+};
+
 export type WrapPropsWithoutCallback = Omit<WrapProps, 'callback'>;
 
 export type WrapInnerProps = Omit<CommonTransactionProps, 'account'> & {

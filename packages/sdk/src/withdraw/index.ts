@@ -1,5 +1,9 @@
 export { LidoSDKWithdraw } from './withdraw.js';
-export type { ClaimRequestsProps } from './claim/types.js';
+export type {
+  ClaimRequestsProps,
+  ClaimResult,
+  ClaimResultEvent,
+} from './claim/types.js';
 export type {
   RequestProps,
   RequestWithPermitProps,
@@ -9,6 +13,8 @@ export type {
   GetAllowanceProps,
   SplitAmountToRequestsProps,
   PermitWstETHStETHProps,
+  WithdrawalResult,
+  WithdrawalEventRequest,
 } from './request/types.js';
 export type {
   RequestStatusWithId,

@@ -26,6 +26,7 @@ import type {
   WrapInnerProps,
   WrapPropsWithoutCallback,
   WrapResults,
+  UnwrapResults,
 } from './types.js';
 
 import { abi } from './abi/wsteth.js';
@@ -271,7 +272,9 @@ export class LidoSDKWrap extends LidoSDKModule {
 
   @Logger('Call:')
   @ErrorHandler()
-  public async unwrap(props: WrapProps): Promise<TransactionResult> {
+  public async unwrap(
+    props: WrapProps,
+  ): Promise<TransactionResult<UnwrapResults>> {
     this.core.useWeb3Provider();
     const { account, callback, value, ...rest } = await this.parseProps(props);
     const contract = await this.getContractWstETH();
@@ -282,6 +285,8 @@ export class LidoSDKWrap extends LidoSDKModule {
       callback,
       getGasLimit: (options) => contract.estimateGas.unwrap([value], options),
       sendTransaction: (options) => contract.write.unwrap([value], options),
+      decodeResult: (receipt) =>
+        this.unwrapParseEvents(receipt, account.address),
     });
   }
 
@@ -369,11 +374,13 @@ export class LidoSDKWrap extends LidoSDKModule {
     address: Address,
   ): Promise<WrapResults> {
     const wstethAddress = await this.contractAddressWstETH();
+
     let stethWrapped: bigint | undefined;
     let wstethReceived: bigint | undefined;
     for (const log of receipt.logs) {
       const parsedLog = decodeEventLog({
-        abi,
+        // fits both wsteth and steth events
+        abi: stethPartialAbi,
         strict: true,
         ...log,
       });
@@ -402,6 +409,47 @@ export class LidoSDKWrap extends LidoSDKModule {
     return {
       stethWrapped,
       wstethReceived,
+    };
+  }
+
+  @Logger('Utils:')
+  private async unwrapParseEvents(
+    receipt: TransactionReceipt,
+    address: Address,
+  ): Promise<UnwrapResults> {
+    let stethReceived: bigint | undefined;
+    let wstethUnwrapped: bigint | undefined;
+    for (const log of receipt.logs) {
+      const parsedLog = decodeEventLog({
+        abi: stethPartialAbi,
+        strict: true,
+        ...log,
+      });
+      if (
+        parsedLog.eventName === 'Transfer' &&
+        addressEqual(parsedLog.args.from, address)
+      ) {
+        wstethUnwrapped = parsedLog.args.value;
+      } else if (
+        parsedLog.eventName === 'Transfer' &&
+        addressEqual(parsedLog.args.to, address)
+      ) {
+        stethReceived = parsedLog.args.value;
+      }
+    }
+    invariant(
+      stethReceived,
+      'could not find Transfer event in unwrap transaction',
+      ERROR_CODE.TRANSACTION_ERROR,
+    );
+    invariant(
+      wstethUnwrapped,
+      'could not find Transfer event in unwrap transaction',
+      ERROR_CODE.TRANSACTION_ERROR,
+    );
+    return {
+      stethReceived,
+      wstethUnwrapped,
     };
   }
 }
