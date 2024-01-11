@@ -469,7 +469,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   public async performTransaction<TDecodedResult = undefined>(
     props: PerformTransactionOptions<TDecodedResult>,
   ): Promise<TransactionResult<TDecodedResult>> {
-    //
+    // this guards against not having web3Provider
     this.useWeb3Provider();
     const {
       callback = NOOP,
