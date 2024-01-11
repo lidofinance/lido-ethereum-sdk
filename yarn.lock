@@ -3093,7 +3093,6 @@ __metadata:
     graphql: ^16.8.1
     graphql-request: ^6.1.0
     jest: ^29.7.0
-    leaked-handles: ^5.2.0
     node-fetch: ^2.6.7
     rimraf: ^5.0.1
     ts-jest: ^29.1.1
@@ -11143,17 +11142,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"leaked-handles@npm:^5.2.0":
-  version: 5.2.0
-  resolution: "leaked-handles@npm:5.2.0"
-  dependencies:
-    process: ^0.10.0
-    weakmap-shim: ^1.1.0
-    xtend: ^4.0.0
-  checksum: 4d4d950a01a42ff9084a8ed9f70df47e94ebbf9553846ad7fe269821382c97f4ac97034a023c4dad6457514877e0ae427443c326e7723ad87e73b73e5045cb8f
-  languageName: node
-  linkType: hard
-
 "legacy-swc-helpers@npm:@swc/helpers@=0.4.14":
   version: 0.4.14
   resolution: "@swc/helpers@npm:0.4.14"
@@ -13365,13 +13353,6 @@ __metadata:
   version: 2.2.0
   resolution: "process-warning@npm:2.2.0"
   checksum: 394ae451c2622ee7d014a7196d36658fc1a5d5cc9f3bfeb54aadd5b77fcfecc89a30a25db259ae76ff49fde3f3f3dd7031dcdfb4da2e5445dac795549352e5d0
-  languageName: node
-  linkType: hard
-
-"process@npm:^0.10.0":
-  version: 0.10.1
-  resolution: "process@npm:0.10.1"
-  checksum: bdaaa28a8edf96d5daa0f5c1faf4adfedce512ebca829a82e846d991492780c34eb934decf4fa5b311c698881d07a8d4592b4d7ea53ec03d51580a2f364d3e30
   languageName: node
   linkType: hard
 
@@ -16110,13 +16091,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"weakmap-shim@npm:^1.1.0":
-  version: 1.1.1
-  resolution: "weakmap-shim@npm:1.1.1"
-  checksum: 27669feb2a05d881211a298fafb1e771fd960a5e308b89a66db2902328f0afdb9c91524bd401d45700918baa84f082017c70cbd56a89ae37c18584c0f00ee0e6
-  languageName: node
-  linkType: hard
-
 "webidl-conversions@npm:^3.0.0":
   version: 3.0.1
   resolution: "webidl-conversions@npm:3.0.1"
@@ -16340,7 +16314,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xtend@npm:^4.0.0, xtend@npm:^4.0.1, xtend@npm:~4.0.1":
+"xtend@npm:^4.0.1, xtend@npm:~4.0.1":
   version: 4.0.2
   resolution: "xtend@npm:4.0.2"
   checksum: ac5dfa738b21f6e7f0dd6e65e1b3155036d68104e67e5d5d1bde74892e327d7e5636a076f625599dc394330a731861e87343ff184b0047fef1360a7ec0a5a36a
