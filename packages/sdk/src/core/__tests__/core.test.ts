@@ -28,8 +28,8 @@ describe('Core Tests', () => {
     expect(core.web3Provider).toBeUndefined();
   });
 
-  test('Core accepts only valid arguments', () => {
-    void expectSDKError(
+  test('Core accepts only valid arguments', async () => {
+    await expectSDKError(
       () =>
         new LidoSDKCore({
           chainId: chainId,
@@ -38,7 +38,7 @@ describe('Core Tests', () => {
       ERROR_CODE.INVALID_ARGUMENT,
     );
 
-    void expectSDKError(
+    await expectSDKError(
       () =>
         new LidoSDKCore({
           chainId: 100 as any,

@@ -62,13 +62,14 @@ export class LidoSDKStake extends LidoSDKModule {
   @ErrorHandler()
   public async stakeEth(props: StakeProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
-    const { callback, account, referralAddress, value } =
-      this.parseProps(props);
+    const { callback, account, referralAddress, value, ...rest } =
+      await this.parseProps(props);
 
     await this.validateStakeLimit(value);
 
     const contract = await this.getContractStETH();
     return this.core.performTransaction({
+      ...rest,
       callback,
       account,
       getGasLimit: async (options) =>
@@ -83,15 +84,10 @@ export class LidoSDKStake extends LidoSDKModule {
   public async stakeEthSimulateTx(
     props: StakeProps,
   ): Promise<WriteContractParameters> {
-    const { referralAddress, value, account } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
-    const address = await this.contractAddressStETH();
-    const { request } = await this.core.rpcProvider.simulateContract({
-      address,
-      abi: StethAbi,
-      functionName: 'submit',
-      account: accountAddress,
-      args: [referralAddress],
+    const { referralAddress, value, account } = await this.parseProps(props);
+    const contract = await this.getContractStETH();
+    const { request } = await contract.simulate.submit([referralAddress], {
+      account,
       value: value,
     });
 
@@ -164,7 +160,6 @@ export class LidoSDKStake extends LidoSDKModule {
   @Logger('Utils:')
   private stakeEthEncodeData(props: StakeEncodeDataProps): Hash {
     const { referralAddress = zeroAddress } = props;
-
     return encodeFunctionData({
       abi: StethAbi,
       functionName: 'submit',
@@ -176,22 +171,26 @@ export class LidoSDKStake extends LidoSDKModule {
   public async stakeEthPopulateTx(
     props: StakeProps,
   ): Promise<PopulatedTransaction> {
-    const { referralAddress, value, account } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { referralAddress, value, account } = await this.parseProps(props);
     const data = this.stakeEthEncodeData({ referralAddress });
     const address = await this.contractAddressStETH();
-
+    const gas = await this.submitGasLimit(value, referralAddress, {
+      account,
+      chain: this.core.chain,
+    });
     return {
       to: address,
-      from: accountAddress,
+      from: account.address,
       value,
+      gas,
       data,
     };
   }
 
-  private parseProps(props: StakeProps): StakeInnerProps {
+  private async parseProps(props: StakeProps): Promise<StakeInnerProps> {
     return {
       ...props,
+      account: await this.core.useAccount(props.account),
       referralAddress: props.referralAddress ?? zeroAddress,
       value: parseValue(props.value),
       callback: props.callback ?? NOOP,
