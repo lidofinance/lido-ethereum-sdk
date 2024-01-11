@@ -3,11 +3,13 @@ import {
   getContract,
   encodeFunctionData,
   decodeEventLog,
+  getAbiItem,
+  getEventSelector,
 } from 'viem';
+
 import type {
   Address,
   GetContractReturnType,
-  PublicClient,
   WalletClient,
   Hash,
   WriteContractParameters,
@@ -29,7 +31,7 @@ import {
 } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
 
-import { StethAbi } from './abi/steth.js';
+import { StethAbi, StethEventsPartialAbi } from './abi/steth.js';
 import type {
   StakeProps,
   StakeEncodeDataProps,
@@ -41,6 +43,13 @@ import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 import { addressEqual } from '../common/utils/address-equal.js';
 
 export class LidoSDKStake extends LidoSDKModule {
+  // Precomputed event signatures
+  private static TRANSFER_SIGNATURE = getEventSelector(
+    getAbiItem({ abi: StethEventsPartialAbi, name: 'Transfer' }),
+  );
+  private static TRANSFER_SHARES_SIGNATURE = getEventSelector(
+    getAbiItem({ abi: StethEventsPartialAbi, name: 'TransferShares' }),
+  );
   // Contracts
 
   @Logger('Contracts:')
@@ -52,15 +61,17 @@ export class LidoSDKStake extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
   public async getContractStETH(): Promise<
-    GetContractReturnType<typeof StethAbi, PublicClient, WalletClient>
+    GetContractReturnType<typeof StethAbi, WalletClient>
   > {
     const address = await this.contractAddressStETH();
 
     return getContract({
       address,
       abi: StethAbi,
-      publicClient: this.core.rpcProvider,
-      walletClient: this.core.web3Provider,
+      client: {
+        public: this.core.rpcProvider,
+        wallet: this.core.web3Provider as WalletClient,
+      },
     });
   }
 
@@ -164,8 +175,14 @@ export class LidoSDKStake extends LidoSDKModule {
     let stethReceived: bigint | undefined;
     let sharesReceived: bigint | undefined;
     for (const log of receipt.logs) {
+      // skips non-relevant events
+      if (
+        log.topics[0] !== LidoSDKStake.TRANSFER_SIGNATURE &&
+        log.topics[0] !== LidoSDKStake.TRANSFER_SHARES_SIGNATURE
+      )
+        continue;
       const parsedLog = decodeEventLog({
-        abi: StethAbi,
+        abi: StethEventsPartialAbi,
         strict: true,
         ...log,
       });

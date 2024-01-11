@@ -26,16 +26,25 @@ import {
   ERROR_CODE,
 } from '../../common/utils/sdk-error.js';
 import {
-  SimulateContractReturnType,
   TransactionReceipt,
   decodeEventLog,
   encodeFunctionData,
   formatEther,
+  getAbiItem,
+  getEventSelector,
 } from 'viem';
 import { parseValue } from '../../common/utils/parse-value.js';
-import { WithdrawalQueueAbi } from '../abi/withdrawalQueue.js';
+import { PartialWithdrawalQueueEventsAbi } from '../abi/withdrawalQueue.js';
 
 export class LidoSDKWithdrawRequest extends BusModule {
+  // Precomputed event signatures
+  private static WITHDRAW_SIGNATURE = getEventSelector(
+    getAbiItem({
+      abi: PartialWithdrawalQueueEventsAbi,
+      name: 'WithdrawalRequested',
+    }),
+  );
+
   @Logger('Views:')
   public async splitAmountToRequests({
     amount: _amount,
@@ -122,9 +131,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
 
   @Logger('Views:')
   @ErrorHandler()
-  public async requestWithdrawalSimulateTx(
-    props: NoCallback<RequestProps>,
-  ): Promise<SimulateContractReturnType> {
+  public async requestWithdrawalSimulateTx(props: NoCallback<RequestProps>) {
     const account = await this.bus.core.useAccount(props.account);
     const {
       token,
@@ -260,7 +267,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
   @ErrorHandler()
   public async requestWithdrawalWithPermitSimulateTx(
     props: NoCallback<RequirePermit<RequestWithPermitProps>>,
-  ): Promise<SimulateContractReturnType> {
+  ) {
     const account = await this.bus.core.useAccount(props.account);
     const {
       token,
@@ -326,9 +333,10 @@ export class LidoSDKWithdrawRequest extends BusModule {
   ): Promise<WithdrawalResult> {
     const requests: WithdrawalEventRequest[] = [];
     for (const log of receipt.logs) {
+      if (log.topics[0] !== LidoSDKWithdrawRequest.WITHDRAW_SIGNATURE) continue;
       const parsedLog = decodeEventLog({
-        // fits both wsteth and steth events
-        abi: WithdrawalQueueAbi,
+        // lightweight abi
+        abi: PartialWithdrawalQueueEventsAbi,
         strict: true,
         ...log,
       });

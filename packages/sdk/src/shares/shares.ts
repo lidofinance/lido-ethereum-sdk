@@ -1,7 +1,6 @@
 import {
   type GetContractReturnType,
   type Address,
-  type PublicClient,
   type WalletClient,
   getContract,
   encodeFunctionData,
@@ -37,15 +36,17 @@ export class LidoSDKShares extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
   public async getContractStETHshares(): Promise<
-    GetContractReturnType<typeof stethSharesAbi, PublicClient, WalletClient>
+    GetContractReturnType<typeof stethSharesAbi, WalletClient>
   > {
     const address = await this.contractAddressStETH();
 
     return getContract({
       address,
       abi: stethSharesAbi,
-      publicClient: this.core.rpcProvider,
-      walletClient: this.core.web3Provider,
+      client: {
+        public: this.core.rpcProvider,
+        wallet: this.core.web3Provider as WalletClient,
+      },
     });
   }
 

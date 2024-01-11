@@ -70,4 +70,27 @@ export const stethPartialAbi = [
     name: 'TransferShares',
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'sender', type: 'address' },
+      { indexed: false, name: 'amount', type: 'uint256' },
+      { indexed: false, name: 'referral', type: 'address' },
+    ],
+    name: 'Submitted',
+    type: 'event',
+  },
+] as const;
+
+export const PartialTransferEventAbi = [
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'from', type: 'address' },
+      { indexed: true, name: 'to', type: 'address' },
+      { indexed: false, name: 'value', type: 'uint256' },
+    ],
+    name: 'Transfer',
+    type: 'event',
+  },
 ] as const;

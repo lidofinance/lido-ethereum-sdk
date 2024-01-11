@@ -12,7 +12,6 @@ import {
   type Address,
   type GetContractReturnType,
   type Hash,
-  type PublicClient,
   type WalletClient,
   encodeFunctionData,
   getContract,
@@ -37,14 +36,16 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContract(): Promise<
-    GetContractReturnType<typeof erc20abi, PublicClient, WalletClient>
+    GetContractReturnType<typeof erc20abi, WalletClient>
   > {
     const address = await this.contractAddress();
     return getContract({
       address,
       abi: erc20abi,
-      publicClient: this.core.rpcProvider,
-      walletClient: this.core.web3Provider,
+      client: {
+        public: this.core.rpcProvider,
+        wallet: this.core.web3Provider as WalletClient,
+      },
     });
   }
 

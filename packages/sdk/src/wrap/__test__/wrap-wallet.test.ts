@@ -84,8 +84,17 @@ describe('LidoSDKWrap wallet methods', () => {
     const stethBalanceAfter = await steth.balance(address);
     const wstethBalanceAfter = await wsteth.balance(address);
 
-    expectAlmostEqualBn(stethBalanceAfter - stethBalanceBefore, -value);
-    expectAlmostEqualBn(wstethBalanceAfter - wstethBalanceBefore, wstethValue);
+    const stethDiff = stethBalanceAfter - stethBalanceBefore;
+    const wstethDiff = wstethBalanceAfter - wstethBalanceBefore;
+
+    expectAlmostEqualBn(stethDiff, -value);
+    expectAlmostEqualBn(wstethDiff, wstethValue);
+
+    expect(tx.result).toBeDefined();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const result = tx.result!;
+    expectAlmostEqualBn(result.stethWrapped, -stethDiff);
+    expect(result.wstethReceived).toEqual(wstethDiff);
 
     await expect(wrap.getStethForWrapAllowance(address)).resolves.toEqual(0n);
   });
@@ -118,7 +127,16 @@ describe('LidoSDKWrap wallet methods', () => {
     const stethBalanceAfter = await steth.balance(address);
     const wstethBalanceAfter = await wsteth.balance(address);
 
-    expectAlmostEqualBn(stethBalanceAfter - stethBalanceBefore, value);
-    expectAlmostEqualBn(wstethBalanceAfter - wstethBalanceBefore, -wstethValue);
+    const stethDiff = stethBalanceAfter - stethBalanceBefore;
+    const wstethDiff = wstethBalanceAfter - wstethBalanceBefore;
+
+    expectAlmostEqualBn(stethDiff, value);
+    expectAlmostEqualBn(wstethDiff, -wstethValue);
+
+    expect(tx.result).toBeDefined();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const result = tx.result!;
+    expectAlmostEqualBn(result.stethReceived, stethDiff);
+    expect(result.wstethUnwrapped).toEqual(-wstethDiff);
   });
 });

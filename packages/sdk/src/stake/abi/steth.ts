@@ -695,3 +695,27 @@ export const StethAbi = [
     type: 'event',
   },
 ] as const;
+
+// smaller ABI for less overhead when parsing submit events
+export const StethEventsPartialAbi = [
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'from', type: 'address' },
+      { indexed: true, name: 'to', type: 'address' },
+      { indexed: false, name: 'sharesValue', type: 'uint256' },
+    ],
+    name: 'TransferShares',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, name: 'from', type: 'address' },
+      { indexed: true, name: 'to', type: 'address' },
+      { indexed: false, name: 'value', type: 'uint256' },
+    ],
+    name: 'Transfer',
+    type: 'event',
+  },
+] as const;

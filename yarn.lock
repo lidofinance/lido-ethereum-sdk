@@ -12,10 +12,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@adraffy/ens-normalize@npm:1.9.4":
-  version: 1.9.4
-  resolution: "@adraffy/ens-normalize@npm:1.9.4"
-  checksum: 7d7fff58ebe2c4961f7e5e61dad123aa6a63fec0df5c84af1fa41079dc05d398599690be4427b3a94d2baa94084544bcfdf2d51cbed7504b9b0583b0960ad550
+"@adraffy/ens-normalize@npm:1.10.0":
+  version: 1.10.0
+  resolution: "@adraffy/ens-normalize@npm:1.10.0"
+  checksum: af0540f963a2632da2bbc37e36ea6593dcfc607b937857133791781e246d47f870d5e3d21fa70d5cfe94e772c284588c81ea3f5b7f4ea8fbb824369444e4dbcb
   languageName: node
   linkType: hard
 
@@ -3093,11 +3093,12 @@ __metadata:
     graphql: ^16.8.1
     graphql-request: ^6.1.0
     jest: ^29.7.0
+    leaked-handles: ^5.2.0
     node-fetch: ^2.6.7
     rimraf: ^5.0.1
     ts-jest: ^29.1.1
     typescript: 5.1.6
-    viem: ^1.18.8
+    viem: ^2.0.6
   languageName: unknown
   linkType: soft
 
@@ -5211,15 +5212,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ws@npm:^8.5.5":
-  version: 8.5.5
-  resolution: "@types/ws@npm:8.5.5"
-  dependencies:
-    "@types/node": "*"
-  checksum: d00bf8070e6938e3ccf933010921c6ce78ac3606696ce37a393b27a9a603f7bd93ea64f3c5fa295a2f743575ba9c9a9fdb904af0f5fe2229bf2adf0630386e4a
-  languageName: node
-  linkType: hard
-
 "@types/yargs-parser@npm:*":
   version: 21.0.2
   resolution: "@types/yargs-parser@npm:21.0.2"
@@ -5916,18 +5908,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"abitype@npm:0.9.8":
-  version: 0.9.8
-  resolution: "abitype@npm:0.9.8"
+"abitype@npm:0.10.0":
+  version: 0.10.0
+  resolution: "abitype@npm:0.10.0"
   peerDependencies:
     typescript: ">=5.0.4"
-    zod: ^3 >=3.19.1
+    zod: ^3 >=3.22.0
   peerDependenciesMeta:
     typescript:
       optional: true
     zod:
       optional: true
-  checksum: d7d887f29d6821e3f7a400de9620511b80ead3f85c5c87308aaec97965d3493e6687ed816e88722b4f512249bd66dee9e69231b49af0e1db8f69400a62c87cf6
+  checksum: 01a75393740036121414024aa7ed61e6a2104bfd90c91b6aa1a7778cf1edfa15b828779acbbb13ac641939d1ba9c836d143d9f7310699cd7496273bb24c599b3
   languageName: node
   linkType: hard
 
@@ -10304,15 +10296,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"isomorphic-ws@npm:5.0.0":
-  version: 5.0.0
-  resolution: "isomorphic-ws@npm:5.0.0"
-  peerDependencies:
-    ws: "*"
-  checksum: e20eb2aee09ba96247465fda40c6d22c1153394c0144fa34fe6609f341af4c8c564f60ea3ba762335a7a9c306809349f9b863c8beedf2beea09b299834ad5398
-  languageName: node
-  linkType: hard
-
 "isomorphic-ws@npm:^4.0.1":
   version: 4.0.1
   resolution: "isomorphic-ws@npm:4.0.1"
@@ -11160,6 +11143,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"leaked-handles@npm:^5.2.0":
+  version: 5.2.0
+  resolution: "leaked-handles@npm:5.2.0"
+  dependencies:
+    process: ^0.10.0
+    weakmap-shim: ^1.1.0
+    xtend: ^4.0.0
+  checksum: 4d4d950a01a42ff9084a8ed9f70df47e94ebbf9553846ad7fe269821382c97f4ac97034a023c4dad6457514877e0ae427443c326e7723ad87e73b73e5045cb8f
+  languageName: node
+  linkType: hard
+
 "legacy-swc-helpers@npm:@swc/helpers@=0.4.14":
   version: 0.4.14
   resolution: "@swc/helpers@npm:0.4.14"
@@ -11439,7 +11433,7 @@ __metadata:
     tiny-invariant: ^1.3.1
     typescript: 5.1.6
     url-loader: ^4.1.1
-    viem: ^1.10.3
+    viem: ^2.0.6
     wagmi: ^0.12.19
   languageName: unknown
   linkType: soft
@@ -13371,6 +13365,13 @@ __metadata:
   version: 2.2.0
   resolution: "process-warning@npm:2.2.0"
   checksum: 394ae451c2622ee7d014a7196d36658fc1a5d5cc9f3bfeb54aadd5b77fcfecc89a30a25db259ae76ff49fde3f3f3dd7031dcdfb4da2e5445dac795549352e5d0
+  languageName: node
+  linkType: hard
+
+"process@npm:^0.10.0":
+  version: 0.10.1
+  resolution: "process@npm:0.10.1"
+  checksum: bdaaa28a8edf96d5daa0f5c1faf4adfedce512ebca829a82e846d991492780c34eb934decf4fa5b311c698881d07a8d4592b4d7ea53ec03d51580a2f364d3e30
   languageName: node
   linkType: hard
 
@@ -16032,38 +16033,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:^1.10.3":
-  version: 1.10.9
-  resolution: "viem@npm:1.10.9"
+"viem@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "viem@npm:2.0.6"
   dependencies:
-    "@adraffy/ens-normalize": 1.9.4
+    "@adraffy/ens-normalize": 1.10.0
     "@noble/curves": 1.2.0
     "@noble/hashes": 1.3.2
     "@scure/bip32": 1.3.2
     "@scure/bip39": 1.2.1
-    "@types/ws": ^8.5.5
-    abitype: 0.9.8
-    isomorphic-ws: 5.0.0
-    ws: 8.13.0
-  peerDependencies:
-    typescript: ">=5.0.4"
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-  checksum: 7bf53044abff4ff703d518227921d9a56907be744a30750873231a442dcfdee485d9928f337e22ad698a4d0cf25a57194aee9e636a09233169721bf2a6f2eea0
-  languageName: node
-  linkType: hard
-
-"viem@npm:^1.18.8":
-  version: 1.18.8
-  resolution: "viem@npm:1.18.8"
-  dependencies:
-    "@adraffy/ens-normalize": 1.9.4
-    "@noble/curves": 1.2.0
-    "@noble/hashes": 1.3.2
-    "@scure/bip32": 1.3.2
-    "@scure/bip39": 1.2.1
-    abitype: 0.9.8
+    abitype: 0.10.0
     isows: 1.0.3
     ws: 8.13.0
   peerDependencies:
@@ -16071,7 +16050,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 735e7debb20592b8c629f54a909c1c4b2f6d5d83ecb85eae15f066df55c9938153be87f7e635d925562ef7c8c600f9778e6f4dc83a76953d2ea1e118914d83db
+  checksum: eb6d17922c9eba640f4dc41e2f263c38033191da0328d0ff6ce710111368b65326fd7e680600dce1d87e4604c7b1898702bb1cdb333625d9c3cfb552f2739f08
   languageName: node
   linkType: hard
 
@@ -16128,6 +16107,13 @@ __metadata:
   dependencies:
     defaults: ^1.0.3
   checksum: 814e9d1ddcc9798f7377ffa448a5a3892232b9275ebb30a41b529607691c0491de47cba426e917a4d08ded3ee7e9ba2f3fe32e62ee3cd9c7d3bafb7754bd553c
+  languageName: node
+  linkType: hard
+
+"weakmap-shim@npm:^1.1.0":
+  version: 1.1.1
+  resolution: "weakmap-shim@npm:1.1.1"
+  checksum: 27669feb2a05d881211a298fafb1e771fd960a5e308b89a66db2902328f0afdb9c91524bd401d45700918baa84f082017c70cbd56a89ae37c18584c0f00ee0e6
   languageName: node
   linkType: hard
 
@@ -16354,7 +16340,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xtend@npm:^4.0.1, xtend@npm:~4.0.1":
+"xtend@npm:^4.0.0, xtend@npm:^4.0.1, xtend@npm:~4.0.1":
   version: 4.0.2
   resolution: "xtend@npm:4.0.2"
   checksum: ac5dfa738b21f6e7f0dd6e65e1b3155036d68104e67e5d5d1bde74892e327d7e5636a076f625599dc394330a731861e87343ff184b0047fef1360a7ec0a5a36a

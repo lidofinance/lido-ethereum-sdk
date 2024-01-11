@@ -1,8 +1,9 @@
 import {
   encodeFunctionData,
   TransactionReceipt,
-  type SimulateContractReturnType,
   decodeEventLog,
+  getAbiItem,
+  getEventSelector,
 } from 'viem';
 
 import { Logger, ErrorHandler } from '../../common/decorators/index.js';
@@ -21,9 +22,17 @@ import type {
 } from './types.js';
 import { bigintComparator } from '../../common/utils/bigint-comparator.js';
 import { invariantArgument } from '../../common/index.js';
-import { WithdrawalQueueAbi } from '../abi/withdrawalQueue.js';
+import { PartialWithdrawalQueueEventsAbi } from '../abi/withdrawalQueue.js';
 
 export class LidoSDKWithdrawClaim extends BusModule {
+  // Precomputed event signatures
+  private static CLAIM_SIGNATURE = getEventSelector(
+    getAbiItem({
+      abi: PartialWithdrawalQueueEventsAbi,
+      name: 'WithdrawalClaimed',
+    }),
+  );
+
   // Calls
   @Logger('Call:')
   @ErrorHandler()
@@ -51,9 +60,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
 
   @Logger('Views:')
   @ErrorHandler()
-  public async claimRequestsSimulateTx(
-    props: NoCallback<ClaimRequestsProps>,
-  ): Promise<SimulateContractReturnType> {
+  public async claimRequestsSimulateTx(props: NoCallback<ClaimRequestsProps>) {
     const account = await this.bus.core.useAccount(props.account);
     const { requestsIds, hints } = await this.sortRequestsWithHints(
       props.requestsIds,
@@ -129,9 +136,10 @@ export class LidoSDKWithdrawClaim extends BusModule {
   ): Promise<ClaimResult> {
     const requests: ClaimResultEvent[] = [];
     for (const log of receipt.logs) {
+      if (log.topics[0] !== LidoSDKWithdrawClaim.CLAIM_SIGNATURE) continue;
       const parsedLog = decodeEventLog({
         // fits both wsteth and steth events
-        abi: WithdrawalQueueAbi,
+        abi: PartialWithdrawalQueueEventsAbi,
         strict: true,
         ...log,
       });

@@ -79,7 +79,7 @@ export class LidoSDKRewards extends LidoSDKModule {
     return getContract({
       address,
       abi: rewardsEventsAbi,
-      publicClient: this.core.rpcProvider,
+      client: this.core.rpcProvider,
     });
   }
 

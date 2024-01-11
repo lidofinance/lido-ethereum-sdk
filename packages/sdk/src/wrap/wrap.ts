@@ -3,12 +3,13 @@ import {
   encodeFunctionData,
   type Address,
   type GetContractReturnType,
-  type PublicClient,
   type WalletClient,
   type FormattedTransactionRequest,
   type WriteContractParameters,
   TransactionReceipt,
   decodeEventLog,
+  getAbiItem,
+  getEventSelector,
 } from 'viem';
 
 import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
@@ -30,12 +31,19 @@ import type {
 } from './types.js';
 
 import { abi } from './abi/wsteth.js';
-import { stethPartialAbi } from './abi/steth-partial.js';
+import {
+  stethPartialAbi,
+  PartialTransferEventAbi,
+} from './abi/steth-partial.js';
 import { ERROR_CODE, invariant } from '../common/utils/sdk-error.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 import { addressEqual } from '../common/utils/address-equal.js';
 
 export class LidoSDKWrap extends LidoSDKModule {
+  private static TRANSFER_SIGNATURE = getEventSelector(
+    getAbiItem({ abi: PartialTransferEventAbi, name: 'Transfer' }),
+  );
+
   // Contracts
 
   @Logger('Contracts:')
@@ -47,22 +55,24 @@ export class LidoSDKWrap extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressWstETH'])
   public async getContractWstETH(): Promise<
-    GetContractReturnType<typeof abi, PublicClient, WalletClient>
+    GetContractReturnType<typeof abi, WalletClient>
   > {
     const address = await this.contractAddressWstETH();
 
     return getContract({
       address,
       abi: abi,
-      publicClient: this.core.rpcProvider,
-      walletClient: this.core.web3Provider,
+      client: {
+        public: this.core.rpcProvider,
+        wallet: this.core.web3Provider as WalletClient,
+      },
     });
   }
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   private async getPartialContractSteth(): Promise<
-    GetContractReturnType<typeof stethPartialAbi, PublicClient, WalletClient>
+    GetContractReturnType<typeof stethPartialAbi, WalletClient>
   > {
     const address = await this.core.getContractAddress(
       LIDO_CONTRACT_NAMES.lido,
@@ -71,9 +81,11 @@ export class LidoSDKWrap extends LidoSDKModule {
     return getContract({
       address,
       abi: stethPartialAbi,
-      publicClient: this.core.rpcProvider,
-      walletClient: this.core.web3Provider,
-    });
+      client: {
+        public: this.core.rpcProvider,
+        wallet: this.core.web3Provider,
+      },
+    }) as GetContractReturnType<typeof stethPartialAbi, WalletClient>;
   }
 
   // Calls
@@ -262,7 +274,6 @@ export class LidoSDKWrap extends LidoSDKModule {
       [wstethContractAddress, value],
       {
         account,
-        functionName: 'approve',
       },
     );
     return request;
@@ -378,21 +389,17 @@ export class LidoSDKWrap extends LidoSDKModule {
     let stethWrapped: bigint | undefined;
     let wstethReceived: bigint | undefined;
     for (const log of receipt.logs) {
+      // skips non-relevant events
+      if (log.topics[0] !== LidoSDKWrap.TRANSFER_SIGNATURE) continue;
       const parsedLog = decodeEventLog({
         // fits both wsteth and steth events
-        abi: stethPartialAbi,
+        abi: PartialTransferEventAbi,
         strict: true,
         ...log,
       });
-      if (
-        parsedLog.eventName === 'Transfer' &&
-        addressEqual(parsedLog.args.to, address)
-      ) {
+      if (addressEqual(parsedLog.args.to, address)) {
         wstethReceived = parsedLog.args.value;
-      } else if (
-        parsedLog.eventName === 'Transfer' &&
-        addressEqual(parsedLog.args.to, wstethAddress)
-      ) {
+      } else if (addressEqual(parsedLog.args.to, wstethAddress)) {
         stethWrapped = parsedLog.args.value;
       }
     }
@@ -420,20 +427,16 @@ export class LidoSDKWrap extends LidoSDKModule {
     let stethReceived: bigint | undefined;
     let wstethUnwrapped: bigint | undefined;
     for (const log of receipt.logs) {
+      // skips non-relevant events
+      if (log.topics[0] !== LidoSDKWrap.TRANSFER_SIGNATURE) continue;
       const parsedLog = decodeEventLog({
-        abi: stethPartialAbi,
+        abi: PartialTransferEventAbi,
         strict: true,
         ...log,
       });
-      if (
-        parsedLog.eventName === 'Transfer' &&
-        addressEqual(parsedLog.args.from, address)
-      ) {
+      if (addressEqual(parsedLog.args.from, address)) {
         wstethUnwrapped = parsedLog.args.value;
-      } else if (
-        parsedLog.eventName === 'Transfer' &&
-        addressEqual(parsedLog.args.to, address)
-      ) {
+      } else if (addressEqual(parsedLog.args.to, address)) {
         stethReceived = parsedLog.args.value;
       }
     }

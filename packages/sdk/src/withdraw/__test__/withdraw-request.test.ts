@@ -1,6 +1,9 @@
 import { expect, describe, jest, beforeAll, test } from '@jest/globals';
 import { useWithdraw } from '../../../tests/utils/fixtures/use-withdraw.js';
-import { expectAlmostEqualBn } from '../../../tests/utils/expect/expect-bn.js';
+import {
+  expectAlmostEqualBn,
+  expectPositiveBn,
+} from '../../../tests/utils/expect/expect-bn.js';
 import { Address } from 'viem';
 import { useWrap } from '../../../tests/utils/fixtures/use-wrap.js';
 import { useAccount } from '../../../tests/utils/fixtures/use-wallet-client.js';
@@ -277,6 +280,17 @@ const testWithdrawals = (token: WithdrawableTokens, ethAmount: bigint) => {
 
     const nftsAfter = await unsteth.getNFTsByAccount(address);
     expect(nftsAfter.length - nftsBefore.length).toBe(requestsAmounts.length);
+
+    expect(tx.result).toBeDefined();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const result = tx.result!;
+    expect(result.requests).toHaveLength(nftsAfter.length - nftsBefore.length);
+    for (const request of result.requests) {
+      expectAddress(request.owner, address);
+      expectAddress(request.requestor, address);
+      expectPositiveBn(request.amountOfStETH);
+      expectPositiveBn(request.amountOfShares);
+    }
   });
 };
 
