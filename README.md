@@ -92,24 +92,24 @@ All examples and usage instructions can be found in the [Docs SDK package](packa
 const lidoSDK = new LidoSDK({
   chainId: 5,
   rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  web3Provider: provider,
 });
-
-// Define default web3 provider in sdk (window.ethereum) if web3Provider is not defined in constructor
-lidoSDK.core.defineWeb3Provider();
 
 // Views
 const balanceETH = await lidoSDK.core.balanceETH(address);
 
 // Calls
-const stakeResult = await lidoSDK.stake.stakeEth({
+const stakeTx = await lidoSDK.stake.stakeEth({
   value,
   callback,
   referralAddress,
   account,
 });
 
+// relevant results are returned with transaction
+const { stethReceived, sharesReceived } = stakeTx.result;
+
 console.log(balanceETH.toString(), 'ETH balance');
-console.log(stakeResult, 'stake result');
 ```
 
 ## Migration
