@@ -533,7 +533,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
     if (isContract) {
       callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
-      return { hash: hash };
+      return { hash };
     }
 
     callback({
@@ -543,7 +543,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
     const receipt = await withSDKError(
       this.rpcProvider.waitForTransactionReceipt({
-        hash: hash,
+        hash,
         timeout: 120_000,
         ...waitForTransactionReceiptParameters,
       }),

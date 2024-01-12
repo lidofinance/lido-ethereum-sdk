@@ -83,9 +83,9 @@ export class LidoSDKWrap extends LidoSDKModule {
       abi: stethPartialAbi,
       client: {
         public: this.core.rpcProvider,
-        wallet: this.core.web3Provider,
+        wallet: this.core.web3Provider as WalletClient,
       },
-    }) as GetContractReturnType<typeof stethPartialAbi, WalletClient>;
+    });
   }
 
   // Calls
