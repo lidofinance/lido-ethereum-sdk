@@ -75,3 +75,15 @@ export type CheckAllowanceResult = {
   allowance: bigint;
   needsApprove: boolean;
 };
+
+export type WithdrawalEventRequest = {
+  requestId: bigint;
+  requestor: Address;
+  owner: Address;
+  amountOfStETH: bigint;
+  amountOfShares: bigint;
+};
+
+export type WithdrawalResult = {
+  requests: WithdrawalEventRequest[];
+};

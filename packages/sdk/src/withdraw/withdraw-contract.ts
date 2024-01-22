@@ -1,10 +1,5 @@
 import { getContract } from 'viem';
-import type {
-  Address,
-  GetContractReturnType,
-  PublicClient,
-  WalletClient,
-} from 'viem';
+import type { Address, GetContractReturnType, WalletClient } from 'viem';
 import { Logger, Cache } from '../common/decorators/index.js';
 import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
 
@@ -30,15 +25,17 @@ export class LidoSDKWithdrawContract extends BusModule {
     'contractAddressWithdrawalQueue',
   ])
   public async getContractWithdrawalQueue(): Promise<
-    GetContractReturnType<typeof WithdrawalQueueAbi, PublicClient, WalletClient>
+    GetContractReturnType<typeof WithdrawalQueueAbi, WalletClient>
   > {
     const address = await this.contractAddressWithdrawalQueue();
 
     return getContract({
       address,
       abi: WithdrawalQueueAbi,
-      publicClient: this.bus.core.rpcProvider,
-      walletClient: this.bus.core.web3Provider,
+      client: {
+        public: this.bus.core.rpcProvider,
+        wallet: this.bus.core.web3Provider as WalletClient,
+      },
     });
   }
 
@@ -51,15 +48,17 @@ export class LidoSDKWithdrawContract extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id', 'contractAddressStETH'])
   public async getContractStETH(): Promise<
-    GetContractReturnType<typeof PartStethAbi, PublicClient, WalletClient>
+    GetContractReturnType<typeof PartStethAbi, WalletClient>
   > {
     const address = await this.contractAddressStETH();
 
     return getContract({
       address,
       abi: PartStethAbi,
-      publicClient: this.bus.core.rpcProvider,
-      walletClient: this.bus.core.web3Provider,
+      client: {
+        public: this.bus.core.rpcProvider,
+        wallet: this.bus.core.web3Provider as WalletClient,
+      },
     });
   }
 
@@ -72,15 +71,17 @@ export class LidoSDKWithdrawContract extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id', 'contractAddressWstETH'])
   public async getContractWstETH(): Promise<
-    GetContractReturnType<typeof PartWstethAbi, PublicClient, WalletClient>
+    GetContractReturnType<typeof PartWstethAbi, WalletClient>
   > {
     const address = await this.contractAddressWstETH();
 
     return getContract({
       address,
       abi: PartWstethAbi,
-      publicClient: this.bus.core.rpcProvider,
-      walletClient: this.bus.core.web3Provider,
+      client: {
+        public: this.bus.core.rpcProvider,
+        wallet: this.bus.core.web3Provider as WalletClient,
+      },
     });
   }
 }

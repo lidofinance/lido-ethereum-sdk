@@ -1,4 +1,10 @@
-import { encodeFunctionData, type SimulateContractReturnType } from 'viem';
+import {
+  encodeFunctionData,
+  TransactionReceipt,
+  decodeEventLog,
+  getAbiItem,
+  getEventSelector,
+} from 'viem';
 
 import { Logger, ErrorHandler } from '../../common/decorators/index.js';
 import type {
@@ -9,17 +15,30 @@ import type {
 import { NOOP } from '../../common/constants.js';
 
 import { BusModule } from '../bus-module.js';
-import type { ClaimRequestsProps } from './types.js';
+import type {
+  ClaimRequestsProps,
+  ClaimResult,
+  ClaimResultEvent,
+} from './types.js';
 import { bigintComparator } from '../../common/utils/bigint-comparator.js';
 import { invariantArgument } from '../../common/index.js';
+import { PartialWithdrawalQueueEventsAbi } from '../abi/withdrawalQueue.js';
 
 export class LidoSDKWithdrawClaim extends BusModule {
+  // Precomputed event signatures
+  private static CLAIM_SIGNATURE = getEventSelector(
+    getAbiItem({
+      abi: PartialWithdrawalQueueEventsAbi,
+      name: 'WithdrawalClaimed',
+    }),
+  );
+
   // Calls
   @Logger('Call:')
   @ErrorHandler()
   public async claimRequests(
     props: ClaimRequestsProps,
-  ): Promise<TransactionResult> {
+  ): Promise<TransactionResult<ClaimResult>> {
     const { account, callback = NOOP, ...rest } = props;
     const { requestsIds, hints } = await this.sortRequestsWithHints(
       props.requestsIds,
@@ -35,14 +54,13 @@ export class LidoSDKWithdrawClaim extends BusModule {
         contract.estimateGas.claimWithdrawals(params, options),
       sendTransaction: (options) =>
         contract.write.claimWithdrawals(params, options),
+      decodeResult: (receipt) => this.decodeClaimEvents(receipt),
     });
   }
 
   @Logger('Views:')
   @ErrorHandler()
-  public async claimRequestsSimulateTx(
-    props: NoCallback<ClaimRequestsProps>,
-  ): Promise<SimulateContractReturnType> {
+  public async claimRequestsSimulateTx(props: NoCallback<ClaimRequestsProps>) {
     const account = await this.bus.core.useAccount(props.account);
     const { requestsIds, hints } = await this.sortRequestsWithHints(
       props.requestsIds,
@@ -110,5 +128,25 @@ export class LidoSDKWithdrawClaim extends BusModule {
       requestsIds: sortedRequestsIds,
       hints: fetchedHints,
     };
+  }
+
+  @Logger('Utils:')
+  private async decodeClaimEvents(
+    receipt: TransactionReceipt,
+  ): Promise<ClaimResult> {
+    const requests: ClaimResultEvent[] = [];
+    for (const log of receipt.logs) {
+      if (log.topics[0] !== LidoSDKWithdrawClaim.CLAIM_SIGNATURE) continue;
+      const parsedLog = decodeEventLog({
+        // fits both wsteth and steth events
+        abi: PartialWithdrawalQueueEventsAbi,
+        strict: true,
+        ...log,
+      });
+      if (parsedLog.eventName === 'WithdrawalClaimed') {
+        requests.push({ ...parsedLog.args });
+      }
+    }
+    return { requests };
   }
 }

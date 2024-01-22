@@ -1,4 +1,4 @@
-import type { Account, Address } from 'viem';
+import type { Address, JsonRpcAccount } from 'viem';
 import { type EtherValue } from '../core/index.js';
 import {
   AccountValue,
@@ -11,7 +11,7 @@ export type InnerTransactionProps = Required<CommonTransactionProps>;
 export type ParsedTransactionProps<TProps extends CommonTransactionProps> =
   Omit<TProps, 'callback'> & {
     callback: NonNullable<TProps['callback']>;
-    account: Account;
+    account: JsonRpcAccount;
   } & (TProps extends { amount: EtherValue } ? { amount: bigint } : object);
 
 export type TransferProps = {

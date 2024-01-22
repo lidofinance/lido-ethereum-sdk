@@ -72,11 +72,21 @@ export type PerformTransactionSendTransaction = (
   override: TransactionOptions,
 ) => Promise<Hash>;
 
-export type PerformTransactionOptions = CommonTransactionProps & {
-  getGasLimit: PerformTransactionGasLimit;
-  sendTransaction: PerformTransactionSendTransaction;
-  waitForTransactionReceiptParameters?: WaitForTransactionReceiptParameters;
-};
+export type PerformTransactionDecodeResult<TDecodedResult> = (
+  receipt: TransactionReceipt,
+) => Promise<TDecodedResult>;
+
+type PerformTransactionOptionsDecodePartial<TDecodedResult> =
+  TDecodedResult extends undefined
+    ? { decodeResult?: undefined }
+    : { decodeResult: PerformTransactionDecodeResult<TDecodedResult> };
+
+export type PerformTransactionOptions<TDecodedResult> =
+  CommonTransactionProps & {
+    getGasLimit: PerformTransactionGasLimit;
+    sendTransaction: PerformTransactionSendTransaction;
+    waitForTransactionReceiptParameters?: WaitForTransactionReceiptParameters;
+  } & PerformTransactionOptionsDecodePartial<TDecodedResult>;
 
 export type TransactionOptions = {
   account: AccountValue;
@@ -87,10 +97,11 @@ export type TransactionOptions = {
   nonce?: number;
 };
 
-export type TransactionResult = {
+export type TransactionResult<TDecodedResult = undefined> = {
   hash: Hash;
   receipt?: TransactionReceipt;
   confirmations?: bigint;
+  result?: TDecodedResult;
 };
 
 export type PopulatedTransaction = Omit<FormattedTransactionRequest, 'type'>;

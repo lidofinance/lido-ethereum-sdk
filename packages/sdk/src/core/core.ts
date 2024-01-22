@@ -13,7 +13,7 @@ import {
   custom,
   getContract,
   maxUint256,
-  Account,
+  JsonRpcAccount,
 } from 'viem';
 import {
   ERROR_CODE,
@@ -177,14 +177,12 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   @Cache(30 * 60 * 1000, ['chain.id', 'contractAddressLidoLocator'])
   public getContractLidoLocator(): GetContractReturnType<
     typeof LidoLocatorAbi,
-    PublicClient,
-    WalletClient
+    PublicClient
   > {
     return getContract({
       address: this.contractAddressLidoLocator(),
       abi: LidoLocatorAbi,
-      publicClient: this.rpcProvider,
-      walletClient: this.web3Provider,
+      client: this.rpcProvider,
     });
   }
 
@@ -196,7 +194,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     return getContract({
       address,
       abi: wqAbi,
-      publicClient: this.rpcProvider,
+      client: this.rpcProvider,
     });
   }
 
@@ -254,8 +252,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     const contract = getContract({
       address: tokenAddress,
       abi: permitAbi,
-      publicClient: this.rpcProvider,
-      walletClient: this.web3Provider,
+      client: this.rpcProvider,
     });
 
     let domain = {
@@ -331,11 +328,13 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   }
 
   @Logger('Utils:')
-  public async useAccount(accountValue?: AccountValue): Promise<Account> {
+  public async useAccount(
+    accountValue?: AccountValue,
+  ): Promise<JsonRpcAccount> {
     if (accountValue) {
       if (typeof accountValue === 'string')
         return { address: accountValue, type: 'json-rpc' };
-      else return accountValue;
+      else return accountValue as JsonRpcAccount;
     }
     if (this.web3Provider) {
       if (!this.web3Provider.account) {
@@ -350,7 +349,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
         );
         this.web3Provider.account = { address: account, type: 'json-rpc' };
       }
-      return this.web3Provider.account;
+      return this.web3Provider.account as unknown as JsonRpcAccount;
     }
     invariantArgument(false, 'No account or web3Provider is available');
   }
@@ -467,15 +466,16 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     }
   }
 
-  public async performTransaction(
-    props: PerformTransactionOptions,
-  ): Promise<TransactionResult> {
-    //
+  public async performTransaction<TDecodedResult = undefined>(
+    props: PerformTransactionOptions<TDecodedResult>,
+  ): Promise<TransactionResult<TDecodedResult>> {
+    // this guards against not having web3Provider
     this.useWeb3Provider();
     const {
       callback = NOOP,
       getGasLimit,
       sendTransaction,
+      decodeResult,
       waitForTransactionReceiptParameters = {},
     } = props;
     const account = await this.useAccount(props.account);
@@ -524,7 +524,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
     callback({ stage: TransactionCallbackStage.SIGN, payload: overrides.gas });
 
-    const transactionHash = await withSDKError(
+    const hash = await withSDKError(
       sendTransaction({
         ...overrides,
       }),
@@ -533,17 +533,17 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
     if (isContract) {
       callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
-      return { hash: transactionHash };
+      return { hash };
     }
 
     callback({
       stage: TransactionCallbackStage.RECEIPT,
-      payload: transactionHash,
+      payload: hash,
     });
 
-    const transactionReceipt = await withSDKError(
+    const receipt = await withSDKError(
       this.rpcProvider.waitForTransactionReceipt({
-        hash: transactionHash,
+        hash,
         timeout: 120_000,
         ...waitForTransactionReceiptParameters,
       }),
@@ -552,12 +552,14 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
     callback({
       stage: TransactionCallbackStage.CONFIRMATION,
-      payload: transactionReceipt,
+      payload: receipt,
     });
 
     const confirmations = await this.rpcProvider.getTransactionConfirmations({
-      hash: transactionReceipt.transactionHash,
+      hash: receipt.transactionHash,
     });
+
+    const result = await decodeResult?.(receipt);
 
     callback({
       stage: TransactionCallbackStage.DONE,
@@ -565,8 +567,9 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     });
 
     return {
-      hash: transactionHash,
-      receipt: transactionReceipt,
+      hash,
+      receipt,
+      result,
       confirmations,
     };
   }

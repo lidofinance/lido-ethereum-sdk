@@ -1,4 +1,4 @@
-import { type SimulateContractReturnType, encodeFunctionData } from 'viem';
+import { encodeFunctionData } from 'viem';
 
 import type {
   NoCallback,
@@ -54,9 +54,7 @@ export class LidoSDKWithdrawApprove extends BusModule {
 
   @Logger('Views:')
   @ErrorHandler()
-  public async approveSimulateTx(
-    props: NoCallback<WithdrawApproveProps>,
-  ): Promise<SimulateContractReturnType> {
+  public async approveSimulateTx(props: NoCallback<WithdrawApproveProps>) {
     const account = await this.bus.core.useAccount(props.account);
     const { token, amount: _amount } = props;
     const amount = parseValue(_amount);
