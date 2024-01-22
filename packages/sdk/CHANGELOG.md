@@ -1,3 +1,23 @@
+# 3.1.0
+
+## SDK
+
+### Added
+
+- `viem` version up to `2.0.6`
+- Account hoisting support: methods no longer require address/account if it's hoisted to `walletClient` or available via `eth_requestAccounts`
+- Stake, Wrap, Withdraw Request & Claim transaction methods now return parsed transaction result
+- `waitForTransactionReceiptParameters` [optional config](https://viem.sh/docs/actions/public/waitForTransactionReceipt.html) added to all transaction methods props
+
+### Fixed
+
+- better multisig behavior for transactions
+- Simulate methods now have correct return types
+
+## Playground
+
+- Upped `next` and `viem` versions
+
 # 3.0.1
 
 ## SDK
