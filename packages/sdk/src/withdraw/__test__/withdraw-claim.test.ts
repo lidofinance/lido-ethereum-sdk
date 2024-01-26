@@ -78,5 +78,15 @@ describe('withdraw request claim', () => {
     const balanceAfter = await core.balanceETH(address);
     expect(balanceAfter - balanceBefore).toEqual(claimableETH - ethForGas);
     await expect(unsteth.getAccountByNFT(request.id)).rejects.toBeDefined();
+
+    expect(tx.result).toBeDefined();
+    expect(tx.result?.requests).toHaveLength(1);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const claimedRequest = tx.result!.requests[0]!;
+
+    expectAddress(claimedRequest.owner, address);
+    expectAddress(claimedRequest.receiver, address);
+    expect(claimedRequest.requestId).toEqual(request.id);
+    expect(claimedRequest.amountOfETH).toEqual(claimableETH);
   });
 });

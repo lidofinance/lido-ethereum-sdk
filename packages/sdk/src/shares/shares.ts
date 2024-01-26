@@ -1,7 +1,6 @@
 import {
   type GetContractReturnType,
   type Address,
-  type PublicClient,
   type WalletClient,
   getContract,
   encodeFunctionData,
@@ -14,7 +13,12 @@ import { TransactionResult } from '../core/index.js';
 import { SharesTotalSupplyResult, SharesTransferProps } from './types.js';
 import { stethSharesAbi } from './abi/steth-shares-abi.js';
 import { parseValue } from '../common/utils/parse-value.js';
-import { EtherValue, NoCallback, TransactionOptions } from '../core/types.js';
+import type {
+  AccountValue,
+  EtherValue,
+  NoCallback,
+  TransactionOptions,
+} from '../core/types.js';
 import { calcShareRate } from '../rewards/utils.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 
@@ -32,23 +36,26 @@ export class LidoSDKShares extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
   public async getContractStETHshares(): Promise<
-    GetContractReturnType<typeof stethSharesAbi, PublicClient, WalletClient>
+    GetContractReturnType<typeof stethSharesAbi, WalletClient>
   > {
     const address = await this.contractAddressStETH();
 
     return getContract({
       address,
       abi: stethSharesAbi,
-      publicClient: this.core.rpcProvider,
-      walletClient: this.core.web3Provider,
+      client: {
+        public: this.core.rpcProvider,
+        wallet: this.core.web3Provider as WalletClient,
+      },
     });
   }
 
   @Logger('Balances:')
   @ErrorHandler()
-  public async balance(address: Address): Promise<bigint> {
+  public async balance(address?: AccountValue): Promise<bigint> {
     const contract = await this.getContractStETHshares();
-    return contract.read.sharesOf([address]);
+    const account = await this.core.useAccount(address);
+    return contract.read.sharesOf([account.address]);
   }
 
   // Transfer
@@ -56,18 +63,19 @@ export class LidoSDKShares extends LidoSDKModule {
   @Logger('Call:')
   @ErrorHandler()
   public async transfer({
-    account,
+    account: accountProp,
     to,
     amount: _amount,
     callback = NOOP,
     from: _from,
+    ...rest
   }: SharesTransferProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
-    const accountAddress = await this.core.getWeb3Address(account);
-    const from = _from ?? accountAddress;
+    const account = await this.core.useAccount(accountProp);
+    const from = _from ?? account.address;
     const amount = parseValue(_amount);
 
-    const isTransferFrom = from !== accountAddress;
+    const isTransferFrom = from !== account.address;
     const contract = await this.getContractStETHshares();
 
     const getGasLimit = async (overrides: TransactionOptions) =>
@@ -81,6 +89,7 @@ export class LidoSDKShares extends LidoSDKModule {
         : contract.write.transferShares([to, amount], overrides);
 
     return this.core.performTransaction({
+      ...rest,
       account,
       callback,
       getGasLimit,
@@ -91,20 +100,20 @@ export class LidoSDKShares extends LidoSDKModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async populateTransfer({
-    account,
+    account: accountProp,
     to,
     amount: _amount,
     from: _from,
   }: NoCallback<SharesTransferProps>) {
-    const accountAddress = await this.core.getWeb3Address(account);
+    const account = await this.core.useAccount(accountProp);
     const amount = parseValue(_amount);
-    const from = _from ?? accountAddress;
+    const from = _from ?? account.address;
     const address = await this.contractAddressStETH();
-    const isTransferFrom = from !== accountAddress;
+    const isTransferFrom = from !== account.address;
 
     return {
       to: address,
-      from: accountAddress,
+      from: account.address,
       data: isTransferFrom
         ? encodeFunctionData({
             abi: stethSharesAbi,
@@ -122,22 +131,22 @@ export class LidoSDKShares extends LidoSDKModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async simulateTransfer({
-    account,
+    account: _account,
     to,
     amount: _amount,
     from: _from,
   }: NoCallback<SharesTransferProps>) {
     const amount = parseValue(_amount);
-    const accountAddress = await this.core.getWeb3Address(account);
-    const from = _from ?? accountAddress;
+    const account = await this.core.useAccount(_account);
+    const from = _from ?? account.address;
     const contract = await this.getContractStETHshares();
-    const isTransferFrom = from !== accountAddress;
+    const isTransferFrom = from !== account.address;
     return isTransferFrom
       ? contract.simulate.transferSharesFrom([from, to, amount], {
-          account: accountAddress,
+          account,
         })
       : contract.simulate.transferShares([to, amount], {
-          account: accountAddress,
+          account,
         });
   }
 

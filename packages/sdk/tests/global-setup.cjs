@@ -25,7 +25,7 @@ module.exports = async function () {
     chain: { chainId, asyncRequestProcessing: false },
   });
 
-  console.debug('Initializing ganache provider...');
+  console.debug('\nInitializing ganache provider...');
   await ganacheProvider.initialize();
   console.debug('Initialized ganache provider');
 

@@ -8,6 +8,7 @@ import type {
   FormattedTransactionRequest,
   BlockTag,
   Account,
+  WaitForTransactionReceiptParameters,
 } from 'viem';
 
 import { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
@@ -60,6 +61,7 @@ export enum TransactionCallbackStage {
 export type CommonTransactionProps = {
   callback?: TransactionCallback;
   account?: AccountValue;
+  waitForTransactionReceiptParameters?: WaitForTransactionReceiptParameters;
 };
 
 export type PerformTransactionGasLimit = (
@@ -70,10 +72,21 @@ export type PerformTransactionSendTransaction = (
   override: TransactionOptions,
 ) => Promise<Hash>;
 
-export type PerformTransactionOptions = CommonTransactionProps & {
-  getGasLimit: PerformTransactionGasLimit;
-  sendTransaction: PerformTransactionSendTransaction;
-};
+export type PerformTransactionDecodeResult<TDecodedResult> = (
+  receipt: TransactionReceipt,
+) => Promise<TDecodedResult>;
+
+type PerformTransactionOptionsDecodePartial<TDecodedResult> =
+  TDecodedResult extends undefined
+    ? { decodeResult?: undefined }
+    : { decodeResult: PerformTransactionDecodeResult<TDecodedResult> };
+
+export type PerformTransactionOptions<TDecodedResult> =
+  CommonTransactionProps & {
+    getGasLimit: PerformTransactionGasLimit;
+    sendTransaction: PerformTransactionSendTransaction;
+    waitForTransactionReceiptParameters?: WaitForTransactionReceiptParameters;
+  } & PerformTransactionOptionsDecodePartial<TDecodedResult>;
 
 export type TransactionOptions = {
   account: AccountValue;
@@ -81,12 +94,14 @@ export type TransactionOptions = {
   gas?: bigint;
   maxFeePerGas?: bigint;
   maxPriorityFeePerGas?: bigint;
+  nonce?: number;
 };
 
-export type TransactionResult = {
+export type TransactionResult<TDecodedResult = undefined> = {
   hash: Hash;
   receipt?: TransactionReceipt;
   confirmations?: bigint;
+  result?: TDecodedResult;
 };
 
 export type PopulatedTransaction = Omit<FormattedTransactionRequest, 'type'>;

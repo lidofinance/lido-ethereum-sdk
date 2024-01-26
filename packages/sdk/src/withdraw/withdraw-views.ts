@@ -1,26 +1,24 @@
-import { type Address } from 'viem';
-
 import { Logger, Cache } from '../common/decorators/index.js';
 
 import { BusModule } from './bus-module.js';
 import { type RequestStatusWithId } from './types.js';
-import { invariantArgument } from '../index.js';
+import { type AccountValue } from '../core/index.js';
+import { invariantArgument } from '../common/index.js';
 
 export class LidoSDKWithdrawViews extends BusModule {
   // Views
   @Logger('Views:')
   public async getWithdrawalRequestsIds(props: {
-    account: Address;
+    account?: AccountValue;
   }): Promise<readonly bigint[]> {
     const contract = await this.bus.contract.getContractWithdrawalQueue();
-
-    return contract.read.getWithdrawalRequests([props.account]);
+    const parsedAccount = await this.bus.core.useAccount(props.account);
+    return contract.read.getWithdrawalRequests([parsedAccount.address]);
   }
 
   @Logger('Views:')
   public async getLastCheckpointIndex(): Promise<bigint> {
     const contract = await this.bus.contract.getContractWithdrawalQueue();
-
     return contract.read.getLastCheckpointIndex();
   }
 

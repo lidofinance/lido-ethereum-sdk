@@ -1,9 +1,19 @@
-import { type Hash, type Address, type ContractFunctionResult } from 'viem';
-import { TransactionCallback, CommonTransactionProps } from '../core/types.js';
-import { type unstethAbi } from './abi/unsteth-abi.js';
+import type {
+  Hash,
+  Address,
+  ContractFunctionReturnType,
+  JsonRpcAccount,
+} from 'viem';
+import type {
+  TransactionCallback,
+  CommonTransactionProps,
+  AccountValue,
+} from '../core/types.js';
+import type { unstethAbi } from './abi/unsteth-abi.js';
 
-export type UnstethNFTstatus = ContractFunctionResult<
+export type UnstethNFTstatus = ContractFunctionReturnType<
   typeof unstethAbi,
+  'view',
   'getWithdrawalStatus'
 >[number];
 
@@ -11,8 +21,8 @@ export type UnstethNFT = { id: bigint } & UnstethNFTstatus;
 
 export type ParsedProps<TProps extends CommonTransactionProps> = Omit<
   TProps,
-  'callback'
-> & { callback: TransactionCallback };
+  'callback' | 'account'
+> & { callback: TransactionCallback; account: JsonRpcAccount };
 
 export type UnstethTransferProps = {
   to: Address;
@@ -32,12 +42,12 @@ export type UnstethApproveAllProps = {
 } & CommonTransactionProps;
 
 export type UnstethApprovedForProps = {
-  account: Address;
+  account?: AccountValue;
   id: bigint;
 };
 
 export type UnstethIsApprovedForAllProps = {
-  account: Address;
+  account?: AccountValue;
   to: Address;
 };
 

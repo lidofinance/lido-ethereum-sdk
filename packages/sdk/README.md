@@ -249,7 +249,7 @@ const addressStETH = await lidoSDK.stake.contractAddressStETH();
 const contractStETH = await lidoSDK.stake.getContractStETH();
 
 // Calls
-const stakeResult = await lidoSDK.stake.stakeEth({
+const stakeTx = await lidoSDK.stake.stakeEth({
   value,
   callback,
   referralAddress,
@@ -257,7 +257,7 @@ const stakeResult = await lidoSDK.stake.stakeEth({
 
 console.log(addressStETH, 'stETH contract address');
 console.log(contractStETH, 'stETH contract');
-console.log(stakeResult, 'stake result');
+console.log(stakeTx, 'stake tx result');
 ```
 
 ### Withdraw example
@@ -276,15 +276,15 @@ const contractWithdrawalQueue =
   await lidoSDK.withdraw.contract.getContractWithdrawalQueue();
 
 // Calls
-const requestResult = await lidoSDK.withdraw.request.requestByToken({
-  account,
+const requestTx = await lidoSDK.withdraw.request.requestWithdrawalWithPermit({
   amount: 10000000n, // `10000000` string is accepted as well
   token: 'stETH',
+  // account will be requested from provider
 });
 
 console.log(addressWithdrawalQueue, 'Withdrawal Queue contract address');
 console.log(contractWithdrawalQueue, 'Withdrawal Queue contract');
-console.log(requestResult, 'request result');
+console.log(requestTx.result.requests, 'array of created requests');
 ```
 
 ### Wrap example
@@ -301,14 +301,16 @@ const addressWstETH = await lidoSDK.wrap.contractAddressWstETH();
 const contractWstETH = await lidoSDK.withdraw.getContractWstETH();
 
 // Calls
-const wrapResult = await lidoSDK.wrap.wrapEth({
+const wrapTx = await lidoSDK.wrap.wrapEth({
   value,
   account,
 });
 
+const { stethWrapped, wstethReceived } = wrapTx.result;
+
 console.log(addressWstETH, 'wstETH contract address');
 console.log(contractWstETH, 'wstETH contract');
-console.log(wrapResult, 'wrap result');
+console.log({ stethWrapped, wstethReceived }, 'wrap result');
 ```
 
 ## Error Codes
@@ -397,7 +399,7 @@ const callback: StakeStageCallback = ({ stage, payload }) => {
 };
 
 try {
-  const stakeResult = await lidoSDK.stake.stakeEth({
+  const stakeTx = await lidoSDK.stake.stakeEth({
     value,
     callback,
     referralAddress,
@@ -405,8 +407,10 @@ try {
   });
 
   console.log(
-    stakeResult,
-    'transaction hash, transaction receipt, confirmations',
+    stakeTx,
+    'transaction hash, transaction receipt, confirmations, stake result',
+    stakeTx.result.stethReceived,
+    stakeTx.result.sharesReceived,
   );
 } catch (error) {
   console.log((error as SDKError).errorMessage, (error as SDKError).code);
@@ -502,15 +506,17 @@ const callback: TransactionCallback = ({ stage, payload }) => {
 };
 
 try {
-  const wrapResult = await lidoSDK.staking.wrapETH({
+  const wrapTx = await lidoSDK.staking.wrapETH({
     value,
     callback,
     account,
   });
 
   console.log(
-    stakeResult,
-    'transaction hash, transaction receipt, confirmations',
+    wrapTx,
+    'transaction hash, transaction receipt, confirmations, wrap result',
+    wrapTx.result.stethWrapped,
+    wrapTx.result.wstethReceived,
   );
 } catch (error) {
   console.log((error as SDKError).errorMessage, (error as SDKError).code);
@@ -552,10 +558,12 @@ const wrapResult = await lidoSDK.wrap.wrapSteth({ value, callback });
 
 ```ts
 // unwrap wstETH to receive stETH
-const unwrapResult = await lidoSDK.wrap.unwrap({
+const unwrapTx = await lidoSDK.wrap.unwrap({
   value: unwrapAmount,
   callback,
 });
+
+console.log(unwrapTx.result.stethReceived, unwrapTx.result.wstethUnwrapped);
 ```
 
 ### Wrap utilities
@@ -636,7 +644,7 @@ const callback: TransactionCallback = ({ stage, payload }) => {
 };
 
 try {
-  const requestResult = await lidoSDK.withdrawals.request.requestWithPermit({
+  const requestTx = await lidoSDK.withdrawals.request.requestWithPermit({
     requests,
     token, // 'stETH' | 'wstETH'
     callback,
@@ -644,8 +652,10 @@ try {
   });
 
   console.log(
+     'transaction hash, transaction receipt, confirmations',
     requestResult,
-    'transaction hash, transaction receipt, confirmations',
+    'array of requests(nfts) created with ids, amounts,creator, owner'
+    request.results.requests,
   );
 } catch (error) {
   console.log((error as SDKError).errorMessage, (error as SDKError).code);
@@ -709,7 +719,7 @@ const callback: TransactionCallback = ({ stage, payload }) => {
 };
 
 try {
-  const requestResult = await lidoSDK.withdrawals.request.requestWithoutPermit({
+  const requestResult = await lidoSDK.withdrawals.request.requestWithdrawal({
     amount,
     token, // 'stETH' | 'wstETH'
     callback,
@@ -781,14 +791,16 @@ const callback: TransactionCallback = ({ stage, payload }) => {
 };
 
 try {
-  const claimResult = await lidoSDK.withdrawals.claim.claimRequests({
+  const claimTx = await lidoSDK.withdrawals.claim.claimRequests({
     requestsIds,
     callback,
   });
 
   console.log(
-    claimResult,
+    claimTx,
     'transaction hash, transaction receipt, confirmations',
+    claim.result.requests,
+    'array of claimed requests, with amounts of ETH claimed',
   );
 } catch (error) {
   console.log((error as SDKError).errorMessage, (error as SDKError).code);

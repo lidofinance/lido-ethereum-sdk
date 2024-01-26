@@ -12,7 +12,6 @@ import {
   type Address,
   type GetContractReturnType,
   type Hash,
-  type PublicClient,
   type WalletClient,
   encodeFunctionData,
   getContract,
@@ -37,14 +36,16 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContract(): Promise<
-    GetContractReturnType<typeof erc20abi, PublicClient, WalletClient>
+    GetContractReturnType<typeof erc20abi, WalletClient>
   > {
     const address = await this.contractAddress();
     return getContract({
       address,
       abi: erc20abi,
-      publicClient: this.core.rpcProvider,
-      walletClient: this.core.web3Provider,
+      client: {
+        public: this.core.rpcProvider,
+        wallet: this.core.web3Provider as WalletClient,
+      },
     });
   }
 
@@ -52,9 +53,10 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
 
   @Logger('Balances:')
   @ErrorHandler()
-  public async balance(address: Address): Promise<bigint> {
+  public async balance(address?: Address): Promise<bigint> {
+    const { address: parsedAddress } = await this.core.useAccount(address);
     const contract = await this.getContract();
-    return contract.read.balanceOf([address]);
+    return contract.read.balanceOf([parsedAddress]);
   }
 
   // Transfer
@@ -63,10 +65,9 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   @ErrorHandler()
   public async transfer(props: TransferProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
-    const parsedProps = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(props.account);
-    const { amount, to, from = accountAddress } = parsedProps;
-    const isTransferFrom = from !== accountAddress;
+    const parsedProps = await this.parseProps(props);
+    const { account, amount, to, from = account.address } = parsedProps;
+    const isTransferFrom = from !== account.address;
     const contract = await this.getContract();
 
     const getGasLimit = async (overrides: TransactionOptions) =>
@@ -89,19 +90,13 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async populateTransfer(props: NoCallback<TransferProps>) {
-    const accountAddress = await this.core.getWeb3Address(props.account);
-    const {
-      account,
-      amount,
-      to,
-      from = accountAddress,
-    } = this.parseProps(props);
-
-    const isTransferFrom = from !== accountAddress;
-    const address = await this.contractAddress();
+    const parsedProps = await this.parseProps(props);
+    const { account, amount, to, from = account.address } = parsedProps;
+    const isTransferFrom = from !== account.address;
+    const contractAddress = await this.contractAddress();
 
     return {
-      to: address,
+      to: contractAddress,
       from: account,
       data: isTransferFrom
         ? encodeFunctionData({
@@ -120,14 +115,10 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async simulateTransfer(props: NoCallback<TransferProps>) {
-    const accountAddress = await this.core.getWeb3Address(props.account);
-    const {
-      account,
-      amount,
-      to,
-      from = accountAddress,
-    } = this.parseProps(props);
-    const isTransferFrom = from !== accountAddress;
+    const parsedProps = await this.parseProps(props);
+    const { account, amount, to, from = account.address } = parsedProps;
+    const isTransferFrom = from !== account.address;
+
     const contract = await this.getContract();
     return isTransferFrom
       ? contract.simulate.transferFrom([from, to, amount], { account })
@@ -159,18 +150,18 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   public async populatePermit(props: SignTokenPermitProps) {
     const {
       amount,
-      account,
+      account: accountProp,
       spender,
       deadline = LidoSDKCore.INFINITY_DEADLINE_VALUE,
     } = props;
-    const web3Provider = this.core.useWeb3Provider();
+
     const contract = await this.getContract();
     const domain = await this.erc721Domain();
-    const accountAddress = await this.core.getWeb3Address(account);
-    const nonce = await contract.read.nonces([accountAddress]);
+    const account = await this.core.useAccount(accountProp);
+    const nonce = await contract.read.nonces([account.address]);
 
     const message = {
-      owner: accountAddress,
+      owner: account.address,
       spender,
       value: amount,
       nonce,
@@ -178,7 +169,7 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
     };
 
     return {
-      account: account ?? web3Provider.account ?? accountAddress,
+      account,
       domain,
       types: PERMIT_MESSAGE_TYPES,
       primaryType: 'Permit',
@@ -192,7 +183,7 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   @ErrorHandler()
   public async approve(props: ApproveProps): Promise<TransactionResult> {
     this.core.useWeb3Provider();
-    const parsedProps = this.parseProps(props);
+    const parsedProps = await this.parseProps(props);
     const contract = await this.getContract();
     const txArguments = [parsedProps.to, parsedProps.amount] as const;
     return this.core.performTransaction({
@@ -207,13 +198,12 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async populateApprove(props: NoCallback<ApproveProps>) {
-    const { account, amount, to } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { account, amount, to } = await this.parseProps(props);
     const address = await this.contractAddress();
 
     return {
       to: address,
-      from: accountAddress,
+      from: account.address,
       data: encodeFunctionData({
         abi: erc20abi,
         functionName: 'approve',
@@ -225,15 +215,18 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async simulateApprove(props: NoCallback<ApproveProps>) {
-    const { account, amount, to } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { account, amount, to } = await this.parseProps(props);
     const contract = await this.getContract();
-    return contract.simulate.approve([to, amount], { account: accountAddress });
+    return contract.simulate.approve([to, amount], { account });
   }
 
   @Logger('Views:')
-  public async allowance({ account, to }: AllowanceProps): Promise<bigint> {
-    return (await this.getContract()).read.allowance([account, to]);
+  public async allowance({
+    account: accountProp,
+    to,
+  }: AllowanceProps): Promise<bigint> {
+    const account = await this.core.useAccount(accountProp);
+    return (await this.getContract()).read.allowance([account.address, to]);
   }
 
   // Views
@@ -303,11 +296,12 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
     return { name, version, chainId, verifyingContract };
   }
 
-  private parseProps<
+  private async parseProps<
     TProps extends CommonTransactionProps & { amount: EtherValue },
-  >(props: TProps): ParsedTransactionProps<TProps> {
+  >(props: TProps): Promise<ParsedTransactionProps<TProps>> {
     return {
       ...props,
+      account: await this.core.useAccount(props.account),
       amount: parseValue(props.amount),
       callback: props.callback ?? NOOP,
     };

@@ -1,11 +1,19 @@
-import { zeroAddress, getContract, encodeFunctionData } from 'viem';
+import {
+  zeroAddress,
+  getContract,
+  encodeFunctionData,
+  decodeEventLog,
+  getAbiItem,
+  getEventSelector,
+} from 'viem';
+
 import type {
   Address,
   GetContractReturnType,
-  PublicClient,
   WalletClient,
   Hash,
   WriteContractParameters,
+  TransactionReceipt,
 } from 'viem';
 
 import {
@@ -13,7 +21,7 @@ import {
   type PopulatedTransaction,
   TransactionOptions,
 } from '../core/index.js';
-import { ERROR_CODE } from '../common/utils/sdk-error.js';
+import { ERROR_CODE, invariant } from '../common/utils/sdk-error.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import {
   SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
@@ -23,16 +31,25 @@ import {
 } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
 
-import { StethAbi } from './abi/steth.js';
+import { StethAbi, StethEventsPartialAbi } from './abi/steth.js';
 import type {
   StakeProps,
   StakeEncodeDataProps,
   StakeInnerProps,
   StakeLimitResult,
+  StakeResult,
 } from './types.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import { addressEqual } from '../common/utils/address-equal.js';
 
 export class LidoSDKStake extends LidoSDKModule {
+  // Precomputed event signatures
+  private static TRANSFER_SIGNATURE = getEventSelector(
+    getAbiItem({ abi: StethEventsPartialAbi, name: 'Transfer' }),
+  );
+  private static TRANSFER_SHARES_SIGNATURE = getEventSelector(
+    getAbiItem({ abi: StethEventsPartialAbi, name: 'TransferShares' }),
+  );
   // Contracts
 
   @Logger('Contracts:')
@@ -44,15 +61,17 @@ export class LidoSDKStake extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
   public async getContractStETH(): Promise<
-    GetContractReturnType<typeof StethAbi, PublicClient, WalletClient>
+    GetContractReturnType<typeof StethAbi, WalletClient>
   > {
     const address = await this.contractAddressStETH();
 
     return getContract({
       address,
       abi: StethAbi,
-      publicClient: this.core.rpcProvider,
-      walletClient: this.core.web3Provider,
+      client: {
+        public: this.core.rpcProvider,
+        wallet: this.core.web3Provider as WalletClient,
+      },
     });
   }
 
@@ -60,21 +79,25 @@ export class LidoSDKStake extends LidoSDKModule {
 
   @Logger('Call:')
   @ErrorHandler()
-  public async stakeEth(props: StakeProps): Promise<TransactionResult> {
+  public async stakeEth(
+    props: StakeProps,
+  ): Promise<TransactionResult<StakeResult>> {
     this.core.useWeb3Provider();
-    const { callback, account, referralAddress, value } =
-      this.parseProps(props);
+    const { callback, account, referralAddress, value, ...rest } =
+      await this.parseProps(props);
 
     await this.validateStakeLimit(value);
-
+    const { address } = await this.core.useAccount(account);
     const contract = await this.getContractStETH();
-    return this.core.performTransaction({
+    return this.core.performTransaction<StakeResult>({
+      ...rest,
       callback,
       account,
       getGasLimit: async (options) =>
         this.submitGasLimit(value, referralAddress, options),
       sendTransaction: (options) =>
         contract.write.submit([referralAddress], { ...options, value }),
+      decodeResult: async (receipt) => this.submitParseEvents(receipt, address),
     });
   }
 
@@ -83,15 +106,10 @@ export class LidoSDKStake extends LidoSDKModule {
   public async stakeEthSimulateTx(
     props: StakeProps,
   ): Promise<WriteContractParameters> {
-    const { referralAddress, value, account } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
-    const address = await this.contractAddressStETH();
-    const { request } = await this.core.rpcProvider.simulateContract({
-      address,
-      abi: StethAbi,
-      functionName: 'submit',
-      account: accountAddress,
-      args: [referralAddress],
+    const { referralAddress, value, account } = await this.parseProps(props);
+    const contract = await this.getContractStETH();
+    const { request } = await contract.simulate.submit([referralAddress], {
+      account,
       value: value,
     });
 
@@ -150,6 +168,50 @@ export class LidoSDKStake extends LidoSDKModule {
   }
 
   @Logger('Utils:')
+  private submitParseEvents(
+    receipt: TransactionReceipt,
+    address: Address,
+  ): StakeResult {
+    let stethReceived: bigint | undefined;
+    let sharesReceived: bigint | undefined;
+    for (const log of receipt.logs) {
+      // skips non-relevant events
+      if (
+        log.topics[0] !== LidoSDKStake.TRANSFER_SIGNATURE &&
+        log.topics[0] !== LidoSDKStake.TRANSFER_SHARES_SIGNATURE
+      )
+        continue;
+      const parsedLog = decodeEventLog({
+        abi: StethEventsPartialAbi,
+        strict: true,
+        ...log,
+      });
+      if (
+        parsedLog.eventName === 'Transfer' &&
+        addressEqual(parsedLog.args.to, address)
+      ) {
+        stethReceived = parsedLog.args.value;
+      } else if (
+        parsedLog.eventName === 'TransferShares' &&
+        addressEqual(parsedLog.args.to, address)
+      ) {
+        sharesReceived = parsedLog.args.sharesValue;
+      }
+    }
+    invariant(
+      stethReceived,
+      'could not find Transfer event in stake transaction',
+      ERROR_CODE.TRANSACTION_ERROR,
+    );
+    invariant(
+      sharesReceived,
+      'could not find TransferShares event in stake transaction',
+      ERROR_CODE.TRANSACTION_ERROR,
+    );
+    return { sharesReceived, stethReceived };
+  }
+
+  @Logger('Utils:')
   private async validateStakeLimit(value: bigint): Promise<void> {
     const { currentStakeLimit } = await this.getStakeLimitInfo();
 
@@ -164,7 +226,6 @@ export class LidoSDKStake extends LidoSDKModule {
   @Logger('Utils:')
   private stakeEthEncodeData(props: StakeEncodeDataProps): Hash {
     const { referralAddress = zeroAddress } = props;
-
     return encodeFunctionData({
       abi: StethAbi,
       functionName: 'submit',
@@ -176,22 +237,21 @@ export class LidoSDKStake extends LidoSDKModule {
   public async stakeEthPopulateTx(
     props: StakeProps,
   ): Promise<PopulatedTransaction> {
-    const { referralAddress, value, account } = this.parseProps(props);
-    const accountAddress = await this.core.getWeb3Address(account);
+    const { referralAddress, value, account } = await this.parseProps(props);
     const data = this.stakeEthEncodeData({ referralAddress });
     const address = await this.contractAddressStETH();
-
     return {
       to: address,
-      from: accountAddress,
+      from: account.address,
       value,
       data,
     };
   }
 
-  private parseProps(props: StakeProps): StakeInnerProps {
+  private async parseProps(props: StakeProps): Promise<StakeInnerProps> {
     return {
       ...props,
+      account: await this.core.useAccount(props.account),
       referralAddress: props.referralAddress ?? zeroAddress,
       value: parseValue(props.value),
       callback: props.callback ?? NOOP,

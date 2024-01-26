@@ -37,12 +37,14 @@ export const expectERC20 = <I extends AbstractLidoSDKErc20>({
     return getContract({
       address,
       abi: erc20abi,
-      publicClient: rpcCore.rpcProvider,
-      walletClient: web3Core.web3Provider,
+      client: {
+        public: rpcCore.rpcProvider,
+        wallet: web3Core.web3Provider,
+      },
     });
   };
 
-  describe('construModulePrototype', () => {
+  describe('constructModulePrototype', () => {
     test('is correct module', () => {
       expectSDKModule(ModulePrototype);
     });
@@ -61,7 +63,7 @@ export const expectERC20 = <I extends AbstractLidoSDKErc20>({
     });
 
     test('balance', async () => {
-      const address = await token.core.getWeb3Address();
+      const { address } = await token.core.useAccount();
       const contract = await token.getContract();
       const balanceViaRawContract = await contract.read.balanceOf([address]);
       const balanceViaClass = await token.balance(address);
@@ -96,7 +98,7 @@ export const expectERC20 = <I extends AbstractLidoSDKErc20>({
     });
 
     test('nonces', async () => {
-      const address = await token.core.getWeb3Address();
+      const { address } = await token.core.useAccount();
       const nonces = await token.nonces(address);
       expectBn(nonces);
     });

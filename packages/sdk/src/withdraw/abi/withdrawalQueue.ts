@@ -146,7 +146,7 @@ export const WithdrawalQueueAbi = [
         type: 'address',
       },
       {
-        indexed: true,
+        indexed: false,
         internalType: 'uint256',
         name: 'tokenId',
         type: 'uint256',
@@ -353,7 +353,7 @@ export const WithdrawalQueueAbi = [
       { indexed: true, internalType: 'address', name: 'from', type: 'address' },
       { indexed: true, internalType: 'address', name: 'to', type: 'address' },
       {
-        indexed: true,
+        indexed: false,
         internalType: 'uint256',
         name: 'tokenId',
         type: 'uint256',
@@ -1118,5 +1118,76 @@ export const WithdrawalQueueAbi = [
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
+  },
+] as const;
+
+export const PartialWithdrawalQueueEventsAbi = [
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'requestId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'requestor',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amountOfStETH',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amountOfShares',
+        type: 'uint256',
+      },
+    ],
+    name: 'WithdrawalRequested',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'requestId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'receiver',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'amountOfETH',
+        type: 'uint256',
+      },
+    ],
+    name: 'WithdrawalClaimed',
+    type: 'event',
   },
 ] as const;

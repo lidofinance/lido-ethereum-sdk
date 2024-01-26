@@ -1,10 +1,10 @@
 export { LidoSDKUnstETH } from './unsteth.js';
-export {
-  type UnstethNFT,
-  type UnstethTransferProps,
-  type UnstethApproveAllProps,
-  type UnstethApproveProps,
-  type UnstethApprovedForProps,
-  type UnstethIsApprovedForAllProps,
-  type UnstethNFTstatus,
+export type {
+  UnstethNFT,
+  UnstethTransferProps,
+  UnstethApproveAllProps,
+  UnstethApproveProps,
+  UnstethApprovedForProps,
+  UnstethIsApprovedForAllProps,
+  UnstethNFTstatus,
 } from './types.js';
