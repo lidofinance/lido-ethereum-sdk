@@ -240,15 +240,10 @@ export class LidoSDKStake extends LidoSDKModule {
     const { referralAddress, value, account } = await this.parseProps(props);
     const data = this.stakeEthEncodeData({ referralAddress });
     const address = await this.contractAddressStETH();
-    const gas = await this.submitGasLimit(value, referralAddress, {
-      account,
-      chain: this.core.chain,
-    });
     return {
       to: address,
       from: account.address,
       value,
-      gas,
       data,
     };
   }

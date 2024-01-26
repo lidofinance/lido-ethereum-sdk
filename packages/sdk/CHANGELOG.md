@@ -13,6 +13,7 @@
 
 - better multisig behavior for transactions
 - Simulate methods now have correct return types
+- `stakeEthPopulateTx` not does not calculate `gasLimit` which prevented usage when stake limit is reached
 
 ## Playground
 
