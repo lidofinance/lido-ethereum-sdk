@@ -147,6 +147,9 @@
     "graphql-request": "^6.1.0",
     "viem": "^2.0.6"
   },
+  "engines": {
+    "node": ">=20"
+  },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
     "@types/fs-extra": "^11.0.1",
