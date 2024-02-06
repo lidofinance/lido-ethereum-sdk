@@ -14,6 +14,7 @@ export const CustomRpcInput = () => {
   useEffect(() => {
     const customUrl = customRpc[chainId] ?? '';
     setUrl(customUrl);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chainId]);
 
   return (

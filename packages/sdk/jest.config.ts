@@ -4,7 +4,6 @@ const jestConfig: JestConfigWithTsJest = {
   displayName: 'LidoSDK tests',
   testEnvironment: 'node',
   // fix for leftover handles when running locally on macos
-  detectOpenHandles: true,
   forceExit: true,
   preset: 'ts-jest',
   verbose: true,
