@@ -1,17 +1,8 @@
 const path = require('path');
-const fetch = require('node-fetch');
 const dotenv = require('dotenv');
 const ganache = require('ganache');
 
 module.exports = async function () {
-  if (!globalThis.fetch) {
-    const g = globalThis;
-    g.fetch = fetch.default;
-    g.Headers = fetch.Headers;
-    g.Request = fetch.Request;
-    g.Response = fetch.Response;
-  }
-
   dotenv.config({
     path: path.resolve(process.cwd(), '.env'),
   });
@@ -22,12 +13,38 @@ module.exports = async function () {
   const ganacheProvider = ganache.provider({
     fork: { url: rpcUrl },
     logging: { quiet: true },
-    chain: { chainId, asyncRequestProcessing: false },
+    chain: { chainId, asyncRequestProcessing: true },
   });
 
   console.debug('\nInitializing ganache provider...');
   await ganacheProvider.initialize();
-  console.debug('Initialized ganache provider');
+  console.debug('Initialized ganache provider OK');
+
+  console.debug('Testing direct RPC provider...');
+  const { result } = await fetch(rpcUrl, {
+    method: 'POST',
+    body: JSON.stringify({
+      method: 'eth_chainId',
+      params: [],
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  }).then((response) => response.json());
+  if (Number(result) !== chainId) {
+    throw new Error(`Invalid direct RPC provider response: ${result}`);
+  }
+  console.debug('Direct RPC provider OK');
+
+  console.debug('Testing ganache fork RPC provider...');
+  const testRequest = await ganacheProvider.request({
+    method: 'eth_chainId',
+    params: [],
+  });
+  if (Number(testRequest) !== chainId) {
+    throw new Error(`Invalid ganache response: ${testRequest}`);
+  }
+  console.debug('Ganache fork RPC provider OK');
 
   globalThis.__ganache_provider__ = ganacheProvider;
 };
