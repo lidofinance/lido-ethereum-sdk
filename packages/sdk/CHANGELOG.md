@@ -2,6 +2,14 @@
 
 ## SDK
 
+### Fixed
+
+- Mainnet subgraph ID now points to updated, L2 based subgraph
+
+# 3.1.0
+
+## SDK
+
 ### Added
 
 - `viem` version up to `2.0.6`
