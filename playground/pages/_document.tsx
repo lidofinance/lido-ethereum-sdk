@@ -1,3 +1,4 @@
+/* eslint-disable  @next/next/no-sync-scripts */
 import Document, {
   Head,
   Html,

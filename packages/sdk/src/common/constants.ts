@@ -30,7 +30,7 @@ export const LIDO_LOCATOR_BY_CHAIN: {
 export const SUBRGRAPH_ID_BY_CHAIN: {
   [key in CHAINS]: string | null;
 } = {
-  [CHAINS.Mainnet]: 'HXfMc1jPHfFQoccWd7VMv66km75FoxVHDMvsJj5vG5vf',
+  [CHAINS.Mainnet]: 'Sxx812XgeKyzQPaBpR5YZWmGV5fZuBaPdh7DFhzSwiQ',
   [CHAINS.Goerli]: 'QmeDfGTuNbSoZ71zi3Ch4WNRbzALfiFPnJMYUFPinLiFNa',
   [CHAINS.Holesky]: null,
 };

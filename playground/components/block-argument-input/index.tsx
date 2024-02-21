@@ -51,7 +51,6 @@ export const BlockArgumentInput = ({
           onChange={(updatedType) =>
             onChange({ [updatedType]: value[type] } as BlockArgumentType)
           }
-          themeOverride="light"
           value={type}
         >
           <Option value={'block'}>Block</Option>

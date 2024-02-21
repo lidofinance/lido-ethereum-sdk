@@ -50,7 +50,6 @@ export const BackArgumentInput = ({
           onChange={(updatedType) =>
             onChange({ [updatedType]: value[type] } as BackArgumentType)
           }
-          themeOverride="light"
           value={type}
         >
           <Option value={'blocks'}>Blocks</Option>

@@ -4,10 +4,9 @@ const jestConfig: JestConfigWithTsJest = {
   displayName: 'LidoSDK tests',
   testEnvironment: 'node',
   // fix for leftover handles when running locally on macos
-  detectOpenHandles: true,
   forceExit: true,
   preset: 'ts-jest',
-  verbose: true,
+  verbose: false,
   extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
@@ -24,7 +23,7 @@ const jestConfig: JestConfigWithTsJest = {
   maxWorkers: 1,
   globalSetup: '<rootDir>/tests/global-setup.cjs',
   globalTeardown: '<rootDir>/tests/global-teardown.cjs',
-  testTimeout: 300_000,
+  testTimeout: 60_000,
 };
 
 export default jestConfig;
