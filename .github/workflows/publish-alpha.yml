@@ -1,0 +1,43 @@
+name: Publish Beta version to registry
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write # to be able to publish a GitHub release
+  issues: write # to be able to comment on released issues
+  id-token: write # to enable use of OIDC for npm provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: production
+    # restricts job to develop branch
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Build
+        run: yarn build:packages
+
+      - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
+        run: yarn npm audit
+
+      - name: Publish Alpha
+        run: yarn multi-semantic-release --deps.bump=override --deps.release=patch --sequential-init
+        env:
+          NPM_CONFIG_PROVENANCE: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
