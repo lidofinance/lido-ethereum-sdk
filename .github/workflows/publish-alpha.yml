@@ -1,8 +1,6 @@
-name: Publish to registry
+name: Publish Beta version to registry
 on:
-  push:
-    branches:
-      - 'main'
+  workflow_dispatch:
 
 permissions:
   contents: write # to be able to publish a GitHub release
@@ -12,7 +10,9 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    environment: production
+    environment: development
+    # restricts job to develop branch
+    if: github.ref == 'refs/heads/develop'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -35,15 +35,7 @@ jobs:
       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
         run: yarn npm audit
 
-      - name: Authenticate in npm
-        run: |
-          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc
-          echo "workspaces-update=false" >> .npmrc
-          echo "provenance=true" >> .npmrc
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish
+      - name: Publish Alpha
         run: yarn multi-semantic-release --deps.bump=override --deps.release=patch --sequential-init
         env:
           NPM_CONFIG_PROVENANCE: true
