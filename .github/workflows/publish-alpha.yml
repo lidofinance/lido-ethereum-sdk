@@ -10,7 +10,7 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    environment: production
+    environment: development
     # restricts job to develop branch
     if: github.ref == 'refs/heads/develop'
     steps:
