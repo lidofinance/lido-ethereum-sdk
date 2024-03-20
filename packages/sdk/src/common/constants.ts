@@ -45,7 +45,7 @@ export const EARLIEST_TOKEN_REBASED_EVENT: {
   [CHAINS.Mainnet]: 17272708n,
   [CHAINS.Goerli]: 8712039n,
   [CHAINS.Holesky]: 52174n,
-  [CHAINS.Sepolia]: 52174n, // TODO: change to real value
+  [CHAINS.Sepolia]: 5434668n,
 } as const;
 
 export const LIDO_TOKENS = {
