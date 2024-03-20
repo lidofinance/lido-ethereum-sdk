@@ -66,6 +66,9 @@ For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
   - [Views](#views)
     - [Constants](#constants)
     - [Requests info](#requests-info)
+  - [Waiting time](#waiting-time)
+    - [get time by amount](#calculate-by-amount)
+    - [Get time by request ids](#get-time-by-request-ids)
 - [(w)stETH](#wsteth)
 - [unstETH NFT](#unsteth-nft)
 - [Shares](#shares)
@@ -654,7 +657,7 @@ try {
   console.log(
      'transaction hash, transaction receipt, confirmations',
     requestResult,
-    'array of requests(nfts) created with ids, amounts,creator, owner'
+    'array of requests(nfts) created with ids, amounts,creator, owner',
     request.results.requests,
   );
 } catch (error) {
@@ -1009,6 +1012,53 @@ try {
 
   - `pendingRequests` (Type: Array[RequestStatusWithId]): A list of requests pending finalization.
   - `pendingAmountStETH` (Type: bigint): The amount of ETH pending claiming.
+
+### Waiting time
+
+#### Methods
+
+##### Get time by amount
+
+###### `getWithdrawalWaitingTimeByAmount`
+
+###### Input Parameters:
+
+- `props: { amount:  bigint }`
+  - `amount` (Type: bigint): The amount of withdrawable eth.
+
+##### Output Parameters:
+
+- Type: Object
+- Structure:
+  - `requestInfo` (Type: Object): Information about withdrawal request
+    - `finalizationIn` (Type: number): The time needed for withdrawal in milliseconds.
+    - `finalizationAt` (Type: string): The amount of ETH available for claiming.
+    - `type` (Type: WaitingTimeCalculationType): Type of final source of eth for withdrawal.
+  - `status` (Type: WaitingTimeStatus): Status of withdrawal request.
+  - `nextCalculationAt` (Type: string): Time when calculation can be 
+
+##### Get time by request ids
+
+###### `getWithdrawalWaitingTimeByRequestIds`
+
+###### Input Parameters:
+
+- `props: { ids: bigint[] }`
+  - `ids` (ids: Array[bigint]): The ids of withdrawal requests.
+
+##### Output Parameters:
+
+- Type: Array of WithdrawalWaitingTimeRequestInfo objects
+- Structure of each object:
+  - `requestInfo` (Type: RequestByIdInfoDto): Information about withdrawal request.
+    - `finalizationIn` (Type: number): The time needed for withdrawal in milliseconds.
+    - `finalizationAt` (Type: string): The amount of ETH available for claiming.
+    - `requestId` (Type: string): The request id.
+    - `requestedAt` (Type: string): The time when withdrawal requested.
+    - `type` (Type: WaitingTimeCalculationType): Type of final source of eth for withdrawal.
+  - `status` (Type: WaitingTimeStatus): Status of withdrawal request.
+  - `nextCalculationAt` (Type: string): Time when calculation can be
+
 
 ## (w)stETH
 

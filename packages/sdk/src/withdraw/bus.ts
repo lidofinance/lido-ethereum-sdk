@@ -7,6 +7,7 @@ import {
   LidoSDKWithdrawApprove,
 } from './request/index.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import { LidoSDKWithdrawWaitingTime } from './withdraw-waiting-time.js';
 
 export class Bus extends LidoSDKModule {
   private version: string | undefined;
@@ -17,6 +18,7 @@ export class Bus extends LidoSDKModule {
   private approvalInstance: LidoSDKWithdrawApprove | undefined;
   private claimInstance: LidoSDKWithdrawClaim | undefined;
   private requestInstance: LidoSDKWithdrawRequest | undefined;
+  private waitingTimeInstance: LidoSDKWithdrawWaitingTime | undefined;
 
   // Contract
 
@@ -88,5 +90,17 @@ export class Bus extends LidoSDKModule {
       });
     }
     return this.requestInstance;
+  }
+
+  // Waiting Time
+
+  get waitingTime(): LidoSDKWithdrawWaitingTime {
+    if (!this.waitingTimeInstance) {
+      this.waitingTimeInstance = new LidoSDKWithdrawWaitingTime({
+        bus: this,
+        version: this.version,
+      });
+    }
+    return this.waitingTimeInstance;
   }
 }

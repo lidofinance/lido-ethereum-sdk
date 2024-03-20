@@ -51,3 +51,54 @@ export type GetWithdrawalRequestsInfoReturnType = {
   pendingInfo: GetPendingRequestsInfoReturnType;
   claimableETH: GetClaimableRequestsETHByAccountReturnType;
 };
+
+export type WithdrawalWaitingTimeByAmountParams = {
+  amount: bigint;
+};
+
+export class RequestInfoDto {
+  finalizationIn: number;
+  finalizationAt: string;
+  type: WaitingTimeCalculationType;
+}
+
+export type WithdrawalWaitingTimeByAmountResponse = {
+  requestInfo: RequestInfoDto;
+  status: WaitingTimeStatus;
+  nextCalculationAt: string;
+};
+
+export type WithdrawalWaitingTimeByRequestIdsParams = {
+  ids: bigint[];
+};
+
+export type RequestByIdInfoDto = {
+  finalizationIn: number;
+  finalizationAt: string;
+  requestId?: string;
+  requestedAt?: string;
+  type: WaitingTimeCalculationType;
+};
+
+export class WithdrawalWaitingTimeRequestInfo {
+  requestInfo: RequestByIdInfoDto;
+  status: WaitingTimeStatus;
+  nextCalculationAt: string;
+}
+
+export enum WaitingTimeStatus {
+  initializing = 'initializing',
+  calculating = 'calculating',
+  finalized = 'finalized',
+  calculated = 'calculated',
+}
+
+export enum WaitingTimeCalculationType {
+  buffer = 'buffer',
+  bunker = 'bunker',
+  vaultsBalance = 'vaultsBalance',
+  rewardsOnly = 'rewardsOnly',
+  validatorBalances = 'validatorBalances',
+  requestTimestampMargin = 'requestTimestampMargin',
+  exitValidators = 'exitValidators',
+}
