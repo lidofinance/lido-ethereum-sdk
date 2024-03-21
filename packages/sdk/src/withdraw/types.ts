@@ -56,7 +56,7 @@ export type WithdrawalWaitingTimeByAmountParams = {
   amount: bigint;
 };
 
-export class RequestInfoDto {
+export type RequestInfoDto = {
   finalizationIn: number;
   finalizationAt: string;
   type: WaitingTimeCalculationType;
@@ -80,7 +80,7 @@ export type RequestByIdInfoDto = {
   type: WaitingTimeCalculationType;
 };
 
-export class WithdrawalWaitingTimeRequestInfo {
+export type WithdrawalWaitingTimeRequestInfo = {
   requestInfo: RequestByIdInfoDto;
   status: WaitingTimeStatus;
   nextCalculationAt: string;
