@@ -60,7 +60,7 @@ export type RequestInfoDto = {
   finalizationIn: number;
   finalizationAt: string;
   type: WaitingTimeCalculationType;
-}
+};
 
 export type WithdrawalWaitingTimeByAmountResponse = {
   requestInfo: RequestInfoDto;
@@ -69,7 +69,7 @@ export type WithdrawalWaitingTimeByAmountResponse = {
 };
 
 export type WithdrawalWaitingTimeByRequestIdsParams = {
-  ids: bigint[];
+  ids: readonly bigint[];
 };
 
 export type RequestByIdInfoDto = {
@@ -84,7 +84,7 @@ export type WithdrawalWaitingTimeRequestInfo = {
   requestInfo: RequestByIdInfoDto;
   status: WaitingTimeStatus;
   nextCalculationAt: string;
-}
+};
 
 export enum WaitingTimeStatus {
   initializing = 'initializing',
