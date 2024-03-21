@@ -1032,10 +1032,10 @@ try {
 - Structure:
   - `requestInfo` (Type: Object): Information about withdrawal request
     - `finalizationIn` (Type: number): The time needed for withdrawal in milliseconds.
-    - `finalizationAt` (Type: string): The amount of ETH available for claiming.
+    - `finalizationAt` (Type: string): The time when request finalized for withdrawal.
     - `type` (Type: WaitingTimeCalculationType): Type of final source of eth for withdrawal.
   - `status` (Type: WaitingTimeStatus): Status of withdrawal request.
-  - `nextCalculationAt` (Type: string): Time when calculation can be 
+  - `nextCalculationAt` (Type: string): Time when next calculation can be changed.
 
 ##### Get time by request ids
 
@@ -1052,12 +1052,12 @@ try {
 - Structure of each object:
   - `requestInfo` (Type: RequestByIdInfoDto): Information about withdrawal request.
     - `finalizationIn` (Type: number): The time needed for withdrawal in milliseconds.
-    - `finalizationAt` (Type: string): The amount of ETH available for claiming.
+    - `finalizationAt` (Type: string): The time when request finalized for withdrawal.
     - `requestId` (Type: string): The request id.
     - `requestedAt` (Type: string): The time when withdrawal requested.
     - `type` (Type: WaitingTimeCalculationType): Type of final source of eth for withdrawal.
   - `status` (Type: WaitingTimeStatus): Status of withdrawal request.
-  - `nextCalculationAt` (Type: string): Time when calculation can be
+  - `nextCalculationAt` (Type: string): Time when next calculation can be changed.
 
 
 ## (w)stETH
