@@ -199,7 +199,7 @@ export const WithdrawalsRequestDemo = () => {
             account,
           });
           return withdraw.waitingTime.getWithdrawalWaitingTimeByRequestIds({
-            ids,
+            ids: ids as readonly bigint[],
           });
         }}
       />

@@ -51,20 +51,38 @@ export class LidoSDKWithdrawWaitingTime extends BusModule {
   public async getWithdrawalWaitingTimeByRequestIds(
     props: WithdrawalWaitingTimeByRequestIdsParams,
   ): Promise<readonly WithdrawalWaitingTimeRequestInfo[]> {
-    const query = new URLSearchParams();
-    query.set('ids', props.ids.toString());
-    const url =
-      urls[this.bus.core.chainId] +
-      endpoints.calculateByRequestId +
-      '?' +
-      query.toString();
+    const idsPages = [];
+    const pageSize = 20;
+    const baseUrl =
+      urls[this.bus.core.chainId] + endpoints.calculateByRequestId;
 
-    const response = await fetch(url, {
-      headers: {
-        'WQ-Request-Source': 'sdk',
-      },
-    });
+    for (let i = 0; i < props.ids.length; i += pageSize) {
+      idsPages.push(props.ids.slice(i, i + pageSize));
+    }
 
-    return response.json();
+    const result = [];
+
+    for (const page of idsPages) {
+      const query = new URLSearchParams();
+      query.set('ids', page.toString());
+
+      const url = baseUrl + '?' + query.toString();
+
+      const response = await fetch(url, {
+        headers: {
+          'WQ-Request-Source': 'sdk',
+        },
+      });
+
+      const requests = await response.json();
+      result.push(...requests);
+
+      if (idsPages.length > 1) {
+        // avoid backend spam
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    }
+
+    return result;
   }
 }
