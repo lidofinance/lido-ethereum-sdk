@@ -7,14 +7,12 @@ import type {
   WithdrawalWaitingTimeByAmountParams,
   WithdrawalWaitingTimeByRequestIdsParams,
 } from './types.js';
-import { CHAINS } from '../common/index.js';
+import { WQ_API_URLS } from '../common/index.js';
 import { formatEther } from 'viem';
-
-const urls = {
-  [CHAINS.Mainnet]: 'https://wq-api.lido.fi',
-  [CHAINS.Goerli]: 'https://wq-api.testnet.fi',
-  [CHAINS.Holesky]: 'https://wq-api-holesky.testnet.fi',
-};
+import {
+  WithdrawalWaitingTimeByAmountOptions,
+  WithdrawalWaitingTimeByRequestIdsOptions,
+} from './types.js';
 
 const endpoints = {
   calculateByAmount: '/v2/request-time/calculate',
@@ -22,20 +20,26 @@ const endpoints = {
 };
 
 export class LidoSDKWithdrawWaitingTime extends BusModule {
-  // Utils
-
-  @Logger('Utils:')
+  // API call integrations
+  @Logger('API:')
   @ErrorHandler()
   public async getWithdrawalWaitingTimeByAmount(
     props: WithdrawalWaitingTimeByAmountParams,
+    options?: WithdrawalWaitingTimeByAmountOptions,
   ): Promise<WithdrawalWaitingTimeByAmountResponse> {
+    const getWqApiURL = options?.getWqApiURL;
+
     const query = new URLSearchParams();
-    query.set('amount', formatEther(props.amount));
-    const url =
-      urls[this.bus.core.chainId] +
-      endpoints.calculateByAmount +
-      '?' +
-      query.toString();
+    if (props.amount) {
+      query.set('amount', formatEther(props.amount));
+    }
+
+    const baseUrl =
+      getWqApiURL && typeof getWqApiURL === 'function'
+        ? getWqApiURL()
+        : WQ_API_URLS[this.bus.core.chainId];
+
+    const url = `${baseUrl}${endpoints.calculateByAmount}?${query.toString()}`;
 
     const response = await fetch(url, {
       headers: {
@@ -46,15 +50,27 @@ export class LidoSDKWithdrawWaitingTime extends BusModule {
     return response.json();
   }
 
-  @Logger('Utils:')
+  @Logger('API:')
   @ErrorHandler()
   public async getWithdrawalWaitingTimeByRequestIds(
     props: WithdrawalWaitingTimeByRequestIdsParams,
+    options?: WithdrawalWaitingTimeByRequestIdsOptions,
   ): Promise<readonly WithdrawalWaitingTimeRequestInfo[]> {
+    const requestDelay = options?.requestDelay ?? 1000;
+    const getWqApiURL = options?.getWqApiURL;
+
+    if (!Array.isArray(props.ids) || props.ids.length === 0) {
+      throw new Error('expected not empty array ids');
+    }
+
     const idsPages = [];
     const pageSize = 20;
     const baseUrl =
-      urls[this.bus.core.chainId] + endpoints.calculateByRequestId;
+      getWqApiURL && typeof getWqApiURL === 'function'
+        ? getWqApiURL()
+        : WQ_API_URLS[this.bus.core.chainId];
+
+    const path = `${baseUrl}${endpoints.calculateByRequestId}`;
 
     for (let i = 0; i < props.ids.length; i += pageSize) {
       idsPages.push(props.ids.slice(i, i + pageSize));
@@ -66,7 +82,7 @@ export class LidoSDKWithdrawWaitingTime extends BusModule {
       const query = new URLSearchParams();
       query.set('ids', page.toString());
 
-      const url = baseUrl + '?' + query.toString();
+      const url = `${path}?${query.toString()}`;
 
       const response = await fetch(url, {
         headers: {
@@ -79,7 +95,7 @@ export class LidoSDKWithdrawWaitingTime extends BusModule {
 
       if (idsPages.length > 1) {
         // avoid backend spam
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, requestDelay));
       }
     }
 

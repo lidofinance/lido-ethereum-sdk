@@ -53,26 +53,35 @@ export type GetWithdrawalRequestsInfoReturnType = {
 };
 
 export type WithdrawalWaitingTimeByAmountParams = {
-  amount: bigint;
+  amount?: bigint;
 };
 
-export type RequestInfoDto = {
+export type RequestInfo = {
   finalizationIn: number;
   finalizationAt: string;
   type: WaitingTimeCalculationType;
 };
 
 export type WithdrawalWaitingTimeByAmountResponse = {
-  requestInfo: RequestInfoDto;
+  requestInfo: RequestInfo;
   status: WaitingTimeStatus;
   nextCalculationAt: string;
+};
+
+export type WithdrawalWaitingTimeByAmountOptions = {
+  getWqApiURL?: () => string;
 };
 
 export type WithdrawalWaitingTimeByRequestIdsParams = {
   ids: readonly bigint[];
 };
 
-export type RequestByIdInfoDto = {
+export type WithdrawalWaitingTimeByRequestIdsOptions = {
+  requestDelay?: number;
+  getWqApiURL?: () => string;
+};
+
+export type RequestByIdInfo = {
   finalizationIn: number;
   finalizationAt: string;
   requestId?: string;
@@ -81,7 +90,7 @@ export type RequestByIdInfoDto = {
 };
 
 export type WithdrawalWaitingTimeRequestInfo = {
-  requestInfo: RequestByIdInfoDto;
+  requestInfo: RequestByIdInfo;
   status: WaitingTimeStatus;
   nextCalculationAt: string;
 };

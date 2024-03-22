@@ -1023,8 +1023,8 @@ try {
 
 ###### Input Parameters:
 
-- `props: { amount:  bigint }`
-  - `amount` (Type: bigint): The amount of withdrawable eth.
+- `props: { amount?:  bigint }`
+  - `amount?` (Type: bigint **optional**): The amount of withdrawable eth. In case when it is not passed, it is calculated as default information about queue.
 
 ##### Output Parameters:
 

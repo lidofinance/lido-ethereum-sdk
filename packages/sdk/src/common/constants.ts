@@ -105,3 +105,9 @@ export const VIEM_CHAINS: { [key in CHAINS]: Chain } = {
   [CHAINS.Goerli]: goerli,
   [CHAINS.Holesky]: holesky,
 };
+
+export const WQ_API_URLS: { [key in CHAINS]: string } = {
+  [CHAINS.Mainnet]: 'https://wq-api.lido.fi',
+  [CHAINS.Goerli]: 'https://wq-api.testnet.fi',
+  [CHAINS.Holesky]: 'https://wq-api-holesky.testnet.fi',
+};
