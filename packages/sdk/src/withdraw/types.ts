@@ -52,8 +52,14 @@ export type GetWithdrawalRequestsInfoReturnType = {
   claimableETH: GetClaimableRequestsETHByAccountReturnType;
 };
 
+export type WqApiCustomUrlGetter = (
+  defaultUrl: string,
+  chainId: number,
+) => string;
+
 export type WithdrawalWaitingTimeByAmountParams = {
   amount?: bigint;
+  getCustomApiUrl?: WqApiCustomUrlGetter;
 };
 
 export type RequestInfo = {
@@ -68,17 +74,10 @@ export type WithdrawalWaitingTimeByAmountResponse = {
   nextCalculationAt: string;
 };
 
-export type WithdrawalWaitingTimeByAmountOptions = {
-  getWqApiURL?: () => string;
-};
-
 export type WithdrawalWaitingTimeByRequestIdsParams = {
   ids: readonly bigint[];
-};
-
-export type WithdrawalWaitingTimeByRequestIdsOptions = {
   requestDelay?: number;
-  getWqApiURL?: () => string;
+  getCustomApiUrl?: WqApiCustomUrlGetter;
 };
 
 export type RequestByIdInfo = {

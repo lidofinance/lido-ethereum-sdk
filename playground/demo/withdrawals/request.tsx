@@ -195,9 +195,7 @@ export const WithdrawalsRequestDemo = () => {
         title={`Withdrawal Waiting Time For Account Requests`}
         walletAction
         action={async () => {
-          const ids = await withdraw.views.getWithdrawalRequestsIds({
-            account,
-          });
+          const ids = [1234n, 1235n];
           return withdraw.waitingTime.getWithdrawalWaitingTimeByRequestIds({
             ids,
           });

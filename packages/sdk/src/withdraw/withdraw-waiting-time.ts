@@ -6,13 +6,10 @@ import type {
   WithdrawalWaitingTimeRequestInfo,
   WithdrawalWaitingTimeByAmountParams,
   WithdrawalWaitingTimeByRequestIdsParams,
+  WqApiCustomUrlGetter,
 } from './types.js';
 import { WQ_API_URLS } from '../common/index.js';
 import { formatEther } from 'viem';
-import {
-  WithdrawalWaitingTimeByAmountOptions,
-  WithdrawalWaitingTimeByRequestIdsOptions,
-} from './types.js';
 
 const endpoints = {
   calculateByAmount: '/v2/request-time/calculate',
@@ -25,20 +22,15 @@ export class LidoSDKWithdrawWaitingTime extends BusModule {
   @ErrorHandler()
   public async getWithdrawalWaitingTimeByAmount(
     props: WithdrawalWaitingTimeByAmountParams,
-    options?: WithdrawalWaitingTimeByAmountOptions,
   ): Promise<WithdrawalWaitingTimeByAmountResponse> {
-    const getWqApiURL = options?.getWqApiURL;
+    const getCustomApiUrl = props?.getCustomApiUrl;
 
     const query = new URLSearchParams();
     if (props.amount) {
       query.set('amount', formatEther(props.amount));
     }
 
-    const baseUrl =
-      getWqApiURL && typeof getWqApiURL === 'function'
-        ? getWqApiURL()
-        : WQ_API_URLS[this.bus.core.chainId];
-
+    const baseUrl = this.getBaseUrl(getCustomApiUrl);
     const url = `${baseUrl}${endpoints.calculateByAmount}?${query.toString()}`;
 
     const response = await fetch(url, {
@@ -54,10 +46,9 @@ export class LidoSDKWithdrawWaitingTime extends BusModule {
   @ErrorHandler()
   public async getWithdrawalWaitingTimeByRequestIds(
     props: WithdrawalWaitingTimeByRequestIdsParams,
-    options?: WithdrawalWaitingTimeByRequestIdsOptions,
   ): Promise<readonly WithdrawalWaitingTimeRequestInfo[]> {
-    const requestDelay = options?.requestDelay ?? 1000;
-    const getWqApiURL = options?.getWqApiURL;
+    const requestDelay = props?.requestDelay ?? 1000;
+    const getCustomApiUrl = props?.getCustomApiUrl;
 
     if (!Array.isArray(props.ids) || props.ids.length === 0) {
       throw new Error('expected not empty array ids');
@@ -65,11 +56,7 @@ export class LidoSDKWithdrawWaitingTime extends BusModule {
 
     const idsPages = [];
     const pageSize = 20;
-    const baseUrl =
-      getWqApiURL && typeof getWqApiURL === 'function'
-        ? getWqApiURL()
-        : WQ_API_URLS[this.bus.core.chainId];
-
+    const baseUrl = this.getBaseUrl(getCustomApiUrl);
     const path = `${baseUrl}${endpoints.calculateByRequestId}`;
 
     for (let i = 0; i < props.ids.length; i += pageSize) {
@@ -100,5 +87,12 @@ export class LidoSDKWithdrawWaitingTime extends BusModule {
     }
 
     return result;
+  }
+
+  getBaseUrl(getCustomApiUrl?: WqApiCustomUrlGetter) {
+    const defaultUrl = WQ_API_URLS[this.bus.core.chainId];
+    return getCustomApiUrl && typeof getCustomApiUrl === 'function'
+      ? getCustomApiUrl(defaultUrl, this.bus.core.chainId)
+      : defaultUrl;
   }
 }
