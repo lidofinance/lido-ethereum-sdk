@@ -1,3 +1,15 @@
+# 3.2.0
+
+## SDK
+
+### Added
+
+- `Sepolia` testnet
+
+## Playground
+
+- Support for `Sepolia` testnet
+
 # 3.1.0
 
 ## SDK
