@@ -91,8 +91,18 @@ export class LidoSDKWithdrawWaitingTime extends BusModule {
 
   getBaseUrl(getCustomApiUrl?: WqApiCustomUrlGetter) {
     const defaultUrl = WQ_API_URLS[this.bus.core.chainId];
-    return getCustomApiUrl && typeof getCustomApiUrl === 'function'
-      ? getCustomApiUrl(defaultUrl, this.bus.core.chainId)
-      : defaultUrl;
+
+    const baseUrl =
+      getCustomApiUrl && typeof getCustomApiUrl === 'function'
+        ? getCustomApiUrl(defaultUrl, this.bus.core.chainId)
+        : defaultUrl;
+
+    if (!baseUrl) {
+      throw new Error(
+        `wq-api URL is not found for chain ${this.bus.core.chainId}, use getCustomApiUrl prop to setup custom URL`,
+      );
+    }
+
+    return baseUrl;
   }
 }

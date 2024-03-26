@@ -1,6 +1,7 @@
 import type { Address } from 'viem';
 import type { Bus } from './bus.js';
 import type { AccountValue } from '../index.js';
+import { CHAINS } from '../index.js';
 
 export type LidoSDKWithdrawModuleProps = { bus: Bus; version?: string };
 
@@ -53,8 +54,8 @@ export type GetWithdrawalRequestsInfoReturnType = {
 };
 
 export type WqApiCustomUrlGetter = (
-  defaultUrl: string,
-  chainId: number,
+  defaultUrl: string | null,
+  chainId: CHAINS,
 ) => string;
 
 export type WithdrawalWaitingTimeByAmountParams = {
