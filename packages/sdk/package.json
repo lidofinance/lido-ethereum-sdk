@@ -120,7 +120,7 @@
   "homepage": "https://github.com/lidofinance/lido-ethereum-sdk",
   "repository": {
     "type": "git",
-    "url": "https://github.com/lidofinance/lido-ethereum-sdk.git",
+    "url": "git+https://github.com/lidofinance/lido-ethereum-sdk.git",
     "directory": "packages/sdk"
   },
   "bugs": {

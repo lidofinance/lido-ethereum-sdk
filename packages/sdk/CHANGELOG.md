@@ -1,3 +1,18 @@
+# 3.2.0
+
+## SDK
+
+### Added
+
+- `Sepolia` testnet
+- New method `getWithdrawalWaitingTimeByAmount` for fetching withdrawal waiting time for amount of eth
+- New method `getWithdrawalWaitingTimeByRequestIds` for fetching withdrawal waiting time for earlier created requests by their ids
+
+## Playground
+
+- Support for `Sepolia` testnet
+- Added blocks with new methods `getWithdrawalWaitingTimeByAmount` and `getWithdrawalWaitingTimeByRequestIds`
+
 # 3.1.0
 
 ## SDK
