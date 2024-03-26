@@ -8,7 +8,7 @@ import type {
   WithdrawalWaitingTimeByRequestIdsParams,
   WqApiCustomUrlGetter,
 } from './types.js';
-import { WQ_API_URLS } from '../common/index.js';
+import { ERROR_CODE, WQ_API_URLS } from '../common/index.js';
 import { formatEther } from 'viem';
 
 const endpoints = {
@@ -51,7 +51,10 @@ export class LidoSDKWithdrawWaitingTime extends BusModule {
     const getCustomApiUrl = props?.getCustomApiUrl;
 
     if (!Array.isArray(props.ids) || props.ids.length === 0) {
-      throw new Error('expected not empty array ids');
+      throw this.bus.core.error({
+        code: ERROR_CODE.INVALID_ARGUMENT,
+        message: 'expected not empty array ids',
+      });
     }
 
     const idsPages = [];
@@ -98,9 +101,10 @@ export class LidoSDKWithdrawWaitingTime extends BusModule {
         : defaultUrl;
 
     if (!baseUrl) {
-      throw new Error(
-        `wq-api URL is not found for chain ${this.bus.core.chainId}, use getCustomApiUrl prop to setup custom URL`,
-      );
+      throw this.bus.core.error({
+        code: ERROR_CODE.INVALID_ARGUMENT,
+        message: `wq-api URL is not found for chain ${this.bus.core.chainId}, use getCustomApiUrl prop to setup custom URL`,
+      });
     }
 
     return baseUrl;
