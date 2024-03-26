@@ -13,4 +13,5 @@ export type HeadMessage =
   | 'Events:'
   | 'Statistic:'
   | 'Rewards:'
-  | 'Deprecation:';
+  | 'Deprecation:'
+  | 'API:';
