@@ -35,7 +35,7 @@ jobs:
           cache: 'yarn'
       - name: Setup Pages
         id: config_pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
       - name: Restore cache
         uses: actions/cache@v4
         with:
@@ -55,6 +55,7 @@ jobs:
           RPC_PROVIDER_URL_1: ${{ vars.RPC_PROVIDER_URL_1 }}
           RPC_PROVIDER_URL_5: ${{ vars.RPC_PROVIDER_URL_5 }}
           RPC_PROVIDER_URL_17000: ${{ vars.RPC_PROVIDER_URL_17000 }}
+          RPC_PROVIDER_URL_11155111: ${{ vars.RPC_PROVIDER_URL_11155111 }}
           WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
           SUPPORTED_CHAINS: ${{ vars.SUPPORTED_CHAINS }}
           DEFAULT_CHAIN: ${{ vars.DEFAULT_CHAIN }}
