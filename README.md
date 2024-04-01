@@ -114,7 +114,7 @@ console.log(balanceETH.toString(), 'ETH balance');
 
 ## Migration
 
-For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
+For breaking changes between versions see [MIGRATION.md](packages/sdk/MIGRATION.md)
 
 ## Documentation
 

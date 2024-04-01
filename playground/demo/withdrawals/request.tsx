@@ -180,6 +180,29 @@ export const WithdrawalsRequestDemo = () => {
           })
         }
       />
+
+      <Action
+        title={`Withdrawal Waiting Time By Amount`}
+        walletAction
+        action={() =>
+          withdraw.waitingTime.getWithdrawalWaitingTimeByAmount({
+            amount,
+          })
+        }
+      />
+
+      <Action
+        title={`Withdrawal Waiting Time For Account Requests`}
+        walletAction
+        action={async () => {
+          const ids = await withdraw.views.getWithdrawalRequestsIds({
+            account,
+          });
+          return withdraw.waitingTime.getWithdrawalWaitingTimeByRequestIds({
+            ids,
+          });
+        }}
+      />
     </Accordion>
   );
 };
