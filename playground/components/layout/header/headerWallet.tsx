@@ -11,17 +11,12 @@ import { HeaderWalletChainStyle } from './headerWalletStyles';
 
 const HeaderWallet: FC = () => {
   const { active, chainId } = useWeb3();
-  // TODO: update @lido-sdk/constants
-  const chainName = chainId && { ...CHAINS, 11155111: 'Sepolia' }[chainId];
-  const isSepolia = chainId === 11155111;
+  const chainName = chainId && CHAINS[chainId];
 
   return (
     <>
       {chainId && (
-        <HeaderWalletChainStyle
-          // TODO: update @lido-sdk/constants -> getChainColor
-          $color={isSepolia ? '#FFD700' : getChainColor(chainId)}
-        >
+        <HeaderWalletChainStyle $color={getChainColor(chainId)}>
           {chainName}
         </HeaderWalletChainStyle>
       )}

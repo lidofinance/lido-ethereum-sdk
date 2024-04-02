@@ -57,8 +57,7 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
       [CHAINS.Mainnet]: getRpc(CHAINS.Mainnet),
       [CHAINS.Goerli]: getRpc(CHAINS.Goerli),
       [CHAINS.Holesky]: getRpc(CHAINS.Holesky),
-      // TODO: update @lido-sdk/constants
-      11155111: getRpc(11155111),
+      [CHAINS.Sepolia]: getRpc(CHAINS.Sepolia),
     };
   }, [customRpc]);
 
