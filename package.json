@@ -53,7 +53,8 @@
   },
   "workspaces": [
     "packages/*",
-    "playground"
+    "playground",
+    "examples/*"
   ],
   "release": {
     "branches": [
