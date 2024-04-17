@@ -86,7 +86,7 @@ const newBalanceStETH = (oldBalanceInShares * postTotalEther) / postTotalShares;
 const rewardsInStETH = newBalanceStETH - oldBalanceStETH;
 ```
 
-## Calculating rewards from on-chain without calculating using the formula
+## Calculating rewards from on-chain without using the formula
 
 [Implementation example](./src/rewardsOnChain.ts)
 
