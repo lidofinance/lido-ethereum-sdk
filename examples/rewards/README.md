@@ -106,7 +106,7 @@ const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
 });
 ```
 
-## Calculating information about rewards from off-chain without calculating using the formula
+## Calculating information about rewards from subgraph without using the formula
 
 [Implementation example](./src/rewardsSubgraph.ts)
 

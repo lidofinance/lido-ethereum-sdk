@@ -28,22 +28,22 @@ const getLastRebaseEvent = async () => {
 };
 
 const main = async () => {
-  // Баланс юзера в шарах до ивента
+  // User's balance in shares before the event
   const oldBalanceInShares = await lidoSDK.shares.balance(mockAddress);
 
   const lastEventData = await getLastRebaseEvent();
   if (!lastEventData) return;
 
-  // расчет баланса юзера в stETH до ивента
+  // Calculation of the user's balance in stETH before the event
   const oldBalanceStETH =
     (oldBalanceInShares * lastEventData.preTotalEther) /
     lastEventData.preTotalShares;
-  // расчет баланса юзера в stETH после ивента
+  // Calculation of the user's balance in stETH after the event
   const newBalanceStETH =
     (oldBalanceInShares * lastEventData.postTotalEther) /
     lastEventData.postTotalShares;
 
-  // Расчет награды юзера за ребейз
+  // Calculate the user's reward for Rebase Event
   const rewardsInStETH = newBalanceStETH - oldBalanceStETH;
 
   console.log('rewardsInStETH', rewardsInStETH);
