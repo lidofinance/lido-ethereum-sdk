@@ -139,8 +139,18 @@ const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
   address: rewardsAddress,
   stepBlock: 10000, // max blocks in 1 query - depend on the RPC capabilities and pricing plans
   back: {
-    days: 1n,
+    days: 1n, // 1 day back from the current block
+    // blocks: 10000n, // 10000 blocks back from the current block
+    // seconds: 86400n, // 86400 seconds back from the current block
   },
+  // from: {
+  //   timestamp: 0n, // from timestamp
+  //   block: 0n, // from block number
+  // }
+  // to: {
+  //   timestamp: 0n, // to timestamp
+  //   block: 0n, // to block number
+  // }
 });
 ```
 
@@ -157,8 +167,18 @@ Simplified code example:
 const rewardsQuery = await lidoSDK.rewards.getRewardsFromSubgraph({
   address: rewardsAddress,
   back: {
-    days: 1n,
+    days: 1n, // 1 day back from the current block
+    // blocks: 10000n, // 10000 blocks back from the current block
+    // seconds: 86400n, // 86400 seconds back from the current block
   },
+  // from: {
+  //   timestamp: 0n, // from timestamp
+  //   block: 0n, // from block number
+  // }
+  // to: {
+  //   timestamp: 0n, // to timestamp
+  //   block: 0n, // to block number
+  // }
   stepEntities: 500, // defaults to 1000, max entities per one request to endpoint
   getSubgraphUrl(graphId, chainId) {
     return `https://gateway.thegraph.com/api/${apiKey}/subgraphs/id/${id}`;
