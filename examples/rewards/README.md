@@ -89,7 +89,7 @@ async function calculateRewards(logs) {
 }
 ```
 
-### Get rewards accrued with the latest stETH token rebase for the chosen account
+### Get rewards accrued with the latest stETH token rebase for the particular account
 
 [Implementation example](./src/lastEvent.ts)
 
@@ -124,7 +124,7 @@ const postBalanceStETH = (balanceInShares * postTotalEther) / postTotalShares;
 const rewardsInStETH = postBalanceStETH - preBalanceStETH;
 ```
 
-### Retrieve reward history for the chosen account using the event logs (recommended)
+### Retrieve reward history for the particular account using the event logs (recommended)
 
 [Implementation example](./src/rewardsOnChain.ts)
 
@@ -137,14 +137,14 @@ Simplified code example:
 ```ts
 const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
   address: rewardsAddress,
-  stepBlock: 10000, // defaults to 50000, max block range per 1 query
+  stepBlock: 10000, // max blocks in 1 query - depend on the RPC capabilities and pricing plans
   back: {
     days: 1n,
   },
 });
 ```
 
-### Retrieve reward history for the chosen account using the Subgraph indexer (alternative way)
+### Retrieve reward history for the particular account using the Subgraph indexer (alternative way)
 
 [Implementation example](./src/rewardsSubgraph.ts)
 
@@ -156,7 +156,9 @@ Simplified code example:
 ```ts
 const rewardsQuery = await lidoSDK.rewards.getRewardsFromSubgraph({
   address: rewardsAddress,
-  blocksBack: 10000,
+  back: {
+    days: 1n,
+  },
   stepEntities: 500, // defaults to 1000, max entities per one request to endpoint
   getSubgraphUrl(graphId, chainId) {
     return `https://gateway.thegraph.com/api/${apiKey}/subgraphs/id/${id}`;
@@ -181,7 +183,7 @@ Simplified code example:
 ```ts
 const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
   address: mockAddress,
-  stepBlock: 10000, // defaults to 50000, max block range per 1 query
+  stepBlock: 10000, // max blocks in 1 query - depend on the RPC capabilities and pricing plans
   back: {
     days: 1n,
   },

@@ -15,7 +15,7 @@ const lidoSDK = new LidoSDK({
 const getRewardsOnChain = async () => {
   const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
     address: mockAddress,
-    stepBlock: 10000, // defaults to 50000, max block range per 1 query
+    stepBlock: 10000, // max blocks in 1 query - depend on the RPC capabilities and pricing plans
     back: {
       days: 1n,
     },
