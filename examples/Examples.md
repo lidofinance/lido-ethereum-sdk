@@ -1,10 +1,10 @@
 # Examples
 
-Description of the operation of some cases of using the SDK with code examples.
+SDK usage examples for practical cases .
 
-## Rewards
+## stETH rewards
 
-- [Calculation with subscribe for the Rebase event](rewards/README.md#subscribe-rebase-event)
-- [Calculation based on a specific (last) event](rewards/README.md#last-rebase-event)
-- [Calculation information about rewards by on-chain](rewards/README.md#calculating-rewards-from-on-chain-without-calculating-using-the-formula)
-- [Calculation information about rewards by Subgraph](rewards/README.md#calculating-information-about-rewards-from-off-chain-without-calculating-using-the-formula)
+- [Example 1. Subscribe on the stETH token rebase events to account for account balance changes](rewards/README.md#subscribe-rebase-event)
+- [Example 2. Get rewards accrued with the latest stETH token rebase for the chosen account](rewards/README.md#last-rebase-event)
+- [Examples 3. Retrieve reward history for the chosen account using the event logs (recommended)](rewards/README.md#calculating-rewards-from-on-chain-without-calculating-using-the-formula)
+- [Example 4. Retrieve reward history for the chosen account using the Subgraph indexer (alternative way)](rewards/README.md#calculating-information-about-rewards-from-off-chain-without-calculating-using-the-formula)
