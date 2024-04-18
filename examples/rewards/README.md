@@ -44,6 +44,10 @@ The [Lido Ethereum SDK](../../packages/sdk/README.md) has the full set of featur
 
 ### Subscribe on the stETH token rebase events to account for account balance changes
 
+#### Requirements:
+
+- RPC provider
+
 [Implementation example](./src/sabscribeEvent.ts)
 
 For the convenience of calculating user balances, it is proposed to use [`Shares`](https://docs.lido.fi/guides/lido-tokens-integration-guide#steth-internals-share-mechanics)
@@ -91,6 +95,10 @@ async function calculateRewards(logs) {
 
 ### Get rewards accrued with the latest stETH token rebase for the particular account
 
+#### Requirements:
+
+- RPC provider
+
 [Implementation example](./src/lastEvent.ts)
 
 For the convenience of calculating user balances, it is proposed to use [`Shares`](https://docs.lido.fi/guides/lido-tokens-integration-guide#steth-internals-share-mechanics).
@@ -126,6 +134,10 @@ const rewardsInStETH = postBalanceStETH - preBalanceStETH;
 
 ### Retrieve reward history for the particular account using the event logs (recommended)
 
+#### Requirements:
+
+- RPC provider (full node)
+
 [Implementation example](./src/rewardsOnChain.ts)
 
 Information about the user’s rewards can be calculating from on-chain using SDK without the need to calculate using a formula.
@@ -155,6 +167,10 @@ const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
 ```
 
 ### Retrieve reward history for the particular account using the Subgraph indexer (alternative way)
+
+#### Requirements:
+
+- The Graph API key
 
 [Implementation example](./src/rewardsSubgraph.ts)
 
@@ -192,6 +208,10 @@ const rewardsQuery = await lidoSDK.rewards.getRewardsFromSubgraph({
 
 [Implementation example](./src/averageAPRbyOnChain.ts)
 
+##### Requirements:
+
+- RPC provider (full node)
+
 To calculate the effective APR for the address concerning the given period, you need:
 
 - Calculate user's rewards for the period
@@ -218,6 +238,10 @@ return totalAPR / rewards.length;
 ```
 
 #### Subgraph
+
+##### Requirements:
+
+- The Graph API key
 
 [Implementation example](./src/averageAPRbySubgraph.ts)
 
@@ -250,6 +274,10 @@ return totalAPR / rewards.length;
 ### Keep track of rewards accrued for the set of addresses
 
 #### By subscribing to the `TokenRebased` event
+
+#### Requirements:
+
+- RPC provider
 
 [Implementation example](./src/usersRewardsBySubscribeEvent.ts)
 
@@ -305,6 +333,10 @@ async function calculateRewards(logs) {
 ```
 
 #### By last `TokenRebased` event
+
+#### Requirements:
+
+- RPC provider
 
 [Implementation example](./src/usersRewardsByLastEvent.ts)
 
