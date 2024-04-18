@@ -43,7 +43,7 @@ const main = async () => {
     (oldBalanceInShares * lastEventData.postTotalEther) /
     lastEventData.postTotalShares;
 
-  // Calculate the user's reward for Rebase Event
+  // Calculate user's updated balance per Rebase event
   const rewardsInStETH = newBalanceStETH - oldBalanceStETH;
 
   console.log('rewardsInStETH', rewardsInStETH);

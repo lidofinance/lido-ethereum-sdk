@@ -8,5 +8,7 @@ The provided examples are useful to establish robust accounting for the stETH re
 
 - [Example 1. Subscribe on the stETH token rebase events to account for account balance changes](rewards/README.md#subscribe-rebase-event)
 - [Example 2. Get rewards accrued with the latest stETH token rebase for the chosen account](rewards/README.md#last-rebase-event)
-- [Examples 3. Retrieve reward history for the chosen account using the event logs (recommended)](rewards/README.md#calculating-rewards-from-on-chain-without-calculating-using-the-formula)
+- [Example 3. Retrieve reward history for the chosen account using the event logs (recommended)](rewards/README.md#calculating-rewards-from-on-chain-without-calculating-using-the-formula)
 - [Example 4. Retrieve reward history for the chosen account using the Subgraph indexer (alternative way)](rewards/README.md#calculating-information-about-rewards-from-off-chain-without-calculating-using-the-formula)
+- [Example 5. Calculate the effective APR for the address concerning the given period](rewards/README.md#calculate-the-effective-apr-for-the-address-concerning-the-given-period)
+- [Example 6. Keep track of rewards accrued for the set of addresses](rewards/README.md#keep-track-of-rewards-accrued-for-the-set-of-addresses)
