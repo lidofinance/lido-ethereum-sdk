@@ -42,7 +42,7 @@ The [Lido Ethereum SDK](../../packages/sdk/README.md) has the full set of featur
 
 ## Code Examples
 
-### Subscribe Rebase event
+### Subscribe on the stETH token rebase events to account for account balance changes
 
 [Implementation example](./src/sabscribeEvent.ts)
 
@@ -61,7 +61,7 @@ Simplified code example:
 
 ```ts
 // User's balance in shares before the event
-const oldBalanceInShares = await lidoSDK.shares.balance(address);
+const balanceInShares = await lidoSDK.shares.balance(address);
 
 // Signature for the rebase event
 rpcProvider.watchContractEvent({
@@ -80,17 +80,16 @@ async function calculateRewards(logs) {
     lastRebaseEvent?.args;
 
   // Calculation of the user's balance in stETH before the event
-  const oldBalanceStETH = (oldBalanceInShares * preTotalEther) / preTotalShares;
+  const oldBalanceStETH = (balanceInShares * preTotalEther) / preTotalShares;
   // Calculation of the user's balance in stETH after the event
-  const postBalanceStETH =
-    (oldBalanceInShares * postTotalEther) / postTotalShares;
+  const postBalanceStETH = (balanceInShares * postTotalEther) / postTotalShares;
 
   // Calculate user's updated balance per Rebase event
   const rewardsInStETH = postBalanceStETH - oldBalanceStETH;
 }
 ```
 
-### Last Rebase event
+### Get rewards accrued with the latest stETH token rebase for the chosen account
 
 [Implementation example](./src/lastEvent.ts)
 
@@ -115,18 +114,17 @@ const { preTotalShares, preTotalEther, postTotalShares, postTotalEther } =
   lastRebaseEvent?.args;
 
 // User's balance in shares before the event
-const oldBalanceInShares = await lidoSDK.shares.balance(address); // for example, the value can be taken from the database
+const balanceInShares = await lidoSDK.shares.balance(address); // for example, the value can be taken from the database
 // Calculation of the user's balance in stETH before the event
-const oldBalanceStETH = (oldBalanceInShares * preTotalEther) / preTotalShares;
+const oldBalanceStETH = (balanceInShares * preTotalEther) / preTotalShares;
 // Calculation of the user's balance in stETH after the event
-const postBalanceStETH =
-  (oldBalanceInShares * postTotalEther) / postTotalShares;
+const postBalanceStETH = (balanceInShares * postTotalEther) / postTotalShares;
 
 // Calculate user's updated balance per Rebase event
 const rewardsInStETH = postBalanceStETH - oldBalanceStETH;
 ```
 
-### Calculating rewards from on-chain without using the formula
+### Retrieve reward history for the chosen account using the event logs (recommended)
 
 [Implementation example](./src/rewardsOnChain.ts)
 
@@ -146,7 +144,7 @@ const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
 });
 ```
 
-### Calculating information about rewards from subgraph without using the formula
+### Retrieve reward history for the chosen account using the Subgraph indexer (alternative way)
 
 [Implementation example](./src/rewardsSubgraph.ts)
 
@@ -254,7 +252,7 @@ Simplified code example:
 
 ```ts
 // Users' balances in shares before the event
-const preBalanceInShares = [balance_1, balance_2, balance_3];
+const balanceInShares = [balance_1, balance_2, balance_3];
 
 // Signature for the rebase event
 rpcProvider.watchContractEvent({
@@ -272,7 +270,7 @@ async function calculateRewards(logs) {
   const { preTotalShares, preTotalEther, postTotalShares, postTotalEther } =
     lastRebaseEvent?.args;
 
-  const balancesUpdate = preBalances.map((balance) => {
+  const balancesUpdate = balanceInShares.map((balance) => {
     // Calculation of the user's balance in stETH before the event
     const preBalanceStETH = (balance * preTotalEther) / preTotalShares;
     // Calculation of the user's balance in stETH after the event
@@ -299,7 +297,7 @@ Simplified code example:
 
 ```ts
 // Users' balances in shares before the event
-const preBalanceInShares = [balance_1, balance_2, balance_3];
+const balanceInShares = [balance_1, balance_2, balance_3];
 
 // Get the last Rebase event
 const lastRebaseEvent = await sdk.events.stethEvents.getLastRebaseEvent();
@@ -308,7 +306,7 @@ const lastRebaseEvent = await sdk.events.stethEvents.getLastRebaseEvent();
 const { preTotalShares, preTotalEther, postTotalShares, postTotalEther } =
   lastRebaseEvent?.args;
 
-const balancesUpdate = preBalances.map((balance) => {
+const balancesUpdate = balanceInShares.map((balance) => {
   // Calculation of the user's balance in stETH before the event
   const preBalanceStETH = (balance * preTotalEther) / preTotalShares;
   // Calculation of the user's balance in stETH after the event

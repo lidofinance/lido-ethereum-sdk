@@ -40,13 +40,13 @@ const getUsersBalancesInShares = async (accounts: Address[]) => {
 };
 
 const calcBalancesUpdate = async (
-  preBalances: bigint[],
+  balanceInShares: bigint[],
   preTotalEther: bigint,
   preTotalShares: bigint,
   postTotalEther: bigint,
   postTotalShares: bigint,
 ) => {
-  const balancesUpdate = preBalances.map((balance) => {
+  const balancesUpdate = balanceInShares.map((balance) => {
     // Calculation of the user's balance in stETH before the event
     const preBalanceStETH = (balance * preTotalEther) / preTotalShares;
     // Calculation of the user's balance in stETH after the event
@@ -61,7 +61,7 @@ const calcBalancesUpdate = async (
 
 const main = async () => {
   // User's balance in shares before the event
-  const preUsersBalancesInShares = await getUsersBalancesInShares([
+  const balanceInShares = await getUsersBalancesInShares([
     mockAddress_1,
     mockAddress_2,
     mockAddress_3,
@@ -71,7 +71,7 @@ const main = async () => {
   if (!lastRebaseEvent) return;
 
   const balancesUpdate = await calcBalancesUpdate(
-    preUsersBalancesInShares,
+    balanceInShares,
     lastRebaseEvent.preTotalEther,
     lastRebaseEvent.preTotalShares,
     lastRebaseEvent.postTotalEther,

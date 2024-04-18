@@ -29,18 +29,18 @@ const getLastRebaseEvent = async () => {
 
 const main = async () => {
   // User's balance in shares before the event
-  const oldBalanceInShares = await lidoSDK.shares.balance(mockAddress);
+  const balanceInShares = await lidoSDK.shares.balance(mockAddress);
 
   const lastEventData = await getLastRebaseEvent();
   if (!lastEventData) return;
 
   // Calculation of the user's balance in stETH before the event
   const oldBalanceStETH =
-    (oldBalanceInShares * lastEventData.preTotalEther) /
+    (balanceInShares * lastEventData.preTotalEther) /
     lastEventData.preTotalShares;
   // Calculation of the user's balance in stETH after the event
   const newBalanceStETH =
-    (oldBalanceInShares * lastEventData.postTotalEther) /
+    (balanceInShares * lastEventData.postTotalEther) /
     lastEventData.postTotalShares;
 
   // Calculate user's updated balance per Rebase event
