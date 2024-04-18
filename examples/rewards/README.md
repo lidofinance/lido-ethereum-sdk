@@ -172,6 +172,9 @@ const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
 
 - The Graph API key
 
+> **_NOTE:_** The subgraph deployed on The Graph Decentralized Network. The subgraph data is indexed and served by independent indexers on the network. Therefore, the performance of the subgraph may depend on the indexer selected at the time of the request.
+> Also, due to distributed indexers, the data in the subgraph may lag slightly behind the data in the on-chain network.
+
 [Implementation example](./src/rewardsSubgraph.ts)
 
 Information about the user’s rewards can be obtained from off-chain using SDK without the need for calculation using a formula.
@@ -242,6 +245,9 @@ return totalAPR / rewards.length;
 ##### Requirements:
 
 - The Graph API key
+
+> **_NOTE:_** The subgraph deployed on The Graph Decentralized Network. The subgraph data is indexed and served by independent indexers on the network. Therefore, the performance of the subgraph may depend on the indexer selected at the time of the request.
+> Also, due to distributed indexers, the data in the subgraph may lag slightly behind the data in the on-chain network.
 
 [Implementation example](./src/averageAPRbySubgraph.ts)
 
