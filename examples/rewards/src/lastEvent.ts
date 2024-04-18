@@ -35,16 +35,16 @@ const main = async () => {
   if (!lastEventData) return;
 
   // Calculation of the user's balance in stETH before the event
-  const oldBalanceStETH =
+  const preBalanceStETH =
     (balanceInShares * lastEventData.preTotalEther) /
     lastEventData.preTotalShares;
   // Calculation of the user's balance in stETH after the event
-  const newBalanceStETH =
+  const postBalanceStETH =
     (balanceInShares * lastEventData.postTotalEther) /
     lastEventData.postTotalShares;
 
   // Calculate user's updated balance per Rebase event
-  const rewardsInStETH = newBalanceStETH - oldBalanceStETH;
+  const rewardsInStETH = postBalanceStETH - preBalanceStETH;
 
   console.log('rewardsInStETH', rewardsInStETH);
 };

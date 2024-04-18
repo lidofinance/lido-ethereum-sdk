@@ -80,12 +80,12 @@ async function calculateRewards(logs) {
     lastRebaseEvent?.args;
 
   // Calculation of the user's balance in stETH before the event
-  const oldBalanceStETH = (balanceInShares * preTotalEther) / preTotalShares;
+  const preBalanceStETH = (balanceInShares * preTotalEther) / preTotalShares;
   // Calculation of the user's balance in stETH after the event
   const postBalanceStETH = (balanceInShares * postTotalEther) / postTotalShares;
 
   // Calculate user's updated balance per Rebase event
-  const rewardsInStETH = postBalanceStETH - oldBalanceStETH;
+  const rewardsInStETH = postBalanceStETH - preBalanceStETH;
 }
 ```
 
@@ -116,12 +116,12 @@ const { preTotalShares, preTotalEther, postTotalShares, postTotalEther } =
 // User's balance in shares before the event
 const balanceInShares = await lidoSDK.shares.balance(address); // for example, the value can be taken from the database
 // Calculation of the user's balance in stETH before the event
-const oldBalanceStETH = (balanceInShares * preTotalEther) / preTotalShares;
+const preBalanceStETH = (balanceInShares * preTotalEther) / preTotalShares;
 // Calculation of the user's balance in stETH after the event
 const postBalanceStETH = (balanceInShares * postTotalEther) / postTotalShares;
 
 // Calculate user's updated balance per Rebase event
-const rewardsInStETH = postBalanceStETH - oldBalanceStETH;
+const rewardsInStETH = postBalanceStETH - preBalanceStETH;
 ```
 
 ### Retrieve reward history for the chosen account using the event logs (recommended)
