@@ -1,9 +1,48 @@
-# Step by step guide to calculate rewards for Rebase event
+# Integration Guide: Managing stETH Rewards with SDK
 
-Although user-friendly, stETH rebases add a whole level of complexity to integrating stETH into other dApps and protocols.
-Therefore, SDK has prepared several options for obtaining information about user rewards. This can be convenient when, for some reason, it is not possible to recalculate user balances through the mechanism of the stETH token itself
+## Introduction
 
-## Subscribe Rebase event
+stETH is a [rebaseable ERC-20 token](https://docs.lido.fi/guides/lido-tokens-integration-guide/#what-is-steth) that represents ether staked with Lido.
+The integration of stETH into decentralized applications (dApps) and protocols introduces a layer of complexity due to its rebasing mechanism. While stETH is designed to be user-friendly, incorporating it into various platforms requires careful consideration of reward distribution.
+
+## Approach
+
+To address the complexities associated with stETH rebases, the SDK offers alternative methods for retrieving user reward information. This is particularly useful in scenarios where recalculating user balances directly through the stETH token mechanism is not feasible.
+
+## Accounting Model
+
+The proposed approach involves maintaining an accounting model based on stETH shares rather than stETH balances. This model relies on tracking the collective account balance in shares, allowing participants to join and leave with precise share amounts, thus ensuring accurate reward distribution.
+
+## Implementation Details
+
+Token shares are managed at the contract level, with dedicated methods for handling share-related operations. Detailed documentation on these methods can be found in the [shares-related methods](https://docs.lido.fi/contracts/lido/#shares-related-methods) section.
+
+## Usage
+
+For developers looking to integrate stETH rewards management into their applications, the Lido Ethereum SDK offers comprehensive interfaces and methods for shares and rewards estimation. Detailed examples and usage guidelines are provided in the [Lido Ethereum SDK documentation](../../packages/sdk/README.md).
+
+By adopting this approach and leveraging the capabilities of the SDK, developers can effectively manage stETH rewards within their applications, ensuring a seamless user experience despite the complexities of the underlying rebasing mechanism.
+
+---
+
+> **_NOTE:_** Due to possibility of rounding errors during shares -> stETH conversion, events-based approach described below is intended for display purposes mostly, bookkeeping should be based on the stETH token shares. See also [1](https://docs.lido.fi/guides/lido-tokens-integration-guide/#1-2-wei-corner-case), [2](https://github.com/lidofinance/lido-dao/issues/442).
+
+The [Lido Ethereum SDK](../../packages/sdk/README.md) has the full set of features in this regard:
+
+- [estimating APR](../../packages/sdk/README.md#getlastapr) for the latest token rebase.
+- [calculating average APR](../../packages/sdk/README.md#getsmaapr) over a selected period.
+- [last rebase event](../../packages/sdk/README.md#getlastrebaseevent) (contains share rate)
+- [first rebase event](../../packages/sdk/README.md#getfirstrebaseevent) starting from the reference point in the past
+- [get last N](../../packages/sdk/README.md#getlastrebaseevents) rebase events
+- [get all rebase events](../../packages/sdk/README.md#getrebaseevents) for the last N days
+- assessing specific rewards accrued over a chosen period by an address
+  - [On-chain](../../packages/sdk/README.md#get-rewards-from-chain)
+  - [Subgraph](../../packages/sdk/README.md#get-rewards-from-subgraph)
+- work with [user balances](../../packages/sdk/README.md#shares) based on stETH shares
+
+## Code Examples
+
+### Subscribe Rebase event
 
 [Implementation example](./src/sabscribeEvent.ts)
 
@@ -43,15 +82,15 @@ async function calculateRewards(logs) {
   // Calculation of the user's balance in stETH before the event
   const oldBalanceStETH = (oldBalanceInShares * preTotalEther) / preTotalShares;
   // Calculation of the user's balance in stETH after the event
-  const newBalanceStETH =
+  const postBalanceStETH =
     (oldBalanceInShares * postTotalEther) / postTotalShares;
 
-  // Calculate the user's reward for Rebase Event
-  const rewardsInStETH = newBalanceStETH - oldBalanceStETH;
+  // Calculate user's updated balance per Rebase event
+  const rewardsInStETH = postBalanceStETH - oldBalanceStETH;
 }
 ```
 
-## Last Rebase event
+### Last Rebase event
 
 [Implementation example](./src/lastEvent.ts)
 
@@ -75,18 +114,19 @@ const lastRebaseEvent = await sdk.events.stethEvents.getLastRebaseEvent();
 const { preTotalShares, preTotalEther, postTotalShares, postTotalEther } =
   lastRebaseEvent?.args;
 
-// User's balance in balls before the event
+// User's balance in shares before the event
 const oldBalanceInShares = await lidoSDK.shares.balance(address); // for example, the value can be taken from the database
 // Calculation of the user's balance in stETH before the event
 const oldBalanceStETH = (oldBalanceInShares * preTotalEther) / preTotalShares;
 // Calculation of the user's balance in stETH after the event
-const newBalanceStETH = (oldBalanceInShares * postTotalEther) / postTotalShares;
+const postBalanceStETH =
+  (oldBalanceInShares * postTotalEther) / postTotalShares;
 
-// Calculate the user's reward for rebasing
-const rewardsInStETH = newBalanceStETH - oldBalanceStETH;
+// Calculate user's updated balance per Rebase event
+const rewardsInStETH = postBalanceStETH - oldBalanceStETH;
 ```
 
-## Calculating rewards from on-chain without using the formula
+### Calculating rewards from on-chain without using the formula
 
 [Implementation example](./src/rewardsOnChain.ts)
 
@@ -106,7 +146,7 @@ const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
 });
 ```
 
-## Calculating information about rewards from subgraph without using the formula
+### Calculating information about rewards from subgraph without using the formula
 
 [Implementation example](./src/rewardsSubgraph.ts)
 
