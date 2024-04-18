@@ -26,6 +26,12 @@ export const expectRewardsSnapshot = async (
   expect(chainId).toBe(chain);
   const chainRewards = await sdk.getRewardsFromChain(params);
   expectRewardsResult(chainRewards, params);
+
+  // filter out native events objs
+  // because some ETH clients can eject extra properties
+  chainRewards.rewards.forEach((reward) => {
+    delete (reward as any).originalEvent;
+  });
   expect(chainRewards).toMatchSnapshot('-chain');
 
   if (subgraphUrl) {
@@ -37,7 +43,9 @@ export const expectRewardsSnapshot = async (
     });
     expectRewardsResult(subgraphRewards, params);
     expect(subgraphRewards).toMatchSnapshot(
-      { lastIndexedBlock: expect.any(BigInt) },
+      {
+        lastIndexedBlock: expect.any(BigInt),
+      },
       '--graph',
     );
 
