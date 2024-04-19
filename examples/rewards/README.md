@@ -270,15 +270,15 @@ const rewardsQuery = await lidoSDK.rewards.getRewardsFromSubgraph({
   address: rewardsAddress,
   blocksBack: 10000,
   stepEntities: 500, // defaults to 1000, max entities per one request to endpoint
+  includeOnlyRebases: true,
   getSubgraphUrl(graphId, chainId) {
     return `https://gateway.thegraph.com/api/${apiKey}/subgraphs/id/${id}`;
   },
 });
-const totalAPR = rewardsQuery.rewards.reduce((acc: number, reward: any) => {
-  if (!reward.apr) return acc;
-
-  return acc + reward.apr;
-}, 0);
+const totalAPR = rewardsQuery.rewards.reduce(
+  (acc: number, reward: any) => acc + reward.apr,
+  0,
+);
 
 return totalAPR / rewards.length;
 ```
