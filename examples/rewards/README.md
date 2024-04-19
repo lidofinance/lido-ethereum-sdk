@@ -1,19 +1,24 @@
-# Integration Guide: Managing stETH Rewards with SDK
+# Case study: stETH rewards accounting with SDK
 
 ## Introduction
 
 stETH is a [rebaseable ERC-20 token](https://docs.lido.fi/guides/lido-tokens-integration-guide/#what-is-steth) that represents ether staked with Lido.
-The integration of stETH into decentralized applications (dApps) and protocols introduces a layer of complexity due to its rebasing mechanism. While stETH is designed to be user-friendly, incorporating it into various platforms requires careful consideration of reward distribution.
+
+The integration of stETH into decentralized applications (dApps), protocols, CEXes, and custodian services, have additional requirements and considerations due to its rebasing mechanism.
+
+While stETH is designed to have the best UX for users (e.g., representing their staked ether amount at the moment with the balance), incorporating it into various platforms requires careful consideration of the reward attribution approaches.
 
 ## Approach
 
-To address the complexities associated with stETH rebases, the SDK offers alternative methods for retrieving user reward information. This is particularly useful in scenarios where recalculating user balances directly through the stETH token mechanism is not feasible.
+The SDK offers several methods for retrieving reward information.
 
-## Accounting Model
+This is particularly useful in scenarios where recalculating user balances directly through the stETH token mechanism is not feasible.
 
-The proposed approach involves maintaining an accounting model based on stETH shares rather than stETH balances. This model relies on tracking the collective account balance in shares, allowing participants to join and leave with precise share amounts, thus ensuring accurate reward distribution.
+## Accounting model
 
-## Implementation Details
+The proposed approach involves maintaining an accounting model based on stETH [shares](https://docs.lido.fi/guides/lido-tokens-integration-guide#bookkeeping-shares) rather than stETH balances. This model relies on tracking the individual account balance in shares. The same accounting model of shares is applicable for collective accounts (used for CEXes and custodian services), allowing participants to join and leave with precise share amounts, thus ensuring accurate reward attribution.
+
+## Implementation notes
 
 Token shares are managed at the contract level, with dedicated methods for handling share-related operations. Detailed documentation on these methods can be found in the [shares-related methods](https://docs.lido.fi/contracts/lido/#shares-related-methods) section.
 
@@ -25,7 +30,7 @@ By adopting this approach and leveraging the capabilities of the SDK, developers
 
 ---
 
-> **_NOTE:_** Due to possibility of rounding errors during shares -> stETH conversion, events-based approach described below is intended for display purposes mostly, bookkeeping should be based on the stETH token shares. See also [1](https://docs.lido.fi/guides/lido-tokens-integration-guide/#1-2-wei-corner-case), [2](https://github.com/lidofinance/lido-dao/issues/442).
+> **_NOTE:_** Due to possibility of rounding errors on shares -> stETH conversion, events-based approach described below is intended for display purposes mostly, bookkeeping should be based on the stETH token shares. See also [1](https://docs.lido.fi/guides/lido-tokens-integration-guide/#1-2-wei-corner-case), [2](https://github.com/lidofinance/lido-dao/issues/442).
 
 The [Lido Ethereum SDK](../../packages/sdk/README.md) has the full set of features in this regard:
 
@@ -42,9 +47,9 @@ The [Lido Ethereum SDK](../../packages/sdk/README.md) has the full set of featur
 
 ## Code Examples
 
-### Subscribe on the stETH token rebase events to account for account balance changes
+### Subscribe on the stETH token rebase events to track rewards updates
 
-#### Requirements:
+#### Requirements
 
 - RPC provider
 
@@ -93,9 +98,9 @@ async function calculateRewards(logs) {
 }
 ```
 
-### Get rewards accrued with the latest stETH token rebase for the particular account
+### Get rewards accrued with the latest stETH token rebase for the chosen account
 
-#### Requirements:
+#### Requirements
 
 - RPC provider
 
@@ -132,9 +137,9 @@ const postBalanceStETH = (balanceInShares * postTotalEther) / postTotalShares;
 const rewardsInStETH = postBalanceStETH - preBalanceStETH;
 ```
 
-### Retrieve reward history for the particular account using the event logs (recommended)
+### Retrieve reward history for the chosen account using the event logs (recommended)
 
-#### Requirements:
+#### Requirements
 
 - RPC provider (full node)
 
@@ -166,9 +171,9 @@ const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
 });
 ```
 
-### Retrieve reward history for the particular account using the Subgraph indexer (alternative way)
+### Retrieve reward history for the chosen account using the Subgraph indexer (alternative way)
 
-#### Requirements:
+#### Requirements
 
 - The Graph API key
 
@@ -205,13 +210,13 @@ const rewardsQuery = await lidoSDK.rewards.getRewardsFromSubgraph({
 });
 ```
 
-### Calculate the effective APR for the address concerning the given period
+### Calculate the effective APR for the chosen account concerning the given period
 
 #### On-chain
 
 [Implementation example](./src/averageAPRbyOnChain.ts)
 
-##### Requirements:
+##### Requirements
 
 - RPC provider (full node)
 
@@ -242,7 +247,7 @@ return totalAPR / rewards.length;
 
 #### Subgraph
 
-##### Requirements:
+##### Requirements
 
 - The Graph API key
 
@@ -277,11 +282,11 @@ const totalAPR = rewardsQuery.rewards.reduce((acc: number, reward: any) => {
 return totalAPR / rewards.length;
 ```
 
-### Keep track of rewards accrued for the set of addresses
+### Keep track of rewards accrued for the set of accounts
 
 #### By subscribing to the `TokenRebased` event
 
-#### Requirements:
+#### Requirements
 
 - RPC provider
 
@@ -340,7 +345,7 @@ async function calculateRewards(logs) {
 
 #### By last `TokenRebased` event
 
-#### Requirements:
+#### Requirements
 
 - RPC provider
 
