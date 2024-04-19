@@ -16,6 +16,7 @@ The proposed approach involves maintaining an accounting model based on stETH sh
 ## Implementation Details
 
 Token shares are managed at the contract level, with dedicated methods for handling share-related operations. Detailed documentation on these methods can be found in the [shares-related methods](https://docs.lido.fi/contracts/lido/#shares-related-methods) section.
+You can also use [SDK methods](../../packages/sdk/README.md#shares) to work with users’ shares directly.
 
 ## Usage
 
@@ -48,7 +49,7 @@ The [Lido Ethereum SDK](../../packages/sdk/README.md) has the full set of featur
 
 - RPC provider
 
-[Implementation example](./src/sabscribeEvent.ts)
+[Implementation example](./src/subscribeToEvent.ts)
 
 For the convenience of calculating user balances, it is proposed to use [`Shares`](https://docs.lido.fi/guides/lido-tokens-integration-guide#steth-internals-share-mechanics)
 
@@ -88,7 +89,7 @@ async function calculateRewards(logs) {
   // Calculation of the user's balance in stETH after the event
   const postBalanceStETH = (balanceInShares * postTotalEther) / postTotalShares;
 
-  // Calculate user's updated balance per Rebase event
+  // Calculate user's balance change per Rebase event
   const rewardsInStETH = postBalanceStETH - preBalanceStETH;
 }
 ```
@@ -128,7 +129,7 @@ const preBalanceStETH = (balanceInShares * preTotalEther) / preTotalShares;
 // Calculation of the user's balance in stETH after the event
 const postBalanceStETH = (balanceInShares * postTotalEther) / postTotalShares;
 
-// Calculate user's updated balance per Rebase event
+// Calculate user's balance change per Rebase event
 const rewardsInStETH = postBalanceStETH - preBalanceStETH;
 ```
 
@@ -230,12 +231,12 @@ const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
   back: {
     days: 1n,
   },
+  includeOnlyRebases: true,
 });
-const totalAPR = rewardsQuery.rewards.reduce((acc: number, reward: any) => {
-  if (!reward.apr) return acc;
-
-  return acc + reward.apr;
-}, 0);
+const totalAPR = rewardsQuery.rewards.reduce(
+  (acc: number, reward: any) => acc + reward.apr,
+  0,
+);
 
 return totalAPR / rewards.length;
 ```
@@ -332,7 +333,7 @@ async function calculateRewards(logs) {
     // Calculation of the user's balance in stETH after the event
     const postBalanceStETH = (balance * postTotalEther) / postTotalShares;
 
-    // Calculate user's updated balance per Rebase event
+    // Calculate user's balance change per Rebase event
     return postBalanceStETH - preBalanceStETH;
   });
 }
@@ -372,7 +373,7 @@ const balancesUpdate = balanceInShares.map((balance) => {
   // Calculation of the user's balance in stETH after the event
   const postBalanceStETH = (balance * postTotalEther) / postTotalShares;
 
-  // Calculate user's updated balance per Rebase event
+  // Calculate user's balance change per Rebase event
   return postBalanceStETH - preBalanceStETH;
 });
 ```

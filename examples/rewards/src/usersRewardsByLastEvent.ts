@@ -52,7 +52,7 @@ const calcBalancesUpdate = async (
     // Calculation of the user's balance in stETH after the event
     const postBalanceStETH = (balance * postTotalEther) / postTotalShares;
 
-    // Calculate user's updated balance per Rebase event
+    // Calculate user's balance change per Rebase event
     return postBalanceStETH - preBalanceStETH;
   });
 

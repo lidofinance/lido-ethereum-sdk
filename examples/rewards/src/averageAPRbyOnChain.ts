@@ -22,6 +22,7 @@ const getRewardsOnChain = async (): Promise<GetRewardsFromChainResult> => {
     back: {
       days: 1n,
     },
+    includeOnlyRebases: true,
   });
 
   return rewardsQuery;
@@ -29,11 +30,10 @@ const getRewardsOnChain = async (): Promise<GetRewardsFromChainResult> => {
 
 const getAverageAPR = async () => {
   const rewards = (await getRewardsOnChain()).rewards;
-  const totalAPR = rewards.reduce((acc: number, reward: any) => {
-    if (!reward.apr) return acc;
-
-    return acc + reward.apr;
-  }, 0);
+  const totalAPR = rewards.reduce(
+    (acc: number, reward: any) => acc + reward.apr,
+    0,
+  );
 
   return totalAPR / rewards.length;
 };
