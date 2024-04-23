@@ -52,6 +52,8 @@ import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import { LidoSDKStake } from '@lidofinance/lido-ethereum-sdk/stake';
 ```
 
+✨ See also the [examples](./examples/Examples.md) provided for some more real-life applications.
+
 ## Initialization
 
 Before using the SDK, you need to create an instance of the LidoSDK class:
