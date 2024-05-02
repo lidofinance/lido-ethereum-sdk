@@ -5,6 +5,7 @@ import {
   decodeEventLog,
   getAbiItem,
   getEventSelector,
+  isAddressEqual,
 } from 'viem';
 
 import type {
@@ -40,7 +41,6 @@ import type {
   StakeResult,
 } from './types.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
-import { addressEqual } from '../common/utils/address-equal.js';
 
 export class LidoSDKStake extends LidoSDKModule {
   // Precomputed event signatures
@@ -188,12 +188,12 @@ export class LidoSDKStake extends LidoSDKModule {
       });
       if (
         parsedLog.eventName === 'Transfer' &&
-        addressEqual(parsedLog.args.to, address)
+        isAddressEqual(parsedLog.args.to, address)
       ) {
         stethReceived = parsedLog.args.value;
       } else if (
         parsedLog.eventName === 'TransferShares' &&
-        addressEqual(parsedLog.args.to, address)
+        isAddressEqual(parsedLog.args.to, address)
       ) {
         sharesReceived = parsedLog.args.sharesValue;
       }
