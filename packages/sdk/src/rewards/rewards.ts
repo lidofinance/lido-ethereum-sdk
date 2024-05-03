@@ -4,6 +4,7 @@ import {
   type PublicClient,
   getContract,
   zeroAddress,
+  isAddressEqual,
 } from 'viem';
 import { Logger, ErrorHandler, Cache } from '../common/decorators/index.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
@@ -31,7 +32,6 @@ import {
   getTotalRewards,
   getTransfers,
 } from './subgraph/index.js';
-import { addressEqual } from '../common/utils/address-equal.js';
 import { getInitialData } from './subgraph/index.js';
 import { calcShareRate, requestWithBlockStep, sharesToSteth } from './utils.js';
 import {
@@ -193,12 +193,14 @@ export class LidoSDKRewards extends LidoSDKModule {
           changeShares: Reward<RewardsChainEvents>['changeShares'],
           balanceShares: Reward<RewardsChainEvents>['balanceShares'];
 
-        if (to === address) {
-          type = from === zeroAddress ? 'submit' : 'transfer_in';
+        if (isAddressEqual(to, address)) {
+          type = isAddressEqual(from, zeroAddress) ? 'submit' : 'transfer_in';
           balanceShares = prevSharesBalance + sharesValue;
           changeShares = sharesValue;
         } else {
-          type = to === withdrawalQueueAddress ? 'withdrawal' : 'transfer_out';
+          type = isAddressEqual(to, withdrawalQueueAddress)
+            ? 'withdrawal'
+            : 'transfer_out';
           balanceShares = prevSharesBalance - sharesValue;
           changeShares = -sharesValue;
         }
@@ -338,10 +340,10 @@ export class LidoSDKRewards extends LidoSDKModule {
         sharesAfterDecrease,
         sharesAfterIncrease,
       } = initialTransfer;
-      if (addressEqual(to, address)) {
+      if (isAddressEqual(to as Address, address)) {
         prevBalanceShares = BigInt(sharesAfterIncrease);
         prevBalance = BigInt(balanceAfterIncrease);
-      } else if (addressEqual(from, address)) {
+      } else if (isAddressEqual(from as Address, address)) {
         prevBalanceShares = BigInt(sharesAfterDecrease);
         prevBalance = BigInt(balanceAfterDecrease);
       }
@@ -393,14 +395,16 @@ export class LidoSDKRewards extends LidoSDKModule {
           change: Reward<RewardsSubgraphEvents>['change'],
           balance: Reward<RewardsSubgraphEvents>['balance'];
 
-        if (addressEqual(to, address)) {
-          type = from === zeroAddress ? 'submit' : 'transfer_in';
+        if (isAddressEqual(to as Address, address)) {
+          type = isAddressEqual(from as Address, zeroAddress)
+            ? 'submit'
+            : 'transfer_in';
           changeShares = BigInt(shares);
           balanceShares = BigInt(sharesAfterIncrease);
           change = BigInt(value);
           balance = BigInt(balanceAfterIncrease);
         } else {
-          type = addressEqual(to, withdrawalQueueAddress)
+          type = isAddressEqual(to as Address, withdrawalQueueAddress)
             ? 'withdrawal'
             : 'transfer_out';
           balance = BigInt(balanceAfterDecrease);

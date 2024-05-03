@@ -1,3 +1,11 @@
+# 3.2.1
+
+## SDK
+
+### Fixed
+
+- fixed edge-cases in `getRewardsFromChain` and `getRewardsFromSubgraph` sometimes causing transfer events to be wronged and leading to negative balance
+
 # 3.2.0
 
 ## SDK

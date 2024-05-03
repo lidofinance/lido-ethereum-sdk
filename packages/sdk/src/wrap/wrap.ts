@@ -10,6 +10,7 @@ import {
   decodeEventLog,
   getAbiItem,
   getEventSelector,
+  isAddressEqual,
 } from 'viem';
 
 import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
@@ -37,7 +38,6 @@ import {
 } from './abi/steth-partial.js';
 import { ERROR_CODE, invariant } from '../common/utils/sdk-error.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
-import { addressEqual } from '../common/utils/address-equal.js';
 
 export class LidoSDKWrap extends LidoSDKModule {
   private static TRANSFER_SIGNATURE = getEventSelector(
@@ -397,9 +397,9 @@ export class LidoSDKWrap extends LidoSDKModule {
         strict: true,
         ...log,
       });
-      if (addressEqual(parsedLog.args.to, address)) {
+      if (isAddressEqual(parsedLog.args.to, address)) {
         wstethReceived = parsedLog.args.value;
-      } else if (addressEqual(parsedLog.args.to, wstethAddress)) {
+      } else if (isAddressEqual(parsedLog.args.to, wstethAddress)) {
         stethWrapped = parsedLog.args.value;
       }
     }
@@ -434,9 +434,9 @@ export class LidoSDKWrap extends LidoSDKModule {
         strict: true,
         ...log,
       });
-      if (addressEqual(parsedLog.args.from, address)) {
+      if (isAddressEqual(parsedLog.args.from, address)) {
         wstethUnwrapped = parsedLog.args.value;
-      } else if (addressEqual(parsedLog.args.to, address)) {
+      } else if (isAddressEqual(parsedLog.args.to, address)) {
         stethReceived = parsedLog.args.value;
       }
     }
