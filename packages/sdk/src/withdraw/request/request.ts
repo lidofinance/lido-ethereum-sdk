@@ -31,14 +31,14 @@ import {
   encodeFunctionData,
   formatEther,
   getAbiItem,
-  toEventSignature,
+  toEventHash,
 } from 'viem';
 import { parseValue } from '../../common/utils/parse-value.js';
 import { PartialWithdrawalQueueEventsAbi } from '../abi/withdrawalQueue.js';
 
 export class LidoSDKWithdrawRequest extends BusModule {
   // Precomputed event signatures
-  private static WITHDRAW_SIGNATURE = toEventSignature(
+  private static WITHDRAW_SIGNATURE = toEventHash(
     getAbiItem({
       abi: PartialWithdrawalQueueEventsAbi,
       name: 'WithdrawalRequested',

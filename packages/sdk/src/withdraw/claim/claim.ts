@@ -3,7 +3,7 @@ import {
   TransactionReceipt,
   decodeEventLog,
   getAbiItem,
-  toEventSignature,
+  toEventHash,
 } from 'viem';
 
 import { Logger, ErrorHandler } from '../../common/decorators/index.js';
@@ -26,7 +26,7 @@ import { PartialWithdrawalQueueEventsAbi } from '../abi/withdrawalQueue.js';
 
 export class LidoSDKWithdrawClaim extends BusModule {
   // Precomputed event signatures
-  private static CLAIM_SIGNATURE = toEventSignature(
+  private static CLAIM_SIGNATURE = toEventHash(
     getAbiItem({
       abi: PartialWithdrawalQueueEventsAbi,
       name: 'WithdrawalClaimed',
