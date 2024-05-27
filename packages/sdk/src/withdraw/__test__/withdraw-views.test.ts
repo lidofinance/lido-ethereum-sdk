@@ -109,7 +109,7 @@ describe('withdraw views', () => {
       await contract.getContractWithdrawalQueue()
     ).read.getLastFinalizedRequestId();
 
-    expectSDKError(async () => {
+    await expectSDKError(async () => {
       await views.findCheckpointHints({
         sortedIds: [lastFinalizedRequestId + 1n],
       });
