@@ -19,8 +19,8 @@ import { useWeb3 } from '@reef-knot/web3-react';
 type ActionProps<TResult> = PropsWithChildren<{
   action: () => Promise<TResult> | TResult;
   title: string;
-  renderResult?: (result: TResult) => JSX.Element;
-  renderError?: (error: SDKError) => JSX.Element;
+  renderResult?: (result: TResult) => React.JSX.Element;
+  renderError?: (error: SDKError) => React.JSX.Element;
   walletAction?: boolean;
 }>;
 

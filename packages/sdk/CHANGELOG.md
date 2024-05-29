@@ -1,3 +1,14 @@
+# 3.2.2
+
+## SDK
+
+### Fixed
+
+- fixed edge-case in `withdraw.views.findCheckpointHints` where last finalized request would fail assertion with `Cannot find hints for unfinalized request...`
+- subsequently fixed same error in `withdraw.request-info`, `withdraw.claim` modules
+
+# 3.2.0
+
 # 3.2.1
 
 ## SDK

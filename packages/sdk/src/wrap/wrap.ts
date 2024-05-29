@@ -9,7 +9,7 @@ import {
   TransactionReceipt,
   decodeEventLog,
   getAbiItem,
-  getEventSelector,
+  toEventHash,
   isAddressEqual,
 } from 'viem';
 
@@ -40,7 +40,7 @@ import { ERROR_CODE, invariant } from '../common/utils/sdk-error.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 
 export class LidoSDKWrap extends LidoSDKModule {
-  private static TRANSFER_SIGNATURE = getEventSelector(
+  private static TRANSFER_SIGNATURE = toEventHash(
     getAbiItem({ abi: PartialTransferEventAbi, name: 'Transfer' }),
   );
 
