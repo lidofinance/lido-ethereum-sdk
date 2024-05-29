@@ -9,8 +9,9 @@
   "parserOptions": {
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "react"],
+  "plugins": ["@typescript-eslint", "react", "deprecation"],
   "rules": {
+    "deprecation/deprecation": "warn",
     "@typescript-eslint/require-await": "off",
     "react/display-name": "off",
     "@typescript-eslint/no-shadow": "off",

@@ -9,11 +9,13 @@ import { parseEther } from 'viem';
 import { useWrap } from '../../../tests/utils/fixtures/use-wrap.js';
 import { useAccount } from '../../../tests/utils/fixtures/use-wallet-client.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
+import { expectSDKError } from '../../../tests/utils/expect/expect-sdk-error.js';
+import { ERROR_CODE } from '../../common/index.js';
 
 describe('withdraw views', () => {
   const withdraw = useWithdraw();
   const wrap = useWrap();
-  const { views } = withdraw;
+  const { views, contract } = withdraw;
   const { address } = useAccount();
 
   const requestCount = 10;
@@ -85,6 +87,33 @@ describe('withdraw views', () => {
     for (const ether of ethers) {
       expectPositiveBn(ether);
     }
+  });
+
+  test('can findCheckpointHints for border requests', async () => {
+    const lastFinalizedRequestId = await (
+      await contract.getContractWithdrawalQueue()
+    ).read.getLastFinalizedRequestId();
+
+    const lastCheckpointIndex = await views.getLastCheckpointIndex();
+
+    const [checkpointFirst, checkpointLast] = await views.findCheckpointHints({
+      sortedIds: [1n, lastFinalizedRequestId],
+    });
+
+    expect(checkpointFirst).toEqual(1n);
+    expect(checkpointLast).toEqual(lastCheckpointIndex);
+  });
+
+  test('findCheckpointHints errors for unfinalized requests', async () => {
+    const lastFinalizedRequestId = await (
+      await contract.getContractWithdrawalQueue()
+    ).read.getLastFinalizedRequestId();
+
+    await expectSDKError(async () => {
+      await views.findCheckpointHints({
+        sortedIds: [lastFinalizedRequestId + 1n],
+      });
+    }, ERROR_CODE.INVALID_ARGUMENT);
   });
 
   test('can get withdrawal request ids and statues', async () => {

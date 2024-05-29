@@ -4,7 +4,7 @@ import {
   encodeFunctionData,
   decodeEventLog,
   getAbiItem,
-  getEventSelector,
+  toEventHash,
   isAddressEqual,
 } from 'viem';
 
@@ -44,10 +44,10 @@ import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 
 export class LidoSDKStake extends LidoSDKModule {
   // Precomputed event signatures
-  private static TRANSFER_SIGNATURE = getEventSelector(
+  private static TRANSFER_SIGNATURE = toEventHash(
     getAbiItem({ abi: StethEventsPartialAbi, name: 'Transfer' }),
   );
-  private static TRANSFER_SHARES_SIGNATURE = getEventSelector(
+  private static TRANSFER_SHARES_SIGNATURE = toEventHash(
     getAbiItem({ abi: StethEventsPartialAbi, name: 'TransferShares' }),
   );
   // Contracts

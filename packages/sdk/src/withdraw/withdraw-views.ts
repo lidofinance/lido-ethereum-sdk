@@ -58,7 +58,7 @@ export class LidoSDKWithdrawViews extends BusModule {
     for (let index = sortedIds.length - 1; index >= 0; index--) {
       const id = sortedIds[index];
       invariantArgument(
-        id && id < lastFinalizedRequestId,
+        id && id <= lastFinalizedRequestId,
         `Cannot find hints for unfinalized request ${id?.toString()}`,
       );
     }
