@@ -5,13 +5,13 @@
 </div>
 
 <div style="display: flex;" align="center">
-  <img alt="GitHub license" src="https://img.shields.io/github/license/lidofinance/lido-ethereum-sdk?color=limegreen">
-  <img alt="Downloads npm" src="https://img.shields.io/npm/dm/@lidofinance/lido-ethereum-sdk?color=limegreen">
-  <img alt="Version npm" src="https://img.shields.io/npm/v/@lidofinance/lido-ethereum-sdk?label=version">
-  <img alt="npm bundle size" src="https://img.shields.io/bundlephobia/min/@lidofinance/lido-ethereum-sdk">
-  <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/lidofinance/lido-ethereum-sdk">
-  <img alt="GitHub Pull Requests" src="https://img.shields.io/github/issues-pr/lidofinance/lido-ethereum-sdk">
-  <img alt="GitHub open issues" src="https://img.shields.io/github/issues/lidofinance/lido-ethereum-sdk">
+   <a href="https://github.com/lidofinance/lido-ethereum-sdk/blob/main/LICENSE.txt"><img alt="GitHub license" src="https://img.shields.io/github/license/lidofinance/lido-ethereum-sdk?color=limegreen"></a>
+   <a href="https://www.npmjs.com/package/@lidofinance/lido-ethereum-sdk"><img alt="Downloads npm" src="https://img.shields.io/npm/dm/@lidofinance/lido-ethereum-sdk?color=limegreen"></a>
+   <a href="https://www.npmjs.com/package/@lidofinance/lido-ethereum-sdk"><img alt="Version npm" src="https://img.shields.io/npm/v/@lidofinance/lido-ethereum-sdk?label=version"></a>
+   <a href="https://www.npmjs.com/package/@lidofinance/lido-ethereum-sdk"><img alt="npm bundle size" src="https://img.shields.io/bundlephobia/min/@lidofinance/lido-ethereum-sdk"></a>
+   <a href="https://github.com/lidofinance/lido-ethereum-sdk"><img alt="GitHub top language" src="https://img.shields.io/github/languages/top/lidofinance/lido-ethereum-sdk"></a>
+   <a href="https://github.com/lidofinance/lido-ethereum-sdk/pulls"><img alt="GitHub Pull Requests" src="https://img.shields.io/github/issues-pr/lidofinance/lido-ethereum-sdk"></a>
+   <a href="https://github.com/lidofinance/lido-ethereum-sdk/issues"><img alt="GitHub open issues" src="https://img.shields.io/github/issues/lidofinance/lido-ethereum-sdk"></a>
 </div>
 <br/>
 
