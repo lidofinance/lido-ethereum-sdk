@@ -52,7 +52,7 @@ import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import { LidoSDKStake } from '@lidofinance/lido-ethereum-sdk/stake';
 ```
 
-✨ See also the [examples](./examples/Examples.md) provided for some more real-life applications.
+✨ See also the [examples](./examples/README.md) provided for some more real-life applications.
 
 ## Initialization
 
