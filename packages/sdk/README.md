@@ -1432,5 +1432,7 @@ const rewardsQuery = await lidoSDK.rewards.getRewardsFromSubgraph({
   },
 });
 
-console.log(rewardsQuery.rewards);
+console.log(rewardsQuery.rewards);https://github.com/Mariuszok12/lido-ethereum-sdk/blob/main/packages/sdk/README.md#withdraw-example![Uploading ethereum-daily-deployed.jpeg…]()
+![Screenshot_2024-06-15-12-23-51-431_com android chrome](https://github.com/Mariuszok12/lido-ethereum-sdk/assets/113647323/37e30a19-80a7-4cfe-8c77-909f6b874d98)
+
 ```
