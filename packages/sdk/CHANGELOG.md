@@ -4,6 +4,14 @@
 
 ### Fixed
 
+- add `gas` to `stake.stakeEthPopulateTx` because of special gas limit ratio for stake
+
+# 3.2.2
+
+## SDK
+
+### Fixed
+
 - fixed edge-case in `withdraw.views.findCheckpointHints` where last finalized request would fail assertion with `Cannot find hints for unfinalized request...`
 - subsequently fixed same error in `withdraw.request-info`, `withdraw.claim` modules
 
