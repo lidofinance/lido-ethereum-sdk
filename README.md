@@ -88,7 +88,7 @@ Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address
 
 ## Examples
 
-All examples and usage instructions can be found in the [Docs SDK package](packages/sdk/README.md).
+All examples and usage instructions can be found in the [Docs SDK package](https://lidofinance.github.io/lido-ethereum-sdk/).
 
 ```ts
 const lidoSDK = new LidoSDK({
@@ -120,8 +120,8 @@ For breaking changes between versions see [MIGRATION.md](packages/sdk/MIGRATION.
 
 ## Documentation
 
-For additional information about available methods and functionality, refer to the [the documentation for the Lido Ethereum SDK](packages/sdk/README.md).
+For additional information about available methods and functionality, refer to the [the documentation for the Lido Ethereum SDK](https://lidofinance.github.io/lido-ethereum-sdk/).
 
 ## Playground
 
-To check out SDK in action visit [playground](https://lidofinance.github.io/lido-ethereum-sdk/). Or tinker locally by cloning this repo and following [Playground instructions](playground/README.md).
+To check out SDK in action visit [playground](https://lidofinance.github.io/lido-ethereum-sdk/playground). Or tinker locally by cloning this repo and following [Playground instructions](playground/README.md).
