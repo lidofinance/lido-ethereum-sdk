@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import { createPublicClient, http, Address } from 'viem';
 import { holesky } from 'viem/chains';

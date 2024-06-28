@@ -45,7 +45,7 @@ jobs:
           key: ${{ runner.os }}-nextjs-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
           # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
+            ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}--${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
@@ -64,10 +64,12 @@ jobs:
         run: yarn build:export
         env:
           NODE_NO_BUILD_DYNAMICS: true
+      - name: Move artifacts
+        run: mkdir -p ./apps && mkdir -p ./apps/playground && mv ./playground/out/* ./apps/playground && mv ./docs/build/* ./apps
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./playground/out
+          path: ./apps
 
   # Deployment job
   deploy:
