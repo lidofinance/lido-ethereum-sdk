@@ -13,7 +13,7 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@lidofinance/lido-ethereum-sdk": "workspace:^",
+    "@lidofinance/lido-ethereum-sdk": "workspace:*",
     "viem": "^2.0.6"
   },
   "devDependencies": {
