@@ -5081,7 +5081,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lidofinance/lido-ethereum-sdk@workspace:*, @lidofinance/lido-ethereum-sdk@workspace:^, @lidofinance/lido-ethereum-sdk@workspace:packages/sdk":
+"@lidofinance/lido-ethereum-sdk@workspace:*, @lidofinance/lido-ethereum-sdk@workspace:packages/sdk":
   version: 0.0.0-use.local
   resolution: "@lidofinance/lido-ethereum-sdk@workspace:packages/sdk"
   dependencies:
@@ -22882,7 +22882,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "rewards-examples@workspace:examples/rewards"
   dependencies:
-    "@lidofinance/lido-ethereum-sdk": "workspace:^"
+    "@lidofinance/lido-ethereum-sdk": "workspace:*"
     rimraf: ^5.0.5
     typescript: 5.1.6
     viem: ^2.0.6
