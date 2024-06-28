@@ -11,7 +11,7 @@ const config: Config = {
   // Set the production url of your site here
   url: 'https://lidofinance.github.io/',
 
-  baseUrl: '/',
+  baseUrl: '/lido-ethereum-sdk/',
   organizationName: 'lidofinance',
   projectName: 'lido-ethereum-sdk',
 
