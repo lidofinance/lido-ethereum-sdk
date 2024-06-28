@@ -4,4 +4,8 @@ module.exports = {
     project: ['./tsconfig.json', './tsconfig.build.json'],
     tsconfigRootDir: __dirname,
   },
+  rules: {
+    'no-console': 'off',
+    'import/no-unresolved': 'off',
+  },
 };
