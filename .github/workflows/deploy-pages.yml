@@ -47,7 +47,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}--${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
 
       - name: Build
         run: yarn build
