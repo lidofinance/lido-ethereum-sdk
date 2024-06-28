@@ -31,7 +31,7 @@ For changes between versions see [CHANGELOG.MD](packages/sdk/CHANGELOG.md)
 
 You can install the Lido Ethereum SDK using npm or yarn:
 
-[Docs SDK package](packages/sdk/README.md)
+[Docs SDK package](https://lidofinance.github.io/lido-ethereum-sdk/)
 
 ```bash
 // SDK (stakes, wrap, withdrawals)
