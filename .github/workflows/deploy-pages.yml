@@ -59,7 +59,7 @@ jobs:
           WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
           SUPPORTED_CHAINS: ${{ vars.SUPPORTED_CHAINS }}
           DEFAULT_CHAIN: ${{ vars.DEFAULT_CHAIN }}
-          BASE_PATH: ${{ steps.config_pages.outputs.base_path }}
+          BASE_PATH: ${{ steps.config_pages.outputs.base_path }}/playground
       - name: Export
         run: yarn build:export
         env:
