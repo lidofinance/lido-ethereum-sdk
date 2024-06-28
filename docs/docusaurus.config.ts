@@ -75,7 +75,7 @@ const config: Config = {
         },
         { to: '/examples/intro', label: 'Examples', position: 'left' },
         {
-          to: '/playground',
+          href: '/playground',
           label: 'Playground',
           position: 'left',
           target: '_blank',

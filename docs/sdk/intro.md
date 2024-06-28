@@ -20,8 +20,6 @@ For changes between versions see [CHANGELOG.MD](https://github.com/lidofinance/l
 
 You can install the Lido Ethereum SDK using npm or yarn:
 
-[Docs SDK package](https://github.com/lidofinance/lido-ethereum-sdk/blob/main/packages/sdk/README.md)
-
 ```bash
 // SDK (stakes, wrap, withdrawals)
 yarn add @lidofinance/lido-ethereum-sdk
@@ -41,7 +39,7 @@ import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import { LidoSDKStake } from '@lidofinance/lido-ethereum-sdk/stake';
 ```
 
-✨ See also the [examples](https://github.com/lidofinance/lido-ethereum-sdk/blob/main/examples/README.md) provided for some more real-life applications.
+✨ See also the [examples](/examples/intro) provided for some more real-life applications.
 
 ## Initialization
 
@@ -75,9 +73,9 @@ const sdk = new LidoSDK({
 
 Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address of your Ethereum provider.
 
-## Examples
+## Example
 
-All examples and usage instructions can be found in the [Docs SDK package](https://github.com/lidofinance/lido-ethereum-sdk/blob/main/packages/sdk/README.md).
+Basic examples and usage instructions can be found in [here](/category/get-started).
 
 ```ts
 const lidoSDK = new LidoSDK({
@@ -109,8 +107,8 @@ For breaking changes between versions see [MIGRATION.md](https://github.com/lido
 
 ## Documentation
 
-For additional information about available methods and functionality, refer to the [the documentation for the Lido Ethereum SDK](https://github.com/lidofinance/lido-ethereum-sdk/blob/main/packages/sdk/README.md).
+For additional information about available methods and functionality, refer to the [the documentation for the Lido Ethereum SDK](/category/methods).
 
 ## Playground
 
-To check out SDK in action visit [playground](https://lidofinance.github.io/lido-ethereum-sdk/). Or tinker locally by cloning this repo and following [Playground instructions](https://github.com/lidofinance/lido-ethereum-sdk/blob/main/playground/README.md).
+To check out SDK in action visit [playground](https://lidofinance.github.io/lido-ethereum-sdk/playground). Or tinker locally by cloning this repo and following [Playground instructions](https://github.com/lidofinance/lido-ethereum-sdk/blob/main/playground/README.md).
