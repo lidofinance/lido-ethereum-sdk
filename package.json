@@ -55,7 +55,8 @@
   "workspaces": [
     "packages/*",
     "playground",
-    "examples/*"
+    "examples/*",
+    "docs"
   ],
   "release": {
     "branches": [
