@@ -76,7 +76,7 @@ For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
   - [APR](#apr)
 - [Lido events](#lido-events)
   - [Rebase](#rebase)
-- [Rewards](#Rewards)
+- [Rewards](#rewards)
 
 ## Installation
 
@@ -655,7 +655,7 @@ try {
   });
 
   console.log(
-     'transaction hash, transaction receipt, confirmations',
+    'transaction hash, transaction receipt, confirmations',
     requestResult,
     'array of requests(nfts) created with ids, amounts,creator, owner',
     request.results.requests,
@@ -1059,7 +1059,6 @@ try {
   - `status` (Type: WaitingTimeStatus): Status of withdrawal request.
   - `nextCalculationAt` (Type: string): Time when next calculation can be changed.
 
-
 ## (w)stETH
 
 stETH and wstETH tokens functionality is presented trough modules with same ERC20 interface that exposes balances, allowances, transfers and ERC2612 permits signing.
@@ -1351,11 +1350,11 @@ This module allows you to query historical rewards data for given address via ch
 ### Common Options
 
 - **address** - (Type: Address) address of an account you want to query rewards for
-- **to** (Type: [`blockType`](#`getRebaseEvents`)) defaults to `{block: "latest"}`, upper bound for query
+- **to** (Type: [`blockType`](#getrebaseevents)) defaults to `{block: "latest"}`, upper bound for query
 
-- **from** (Type: [`blockType`](#`getRebaseEvents`)) lower bound for query
+- **from** (Type: [`blockType`](#getrebaseevents)) lower bound for query
   or
-- **back** (Type: [`backType`](#`getRebaseEvents`)) alternative way to define lower bound relative to `to`
+- **back** (Type: [`backType`](#getrebaseevents)) alternative way to define lower bound relative to `to`
 
 - **includeZeroRebases** [default: `false` ] - include rebase events when users had no rewards(because of empty balance)
 - **includeOnlyRewards** [default: `false` ] - include only rebase events

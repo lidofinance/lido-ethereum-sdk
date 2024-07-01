@@ -16,7 +16,7 @@ jobs:
           cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
 
       - name: Check Lint
         run: yarn lint
