@@ -10,7 +10,12 @@ permissions:
   id-token: write # to enable use of OIDC for npm provenance
 
 jobs:
+  pre-publish:
+    uses: ./.github/workflows/publish-dry-run.yml
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   publish:
+    needs: pre-publish
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -44,7 +49,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish
-        run: yarn multi-semantic-release --deps.bump=override --deps.release=patch --sequential-init
+        run: yarn multi-semantic-release
         env:
           NPM_CONFIG_PROVENANCE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
