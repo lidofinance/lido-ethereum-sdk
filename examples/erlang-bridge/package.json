@@ -1,0 +1,14 @@
+{
+  "name": "erlang-bridge-examples",
+  "packageManager": "yarn@3.6.3",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build:erlang": "erlc src/**/main.erl",
+    "build:rebar": "rebar3 get-deps && rebar3 compile"
+  },
+  "dependencies": {
+    "@lidofinance/lido-ethereum-sdk": "workspace:*",
+    "viem": "^2.0.6"
+  }
+}
