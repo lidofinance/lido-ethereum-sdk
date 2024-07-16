@@ -7,30 +7,34 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { WalletsModalForEth } from 'reef-knot/connect-wallet-modal';
 import { dynamics } from 'config';
-import { ProviderWeb3 } from '@reef-knot/web3-react';
-import { getConnectors, holesky } from '@reef-knot/core-react';
-import { WagmiConfig, createClient, configureChains, Chain } from 'wagmi';
+import { WalletsListEthereum } from 'reef-knot/wallets';
+import {
+  AutoConnect,
+  getWalletsDataList,
+  ReefKnot,
+} from 'reef-knot/core-react';
+import { createConfig, http, WagmiProvider } from 'wagmi';
 import * as wagmiChains from 'wagmi/chains';
-import { getStaticRpcBatchProvider } from '@lido-sdk/providers';
 import invariant from 'tiny-invariant';
 import { CHAINS } from '@lido-sdk/constants';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useThemeToggle } from '@lidofinance/lido-ui';
 
-const wagmiChainsArray = Object.values({ ...wagmiChains, holesky });
+type ChainsList = [wagmiChains.Chain, ...wagmiChains.Chain[]];
+
+const wagmiChainsArray = Object.values(wagmiChains) as any as ChainsList;
+
 const supportedChains = wagmiChainsArray.filter((chain) =>
   dynamics.supportedChains.includes(chain.id),
-);
-
-// Adding Mumbai as a temporary workaround
-// for the wagmi and walletconnect bug, when some wallets are failing to connect
-// when there are only one supported network, so we need at least 2 of them.
-// Mumbai should be the last in the array, otherwise wagmi can send request to it.
-// TODO: remove after updating wagmi to v1+
-supportedChains.push(wagmiChains.polygonMumbai);
+) as ChainsList;
 
 const defaultChain = wagmiChainsArray.find(
   (chain) => chain.id === dynamics.defaultChain,
 );
+
+const queryClient = new QueryClient();
 
 type CustomRpcContextValue = {
   customRpc: Record<number, string | null>;
@@ -48,6 +52,7 @@ export const useCustomRpc = () => {
 };
 
 const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
+  const { themeName } = useThemeToggle();
   const [customRpc, setCustomRpc] = useState<Record<number, string | null>>({});
 
   const activeRpc: Record<number, string> = useMemo(() => {
@@ -72,52 +77,78 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
     [customRpc, activeRpc],
   );
 
-  const client = useMemo(() => {
-    const jsonRcpBatchProvider = (chain: Chain) => ({
-      provider: () =>
-        getStaticRpcBatchProvider(
-          chain.id,
-          activeRpc[chain.id],
-          undefined,
-          12000,
-        ),
-      chain,
-    });
+  // const client = useMemo(() => {
+  //   const jsonRcpBatchProvider = (chain: Chain) => ({
+  //     provider: () =>
+  //       getStaticRpcBatchProvider(
+  //         chain.id,
+  //         activeRpc[chain.id],
+  //         undefined,
+  //         12000,
+  //       ),
+  //     chain,
+  //   });
 
-    const { chains, provider, webSocketProvider } = configureChains(
-      supportedChains,
-      [jsonRcpBatchProvider],
-    );
+  //   const { chains, provider, webSocketProvider } = configureChains(
+  //     supportedChains,
+  //     [jsonRcpBatchProvider],
+  //   );
 
-    const connectors = getConnectors({
-      chains,
-      defaultChain,
+  //   const connectors = getConnectors({
+  //     chains,
+  //     defaultChain,
+  //     rpc: activeRpc,
+  //     walletconnectProjectId: dynamics.walletconnectProjectId,
+  //   });
+
+  //   return createClient({
+  //     connectors,
+  //     autoConnect: true,
+  //     provider,
+  //     webSocketProvider,
+  //   });
+  // }, [activeRpc]);
+
+  const { walletsDataList } = useMemo(() => {
+    return getWalletsDataList({
+      walletsList: WalletsListEthereum,
       rpc: activeRpc,
       walletconnectProjectId: dynamics.walletconnectProjectId,
+      defaultChain: defaultChain,
     });
+  }, [activeRpc, defaultChain, dynamics.walletconnectProjectId]);
 
-    return createClient({
-      connectors,
-      autoConnect: true,
-      provider,
-      webSocketProvider,
+  const config = useMemo(() => {
+    return createConfig({
+      chains: supportedChains,
+      ssr: true,
+      multiInjectedProviderDiscovery: false,
+      transports: supportedChains.reduce(
+        (res, curr) => ({
+          ...res,
+          [curr.id]: http(activeRpc[curr.id], { batch: true }),
+        }),
+        {},
+      ),
     });
-  }, [activeRpc]);
+  }, [supportedChains, activeRpc]);
 
   return (
     <CustomRpcContext.Provider value={customRpcContextValue}>
-      <WagmiConfig client={client}>
-        {/* @ts-ignore */}
-        <ProviderWeb3
-          pollingInterval={1200}
-          defaultChainId={dynamics.defaultChain}
-          supportedChainIds={dynamics.supportedChains}
-          rpc={activeRpc}
-          walletconnectProjectId={dynamics.walletconnectProjectId}
-        >
-          {children}
-        </ProviderWeb3>
-      </WagmiConfig>
+      <WagmiProvider config={config} reconnectOnMount={false}>
+        <QueryClientProvider client={queryClient}>
+          <ReefKnot
+            rpc={activeRpc}
+            chains={supportedChains}
+            walletDataList={walletsDataList}
+          >
+            <AutoConnect autoConnect />
+
+            {children}
+            <WalletsModalForEth shouldInvertWalletIcon={themeName === 'dark'} />
+          </ReefKnot>
+        </QueryClientProvider>
+      </WagmiProvider>
     </CustomRpcContext.Provider>
   );
 };

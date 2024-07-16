@@ -1,14 +1,13 @@
 import { FC } from 'react';
 import { Button, ButtonProps } from '@lidofinance/lido-ui';
-import { useModal } from 'hooks/useModal';
-import { MODAL } from 'providers';
+import { useConnect } from 'reef-knot/core-react';
 
 const WalletConnect: FC<ButtonProps> = (props) => {
   const { onClick, ...rest } = props;
-  const { openModal } = useModal(MODAL.connect);
+  const { connect } = useConnect();
 
   return (
-    <Button onClick={openModal} {...rest}>
+    <Button onClick={connect} {...rest}>
       Connect wallet
     </Button>
   );

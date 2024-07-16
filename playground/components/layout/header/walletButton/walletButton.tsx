@@ -5,14 +5,14 @@ import {
   WalledButtonStyle,
   WalledButtonWrapperStyle,
 } from './walletButtonStyles';
+import { useAccount } from 'wagmi';
 import { useModal } from 'hooks/useModal';
 import { MODAL } from 'providers';
-import { useWeb3 } from '@reef-knot/web3-react';
 
 const WalletButton: FC<ButtonProps> = (props) => {
   const { onClick, ...rest } = props;
+  const { address } = useAccount();
   const { openModal } = useModal(MODAL.wallet);
-  const { account } = useWeb3();
 
   return (
     <WalledButtonStyle
@@ -23,7 +23,7 @@ const WalletButton: FC<ButtonProps> = (props) => {
       {...rest}
     >
       <WalledButtonWrapperStyle>
-        <AddressBadge address={account} />
+        <AddressBadge address={address} />
       </WalledButtonWrapperStyle>
     </WalledButtonStyle>
   );
