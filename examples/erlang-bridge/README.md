@@ -29,11 +29,26 @@ yarn install
 
 ### Starting the Erlang Process
 
-1. Navigate to the project directory, install deps and start the Erlang shell:
+## Starting the Erlang Process
+
+1. Navigate to the project directory and install deps :
 
    ```bash
    cd examples/erlang-bridge/src
+
+   yarn install
    ```
+
+2. Replace RPC_URL in `sdk.js` with the actual RPC URL and set the `chain` parameter to which chain you want to connect:
+
+   ```ts
+   const rpcProvider = createPublicClient({
+     chain: mainnet,
+     transport: http('RPC_URL'),
+   });
+   ```
+
+3. Start the Erlang shell:
 
    ```bash
    rebar3 get-deps && rebar3 compile
@@ -47,19 +62,19 @@ yarn install
    erl -pa _build/default/lib/*/ebin
    ```
 
-2. In the Erlang shell, compile the `main` module:
+4. In the Erlang shell, compile the `main` module:
 
    ```erlang
    c(main).
    ```
 
-3. Start the Node.js process from Erlang and get the port:
+5. Start the Node.js process from Erlang and get the port:
 
    ```erlang
    {ok, Port} = main:start().
    ```
 
-4. Define the parameters and call the `get_rewards_from_chain` function:
+6. Define the parameters and call the `get_rewards_from_chain` function:
 
    ```erlang
    Params = [

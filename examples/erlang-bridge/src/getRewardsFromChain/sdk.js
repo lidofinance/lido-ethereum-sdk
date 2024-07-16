@@ -1,6 +1,6 @@
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import { createPublicClient, http } from 'viem';
-import { holesky } from 'viem/chains';
+import { mainnet } from 'viem/chains';
 
 import readline from 'readline';
 
@@ -11,11 +11,11 @@ const rl = readline.createInterface({
 });
 
 const rpcProvider = createPublicClient({
-  chain: holesky,
+  chain: mainnet,
   transport: http('RPC_URL'),
 });
 const lidoSDK = new LidoSDK({
-  chainId: holesky.id,
+  chainId: mainnet.id,
   rpcProvider,
   logMode: 'none',
 });
