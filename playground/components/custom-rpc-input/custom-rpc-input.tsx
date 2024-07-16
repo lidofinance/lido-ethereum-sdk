@@ -1,11 +1,12 @@
-import { useSDK } from '@lido-sdk/react';
+import { useWeb3 } from 'reef-knot/web3-react';
 import { Accordion, Button, DataTableRow, Input } from '@lidofinance/lido-ui';
 import { useCustomRpc } from 'providers/web3';
 import { useEffect, useState } from 'react';
 import { Controls, StyledBlock } from './styles';
+import { dynamics } from 'config';
 
 export const CustomRpcInput = () => {
-  const { chainId } = useSDK();
+  const { chainId = dynamics.defaultChain } = useWeb3();
   const { activeRpc, setCustomRpcUrl, customRpc } = useCustomRpc();
   const [url, setUrl] = useState('');
 
