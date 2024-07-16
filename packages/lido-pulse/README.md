@@ -27,7 +27,7 @@ To get started, clone the repository and install the dependencies:
 
 ```bash
 git clone https://github.com/lidofinance/lido-ethereum-sdk.git
-cd packages/rpc-api
+cd packages/lido-pulse
 cp .env.example .env
 yarn install
 ```
@@ -271,3 +271,14 @@ The server includes comprehensive error handling. Errors are returned in the sta
   "id": null
 }
 ```
+
+## Error Codes
+
+The following error codes are used by the server:
+
+- `-32600`: Invalid Request
+- `-32700`: Parse error
+- `-32601`: Method not found
+- `-32602`: Invalid params
+- `-32603`: Internal error
+- `-32000`: Server error

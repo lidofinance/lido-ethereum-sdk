@@ -32,6 +32,15 @@ const config: Config = {
         sidebarPath: './sidebarsExamples.ts',
       },
     ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'lidoPulse',
+        path: 'lidoPulse',
+        routeBasePath: 'lidoPulse',
+        sidebarPath: './sidebarsLidoPulse.ts',
+      },
+    ],
   ],
   presets: [
     [
@@ -74,6 +83,7 @@ const config: Config = {
           label: 'Docs',
         },
         { to: '/examples/intro', label: 'Examples', position: 'left' },
+        { to: '/lidoPulse/intro', label: 'LidoPulse', position: 'left' },
         {
           href: '/playground',
           label: 'Playground',
