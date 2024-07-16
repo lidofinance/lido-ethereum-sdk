@@ -2,7 +2,7 @@
 sidebar_position: 3
 ---
 
-# Running the Project
+# Usage
 
 ## Starting the Erlang Process
 
