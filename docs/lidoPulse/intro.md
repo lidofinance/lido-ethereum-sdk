@@ -7,7 +7,15 @@ title: Introduction
 
 A pulse of data from Lido Ethereum SDK through intuitive HTTP requests, providing simple and efficient interaction.
 
-Features:
+## Use Case
+
+`LidoPulse` is designed to provide developers with a simple and efficient way to interact with the Lido Ethereum SDK using JSON-RPC over HTTP. By abstracting the complexities of direct SDK integration, LidoPulse allows you to easily retrieve protocol parameters and information about addresses interacting with the protocol. This can be particularly useful for:
+
+- Monitoring and analyzing staking activities and protocol parameters.
+- Building dashboards and tools that require real-time data from the Lido Ethereum SDK.
+- Developing custom integrations and services that leverage Lido's staking information
+
+## Features:
 
 - Smooth and convenient data retrieval from [Lido Ethereum SDK](/)
 - Intuitive HTTP requests by JSON-RPC
