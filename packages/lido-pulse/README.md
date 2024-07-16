@@ -1,6 +1,7 @@
-# LidoWave
+# LidoPulse
 
-A wave of data from Lido Ethereum SDK through intuitive HTTP requests, providing simple and efficient interaction.
+A pulse of data from Lido Ethereum SDK through intuitive HTTP requests, providing simple and efficient interaction.
+
 Features:
 
 - Smooth and convenient data retrieval from [Lido Ethereum SDK](https://lidofinance.github.io/lido-ethereum-sdk/)
@@ -27,8 +28,11 @@ To get started, clone the repository and install the dependencies:
 ```bash
 git clone https://github.com/lidofinance/lido-ethereum-sdk.git
 cd packages/rpc-api
+cp .env.example .env
 yarn install
 ```
+
+Fill in the `.env` file with the required environment variables.
 
 ## Running the Server
 
