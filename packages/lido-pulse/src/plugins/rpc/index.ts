@@ -40,11 +40,11 @@ export const createRpc =
   async (req: FastifyRequest, res: FastifyReply) => {
     const rpcData = req.body as RPC_DATA;
     if (Array.isArray(rpcData)) {
-      res.send(await handleBatchRequest(rpcData, fastify));
+      void res.send(await handleBatchRequest(rpcData, fastify));
     } else if (typeof rpcData === 'object' && rpcData !== null) {
-      res.send(await handleSingleRequest(rpcData, fastify));
+      void res.send(await handleSingleRequest(rpcData, fastify));
     } else {
-      res.send({
+      void res.send({
         jsonrpc: {},
         error: {
           code: ERROR_CODES.PARSE_ERROR.code,

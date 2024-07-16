@@ -3,7 +3,7 @@ import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 
 export const initSwagger = async (fastify: FastifyInstance) => {
-  fastify.register(swagger, {
+  await fastify.register(swagger, {
     openapi: {
       openapi: '3.0.0',
       info: {

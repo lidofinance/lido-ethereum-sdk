@@ -27,13 +27,13 @@ const options = {
   schema: schema,
 };
 
-initSwagger(fastify);
+void initSwagger(fastify);
 
-fastify.register(fastifyEnv, options);
-fastify.register(SDKPlugin);
-fastify.register(RPCPlugin);
+void fastify.register(fastifyEnv, options);
+void fastify.register(SDKPlugin);
+void fastify.register(RPCPlugin);
 
-fastify.register(async (instance) => {
+void fastify.register(async (instance) => {
   const rpc = instance.rpc;
 
   instance.post('/rpc', rpcSwaggerSchema, rpc);
@@ -51,4 +51,5 @@ const start = async () => {
 process.on('unhandledRejection', function (reason) {
   console.error('unhandledRejection', reason);
 });
-start();
+
+void start();
