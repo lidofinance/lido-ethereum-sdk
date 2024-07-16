@@ -2,14 +2,6 @@ import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import { createPublicClient, http } from 'viem';
 import { mainnet } from 'viem/chains';
 
-import readline from 'readline';
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  terminal: false,
-});
-
 const rpcProvider = createPublicClient({
   chain: mainnet,
   transport: http('RPC_URL'),
