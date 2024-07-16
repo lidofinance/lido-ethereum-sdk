@@ -32,6 +32,10 @@ yarn install
 1. Navigate to the project directory, install deps and start the Erlang shell:
 
    ```bash
+   cd examples/erlang-bridge/src
+   ```
+
+   ```bash
    rebar3 get-deps && rebar3 compile
    ```
 
