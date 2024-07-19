@@ -8,9 +8,9 @@ sidebar_position: 2
 
 Download and install Erlang/OTP from the [official website](https://www.erlang.org/downloads).
 
-## Installing Node.js
+## Installing Node.js (version >= 20)
 
-Download and install Node.js and NPM from the [official website](https://nodejs.org/). Version 20 or higher is recommended.
+Download and install Node.js and NPM from the [official website](https://nodejs.org/).
 
 ## Installing Node.js Dependencies
 
