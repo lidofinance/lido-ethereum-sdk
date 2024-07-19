@@ -30,7 +30,7 @@ process.stdin.on('data', async (data) => {
       const result = await getRewardsFromChain(message.params);
 
       process.stdout.write(
-        JSON.stringify({ success: true, result }, (_key, value) =>
+        JSON.stringify({ success: true, result }, (_, value) =>
           typeof value === 'bigint' ? value.toString() : value,
         ) + '\n',
       );

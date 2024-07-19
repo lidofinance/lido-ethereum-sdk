@@ -7,6 +7,10 @@ This examples demonstrate the interaction between Erlang and Lido Ethereum SDK p
 - `main.erl`: Erlang module that manages launching and interacting with the Node.js process.
 - `sdk.js`: Lido SDK script that processes commands received from the Erlang process and returns results.
 
+## Use Case
+
+The primary use case for this project is to integrate blockchain reward retrieval functionalities into an Erlang-based application. By leveraging the Lido SDK in a Node.js process, this project provides a way to access blockchain data and utilities that may not be easily accessible within the Erlang ecosystem.
+
 ## Installation
 
 ### Installing Erlang
@@ -15,7 +19,7 @@ Download and install Erlang/OTP from the [official website](https://www.erlang.o
 
 ### Installing Node.js
 
-Download and install Node.js and NPM from the [official website](https://nodejs.org/).
+Download and install Node.js and NPM from the [official website](https://nodejs.org/). Version 20 or higher is recommended.
 
 ### Installing Node.js Dependencies
 
@@ -28,8 +32,6 @@ yarn install
 ## Running the Project
 
 ### Starting the Erlang Process
-
-## Starting the Erlang Process
 
 1. Navigate to the project directory and install deps :
 

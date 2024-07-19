@@ -14,4 +14,4 @@ This examples demonstrate the interaction between Erlang and Lido Ethereum SDK p
 
 ## Use Case
 
-The primary use case for this project is to integrate blockchain reward retrieval functionalities into an Erlang-based application. By leveraging the Lido SDK in a Node.js process, this project provides a way to access blockchain data and perform complex computations that may not be easily achievable within Erlang.
+The primary use case for this project is to integrate blockchain reward retrieval functionalities into an Erlang-based application. By leveraging the Lido SDK in a Node.js process, this project provides a way to access blockchain data and utilities that may not be easily accessible within the Erlang ecosystem.
