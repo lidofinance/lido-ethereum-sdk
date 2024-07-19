@@ -39,9 +39,7 @@ export const initSwagger = async (fastify: FastifyInstance) => {
     },
     staticCSP: true,
     transformStaticCSP: (header) => header,
-    transformSpecification: (swaggerObject, _request, _reply) => {
-      return swaggerObject;
-    },
+    transformSpecification: (swaggerObject) => swaggerObject,
     transformSpecificationClone: true,
   });
 };

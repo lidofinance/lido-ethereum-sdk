@@ -13,7 +13,7 @@ const fastify = Fastify({
   },
 });
 
-const schema = {
+const ENV_SCHEME = {
   type: 'object',
   required: ['RPC_PROVIDER_URL'],
   properties: {
@@ -22,21 +22,19 @@ const schema = {
     },
   },
 };
-const options = {
+const ENV_OPTIONS = {
   dotenv: true,
-  schema: schema,
+  schema: ENV_SCHEME,
 };
 
 void initSwagger(fastify);
 
-void fastify.register(fastifyEnv, options);
+void fastify.register(fastifyEnv, ENV_OPTIONS);
 void fastify.register(SDKPlugin);
 void fastify.register(RPCPlugin);
 
 void fastify.register(async (instance) => {
-  const rpc = instance.rpc;
-
-  instance.post('/rpc', rpcSwaggerSchema, rpc);
+  instance.post('/rpc', rpcSwaggerSchema, instance.rpc);
 });
 
 const start = async () => {

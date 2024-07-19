@@ -89,13 +89,13 @@ const handleSingleRequest = async (
     const result = await executeFunctionByName(method, fastify, parsedParams);
 
     if (!(result == null)) return { jsonrpc, result, id };
-  } catch (e: any) {
+  } catch (err: any) {
     const error = {
-      code: Number(e.code || e.status || ERROR_CODES.INTERNAL_ERROR.code),
-      message: e.message || ERROR_CODES.INTERNAL_ERROR.message,
+      code: Number(err.code || err.status || ERROR_CODES.INTERNAL_ERROR.code),
+      message: err.message || ERROR_CODES.INTERNAL_ERROR.message,
       data: null,
     };
-    if (e && e.data) error.data = e.data;
+    if (err && err.data) error.data = err.data;
 
     return { jsonrpc, error, id: id || null };
   }
