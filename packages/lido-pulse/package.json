@@ -1,0 +1,66 @@
+{
+  "name": "@lidofinance/lido-pulse",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "lido",
+    "lido-sdk-rpc-api",
+    "lido-ethereum-sdk-rpc-api",
+    "sdk",
+    "rpc",
+    "api",
+    "ethereum"
+  ],
+  "homepage": "https://github.com/lidofinance/lido-ethereum-sdk",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lidofinance/lido-ethereum-sdk.git",
+    "directory": "packages/sdk-rpc-api"
+  },
+  "bugs": {
+    "url": "https://github.com/lidofinance/lido-ethereum-sdk/issues"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "yarn clean && yarn build:cjs && yarn build:esm && yarn build:types",
+    "types": "tsc --noEmit",
+    "build:cjs": "tsc --project tsconfig.build.json --module commonjs --outDir ./dist/cjs --removeComments --verbatimModuleSyntax false && echo > ./dist/cjs/package.json '{\"type\":\"commonjs\"}'",
+    "build:esm": "tsc --project tsconfig.build.json --module es2015 --outDir ./dist/esm && echo > ./dist/esm/package.json '{\"type\":\"module\",\"sideEffects\":false}'",
+    "build:types": "tsc --project tsconfig.build.json --module esnext --declarationDir ./dist/types --emitDeclarationOnly --declaration --declarationMap",
+    "lint": "eslint . --ext .ts --max-warnings 0",
+    "start": "tsc && node dist/esm/index.js",
+    "dev": "nodemon --exec node --no-warnings=ExperimentalWarning --loader ts-node/esm src/index.ts",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@fastify/env": "^4.4.0",
+    "@fastify/swagger": "^8.14.0",
+    "@fastify/swagger-ui": "^4.0.0",
+    "@lidofinance/lido-ethereum-sdk": "workspace:*",
+    "fastify": "^4.28.1",
+    "fastify-plugin": "^4.5.1",
+    "reflect-metadata": "^0.2.2",
+    "viem": "^2.0.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "nodemon": "^3.1.4",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
+    "typescript": "5.1.6"
+  },
+  "packageManager": "yarn@3.6.3"
+}

@@ -1,0 +1,8 @@
+{"1.2.0",
+[{<<"jsx">>,{pkg,<<"jsx">>,<<"2.9.0">>},0}]}.
+[
+{pkg_hash,[
+ {<<"jsx">>, <<"D2F6E5F069C00266CAD52FB15D87C428579EA4D7D73A33669E12679E203329DD">>}]},
+{pkg_hash_ext,[
+ {<<"jsx">>, <<"8EE1DB1CABAFDD578A2776A6AAAE87C2A8CE54B47B59E9EC7DAB5D7EB71CD8DC">>}]}
+].
