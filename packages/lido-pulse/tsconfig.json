@@ -1,0 +1,15 @@
+{
+  // This configuration is used for local development and type checking.
+  "extends": "../../tsconfig.base.json",
+  "outDir": "dist",
+  "baseUrl": "./src/",
+  "include": ["src", "tests", "jest.config.ts"],
+  "exclude": ["node_modules", "dist", "__test__"],
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "module": "NodeNext",
+    "target": "es2022"
+  }
+}
