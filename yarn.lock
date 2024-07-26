@@ -2854,7 +2854,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.19.4, @babel/runtime@npm:^7.20.6, @babel/runtime@npm:^7.21.0":
+"@babel/runtime@npm:^7.19.4, @babel/runtime@npm:^7.21.0":
   version: 7.24.8
   resolution: "@babel/runtime@npm:7.24.8"
   dependencies:
@@ -2966,9 +2966,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@coinbase/wallet-sdk@npm:4.0.3":
-  version: 4.0.3
-  resolution: "@coinbase/wallet-sdk@npm:4.0.3"
+"@coinbase/wallet-sdk@npm:4.0.4":
+  version: 4.0.4
+  resolution: "@coinbase/wallet-sdk@npm:4.0.4"
   dependencies:
     buffer: ^6.0.3
     clsx: ^1.2.1
@@ -2976,7 +2976,7 @@ __metadata:
     keccak: ^3.0.3
     preact: ^10.16.0
     sha.js: ^2.4.11
-  checksum: 47c2818b57f13b1fa403a5e79fc3e039a8cfc4daf9e92910aec4fe32caa4f2326d13c7ff26bbe1921cdcae29acfe41fbf5f0d3c9d58ab39035f05b1737bc06ab
+  checksum: 002d03d791683a15b465a285d7293a7994684f6f91d67c01b52ee9a07ba62f555a12d5c9471c964ccae0df048190f9c2e82929aeba9247e6d97ad1a9e9dd4132
   languageName: node
   linkType: hard
 
@@ -4741,14 +4741,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ledgerhq/cryptoassets@npm:^13.1.1":
-  version: 13.1.1
-  resolution: "@ledgerhq/cryptoassets@npm:13.1.1"
+"@ledgerhq/cryptoassets@npm:^13.2.0":
+  version: 13.2.0
+  resolution: "@ledgerhq/cryptoassets@npm:13.2.0"
   dependencies:
     axios: ^1.6.0
     bs58check: ^2.1.2
     invariant: 2
-  checksum: cac2d2662fdecde18c9344258593cbdc1135a43b3554fcc48ec6cdc36770194d9c1bccbc9e5e0922764273101d96eb8d576982ea1e0a3f93477f901371f3e651
+  checksum: aec0547dcfc2e21241ede8fba154d11da306766ae73c7f1553f4cb445108c783d9b935481fa9e2cb67cb559ee63bc17507b2caec8c13bde613bb2b2bf9365013
   languageName: node
   linkType: hard
 
@@ -4764,18 +4764,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ledgerhq/domain-service@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "@ledgerhq/domain-service@npm:1.2.1"
+"@ledgerhq/devices@npm:^8.4.2":
+  version: 8.4.2
+  resolution: "@ledgerhq/devices@npm:8.4.2"
   dependencies:
-    "@ledgerhq/errors": ^6.17.0
+    "@ledgerhq/errors": ^6.18.0
     "@ledgerhq/logs": ^6.12.0
-    "@ledgerhq/types-live": ^6.48.1
+    rxjs: ^7.8.1
+    semver: ^7.3.5
+  checksum: ff03c2cdb9cfef0eadd26c360f8023c3973f924832ad19e2ecd42800ea665ee9177f79f949f76cd26dcbc9d162c7901b81a28478943a3e391b7f2ec16d9f2c89
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/domain-service@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "@ledgerhq/domain-service@npm:1.2.2"
+  dependencies:
+    "@ledgerhq/errors": ^6.18.0
+    "@ledgerhq/logs": ^6.12.0
+    "@ledgerhq/types-live": ^6.49.0
     axios: ^1.3.4
     eip55: ^2.1.1
     react: ^18.2.0
     react-dom: ^18.2.0
-  checksum: 4d5cb2a1c6d8180b673205ce1c4d319fb87f6828a8100fd13352f368642bb9bf4ca17913b2097ebfb95139023897e430632d2dc4fac704d328ff9c5099ae598c
+  checksum: 5a3aa9120e47a9e05270e41f4c1a5a57083218e7f45477ff31b4b371b6b5db4f280c6112ac80e79ce2ca0cb68c5eeb7edca7aa14d2cb1c3911e676ef99c4d793
   languageName: node
   linkType: hard
 
@@ -4786,63 +4798,70 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ledgerhq/evm-tools@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "@ledgerhq/evm-tools@npm:1.1.1"
+"@ledgerhq/errors@npm:^6.18.0":
+  version: 6.18.0
+  resolution: "@ledgerhq/errors@npm:6.18.0"
+  checksum: 167f9530ca7498aa2ebfd3e036d3269f917bc27d95540f8a2a566b454896d41fc15026ac53951be0befdd1a05f9a9c2d03a6de8c78752e57aee9bc28838c8a48
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/evm-tools@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "@ledgerhq/evm-tools@npm:1.1.2"
   dependencies:
-    "@ledgerhq/cryptoassets": ^13.1.1
+    "@ledgerhq/cryptoassets": ^13.2.0
     "@ledgerhq/live-env": ^2.1.0
     axios: ^1.6.5
     crypto-js: 4.2.0
     ethers: 5.7.2
-  checksum: 153ea9f7a4303b31bc00249c312314ad8307d1e56d5e2cec4964977b5a398e5d136373538389f2140c9ae6beee88ddb34ae620424d0d00e442c879b16703a03f
+  checksum: 4ba7d891d8bc7b68701dbe55098c1bb5b4d6ea7ad18e56dc6b1eefb6f976346aa9b49aa8d34ce395b4049cbe1345417e532b71dfff74371bed14a1c73b03810f
   languageName: node
   linkType: hard
 
-"@ledgerhq/hw-app-eth@npm:^6.35.2":
-  version: 6.37.1
-  resolution: "@ledgerhq/hw-app-eth@npm:6.37.1"
+"@ledgerhq/hw-app-eth@npm:^6.37.1":
+  version: 6.37.3
+  resolution: "@ledgerhq/hw-app-eth@npm:6.37.3"
   dependencies:
     "@ethersproject/abi": ^5.5.0
     "@ethersproject/rlp": ^5.5.0
-    "@ledgerhq/cryptoassets": ^13.1.1
-    "@ledgerhq/domain-service": ^1.2.1
-    "@ledgerhq/errors": ^6.17.0
-    "@ledgerhq/evm-tools": ^1.1.1
-    "@ledgerhq/hw-transport": ^6.31.0
-    "@ledgerhq/hw-transport-mocker": ^6.29.0
+    "@ledgerhq/cryptoassets": ^13.2.0
+    "@ledgerhq/domain-service": ^1.2.2
+    "@ledgerhq/errors": ^6.18.0
+    "@ledgerhq/evm-tools": ^1.1.2
+    "@ledgerhq/hw-transport": ^6.31.2
+    "@ledgerhq/hw-transport-mocker": ^6.29.2
     "@ledgerhq/logs": ^6.12.0
-    "@ledgerhq/types-live": ^6.48.1
+    "@ledgerhq/types-live": ^6.49.0
     axios: ^1.3.4
     bignumber.js: ^9.1.2
-  checksum: c8a0da1b336d816aa8ed1464c799c5b877305d90d6d3ee727860721fa06e498a5652be91ffd71f7e74187b3c96a79a6cc7cdc0dfcfefcf9540ac457695385113
+  checksum: 93d46e4570d76f65f403db619dc35923282a762ef68f90ae32acbaef24f288c436b8c99abe7a293c1256558f10100a949484de9da83aea2ff932345445af0d6c
   languageName: node
   linkType: hard
 
-"@ledgerhq/hw-transport-mocker@npm:^6.29.0":
-  version: 6.29.0
-  resolution: "@ledgerhq/hw-transport-mocker@npm:6.29.0"
+"@ledgerhq/hw-transport-mocker@npm:^6.29.2":
+  version: 6.29.2
+  resolution: "@ledgerhq/hw-transport-mocker@npm:6.29.2"
   dependencies:
-    "@ledgerhq/hw-transport": ^6.31.0
+    "@ledgerhq/hw-transport": ^6.31.2
     "@ledgerhq/logs": ^6.12.0
     rxjs: ^7.8.1
-  checksum: 012ce1ff23e2b0ddedf3d1532d9f64b30fbc9a4669a28eb82d098ed3b5f5b7495d840bfdf60a62cd8955aced0787cfcacf78edcf200867985ebb7f9378526869
+  checksum: 16d936cc6618301630214c2ee28f478b80a1c1f1ccbfeabf19199fb4962e096153b3ea32964d138b7b2507a20b27a0bfe3f81ee158ca827e6d095361b75fffcf
   languageName: node
   linkType: hard
 
-"@ledgerhq/hw-transport-webhid@npm:^6.28.1":
-  version: 6.29.0
-  resolution: "@ledgerhq/hw-transport-webhid@npm:6.29.0"
+"@ledgerhq/hw-transport-webhid@npm:^6.29.0":
+  version: 6.29.2
+  resolution: "@ledgerhq/hw-transport-webhid@npm:6.29.2"
   dependencies:
-    "@ledgerhq/devices": ^8.4.0
-    "@ledgerhq/errors": ^6.17.0
-    "@ledgerhq/hw-transport": ^6.31.0
+    "@ledgerhq/devices": ^8.4.2
+    "@ledgerhq/errors": ^6.18.0
+    "@ledgerhq/hw-transport": ^6.31.2
     "@ledgerhq/logs": ^6.12.0
-  checksum: 738e9831b4cbde20a59fd4bdfd8e0dabedee6412e666fbf83b037cfd9a0a77855766a42eb571fee64f5d81d7026d12f59f21f4a958a3a64e512a1e25baa7e47d
+  checksum: 1b5a613e93599aaa8570de3028040593f873c579d5100dd7356696d21a80a09af7c0085ac5b4c8d6d0e213173edf3bdbf4ecab2eedb306160f562e9576f977f4
   languageName: node
   linkType: hard
 
-"@ledgerhq/hw-transport@npm:^6.30.1, @ledgerhq/hw-transport@npm:^6.31.0":
+"@ledgerhq/hw-transport@npm:^6.31.0":
   version: 6.31.0
   resolution: "@ledgerhq/hw-transport@npm:6.31.0"
   dependencies:
@@ -4851,6 +4870,18 @@ __metadata:
     "@ledgerhq/logs": ^6.12.0
     events: ^3.3.0
   checksum: 97911686ed4de1aaedcde364616c36a9831278002d7a168ea8469c0ce79d1712ded53c1f6deec3b7a86b76cad8b7ad4ba819670e864b1acfeb873271a829ee36
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/hw-transport@npm:^6.31.2":
+  version: 6.31.2
+  resolution: "@ledgerhq/hw-transport@npm:6.31.2"
+  dependencies:
+    "@ledgerhq/devices": ^8.4.2
+    "@ledgerhq/errors": ^6.18.0
+    "@ledgerhq/logs": ^6.12.0
+    events: ^3.3.0
+  checksum: 61f9fc0c9576bd2247f8ac660efc32f50ffaf7c099d6f0270d8ea66e624dab00c8a58586aed14e4c56ff6462c76f01e4e5e5d3ca7d6920beafb51b29b840b3ad
   languageName: node
   linkType: hard
 
@@ -4880,13 +4911,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ledgerhq/types-live@npm:^6.48.1":
-  version: 6.48.1
-  resolution: "@ledgerhq/types-live@npm:6.48.1"
+"@ledgerhq/types-live@npm:^6.49.0":
+  version: 6.49.0
+  resolution: "@ledgerhq/types-live@npm:6.49.0"
   dependencies:
     bignumber.js: ^9.1.2
     rxjs: ^7.8.1
-  checksum: 8e77403f68b8d654541421cafa214d248449cf86651a55e6c3c234e3e41706ce370979b4e99bdf60e5a9e527de1c8f849cf8512383aff52461b9101d7979e4a5
+  checksum: 1d09725cd1075e81a55e2d171322db21991bf4838981cad3cb923c8422493130ed5373a5ad06b9d3b3fe0231a39a3e600cc171a2a7e51d2c1fde6ce24d94a557
   languageName: node
   linkType: hard
 
@@ -5019,7 +5050,7 @@ __metadata:
     jest: ^29.7.0
     rimraf: ^5.0.1
     ts-jest: ^29.1.2
-    typescript: 5.1.6
+    typescript: ^5.4.5
     viem: ^2.0.6
   languageName: unknown
   linkType: soft
@@ -5156,26 +5187,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/json-rpc-engine@npm:^7.3.2":
-  version: 7.3.3
-  resolution: "@metamask/json-rpc-engine@npm:7.3.3"
+"@metamask/json-rpc-engine@npm:^8.0.1, @metamask/json-rpc-engine@npm:^8.0.2":
+  version: 8.0.2
+  resolution: "@metamask/json-rpc-engine@npm:8.0.2"
   dependencies:
     "@metamask/rpc-errors": ^6.2.1
     "@metamask/safe-event-emitter": ^3.0.0
     "@metamask/utils": ^8.3.0
-  checksum: 7bab8b4d2341a6243ba451bc58283f0a6905b09f7257857859848a51a795444ca6899b1a6908b15f8ed236fb574ab85a630c9cb28d127ab52c4630e496c16006
+  checksum: c240d298ad503d93922a94a62cf59f0344b6d6644a523bc8ea3c0f321bea7172b89f2747a5618e2861b2e8152ae5086b76f391a10e4566529faa50b8850c051d
   languageName: node
   linkType: hard
 
-"@metamask/json-rpc-middleware-stream@npm:^6.0.2":
-  version: 6.0.2
-  resolution: "@metamask/json-rpc-middleware-stream@npm:6.0.2"
+"@metamask/json-rpc-middleware-stream@npm:^7.0.1":
+  version: 7.0.2
+  resolution: "@metamask/json-rpc-middleware-stream@npm:7.0.2"
   dependencies:
-    "@metamask/json-rpc-engine": ^7.3.2
+    "@metamask/json-rpc-engine": ^8.0.2
     "@metamask/safe-event-emitter": ^3.0.0
     "@metamask/utils": ^8.3.0
     readable-stream: ^3.6.2
-  checksum: e831041b03e9f48f584f4425188f72b58974f95b60429c9fe8b5561da69c6bbfad2f2b2199acdff06ee718967214b65c05604d4f85f3287186619683487f1060
+  checksum: ff11ad3ff0ec27530efc53c4e6543661648f437dacdd58797449307e20dbc428b479cd8d1e9767797268b98d0445bd6f1986820a8c855faeef01d5c03b55323b
   languageName: node
   linkType: hard
 
@@ -5198,15 +5229,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/providers@npm:^15.0.0":
-  version: 15.0.0
-  resolution: "@metamask/providers@npm:15.0.0"
+"@metamask/providers@npm:16.1.0":
+  version: 16.1.0
+  resolution: "@metamask/providers@npm:16.1.0"
   dependencies:
-    "@metamask/json-rpc-engine": ^7.3.2
-    "@metamask/json-rpc-middleware-stream": ^6.0.2
+    "@metamask/json-rpc-engine": ^8.0.1
+    "@metamask/json-rpc-middleware-stream": ^7.0.1
     "@metamask/object-multiplex": ^2.0.0
     "@metamask/rpc-errors": ^6.2.1
-    "@metamask/safe-event-emitter": ^3.0.0
+    "@metamask/safe-event-emitter": ^3.1.1
     "@metamask/utils": ^8.3.0
     detect-browser: ^5.2.0
     extension-port-stream: ^3.0.0
@@ -5214,7 +5245,7 @@ __metadata:
     is-stream: ^2.0.0
     readable-stream: ^3.6.2
     webextension-polyfill: ^0.10.0
-  checksum: 42571450e79d69d943384f557f6a61e0f73101d49804fb6e8075d791959f76c42b8ff626f711d434674792d77aead6cb8a32b04a3dcd53598c8aff24cbb1ad25
+  checksum: 85e40140f342a38112c3d7cee436751a2be4c575cc4f815ab48a73b549abc2d756bf4a10e4b983e91dbd38076601f992531edb6d8d674aebceae32ef7e299275
   languageName: node
   linkType: hard
 
@@ -5252,14 +5283,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@metamask/sdk-communication-layer@npm:0.26.0":
-  version: 0.26.0
-  resolution: "@metamask/sdk-communication-layer@npm:0.26.0"
+"@metamask/safe-event-emitter@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "@metamask/safe-event-emitter@npm:3.1.1"
+  checksum: e24db4d7c20764bfc5b025065f92518c805f0ffb1da4820078b8cff7dcae964c0f354cf053fcb7ac659de015d5ffdf21aae5e8d44e191ee8faa9066855f22653
+  languageName: node
+  linkType: hard
+
+"@metamask/sdk-communication-layer@npm:0.26.4":
+  version: 0.26.4
+  resolution: "@metamask/sdk-communication-layer@npm:0.26.4"
   dependencies:
     bufferutil: ^4.0.8
     date-fns: ^2.29.3
     debug: ^4.3.4
-    utf-8-validate: ^6.0.3
+    utf-8-validate: ^5.0.2
     uuid: ^8.3.2
   peerDependencies:
     cross-fetch: ^4.0.0
@@ -5267,20 +5305,19 @@ __metadata:
     eventemitter2: ^6.4.7
     readable-stream: ^3.6.2
     socket.io-client: ^4.5.1
-  checksum: ef3e1f4fe5f48dd58f4646ceb649cbde85e802755a128fc6c0f4661088987cc12af919dae632e4e77e32ff743c82cca471906abb2ff4b990aa3e2a187bebac4b
+  checksum: a355826fb3b91af1e52e6afb53590441765b4b47c06047d5e9330e90ab8c9e576f5a12a9ed72782de274632c6751326c3b7d895c5b9b0c85f2008510d2a382fb
   languageName: node
   linkType: hard
 
-"@metamask/sdk-install-modal-web@npm:0.26.0":
-  version: 0.26.0
-  resolution: "@metamask/sdk-install-modal-web@npm:0.26.0"
+"@metamask/sdk-install-modal-web@npm:0.26.5":
+  version: 0.26.5
+  resolution: "@metamask/sdk-install-modal-web@npm:0.26.5"
   dependencies:
     qr-code-styling: ^1.6.0-rc.1
   peerDependencies:
-    i18next: 22.5.1
+    i18next: 23.11.5
     react: ^18.2.0
     react-dom: ^18.2.0
-    react-i18next: ^13.2.2
     react-native: "*"
   peerDependenciesMeta:
     react:
@@ -5289,18 +5326,18 @@ __metadata:
       optional: true
     react-native:
       optional: true
-  checksum: 780c3c9beef06ef3dc4bbfe5462fe79af767a1509b21db10b153038e2e0fdf1c71a92e757b4ce26fbf547b8b0ae2f7a2e8693c5f31ad7488a6cb98ae8eef3075
+  checksum: 3aba8d39bac0d320727b7abfcd803d843906962cea28685e946acba3f198b14d0a672ac8dfd6ec97a7d0efd4f92d00dae956af8872ca4cb2e677f91342bc58b0
   languageName: node
   linkType: hard
 
-"@metamask/sdk@npm:0.26.0":
-  version: 0.26.0
-  resolution: "@metamask/sdk@npm:0.26.0"
+"@metamask/sdk@npm:0.26.5":
+  version: 0.26.5
+  resolution: "@metamask/sdk@npm:0.26.5"
   dependencies:
     "@metamask/onboarding": ^1.0.1
-    "@metamask/providers": ^15.0.0
-    "@metamask/sdk-communication-layer": 0.26.0
-    "@metamask/sdk-install-modal-web": 0.26.0
+    "@metamask/providers": 16.1.0
+    "@metamask/sdk-communication-layer": 0.26.4
+    "@metamask/sdk-install-modal-web": 0.26.5
     "@types/dom-screen-wake-lock": ^1.0.0
     bowser: ^2.9.0
     cross-fetch: ^4.0.0
@@ -5308,7 +5345,7 @@ __metadata:
     eciesjs: ^0.3.15
     eth-rpc-errors: ^4.0.3
     eventemitter2: ^6.4.7
-    i18next: 22.5.1
+    i18next: 23.11.5
     i18next-browser-languagedetector: 7.1.0
     obj-multiplex: ^1.0.0
     pump: ^3.0.0
@@ -5327,7 +5364,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 5d098ce67433ba57aa9d7e7a9f727d546469aa3cde30c01743121b98a7541ad5e2bef73d17584e00856571d25ad50ca87e7686b4562d4489d708e3b336f45c6e
+  checksum: 63d53041a44669fd3110647a485e77e43038806c4548d86716e973c22b9f6ad019499beb9419cb8b08f243828aa3753485ba121d89169154462c90828f13f07f
   languageName: node
   linkType: hard
 
@@ -5575,6 +5612,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@noble/curves@npm:1.4.0":
+  version: 1.4.0
+  resolution: "@noble/curves@npm:1.4.0"
+  dependencies:
+    "@noble/hashes": 1.4.0
+  checksum: 0014ff561d16e98da4a57e2310a4015e4bdab3b1e1eafcd18d3f9b955c29c3501452ca5d702fddf8ca92d570bbeadfbe53fe16ebbd81a319c414f739154bb26b
+  languageName: node
+  linkType: hard
+
+"@noble/curves@npm:~1.4.0":
+  version: 1.4.2
+  resolution: "@noble/curves@npm:1.4.2"
+  dependencies:
+    "@noble/hashes": 1.4.0
+  checksum: c475a83c4263e2c970eaba728895b9b5d67e0ca880651e9c6e3efdc5f6a4f07ceb5b043bf71c399fc80fada0b8706e69d0772bffdd7b9de2483b988973a34cba
+  languageName: node
+  linkType: hard
+
 "@noble/hashes@npm:1.3.2":
   version: 1.3.2
   resolution: "@noble/hashes@npm:1.3.2"
@@ -5586,6 +5641,13 @@ __metadata:
   version: 1.3.3
   resolution: "@noble/hashes@npm:1.3.3"
   checksum: 8a6496d1c0c64797339bc694ad06cdfaa0f9e56cd0c3f68ae3666cfb153a791a55deb0af9c653c7ed2db64d537aa3e3054629740d2f2338bb1dcb7ab60cd205b
+  languageName: node
+  linkType: hard
+
+"@noble/hashes@npm:1.4.0, @noble/hashes@npm:~1.4.0":
+  version: 1.4.0
+  resolution: "@noble/hashes@npm:1.4.0"
+  checksum: 8ba816ae26c90764b8c42493eea383716396096c5f7ba6bea559993194f49d80a73c081f315f4c367e51bd2d5891700bcdfa816b421d24ab45b41cb03e4f3342
   languageName: node
   linkType: hard
 
@@ -6176,15 +6238,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reef-knot/connect-wallet-modal@npm:5.1.0":
-  version: 5.1.0
-  resolution: "@reef-knot/connect-wallet-modal@npm:5.1.0"
+"@reef-knot/connect-wallet-modal@npm:5.2.0":
+  version: 5.2.0
+  resolution: "@reef-knot/connect-wallet-modal@npm:5.2.0"
   dependencies:
-    "@ledgerhq/hw-app-eth": ^6.35.2
-    "@ledgerhq/hw-transport": ^6.30.1
-    "@ledgerhq/hw-transport-webhid": ^6.28.1
+    "@ledgerhq/hw-app-eth": ^6.37.1
+    "@ledgerhq/hw-transport": ^6.31.0
+    "@ledgerhq/hw-transport-webhid": ^6.29.0
     "@lidofinance/lido-ui": ^3.18.0
-    "@reef-knot/wallets-list": ^2.0.0
+    "@reef-knot/wallets-list": ^2.0.1
     "@types/react": 18.2.45
     "@types/react-dom": 18.2.17
   peerDependencies:
@@ -6198,14 +6260,14 @@ __metadata:
     "@tanstack/react-query": ^5.29.0
     react: ">=18"
     viem: 2.13.3
-    wagmi: 2.10.4
-  checksum: 42aa41581336886b2a55ef8a5f80ba6c98472364509624117c5e842eacb0601675c6c6252d065ba21cf3c6683b0a28c967b6f37cddb6d821b5897c68674b345c
+    wagmi: 2.11.2
+  checksum: 01efe29f11155f29c3b5ae35b07819077c903510802ee4b4b65ea1950d20cbe062dfa2a7d9236188c2c7a6648e2de7ba36265f5f3d67a4786390b6ef5c6cb037
   languageName: node
   linkType: hard
 
-"@reef-knot/core-react@npm:4.1.0":
-  version: 4.1.0
-  resolution: "@reef-knot/core-react@npm:4.1.0"
+"@reef-knot/core-react@npm:4.1.1":
+  version: 4.1.1
+  resolution: "@reef-knot/core-react@npm:4.1.1"
   peerDependencies:
     "@reef-knot/ledger-connector": ^4.0.0
     "@reef-knot/types": ^2.0.0
@@ -6215,14 +6277,14 @@ __metadata:
     "@tanstack/react-query": ^5.29.0
     react: ">=18"
     viem: 2.13.3
-    wagmi: 2.10.4
-  checksum: 19fc9e51a1f33f64900ffe2ea163c65d301e9794df2c405983575897b4ad5b9146c6b698ca625425148dface4a0390f21bd0bbcbce19c0c6def62ead7fbb91f4
+    wagmi: 2.11.2
+  checksum: 0690f179f1f6867b5df8f1553c91ddd92dda7fa23d72acf4c6814f9182218d1dc7ebf90090ceacbe04438ad7ab76be825ff8f851fd034451f8d572958a3d2ac1
   languageName: node
   linkType: hard
 
-"@reef-knot/ledger-connector@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@reef-knot/ledger-connector@npm:4.0.0"
+"@reef-knot/ledger-connector@npm:4.1.0":
+  version: 4.1.0
+  resolution: "@reef-knot/ledger-connector@npm:4.1.0"
   dependencies:
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/address": ^5.7.0
@@ -6233,9 +6295,9 @@ __metadata:
     "@ethersproject/providers": ^5.7.2
     "@ethersproject/strings": ^5.7.0
     "@ethersproject/transactions": ^5.7.0
-    "@ledgerhq/hw-app-eth": ^6.35.2
-    "@ledgerhq/hw-transport": ^6.30.1
-    "@ledgerhq/hw-transport-webhid": ^6.28.1
+    "@ledgerhq/hw-app-eth": ^6.37.1
+    "@ledgerhq/hw-transport": ^6.31.0
+    "@ledgerhq/hw-transport-webhid": ^6.29.0
     "@ledgerhq/iframe-provider": ^0.4.3
     "@web3-react/abstract-connector": ^6.0.7
     "@web3-react/types": ^6.0.7
@@ -6243,25 +6305,25 @@ __metadata:
   peerDependencies:
     "@tanstack/react-query": ^5.29.0
     viem: 2.13.3
-    wagmi: 2.10.4
-  checksum: 43c3b0eaf51a9eb9f3893a65fa0854ae8503b0e881c749e85a5742d74361c6af31d73d80b9bd7b07f359e1381cbfb132db313055961d4c57b4738fb4a0cd623e
+    wagmi: 2.11.2
+  checksum: 57daf1ad2c0209944a088d75e534b6fca52e82683ca376e7fdcaf1af83651fed96aa9402ca1abda73b1cb17d1d35b3bb324efc7a272640007641e571c05a010e
   languageName: node
   linkType: hard
 
-"@reef-knot/types@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/types@npm:2.0.0"
+"@reef-knot/types@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/types@npm:2.0.1"
   peerDependencies:
     "@tanstack/react-query": ^5.29.0
     react: ">=18"
-    wagmi: 2.10.4
-  checksum: 08259e0e4b38bc07e024c5d19b54a30c3d78fd4e16040aba9f8588c24df35e5401b5ba678b258ae38243c357839ad4c7c26e5ff3b677eaea90b2e0c32af782da
+    wagmi: 2.11.2
+  checksum: 82006bbebece352cf2817b15b4ddc4445259ac139dcc0faeb01fc5b259c14c0a170e5c969a3c31ca6fe224c5e321d3d5fc8a73e7826b72cb84af65ae07ba086f
   languageName: node
   linkType: hard
 
-"@reef-knot/ui-react@npm:2.1.0":
-  version: 2.1.0
-  resolution: "@reef-knot/ui-react@npm:2.1.0"
+"@reef-knot/ui-react@npm:2.1.2":
+  version: 2.1.2
+  resolution: "@reef-knot/ui-react@npm:2.1.2"
   dependencies:
     react-transition-group: 4
     use-callback-ref: 1.2.5
@@ -6270,248 +6332,248 @@ __metadata:
     react-dom: ">=18"
     react-is: ">=18"
     styled-components: 5
-    wagmi: 2.10.4
-  checksum: 4dbbf267f52439014b0229ebc08be5ee2d16386c117a17beb770c2a6a43302b8458b745e321be3ca1d59bf758aabce3fc36cd62ffd2442cf7a7991e5b2becd4f
+    wagmi: 2.11.2
+  checksum: 7ff70deaa66fe551b250ab9e6c5cdc0e4fd6e6e34ea609473aa3a2f628a56c5ea38381cfee382bb946472fb12b8f3f05cfe8600a38d4f4bfb6a9f6669c03004c
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-ambire@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-ambire@npm:2.0.0"
+"@reef-knot/wallet-adapter-ambire@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-ambire@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@reef-knot/wallets-helpers": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: b52484f05e1164751d1a2414efc27b90041da287e7d3d49f429fe8535d20bdfbaeb481aa81c3ec79a5fad659d8e07d5541bb932eaa233838840331b53b98b537
+    wagmi: 2.11.2
+  checksum: ec68cc95544441cbbb05a31b08855f9b5182da2343a2851400c87f3abd57a7b8a45d1da90ba80f5820867b2d678f1330d20576908691fa284a096a021f4c9b1f
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-bitkeep@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-bitkeep@npm:2.0.0"
+"@reef-knot/wallet-adapter-bitkeep@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-bitkeep@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: e82b318819c58b8f0eaf351b89a0ca2c773862fe86a0c7fb543f0f8901e018afc31b701ce8a071be616384a7cab6873a4c7aa19ea967e08151f6720a78ef58b5
+    wagmi: 2.11.2
+  checksum: 41bde776af6ea4a91696fd3eef1fd8a701d67d39729c69f743299b8e99eff78daacc11cc5514b9541c39aa6280f24334cabd0ea9f782b306bddc0d2da8855afd
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-brave@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-brave@npm:2.0.0"
+"@reef-knot/wallet-adapter-brave@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-brave@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: 5dfb895f07494fe0e6d7c9db0ccdcbf50b25f641a6ef7278e2a5b3545ee11025d54c3093d384bf6e529128bc7b457b445dbcfcdb85a307164773f3dc7a92f8b6
+    wagmi: 2.11.2
+  checksum: fa9f4cb7a3cc9b8a3be5cba4ae9e360ac9ec1ddcd3c18e0b7f6db4e1286300162b8bc5c25d226c0f6b2c160b7d920a693c52b1bb156fffd87301322c73a77a5d
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-browser-extension@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-browser-extension@npm:2.0.0"
+"@reef-knot/wallet-adapter-browser-extension@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-browser-extension@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: 28a64343b159df4bf100e7dcce0085814dd39367406aa89ff047b629aaab654c132d8adbe84caae2b90a1cdd838a2f16d694622504e90eddf7978fcb90cbb81b
+    wagmi: 2.11.2
+  checksum: 133f069d6a5679eb2fe0ec30d1a7b8e33cd5db9bb51b513153aedb760389281d1132825d2db2f55bc40f929623d6b7e218ba1d81fec0b3e8caf22ad8bf3c772c
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-coin98@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-coin98@npm:2.0.0"
+"@reef-knot/wallet-adapter-coin98@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-coin98@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: 20413eab70fcf826054d920ddac451117bef74c0869d6f2f68eb1341d011219f1067d576af831d466974e37c1cf027323d490aa9cab42e207939dbb9aada27f8
+    wagmi: 2.11.2
+  checksum: c7d8826de8c26dd0b19735da543051075df241106503fed3e2d68286e0519211498101491764d60ac354fadcc3ae2e63dfe8f0002f1b072ec46e53ccf0aec13a
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-coinbase@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-coinbase@npm:2.0.0"
+"@reef-knot/wallet-adapter-coinbase@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-coinbase@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: 15fd712d2a4ad19ef415581a452d3c833ae21701d1a80e2cba27a7c42ef833a0057c15de90faab85ddfe6ef4c0e21c976dd515402bd56cbc211ece4901f69823
+    wagmi: 2.11.2
+  checksum: be59674353ad3fe75a04e4763240c59c5256b1d7db18010737614494baa7fc6dbea802efde03349fe896a49fbe4621ceac2ae82726173baf554c3bf0d9ef6bf7
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-dapp-browser-injected@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-dapp-browser-injected@npm:2.0.0"
+"@reef-knot/wallet-adapter-dapp-browser-injected@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-dapp-browser-injected@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@reef-knot/wallets-helpers": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: a959231e4d915a004fdca07167fbc187496c0297513de860206090525f7e6f1ab3158a3b1f6b0c471d71a1b0d0e10498c685677b0ee5b094c89af7a611a5d6e6
+    wagmi: 2.11.2
+  checksum: 12bd3b924d67cd6742763343783aef0bcd085f3fa86ce467550a6995cc140a984db37bb1a85ef3f656069663f1c2fad620e22f7e76db8dac21f86a5901b47e1a
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-exodus@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-exodus@npm:2.0.0"
+"@reef-knot/wallet-adapter-exodus@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-exodus@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: 2c60f2eb43ca1eae80eaf960bd59b3910ea1d5340260db9004a1bbbdeb9b99b3d20682e68d16ae82c502f7cf0bd22d2cce5ed7093ef2753b226fd5afa61f6ca8
+    wagmi: 2.11.2
+  checksum: a0a67e2d8afae421e9158c7f971b42f451cc0b6931c111f662ecc58483b8bd3a81ff089d6c7828b4dedcff6ecb2971a77bf9eae76cdb7838c42961295ae74e8c
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-imtoken@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-imtoken@npm:2.0.0"
+"@reef-knot/wallet-adapter-imtoken@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-imtoken@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: ba61760a9d9ee2bcf57e09423ba5608f31f31cccb24dc6abe82f976405286731e946b2e75853c3ac72db33531a9b3faf1fe5b8210907b1c3245830b077ee8b2f
+    wagmi: 2.11.2
+  checksum: c74e4daec5cd02260aa1636f6d1245068b4ee2ba7f2fc5bb21505b0f07bd4f9b9904dfe26f3262f56981de1f1e205aad060a459e248867ae268b87e1cb9c63da
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-ledger-hid@npm:3.0.0":
-  version: 3.0.0
-  resolution: "@reef-knot/wallet-adapter-ledger-hid@npm:3.0.0"
-  peerDependencies:
-    "@reef-knot/ledger-connector": ^4.0.0
-    "@reef-knot/types": ^2.0.0
-    "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: 4a84f4c42817500bddbe7865db8b678805e44e8e83c4830907c4de9b0cfcf7f75b9d28b67ccb2143c4111e54ed331223faf9ade001ea983d7fd6d555121bb0db
-  languageName: node
-  linkType: hard
-
-"@reef-knot/wallet-adapter-ledger-live@npm:3.0.0":
-  version: 3.0.0
-  resolution: "@reef-knot/wallet-adapter-ledger-live@npm:3.0.0"
+"@reef-knot/wallet-adapter-ledger-hid@npm:3.0.1":
+  version: 3.0.1
+  resolution: "@reef-knot/wallet-adapter-ledger-hid@npm:3.0.1"
   peerDependencies:
     "@reef-knot/ledger-connector": ^4.0.0
     "@reef-knot/types": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: 55b20095a4f1834c5b3f53a6890f047a33c811e2937078e3fda830a65b11f4df70e1beebf2a12d5f05cc43053289042eddf3e6b8cb054ea2691bf1bf43cc2835
+    wagmi: 2.11.2
+  checksum: f55e85b3506a5e6a748ad15ad5c01f0dcea758ed6b8e87e4c09fcd4b940f56eaeebe9aa1d61c30ce5e061faeda77be52cdce595d9e40e1067e0c64bfd97962fe
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-metamask@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-metamask@npm:2.0.0"
+"@reef-knot/wallet-adapter-ledger-live@npm:3.0.1":
+  version: 3.0.1
+  resolution: "@reef-knot/wallet-adapter-ledger-live@npm:3.0.1"
+  peerDependencies:
+    "@reef-knot/ledger-connector": ^4.0.0
+    "@reef-knot/types": ^2.0.0
+    "@tanstack/react-query": ^5.29.0
+    wagmi: 2.11.2
+  checksum: b8214d96f2b547ed2b0f5cc0cd8ab664216fcdae841ed83cc6f95ded20fef8a4f1ed5e7f2bc26a639df2972c9fbf837c0bc634178aedf25b3331ceae6f657935
+  languageName: node
+  linkType: hard
+
+"@reef-knot/wallet-adapter-metamask@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-metamask@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: cd2359d6306875ae5d22b3d3867686cf4f9abf9c6ea3ac94c1a77ef85f0145dccfa720501d1632bbd17db954e00c9f3b9c214dc802783fbefad8f503b08b4a28
+    wagmi: 2.11.2
+  checksum: 35951ef6b3c10b0f0660b27e83212c720dd865b428b8f349a27f482c7be18f4895c66812caa0c454266fd1f8119fd26c3aa6f850178a60a8918f3f425c719a01
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-okx@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-okx@npm:2.0.0"
+"@reef-knot/wallet-adapter-okx@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-okx@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: 61e1a5ef93ecfd425a5d67bae823584bb58421471bd3be41deec5bb2f40f046a850bfb504285f24bb1714f5eeff5608d444c495f129f375948f7089c24802db6
+    wagmi: 2.11.2
+  checksum: 08854b54751ceadca0c832f348a972e8e2a6b89dc44515c5dc9eb6254d837c77ced5fb6ecd546ac785ffb91cb1ec5342a166765c26cfd2b038070eb002a918fd
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-safe@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-safe@npm:2.0.0"
+"@reef-knot/wallet-adapter-safe@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-safe@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@tanstack/react-query": ^5.29.0
     viem: 2.13.3
-    wagmi: 2.10.4
-  checksum: 759135dfa869afd3eb6c3dac189b9ab278d360c536da605432a7a31b09e64b109755179b6d00ba0cdba0fbf0c04fb543c4b9c5280b07da72e9c6fc7fb70f8724
+    wagmi: 2.11.2
+  checksum: bc1bda72caf17c8898f3d670925a2093d407b8edea32347cc1c93cb3f2e373406100df87757a533a9f85647354cece2b62cae88eb8df25e2e755505af5d01bf1
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-trust@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-trust@npm:2.0.0"
+"@reef-knot/wallet-adapter-trust@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-trust@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: 8886b0caaae81d6ac5a0fbad03e72c4a9a93ed88a84c75873841bcf65c62cc5c154d56b754b18415cf681782eb0b54650c04a977e663152936f0cdf5d0162b30
+    wagmi: 2.11.2
+  checksum: a5839b43511cf2fd4a4076995049e55b47bf95fab43119beea644b5a817ba92d599c58134e116c2d1135b2b23766eb4ed26a0dd532ac20f57a99e2597a096877
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-walletconnect@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-walletconnect@npm:2.0.0"
+"@reef-knot/wallet-adapter-walletconnect@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-walletconnect@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@reef-knot/wallets-helpers": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: 38e8375cd9b5715ebd156ee4d022f59156024a7e0532832ae13f581cec1aa58f8b6b18ab3b1265370c20a26a397bce4b40e9b045d4ff14805810425c66a09a08
+    wagmi: 2.11.2
+  checksum: 5ecae5e9fb80d763d1f7e7209ede12201dcc025ec30000c0582ab713423aad83a03b13a07746c8da2606f1a3b98323e0df4e67ab766c105973aa568d8046d708
   languageName: node
   linkType: hard
 
-"@reef-knot/wallet-adapter-xdefi@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallet-adapter-xdefi@npm:2.0.0"
+"@reef-knot/wallet-adapter-xdefi@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallet-adapter-xdefi@npm:2.0.1"
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     "@tanstack/react-query": ^5.29.0
-    wagmi: 2.10.4
-  checksum: 054b247ed6e1d0d15b1bc72f531627aeeec61be2acc1e681df2d2636667f06112f39f6328cfbf3e9f0a173a2010cbc3fb2ddbf790f024b40da5d25d055b398f9
+    wagmi: 2.11.2
+  checksum: de597c7d63fffa683b5123631ca6ca004c6428e453724d2c2c4d19b6a93a60704a2cee0dc3a8b637c848b9d041ec8cddac813104276a49047c0dc6570b7e0d5d
   languageName: node
   linkType: hard
 
-"@reef-knot/wallets-helpers@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallets-helpers@npm:2.0.0"
+"@reef-knot/wallets-helpers@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallets-helpers@npm:2.0.1"
   peerDependencies:
     "@tanstack/react-query": ^5.29.0
     "@types/ua-parser-js": 0.7.39
     react: ">=18"
     ua-parser-js: 1.0.37
-    wagmi: 2.10.4
-  checksum: 7d2f402802de9522833d774111e871209e59142b485cf480d0cf1d2c3a438cd1ab0e4de10e86c16634a3d09ec5e7a41c6e0cdb313e0b66830666edb93c39666f
+    wagmi: 2.11.2
+  checksum: cce6b45c77389af4acf2535668bf65636f0a05d9582504c97db81cad778c8593f08feeeb607fa42b55447f0815517cc4557235b35e5aca7b9f057f9eb912fd9d
   languageName: node
   linkType: hard
 
-"@reef-knot/wallets-list@npm:2.0.0, @reef-knot/wallets-list@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@reef-knot/wallets-list@npm:2.0.0"
+"@reef-knot/wallets-list@npm:2.0.1, @reef-knot/wallets-list@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@reef-knot/wallets-list@npm:2.0.1"
   dependencies:
-    "@reef-knot/wallet-adapter-ambire": 2.0.0
-    "@reef-knot/wallet-adapter-bitkeep": 2.0.0
-    "@reef-knot/wallet-adapter-brave": 2.0.0
-    "@reef-knot/wallet-adapter-browser-extension": 2.0.0
-    "@reef-knot/wallet-adapter-coin98": 2.0.0
-    "@reef-knot/wallet-adapter-coinbase": 2.0.0
-    "@reef-knot/wallet-adapter-dapp-browser-injected": 2.0.0
-    "@reef-knot/wallet-adapter-exodus": 2.0.0
-    "@reef-knot/wallet-adapter-imtoken": 2.0.0
-    "@reef-knot/wallet-adapter-ledger-hid": 3.0.0
-    "@reef-knot/wallet-adapter-ledger-live": 3.0.0
-    "@reef-knot/wallet-adapter-metamask": 2.0.0
-    "@reef-knot/wallet-adapter-okx": 2.0.0
-    "@reef-knot/wallet-adapter-safe": 2.0.0
-    "@reef-knot/wallet-adapter-trust": 2.0.0
-    "@reef-knot/wallet-adapter-walletconnect": 2.0.0
-    "@reef-knot/wallet-adapter-xdefi": 2.0.0
+    "@reef-knot/wallet-adapter-ambire": 2.0.1
+    "@reef-knot/wallet-adapter-bitkeep": 2.0.1
+    "@reef-knot/wallet-adapter-brave": 2.0.1
+    "@reef-knot/wallet-adapter-browser-extension": 2.0.1
+    "@reef-knot/wallet-adapter-coin98": 2.0.1
+    "@reef-knot/wallet-adapter-coinbase": 2.0.1
+    "@reef-knot/wallet-adapter-dapp-browser-injected": 2.0.1
+    "@reef-knot/wallet-adapter-exodus": 2.0.1
+    "@reef-knot/wallet-adapter-imtoken": 2.0.1
+    "@reef-knot/wallet-adapter-ledger-hid": 3.0.1
+    "@reef-knot/wallet-adapter-ledger-live": 3.0.1
+    "@reef-knot/wallet-adapter-metamask": 2.0.1
+    "@reef-knot/wallet-adapter-okx": 2.0.1
+    "@reef-knot/wallet-adapter-safe": 2.0.1
+    "@reef-knot/wallet-adapter-trust": 2.0.1
+    "@reef-knot/wallet-adapter-walletconnect": 2.0.1
+    "@reef-knot/wallet-adapter-xdefi": 2.0.1
   peerDependencies:
     "@reef-knot/types": ^2.0.0
     react: ">=18"
-  checksum: a1ae4040240735028bbed63c703f29970a92f66ff96ff68cdc5deda7a168c006a1069a5ee86cbf424c19f29557434f1f81107f0daac61ba87a7e004de0bfbdd5
+  checksum: a34f2ae652f02edd831605676ac6e7e99dff0ca3086f1130bf12ffc157d2cb49295da0a4c43873dd088417f82ee570beaba8a324388db8835fc0bdcb8eca4307
   languageName: node
   linkType: hard
 
-"@reef-knot/web3-react@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@reef-knot/web3-react@npm:4.0.0"
+"@reef-knot/web3-react@npm:4.0.1":
+  version: 4.0.1
+  resolution: "@reef-knot/web3-react@npm:4.0.1"
   dependencies:
     tiny-invariant: ^1.1.0
   peerDependencies:
@@ -6521,28 +6583,28 @@ __metadata:
     "@reef-knot/wallets-helpers": ^2.0.0
     "@tanstack/react-query": ^5.29.0
     react: ">=18"
-    wagmi: 2.10.4
-  checksum: b6bcf945d7ec41fec3f2380359459641dd25dddf9df846e0199edf758f7509dc8c73f8ec07c87e76d94e83a237eaa3fa0bc6ba2ab56c5233a6e48469b5a231c8
+    wagmi: 2.11.2
+  checksum: ed7ef54cbb7741107c65aad6d2960005bc5341e7551581eea166fba50ee381c19ed8006977b5344fa7ae6b0cab37062e6cb1bb217a8ccb8d4248ddcf9ca7caa7
   languageName: node
   linkType: hard
 
-"@safe-global/safe-apps-provider@npm:0.18.1":
-  version: 0.18.1
-  resolution: "@safe-global/safe-apps-provider@npm:0.18.1"
+"@safe-global/safe-apps-provider@npm:0.18.3":
+  version: 0.18.3
+  resolution: "@safe-global/safe-apps-provider@npm:0.18.3"
   dependencies:
-    "@safe-global/safe-apps-sdk": ^8.1.0
+    "@safe-global/safe-apps-sdk": ^9.1.0
     events: ^3.3.0
-  checksum: fb77aee24149303a8886f1c23ed35ccd75ed63ed67cdb1dfd5c7160e7744f37c8872feadcfbf6d5712d2de65896a1aaf339dc4afb1fa648f0dddd689ff89183c
+  checksum: e208df42fe49474d54847d8edd44efb601b5aafaf9e25537500db7fefb1172201a62f577c749f424b34932439dd7ebe461d33b23075cf6b80fb35ef841017a30
   languageName: node
   linkType: hard
 
-"@safe-global/safe-apps-sdk@npm:8.1.0, @safe-global/safe-apps-sdk@npm:^8.1.0":
-  version: 8.1.0
-  resolution: "@safe-global/safe-apps-sdk@npm:8.1.0"
+"@safe-global/safe-apps-sdk@npm:9.1.0, @safe-global/safe-apps-sdk@npm:^9.1.0":
+  version: 9.1.0
+  resolution: "@safe-global/safe-apps-sdk@npm:9.1.0"
   dependencies:
     "@safe-global/safe-gateway-typescript-sdk": ^3.5.3
-    viem: ^1.0.0
-  checksum: e9d31ed6d9cd2cd9ed71ef5a0e1f6ecfca9f0c62acb9b86a0ddb1b65a609090f2297c4304591ac0518b266a1bcc88d1dad31b0d05e50c7732accccb65adab754
+    viem: ^2.1.1
+  checksum: e56c3fe83f52667b370072807468b011e9f3e6d690126af4cc5b13ee1544dd5a91b4b3e962d45d2dab065fc4401ef57c350896a9f43c70a9fb3269249f265d72
   languageName: node
   linkType: hard
 
@@ -6557,6 +6619,13 @@ __metadata:
   version: 1.1.5
   resolution: "@scure/base@npm:1.1.5"
   checksum: 9e9ee6088cb3aa0fb91f5a48497d26682c7829df3019b1251d088d166d7a8c0f941c68aaa8e7b96bbad20c71eb210397cb1099062cde3e29d4bad6b975c18519
+  languageName: node
+  linkType: hard
+
+"@scure/base@npm:~1.1.6":
+  version: 1.1.7
+  resolution: "@scure/base@npm:1.1.7"
+  checksum: d9084be9a2f27971df1684af9e40bb750e86f549345e1bb3227fb61673c0c83569c92c1cb0a4ddccb32650b39d3cd3c145603b926ba751c9bc60c27317549b20
   languageName: node
   linkType: hard
 
@@ -6582,6 +6651,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@scure/bip32@npm:1.4.0":
+  version: 1.4.0
+  resolution: "@scure/bip32@npm:1.4.0"
+  dependencies:
+    "@noble/curves": ~1.4.0
+    "@noble/hashes": ~1.4.0
+    "@scure/base": ~1.1.6
+  checksum: eff491651cbf2bea8784936de75af5fc020fc1bbb9bcb26b2cfeefbd1fb2440ebfaf30c0733ca11c0ae1e272a2ef4c3c34ba5c9fb3e1091c3285a4272045b0c6
+  languageName: node
+  linkType: hard
+
 "@scure/bip39@npm:1.2.1":
   version: 1.2.1
   resolution: "@scure/bip39@npm:1.2.1"
@@ -6599,6 +6679,16 @@ __metadata:
     "@noble/hashes": ~1.3.2
     "@scure/base": ~1.1.4
   checksum: cb99505e6d2deef8e55e81df8c563ce8dbfdf1595596dc912bceadcf366c91b05a98130e928ecb090df74efdb20150b64acc4be55bc42768cab4d39a2833d234
+  languageName: node
+  linkType: hard
+
+"@scure/bip39@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@scure/bip39@npm:1.3.0"
+  dependencies:
+    "@noble/hashes": ~1.4.0
+    "@scure/base": ~1.1.6
+  checksum: dbb0b27df753eb6c6380010b25cc9a9ea31f9cb08864fc51e69e5880ff7e2b8f85b72caea1f1f28af165e83b72c48dd38617e43fc632779d025b50ba32ea759e
   languageName: node
   linkType: hard
 
@@ -8414,34 +8504,34 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wagmi/connectors@npm:5.0.16":
-  version: 5.0.16
-  resolution: "@wagmi/connectors@npm:5.0.16"
+"@wagmi/connectors@npm:5.0.26":
+  version: 5.0.26
+  resolution: "@wagmi/connectors@npm:5.0.26"
   dependencies:
-    "@coinbase/wallet-sdk": 4.0.3
-    "@metamask/sdk": 0.26.0
-    "@safe-global/safe-apps-provider": 0.18.1
-    "@safe-global/safe-apps-sdk": 8.1.0
+    "@coinbase/wallet-sdk": 4.0.4
+    "@metamask/sdk": 0.26.5
+    "@safe-global/safe-apps-provider": 0.18.3
+    "@safe-global/safe-apps-sdk": 9.1.0
     "@walletconnect/ethereum-provider": 2.13.0
     "@walletconnect/modal": 2.6.2
     cbw-sdk: "npm:@coinbase/wallet-sdk@3.9.3"
   peerDependencies:
-    "@wagmi/core": 2.11.4
+    "@wagmi/core": 2.12.2
     typescript: ">=5.0.4"
     viem: 2.x
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 2a3c2632c3fc18d524b472ee1e3c2999586ef3b88aad046eddd7a2bf552265aecf25803ea18a72fabbb310c703f418dbb5becec6b7644dea91e485ca7b0ce200
+  checksum: 286c641c912fb2d4620fa867d920d79f5730372ae49f26eff5484b36a1d21f03c984fcde9d85d4f2c732f2891bebc579e3d7613702b9ced8426cc7f10627c118
   languageName: node
   linkType: hard
 
-"@wagmi/core@npm:2.11.4":
-  version: 2.11.4
-  resolution: "@wagmi/core@npm:2.11.4"
+"@wagmi/core@npm:2.12.2":
+  version: 2.12.2
+  resolution: "@wagmi/core@npm:2.12.2"
   dependencies:
     eventemitter3: 5.0.1
-    mipd: 0.0.5
+    mipd: 0.0.7
     zustand: 4.4.1
   peerDependencies:
     "@tanstack/query-core": ">=5.0.0"
@@ -8452,7 +8542,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 8bdb7bd4f2b4f2e2c2ef8d1380c5fa47f466bfafcdf86eb15b10142481bdafc0486444f144d8a9787c28ebdb3b277488706950bc3dde9b9e43087db05e677d72
+  checksum: 06d3fde29b53474805460474158dfe7e3d6356dc11cf8f90033a9edae605cbe56839da7cbc20bb82e72d1ee68cf7b02ef493aa5d4f7041b8247017e89879b52e
   languageName: node
   linkType: hard
 
@@ -8989,21 +9079,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"abitype@npm:0.9.8":
-  version: 0.9.8
-  resolution: "abitype@npm:0.9.8"
-  peerDependencies:
-    typescript: ">=5.0.4"
-    zod: ^3 >=3.19.1
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-    zod:
-      optional: true
-  checksum: d7d887f29d6821e3f7a400de9620511b80ead3f85c5c87308aaec97965d3493e6687ed816e88722b4f512249bd66dee9e69231b49af0e1db8f69400a62c87cf6
-  languageName: node
-  linkType: hard
-
 "abitype@npm:1.0.0":
   version: 1.0.0
   resolution: "abitype@npm:1.0.0"
@@ -9016,6 +9091,21 @@ __metadata:
     zod:
       optional: true
   checksum: ea2c0548c3ba58c37a6de7483d63389074da498e63d803b742bbe94eb4eaa1f51a35d000c424058b2583aef56698cf07c696eb3bc4dd0303bc20c6f0826a241a
+  languageName: node
+  linkType: hard
+
+"abitype@npm:1.0.5":
+  version: 1.0.5
+  resolution: "abitype@npm:1.0.5"
+  peerDependencies:
+    typescript: ">=5.0.4"
+    zod: ^3 >=3.22.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+    zod:
+      optional: true
+  checksum: 4a4865926e5e8e33e4fab0081a106ce4f627db30b4052fbc449e4707aea6d34d805d46c8d6d0a72234bdd9a2b4900993591515fc299bc57d393181c70dc0c19e
   languageName: node
   linkType: hard
 
@@ -12548,8 +12638,8 @@ __metadata:
     "@mdx-js/react": ^3.0.0
     clsx: ^2.0.0
     prism-react-renderer: ^2.3.0
-    react: ^18.0.0
-    react-dom: ^18.0.0
+    react: ^18.3.1
+    react-dom: ^18.3.1
     typescript: ~5.2.2
   languageName: unknown
   linkType: soft
@@ -15572,12 +15662,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next@npm:22.5.1":
-  version: 22.5.1
-  resolution: "i18next@npm:22.5.1"
+"i18next@npm:23.11.5":
+  version: 23.11.5
+  resolution: "i18next@npm:23.11.5"
   dependencies:
-    "@babel/runtime": ^7.20.6
-  checksum: 175f8ab7fac2abcee147b00cc2d8e7d4fa9b05cdc227f02cac841fc2fd9545ed4a6d88774f594f8ad12dc944e4d34cc8e88aa00c8b9947baef9e859d93abd305
+    "@babel/runtime": ^7.23.2
+  checksum: e9ec83703af59205af81f10929fd420314c0c976d1f4c42a191dc4d13f1284d13517105325286772571292953839c7183baa92e9bb43f41efe87dbc50c9aed1c
   languageName: node
   linkType: hard
 
@@ -16499,6 +16589,15 @@ __metadata:
   peerDependencies:
     ws: "*"
   checksum: 9cacd5cf59f67deb51e825580cd445ab1725ecb05a67c704050383fb772856f3cd5e7da8ad08f5a3bd2823680d77d099459d0c6a7037972a74d6429af61af440
+  languageName: node
+  linkType: hard
+
+"isows@npm:1.0.4":
+  version: 1.0.4
+  resolution: "isows@npm:1.0.4"
+  peerDependencies:
+    ws: "*"
+  checksum: a3ee62e3d6216abb3adeeb2a551fe2e7835eac87b05a6ecc3e7739259bf5f8e83290501f49e26137390c8093f207fc3378d4a7653aab76ad7bbab4b2dba9c5b9
   languageName: node
   linkType: hard
 
@@ -17645,6 +17744,7 @@ __metadata:
     "@lidofinance/eslint-config": ^0.35.0
     "@next/eslint-plugin-next": ^14.0.1
     "@qiwi/multi-semantic-release": 7.1.1
+    "@tanstack/react-query": ^5.51.1
     "@typescript-eslint/eslint-plugin": ^5
     "@typescript-eslint/parser": ^5.46.0
     eslint: ^8.46.0
@@ -17664,8 +17764,10 @@ __metadata:
     eslint-plugin-unicorn: ^45
     husky: ^8.0.3
     prettier: ^3.0.1
+    styled-components: ^5.3.5
     ts-node: ^10.9.1
-    typescript: ^5.1.6
+    typescript: ^5.4.5
+    wagmi: 2.11.2
   languageName: unknown
   linkType: soft
 
@@ -17693,18 +17795,18 @@ __metadata:
     next: ^13.5.1
     next-logger: ^3.0.0
     prom-client: ^14.2.0
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    react-is: ^18.2.0
+    react: ^18.3.1
+    react-dom: ^18.3.1
+    react-is: ^18.3.1
     react-json-view: ^1.21.3
-    reef-knot: ^5.1.0
+    reef-knot: ^5.2.1
     styled-components: ^5.3.5
     swr: ^1.3.0
     tiny-invariant: ^1.3.1
-    typescript: 5.1.6
+    typescript: ^5.4.5
     url-loader: ^4.1.1
     viem: ^2.0.6
-    wagmi: 2.10.4
+    wagmi: 2.11.2
   languageName: unknown
   linkType: soft
 
@@ -19670,17 +19772,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mipd@npm:0.0.5":
-  version: 0.0.5
-  resolution: "mipd@npm:0.0.5"
-  dependencies:
-    viem: ^1.1.4
+"mipd@npm:0.0.7":
+  version: 0.0.7
+  resolution: "mipd@npm:0.0.7"
   peerDependencies:
     typescript: ">=5.0.4"
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 920b3afb3a92daeb66685adb746211ac4268ff805392a2f6e1da2703c43aa5835e5ad7be9d0312582a348d4c764ae3c81ab39362b66607ba0d54032def0038f1
+  checksum: 14526f78d6d1bc8580898922508d64714f5abc7293b5998fe93c54237fd1cea120dc98674fe2b329ba3803bda5a85f3e442c3b1fa880e4c6b443bf73018514a8
   languageName: node
   linkType: hard
 
@@ -22249,7 +22349,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^18.0.0":
+"react-dom@npm:^18.2.0, react-dom@npm:^18.3.1":
   version: 18.3.1
   resolution: "react-dom@npm:18.3.1"
   dependencies:
@@ -22258,18 +22358,6 @@ __metadata:
   peerDependencies:
     react: ^18.3.1
   checksum: 298954ecd8f78288dcaece05e88b570014d8f6dce5db6f66e6ee91448debeb59dcd31561dddb354eee47e6c1bb234669459060deb238ed0213497146e555a0b9
-  languageName: node
-  linkType: hard
-
-"react-dom@npm:^18.2.0":
-  version: 18.2.0
-  resolution: "react-dom@npm:18.2.0"
-  dependencies:
-    loose-envify: ^1.1.0
-    scheduler: ^0.23.0
-  peerDependencies:
-    react: ^18.2.0
-  checksum: 7d323310bea3a91be2965f9468d552f201b1c27891e45ddc2d6b8f717680c95a75ae0bc1e3f5cf41472446a2589a75aed4483aee8169287909fcd59ad149e8cc
   languageName: node
   linkType: hard
 
@@ -22323,10 +22411,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-is@npm:^18.0.0, react-is@npm:^18.2.0":
-  version: 18.2.0
-  resolution: "react-is@npm:18.2.0"
-  checksum: e72d0ba81b5922759e4aff17e0252bd29988f9642ed817f56b25a3e217e13eea8a7f2322af99a06edb779da12d5d636e9fda473d620df9a3da0df2a74141d53e
+"react-is@npm:^18.0.0, react-is@npm:^18.3.1":
+  version: 18.3.1
+  resolution: "react-is@npm:18.3.1"
+  checksum: e20fe84c86ff172fc8d898251b7cc2c43645d108bf96d0b8edf39b98f9a2cae97b40520ee7ed8ee0085ccc94736c4886294456033304151c3f94978cec03df21
   languageName: node
   linkType: hard
 
@@ -22497,21 +22585,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^18.0.0":
+"react@npm:^18.2.0, react@npm:^18.3.1":
   version: 18.3.1
   resolution: "react@npm:18.3.1"
   dependencies:
     loose-envify: ^1.1.0
   checksum: a27bcfa8ff7c15a1e50244ad0d0c1cb2ad4375eeffefd266a64889beea6f6b64c4966c9b37d14ee32d6c9fcd5aa6ba183b6988167ab4d127d13e7cb5b386a376
-  languageName: node
-  linkType: hard
-
-"react@npm:^18.2.0":
-  version: 18.2.0
-  resolution: "react@npm:18.2.0"
-  dependencies:
-    loose-envify: ^1.1.0
-  checksum: 88e38092da8839b830cda6feef2e8505dec8ace60579e46aa5490fc3dc9bba0bd50336507dc166f43e3afc1c42939c09fe33b25fae889d6f402721dcd78fca1b
   languageName: node
   linkType: hard
 
@@ -22721,19 +22800,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reef-knot@npm:^5.1.0":
-  version: 5.1.0
-  resolution: "reef-knot@npm:5.1.0"
+"reef-knot@npm:^5.2.1":
+  version: 5.2.1
+  resolution: "reef-knot@npm:5.2.1"
   dependencies:
-    "@reef-knot/connect-wallet-modal": 5.1.0
-    "@reef-knot/core-react": 4.1.0
-    "@reef-knot/ledger-connector": 4.0.0
-    "@reef-knot/types": 2.0.0
-    "@reef-knot/ui-react": 2.1.0
-    "@reef-knot/wallets-helpers": 2.0.0
-    "@reef-knot/wallets-list": 2.0.0
-    "@reef-knot/web3-react": 4.0.0
-  checksum: 5fb514a9d901c2baa4b41fa795519df2359b48b20fb1cc1533f8e939d743bc6e36f9d0d91907f5cf537b6de6ca4549ce3d59cffcb1046ad8307b5912aed1e28d
+    "@reef-knot/connect-wallet-modal": 5.2.0
+    "@reef-knot/core-react": 4.1.1
+    "@reef-knot/ledger-connector": 4.1.0
+    "@reef-knot/types": 2.0.1
+    "@reef-knot/ui-react": 2.1.2
+    "@reef-knot/wallets-helpers": 2.0.1
+    "@reef-knot/wallets-list": 2.0.1
+    "@reef-knot/web3-react": 4.0.1
+  checksum: 973d86fc3702c02e76a2a9e702b2d8e7b5599de1d42c19e9fcecf624cceeceb836cef3005e045e76aed2478dd423b03e5ccdfabdabcfd06c4266038e25fd670c
   languageName: node
   linkType: hard
 
@@ -23341,15 +23420,6 @@ __metadata:
   version: 1.4.1
   resolution: "sax@npm:1.4.1"
   checksum: 3ad64df16b743f0f2eb7c38ced9692a6d924f1cd07bbe45c39576c2cf50de8290d9d04e7b2228f924c7d05fecc4ec5cf651423278e0c7b63d260c387ef3af84a
-  languageName: node
-  linkType: hard
-
-"scheduler@npm:^0.23.0":
-  version: 0.23.0
-  resolution: "scheduler@npm:0.23.0"
-  dependencies:
-    loose-envify: ^1.1.0
-  checksum: d79192eeaa12abef860c195ea45d37cbf2bbf5f66e3c4dcd16f54a7da53b17788a70d109ee3d3dde1a0fd50e6a8fc171f4300356c5aee4fc0171de526bf35f8a
   languageName: node
   linkType: hard
 
@@ -25263,7 +25333,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^4.6.4 || ^5.2.2, typescript@npm:^5.1.6":
+"typescript@npm:^4.6.4 || ^5.2.2":
   version: 5.3.3
   resolution: "typescript@npm:5.3.3"
   bin:
@@ -25280,6 +25350,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: ee000bc26848147ad423b581bd250075662a354d84f0e06eb76d3b892328d8d4440b7487b5a83e851b12b255f55d71835b008a66cbf8f255a11e4400159237db
+  languageName: node
+  linkType: hard
+
+"typescript@npm:^5.4.5":
+  version: 5.5.4
+  resolution: "typescript@npm:5.5.4"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: b309040f3a1cd91c68a5a58af6b9fdd4e849b8c42d837b2c2e73f9a4f96a98c4f1ed398a9aab576ee0a4748f5690cf594e6b99dbe61de7839da748c41e6d6ca8
   languageName: node
   linkType: hard
 
@@ -25303,7 +25383,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.6.4 || ^5.2.2#~builtin<compat/typescript>, typescript@patch:typescript@^5.1.6#~builtin<compat/typescript>":
+"typescript@patch:typescript@^4.6.4 || ^5.2.2#~builtin<compat/typescript>":
   version: 5.3.3
   resolution: "typescript@patch:typescript@npm%3A5.3.3#~builtin<compat/typescript>::version=5.3.3&hash=f3b441"
   bin:
@@ -25320,6 +25400,16 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 1f8f3b6aaea19f0f67cba79057674ba580438a7db55057eb89cc06950483c5d632115c14077f6663ea76fd09fce3c190e6414bb98582ec80aa5a4eaf345d5b68
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@^5.4.5#~builtin<compat/typescript>":
+  version: 5.5.4
+  resolution: "typescript@patch:typescript@npm%3A5.5.4#~builtin<compat/typescript>::version=5.5.4&hash=f3b441"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: fc52962f31a5bcb716d4213bef516885e4f01f30cea797a831205fc9ef12b405a40561c40eae3127ab85ba1548e7df49df2bcdee6b84a94bfbe3a0d7eff16b14
   languageName: node
   linkType: hard
 
@@ -25859,13 +25949,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"utf-8-validate@npm:^6.0.3":
-  version: 6.0.4
-  resolution: "utf-8-validate@npm:6.0.4"
+"utf-8-validate@npm:^5.0.2":
+  version: 5.0.10
+  resolution: "utf-8-validate@npm:5.0.10"
   dependencies:
     node-gyp: latest
     node-gyp-build: ^4.3.0
-  checksum: ccbfbceeed7cbad62282aed5420236d38006453ce583cf9021ad6225c2d15996a660a3b3bdd2b9344b4d3b5df5673fbaf9e70c3637628a2cd58824089d9d9153
+  checksum: 5579350a023c66a2326752b6c8804cc7b39dcd251bb088241da38db994b8d78352e388dcc24ad398ab98385ba3c5ffcadb6b5b14b2637e43f767869055e46ba6
   languageName: node
   linkType: hard
 
@@ -26042,27 +26132,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:^1.0.0, viem@npm:^1.1.4":
-  version: 1.21.4
-  resolution: "viem@npm:1.21.4"
-  dependencies:
-    "@adraffy/ens-normalize": 1.10.0
-    "@noble/curves": 1.2.0
-    "@noble/hashes": 1.3.2
-    "@scure/bip32": 1.3.2
-    "@scure/bip39": 1.2.1
-    abitype: 0.9.8
-    isows: 1.0.3
-    ws: 8.13.0
-  peerDependencies:
-    typescript: ">=5.0.4"
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-  checksum: c351fdea2d53d2d781ac73c964348b3b9fc5dd46f9eb53903e867705fc9e30a893cb9f2c8d7a00acdcdeca27d14eeebf976eed9f948c28c47018dc9211369117
-  languageName: node
-  linkType: hard
-
 "viem@npm:^2.0.6":
   version: 2.7.9
   resolution: "viem@npm:2.7.9"
@@ -26084,12 +26153,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wagmi@npm:2.10.4":
-  version: 2.10.4
-  resolution: "wagmi@npm:2.10.4"
+"viem@npm:^2.1.1":
+  version: 2.17.11
+  resolution: "viem@npm:2.17.11"
   dependencies:
-    "@wagmi/connectors": 5.0.16
-    "@wagmi/core": 2.11.4
+    "@adraffy/ens-normalize": 1.10.0
+    "@noble/curves": 1.4.0
+    "@noble/hashes": 1.4.0
+    "@scure/bip32": 1.4.0
+    "@scure/bip39": 1.3.0
+    abitype: 1.0.5
+    isows: 1.0.4
+    ws: 8.17.1
+  peerDependencies:
+    typescript: ">=5.0.4"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 7eefb347d0f717a6bc0f286ef82ecb6b52c9ff6e257205d470c3d92b4e2443cbb8a28a7fe0a49b3155a9f7c884eb9242c3cd56f3db4ab112cc0c97f591342f6d
+  languageName: node
+  linkType: hard
+
+"wagmi@npm:2.11.2":
+  version: 2.11.2
+  resolution: "wagmi@npm:2.11.2"
+  dependencies:
+    "@wagmi/connectors": 5.0.26
+    "@wagmi/core": 2.12.2
     use-sync-external-store: 1.2.0
   peerDependencies:
     "@tanstack/react-query": ">=5.0.0"
@@ -26099,7 +26189,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 3cd966d96a6c3d71f12896c64ba57d9801d464fe76edc3296207df36d5e0820aaaad1edae49e76e17acef6ea06058bd419d748324431c30a821d4fe0e4638f51
+  checksum: 5fb5d9434261de1760dc0ba5798627e993f1e80f3ec64c351b42ee7b4f0230c6391194f2ba91dca9ed2452dfb8628215dfdbffda73238bef3cbc65c500f8c964
   languageName: node
   linkType: hard
 
@@ -26648,6 +26738,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ws@npm:8.17.1, ws@npm:^8.13.0, ws@npm:~8.17.1":
+  version: 8.17.1
+  resolution: "ws@npm:8.17.1"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 442badcce1f1178ec87a0b5372ae2e9771e07c4929a3180321901f226127f252441e8689d765aa5cfba5f50ac60dd830954afc5aeae81609aefa11d3ddf5cecf
+  languageName: node
+  linkType: hard
+
 "ws@npm:^7.3.1, ws@npm:^7.5.1":
   version: 7.5.9
   resolution: "ws@npm:7.5.9"
@@ -26660,21 +26765,6 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: c3c100a181b731f40b7f2fddf004aa023f79d64f489706a28bc23ff88e87f6a64b3c6651fbec3a84a53960b75159574d7a7385709847a62ddb7ad6af76f49138
-  languageName: node
-  linkType: hard
-
-"ws@npm:^8.13.0, ws@npm:~8.17.1":
-  version: 8.17.1
-  resolution: "ws@npm:8.17.1"
-  peerDependencies:
-    bufferutil: ^4.0.1
-    utf-8-validate: ">=5.0.2"
-  peerDependenciesMeta:
-    bufferutil:
-      optional: true
-    utf-8-validate:
-      optional: true
-  checksum: 442badcce1f1178ec87a0b5372ae2e9771e07c4929a3180321901f226127f252441e8689d765aa5cfba5f50ac60dd830954afc5aeae81609aefa11d3ddf5cecf
   languageName: node
   linkType: hard
 
