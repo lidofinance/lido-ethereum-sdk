@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useWeb3 } from '@reef-knot/web3-react';
+import { useWeb3 } from 'reef-knot/web3-react';
 import { Input, Accordion } from '@lidofinance/lido-ui';
 import { Action, renderTokenResult } from 'components/action';
 import { useLidoSDK } from 'providers/sdk';
