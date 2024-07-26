@@ -26,7 +26,7 @@ export const LidoSDKProvider: React.FC<PropsWithChildren> = ({ children }) => {
     // inject lido_sdk for console access
     if (typeof window !== 'undefined') (window as any).lido_sdk = sdk;
     return sdk;
-  }, [chainId]);
+  }, [chainId, publicClient, walletClient]);
 
   return <context.Provider value={value}>{children}</context.Provider>;
 };

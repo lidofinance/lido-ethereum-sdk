@@ -30,9 +30,9 @@ const supportedChains = wagmiChainsArray.filter((chain) =>
   dynamics.supportedChains.includes(chain.id),
 ) as ChainsList;
 
-const defaultChain = wagmiChainsArray.find(
-  (chain) => chain.id === dynamics.defaultChain,
-);
+const defaultChain =
+  wagmiChainsArray.find((chain) => chain.id === dynamics.defaultChain) ||
+  supportedChains[0]; // first supported chain as fallback;
 
 const queryClient = new QueryClient();
 
@@ -77,38 +77,6 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
     [customRpc, activeRpc],
   );
 
-  // const client = useMemo(() => {
-  //   const jsonRcpBatchProvider = (chain: Chain) => ({
-  //     provider: () =>
-  //       getStaticRpcBatchProvider(
-  //         chain.id,
-  //         activeRpc[chain.id],
-  //         undefined,
-  //         12000,
-  //       ),
-  //     chain,
-  //   });
-
-  //   const { chains, provider, webSocketProvider } = configureChains(
-  //     supportedChains,
-  //     [jsonRcpBatchProvider],
-  //   );
-
-  //   const connectors = getConnectors({
-  //     chains,
-  //     defaultChain,
-  //     rpc: activeRpc,
-  //     walletconnectProjectId: dynamics.walletconnectProjectId,
-  //   });
-
-  //   return createClient({
-  //     connectors,
-  //     autoConnect: true,
-  //     provider,
-  //     webSocketProvider,
-  //   });
-  // }, [activeRpc]);
-
   const { walletsDataList } = useMemo(() => {
     return getWalletsDataList({
       walletsList: WalletsListEthereum,
@@ -116,7 +84,7 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
       walletconnectProjectId: dynamics.walletconnectProjectId,
       defaultChain: defaultChain,
     });
-  }, [activeRpc, defaultChain, dynamics.walletconnectProjectId]);
+  }, [activeRpc]);
 
   const config = useMemo(() => {
     return createConfig({
@@ -131,7 +99,7 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
         {},
       ),
     });
-  }, [supportedChains, activeRpc]);
+  }, [activeRpc]);
 
   return (
     <CustomRpcContext.Provider value={customRpcContextValue}>
