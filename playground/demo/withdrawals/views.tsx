@@ -1,5 +1,5 @@
 import { Accordion } from '@lidofinance/lido-ui';
-import { useWeb3 } from '@reef-knot/web3-react';
+import { useWeb3 } from 'reef-knot/web3-react';
 import { Action, renderTokenResult } from 'components/action';
 import { useLidoSDK } from 'providers/sdk';
 
