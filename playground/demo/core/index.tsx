@@ -4,6 +4,7 @@ import { Input, Accordion } from '@lidofinance/lido-ui';
 import { Action, renderTokenResult } from 'components/action';
 import { useLidoSDK } from 'providers/sdk';
 import { renderBlockResult } from 'components/action/render-block-result';
+import NoSsrWrapper from '../../components/no-ssr-wrapper/no-ssr-wrapper';
 
 const locale = new Intl.Locale('en', { hourCycle: 'h24' });
 
@@ -65,11 +66,13 @@ export const CoreDemo = () => {
           core.getLatestBlockToTimestamp(BigInt(timestampSeconds))
         }
       >
-        <Input
-          label={`timestamp at ${dateAtTimestamp}`}
-          value={timestampSeconds}
-          onChange={(e) => setTimestampSeconds(e.currentTarget.value)}
-        />
+        <NoSsrWrapper>
+          <Input
+            label={`timestamp at ${dateAtTimestamp}`}
+            value={timestampSeconds}
+            onChange={(e) => setTimestampSeconds(e.currentTarget.value)}
+          />
+        </NoSsrWrapper>
       </Action>
     </Accordion>
   );
