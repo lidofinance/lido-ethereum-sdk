@@ -7,10 +7,10 @@ import {
   External,
   Copy,
 } from '@lidofinance/lido-ui';
-import { useEtherscanOpen } from '@lido-sdk/react';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { useConnectorInfo, useDisconnect } from 'reef-knot/core-react';
 import { useCopyToClipboard } from 'hooks/useCopyToClipboard';
+import { useEtherscanOpen } from 'hooks/useEtherscanOpen';
 import { FC, useCallback } from 'react';
 import {
   WalletModalContentStyle,
@@ -33,7 +33,7 @@ const WalletModal: FC<ModalProps> = ({ onClose, ...props }) => {
   }, [disconnect, onClose]);
 
   const handleCopy = useCopyToClipboard(account ?? '');
-  //const handleEtherscan = useEtherscanOpen(account ?? '', 'address');
+  const handleEtherscan = useEtherscanOpen(account ?? '', 'address');
 
   return (
     <Modal title="Account" {...props}>
@@ -73,7 +73,7 @@ const WalletModal: FC<ModalProps> = ({ onClose, ...props }) => {
             Copy address
           </ButtonIcon>
           <ButtonIcon
-            onClick={() => {}}
+            onClick={handleEtherscan}
             icon={<External />}
             size="xs"
             variant="ghost"
