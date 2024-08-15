@@ -1,0 +1,46 @@
+name: Publish Dry Run
+on:
+  workflow_dispatch:
+  workflow_call:
+    secrets:
+      NPM_TOKEN:
+        description: 'NPM token'
+        required: true
+
+jobs:
+  publish-dry-run:
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn --immutable
+
+      - name: Build
+        run: yarn build:packages
+
+      - name: Dry run Publish
+        run: yarn multi-semantic-release --dry-run --silent | grep -E '#|###|\*'  > dry_run_output.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Write results to summary
+        run: |
+          if [ -s dry_run_output.txt ]; then 
+            echo "# Packages to be published:" >> $GITHUB_STEP_SUMMARY
+            cat dry_run_output.txt >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Nothing will be published" >> $GITHUB_STEP_SUMMARY
+          fi

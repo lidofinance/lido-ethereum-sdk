@@ -73,6 +73,13 @@
       }
     ]
   },
+  "multi-release": {
+    "sequentialInit": true,
+    "deps": {
+      "bump": "override",
+      "release": "patch"
+    }
+  },
   "packageManager": "yarn@3.6.3",
   "engines": {
     "node": ">=20"
