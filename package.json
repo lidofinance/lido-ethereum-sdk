@@ -20,11 +20,6 @@
     "lint": "yarn workspaces foreach -pt run lint",
     "prepare": "husky install"
   },
-  "dependencies": {
-    "@tanstack/react-query": "^5.51.1",
-    "styled-components": "^5.3.5",
-    "wagmi": "2.11.2"
-  },
   "devDependencies": {
     "@commitlint/cli": "^17.7.1",
     "@commitlint/config-conventional": "^17.7.0",

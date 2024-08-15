@@ -6311,9 +6311,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reef-knot/connect-wallet-modal@npm:5.2.0":
-  version: 5.2.0
-  resolution: "@reef-knot/connect-wallet-modal@npm:5.2.0"
+"@reef-knot/connect-wallet-modal@npm:5.2.2":
+  version: 5.2.2
+  resolution: "@reef-knot/connect-wallet-modal@npm:5.2.2"
   dependencies:
     "@ledgerhq/hw-app-eth": ^6.37.1
     "@ledgerhq/hw-transport": ^6.31.0
@@ -6334,7 +6334,7 @@ __metadata:
     react: ">=18"
     viem: 2.13.3
     wagmi: 2.11.2
-  checksum: 01efe29f11155f29c3b5ae35b07819077c903510802ee4b4b65ea1950d20cbe062dfa2a7d9236188c2c7a6648e2de7ba36265f5f3d67a4786390b6ef5c6cb037
+  checksum: 8c71f1f40b626b06f6fda995001c8f49b606c88bf12e8885ec23adb9d196e8ee45b81019274e2a4aacbb6c5f7ffb06ce641abf9c7d6ac80ae15fb30284223686
   languageName: node
   linkType: hard
 
@@ -6394,19 +6394,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reef-knot/ui-react@npm:2.1.2":
-  version: 2.1.2
-  resolution: "@reef-knot/ui-react@npm:2.1.2"
+"@reef-knot/ui-react@npm:2.1.3":
+  version: 2.1.3
+  resolution: "@reef-knot/ui-react@npm:2.1.3"
   dependencies:
     react-transition-group: 4
     use-callback-ref: 1.2.5
   peerDependencies:
     react: ">=18"
     react-dom: ">=18"
-    react-is: ">=18"
     styled-components: 5
     wagmi: 2.11.2
-  checksum: 7ff70deaa66fe551b250ab9e6c5cdc0e4fd6e6e34ea609473aa3a2f628a56c5ea38381cfee382bb946472fb12b8f3f05cfe8600a38d4f4bfb6a9f6669c03004c
+  checksum: 42f58876fdd2fe8708a18d2a4913e382e6ff44f50d0264d575ec4bd0e2ccb45d346044a11f188669d04c80b9e7df5c78d197951bebb829ffdeb6a9dba66b4f1a
   languageName: node
   linkType: hard
 
@@ -6603,16 +6602,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@reef-knot/wallets-helpers@npm:2.0.1":
-  version: 2.0.1
-  resolution: "@reef-knot/wallets-helpers@npm:2.0.1"
+"@reef-knot/wallets-helpers@npm:2.0.2":
+  version: 2.0.2
+  resolution: "@reef-knot/wallets-helpers@npm:2.0.2"
+  dependencies:
+    "@types/ua-parser-js": 0.7.39
+    ua-parser-js: 1.0.37
   peerDependencies:
     "@tanstack/react-query": ^5.29.0
-    "@types/ua-parser-js": 0.7.39
     react: ">=18"
-    ua-parser-js: 1.0.37
     wagmi: 2.11.2
-  checksum: cce6b45c77389af4acf2535668bf65636f0a05d9582504c97db81cad778c8593f08feeeb607fa42b55447f0815517cc4557235b35e5aca7b9f057f9eb912fd9d
+  checksum: 9f3b4779918a1d81d50078098ebd907af993ae32cfa7d562dde9e28ea277b92c2442163acd258b423a54e59358061a3df9e4e45116250006ae8f84b4d023860e
   languageName: node
   linkType: hard
 
@@ -8353,6 +8353,13 @@ __metadata:
   version: 2.0.7
   resolution: "@types/trusted-types@npm:2.0.7"
   checksum: 8e4202766a65877efcf5d5a41b7dd458480b36195e580a3b1085ad21e948bc417d55d6f8af1fd2a7ad008015d4117d5fdfe432731157da3c68678487174e4ba3
+  languageName: node
+  linkType: hard
+
+"@types/ua-parser-js@npm:0.7.39":
+  version: 0.7.39
+  resolution: "@types/ua-parser-js@npm:0.7.39"
+  checksum: 81046605eb2815b098228743b7dfde887cc8990369f2ad56e71f1400b4cef5078481c7ca91ca3dddf2e8d4e183fe93224bfdeee13bfe034a1e62d55cfbac9e26
   languageName: node
   linkType: hard
 
@@ -18053,7 +18060,6 @@ __metadata:
     "@lidofinance/eslint-config": ^0.35.0
     "@next/eslint-plugin-next": ^14.0.1
     "@qiwi/multi-semantic-release": 7.1.1
-    "@tanstack/react-query": ^5.51.1
     "@typescript-eslint/eslint-plugin": ^5
     "@typescript-eslint/parser": ^5.46.0
     eslint: ^8.46.0
@@ -18073,10 +18079,8 @@ __metadata:
     eslint-plugin-unicorn: ^45
     husky: ^8.0.3
     prettier: ^3.0.1
-    styled-components: ^5.3.5
     ts-node: ^10.9.1
     typescript: ^5.4.5
-    wagmi: 2.11.2
   languageName: unknown
   linkType: soft
 
@@ -18105,9 +18109,8 @@ __metadata:
     prom-client: ^14.2.0
     react: ^18.3.1
     react-dom: ^18.3.1
-    react-is: ^18.3.1
     react-json-view: ^1.21.3
-    reef-knot: ^5.2.1
+    reef-knot: ^5.3.1
     styled-components: ^5.3.5
     swr: ^1.3.0
     tiny-invariant: ^1.3.1
@@ -22842,7 +22845,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-is@npm:^18.0.0, react-is@npm:^18.3.1":
+"react-is@npm:^18.0.0":
   version: 18.3.1
   resolution: "react-is@npm:18.3.1"
   checksum: e20fe84c86ff172fc8d898251b7cc2c43645d108bf96d0b8edf39b98f9a2cae97b40520ee7ed8ee0085ccc94736c4886294456033304151c3f94978cec03df21
@@ -23231,19 +23234,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reef-knot@npm:^5.2.1":
-  version: 5.2.1
-  resolution: "reef-knot@npm:5.2.1"
+"reef-knot@npm:^5.3.1":
+  version: 5.3.1
+  resolution: "reef-knot@npm:5.3.1"
   dependencies:
-    "@reef-knot/connect-wallet-modal": 5.2.0
+    "@reef-knot/connect-wallet-modal": 5.2.2
     "@reef-knot/core-react": 4.1.1
     "@reef-knot/ledger-connector": 4.1.0
     "@reef-knot/types": 2.0.1
-    "@reef-knot/ui-react": 2.1.2
-    "@reef-knot/wallets-helpers": 2.0.1
+    "@reef-knot/ui-react": 2.1.3
+    "@reef-knot/wallets-helpers": 2.0.2
     "@reef-knot/wallets-list": 2.0.1
     "@reef-knot/web3-react": 4.0.1
-  checksum: 973d86fc3702c02e76a2a9e702b2d8e7b5599de1d42c19e9fcecf624cceeceb836cef3005e045e76aed2478dd423b03e5ccdfabdabcfd06c4266038e25fd670c
+  peerDependencies:
+    "@lidofinance/lido-ui": ^3.18.0
+    "@tanstack/react-query": ^5.51.1
+    react: ">=18"
+    react-dom: ">=18"
+    styled-components: ^5.3.5
+    viem: 2.13.3
+    wagmi: 2.11.2
+  checksum: 5c222c24c7bcdec49359b168cf38920993e86b1c08a14c405e9ef47295af8307b32d7bf5b5f6d7cab1d3a3cc15b3e9ff1193abafff6e6f6186065ef463c9f64d
   languageName: node
   linkType: hard
 
@@ -25941,7 +25952,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ua-parser-js@npm:^1.0.35":
+"ua-parser-js@npm:1.0.37, ua-parser-js@npm:^1.0.35":
   version: 1.0.37
   resolution: "ua-parser-js@npm:1.0.37"
   checksum: 4d481c720d523366d7762dc8a46a1b58967d979aacf786f9ceceb1cd767de069f64a4bdffb63956294f1c0696eb465ddb950f28ba90571709e33521b4bd75e07
