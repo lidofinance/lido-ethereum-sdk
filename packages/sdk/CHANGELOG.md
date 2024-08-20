@@ -1,3 +1,15 @@
+# 3.4.0
+
+### Fixed
+
+- `apr` in `getRewardsFromChain` and `getRewardsFromSubgraph` is now in percents e.g 3.14 and not 0.314
+- package is build with ts@5.4.5
+- `LidoSDKApr.calculateAprFromRebaseEvent` has increased precision
+
+# 3.3.0
+
+No changes
+
 # 3.2.2
 
 ## SDK
@@ -6,8 +18,6 @@
 
 - fixed edge-case in `withdraw.views.findCheckpointHints` where last finalized request would fail assertion with `Cannot find hints for unfinalized request...`
 - subsequently fixed same error in `withdraw.request-info`, `withdraw.claim` modules
-
-# 3.2.0
 
 # 3.2.1
 
