@@ -21,7 +21,7 @@ const APR_SPEC: Array<[AprRebaseEvent, number]> = [
       postTotalShares: 380434280124073199943710n,
       postTotalEther: 381570076199165808306368n,
     },
-    1.7,
+    1.7497,
   ],
   [
     {
@@ -31,7 +31,7 @@ const APR_SPEC: Array<[AprRebaseEvent, number]> = [
       postTotalShares: 380434280124073199943710n,
       timeElapsed: 96768n,
     },
-    1.7,
+    1.7918,
   ],
   [
     {
@@ -41,7 +41,7 @@ const APR_SPEC: Array<[AprRebaseEvent, number]> = [
       postTotalShares: 380434280124073199943710n,
       timeElapsed: 188928n,
     },
-    1.7,
+    1.7613,
   ],
   [
     {
@@ -51,7 +51,7 @@ const APR_SPEC: Array<[AprRebaseEvent, number]> = [
       preTotalShares: 8066681860242338824295513n,
       timeElapsed: 950400n,
     },
-    3.8,
+    3.8393,
   ],
   [
     {
@@ -61,7 +61,7 @@ const APR_SPEC: Array<[AprRebaseEvent, number]> = [
       preTotalShares: 7381214257921691114069196n,
       timeElapsed: 9244800n,
     },
-    3.7,
+    3.7196,
   ],
   [
     {
@@ -71,7 +71,7 @@ const APR_SPEC: Array<[AprRebaseEvent, number]> = [
       preTotalShares: 352884611916239405037988n,
       timeElapsed: 12009600n,
     },
-    4.5,
+    4.5775,
   ],
 ];
 
@@ -79,29 +79,29 @@ const APR_SPEC_BLOCK: Record<string, { block: bigint; apr: number }[]> = {
   '17000': [
     {
       block: 500726n,
-      apr: 1.7,
+      apr: 1.7265,
     },
     {
       block: 493967n,
-      apr: 1.9,
+      apr: 1.9044,
     },
     {
       block: 491753n,
-      apr: 1.5,
+      apr: 1.5673,
     },
     {
       block: 94120n,
-      apr: 1.3,
+      apr: 1.3987,
     },
 
     {
       block: 103607n,
-      apr: 6.3,
+      apr: 6.3928,
     },
 
     {
       block: 77212n,
-      apr: 1.3,
+      apr: 1.3269,
     },
   ],
 };

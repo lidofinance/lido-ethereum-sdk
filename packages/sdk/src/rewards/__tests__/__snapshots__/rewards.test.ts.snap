@@ -414,7 +414,7 @@ exports[`LidoSDKRewards rewards snapshot 0: --graph 1`] = `
       "type": "transfer_out",
     },
     {
-      "apr": 0.018021902137936127,
+      "apr": 1.8021902137936125,
       "balance": 3002010105772024149n,
       "balanceShares": 2994045064012817428n,
       "change": 7905284365305n,
@@ -893,7 +893,7 @@ exports[`LidoSDKRewards rewards snapshot 0: --graph 1`] = `
       "type": "transfer_out",
     },
     {
-      "apr": 0.01912396462356596,
+      "apr": 1.912396462356596,
       "balance": 3002018494496782642n,
       "balanceShares": 2994045064012817947n,
       "change": 8388724757972n,
@@ -913,7 +913,7 @@ exports[`LidoSDKRewards rewards snapshot 0: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01752819866600564,
+      "apr": 1.752819866600564,
       "balance": 3002026183260482450n,
       "balanceShares": 2994045064012817947n,
       "change": 7688763699808n,
@@ -933,7 +933,7 @@ exports[`LidoSDKRewards rewards snapshot 0: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019608007769120153,
+      "apr": 1.9608007769120155,
       "balance": 3002034784356770958n,
       "balanceShares": 2994045064012817947n,
       "change": 8601096288508n,
@@ -1086,7 +1086,7 @@ exports[`LidoSDKRewards rewards snapshot 0: -chain 1`] = `
       "type": "transfer_out",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.8021,
       "balance": 3002010105772024149n,
       "balanceShares": 2994045064012817428n,
       "change": 7905284365305n,
@@ -1231,7 +1231,7 @@ exports[`LidoSDKRewards rewards snapshot 0: -chain 1`] = `
       "type": "transfer_out",
     },
     {
-      "apr": 0.019,
+      "apr": 1.9123,
       "balance": 3002018494496782642n,
       "balanceShares": 2994045064012817947n,
       "change": 8388724757972n,
@@ -1240,7 +1240,7 @@ exports[`LidoSDKRewards rewards snapshot 0: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.017,
+      "apr": 1.7528,
       "balance": 3002026183260482450n,
       "balanceShares": 2994045064012817947n,
       "change": 7688763699808n,
@@ -1249,7 +1249,7 @@ exports[`LidoSDKRewards rewards snapshot 0: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019,
+      "apr": 1.9608,
       "balance": 3002034784356770958n,
       "balanceShares": 2994045064012817947n,
       "change": 8601096288508n,
@@ -1461,7 +1461,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "transfer_out",
     },
     {
-      "apr": 0.017484555972814887,
+      "apr": 1.7484555972814886,
       "balance": 3002286087232350332n,
       "balanceShares": 2994045064012818466n,
       "change": 7670283839578n,
@@ -1481,7 +1481,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.017873572328454643,
+      "apr": 1.7873572328454643,
       "balance": 3002293928193450731n,
       "balanceShares": 2994045064012818466n,
       "change": 7840961100399n,
@@ -1501,7 +1501,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.016154698467794028,
+      "apr": 1.6154698467794026,
       "balance": 3002301015119934261n,
       "balanceShares": 2994045064012818466n,
       "change": 7086926483530n,
@@ -1521,7 +1521,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.017777299648921163,
+      "apr": 1.7777299648921163,
       "balance": 3002308813885929811n,
       "balanceShares": 2994045064012818466n,
       "change": 7798765995550n,
@@ -1541,7 +1541,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01875423549365398,
+      "apr": 1.8754235493653981,
       "balance": 3002317041247613141n,
       "balanceShares": 2994045064012818466n,
       "change": 8227361683330n,
@@ -1561,7 +1561,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.016856563802468708,
+      "apr": 1.6856563802468707,
       "balance": 3002324436133276853n,
       "balanceShares": 2994045064012818466n,
       "change": 7394885663712n,
@@ -1581,7 +1581,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.020444197244952812,
+      "apr": 2.044419724495281,
       "balance": 3002333404916906537n,
       "balanceShares": 2994045064012818466n,
       "change": 8968783629684n,
@@ -1601,7 +1601,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01727389748427076,
+      "apr": 1.7273897484270757,
       "balance": 3002340982925958612n,
       "balanceShares": 2994045064012818466n,
       "change": 7578009052075n,
@@ -1621,7 +1621,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01587745349086303,
+      "apr": 1.587745349086303,
       "balance": 3002347948336635524n,
       "balanceShares": 2994045064012818466n,
       "change": 6965410676912n,
@@ -1641,7 +1641,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019914441974503167,
+      "apr": 1.9914441974503168,
       "balance": 3002356684787266307n,
       "balanceShares": 2994045064012818466n,
       "change": 8736450630783n,
@@ -1661,7 +1661,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01683879385509904,
+      "apr": 1.6838793855099041,
       "balance": 3002364071974889264n,
       "balanceShares": 2994045064012818466n,
       "change": 7387187622957n,
@@ -1681,7 +1681,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01788461179391685,
+      "apr": 1.7884611793916851,
       "balance": 3002371917982690728n,
       "balanceShares": 2994045064012818466n,
       "change": 7846007801464n,
@@ -1701,7 +1701,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01927393419773645,
+      "apr": 1.927393419773645,
       "balance": 3002380373510549626n,
       "balanceShares": 2994045064012818466n,
       "change": 8455527858898n,
@@ -1721,7 +1721,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01688211818457367,
+      "apr": 1.688211818457367,
       "balance": 3002387779763013648n,
       "balanceShares": 2994045064012818466n,
       "change": 7406252464022n,
@@ -1741,7 +1741,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01782836721608299,
+      "apr": 1.782836721608299,
       "balance": 3002395601157989019n,
       "balanceShares": 2994045064012818466n,
       "change": 7821394975371n,
@@ -1761,7 +1761,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018597154461474377,
+      "apr": 1.8597154461474377,
       "balance": 3002403759845075658n,
       "balanceShares": 2994045064012818466n,
       "change": 8158687086639n,
@@ -1781,7 +1781,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.016243332777353535,
+      "apr": 1.6243332777353536,
       "balance": 3002410885915344610n,
       "balanceShares": 2994045064012818466n,
       "change": 7126070268952n,
@@ -1801,7 +1801,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01889312974790808,
+      "apr": 1.889312974790808,
       "balance": 3002419174490822108n,
       "balanceShares": 2994045064012818466n,
       "change": 8288575477498n,
@@ -1821,7 +1821,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01940494669409584,
+      "apr": 1.940494669409584,
       "balance": 3002427687628215252n,
       "balanceShares": 2994045064012818466n,
       "change": 8513137393144n,
@@ -1841,7 +1841,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018457985695374667,
+      "apr": 1.8457985695374668,
       "balance": 3002435785347639491n,
       "balanceShares": 2994045064012818466n,
       "change": 8097719424239n,
@@ -1861,7 +1861,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018690406963797968,
+      "apr": 1.8690406963797968,
       "balance": 3002443985054921437n,
       "balanceShares": 2994045064012818466n,
       "change": 8199707281946n,
@@ -1881,7 +1881,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01710916100027747,
+      "apr": 1.710916100027747,
       "balance": 3002451491070999555n,
       "balanceShares": 2994045064012818466n,
       "change": 7506016078118n,
@@ -1901,7 +1901,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.016123483811953946,
+      "apr": 1.6123483811953945,
       "balance": 3002458564675092700n,
       "balanceShares": 2994045064012818466n,
       "change": 7073604093145n,
@@ -1921,7 +1921,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019611822884722595,
+      "apr": 1.9611822884722594,
       "balance": 3002467168683945906n,
       "balanceShares": 2994045064012818466n,
       "change": 8604008853206n,
@@ -1941,7 +1941,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019767455920267973,
+      "apr": 1.9767455920267971,
       "balance": 3002475840996261378n,
       "balanceShares": 2994045064012818466n,
       "change": 8672312315472n,
@@ -1961,7 +1961,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.02123967494503374,
+      "apr": 2.1239674945033737,
       "balance": 3002485159222510595n,
       "balanceShares": 2994045064012818466n,
       "change": 9318226249217n,
@@ -1981,7 +1981,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01557067518455181,
+      "apr": 1.557067518455181,
       "balance": 3002491990378113983n,
       "balanceShares": 2994045064012818466n,
       "change": 6831155603388n,
@@ -2001,7 +2001,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01979910028448909,
+      "apr": 1.9799100284489088,
       "balance": 3002500676645148996n,
       "balanceShares": 2994045064012818466n,
       "change": 8686267035013n,
@@ -2021,7 +2021,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018255688843997992,
+      "apr": 1.8255688843997993,
       "balance": 3002508685809438564n,
       "balanceShares": 2994045064012818466n,
       "change": 8009164289568n,
@@ -2041,7 +2041,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018985566649996923,
+      "apr": 1.8985566649996923,
       "balance": 3002517015209076428n,
       "balanceShares": 2994045064012818466n,
       "change": 8329399637864n,
@@ -2061,7 +2061,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01897885975817182,
+      "apr": 1.8978859758171822,
       "balance": 3002525341689347211n,
       "balanceShares": 2994045064012818466n,
       "change": 8326480270783n,
@@ -2081,7 +2081,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018878185626824404,
+      "apr": 1.8878185626824404,
       "balance": 3002533624024433919n,
       "balanceShares": 2994045064012818466n,
       "change": 8282335086708n,
@@ -2101,7 +2101,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.0188896513314729,
+      "apr": 1.88896513314729,
       "balance": 3002541911412674116n,
       "balanceShares": 2994045064012818466n,
       "change": 8287388240197n,
@@ -2121,7 +2121,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01667999071463843,
+      "apr": 1.667999071463843,
       "balance": 3002549229384721995n,
       "balanceShares": 2994045064012818466n,
       "change": 7317972047879n,
@@ -2141,7 +2141,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019637225681237238,
+      "apr": 1.9637225681237238,
       "balance": 3002557844798323669n,
       "balanceShares": 2994045064012818466n,
       "change": 8615413601674n,
@@ -2161,7 +2161,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.017316471083012118,
+      "apr": 1.7316471083012117,
       "balance": 3002565442052182229n,
       "balanceShares": 2994045064012818466n,
       "change": 7597253858560n,
@@ -2181,7 +2181,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018486027395233133,
+      "apr": 1.8486027395233133,
       "balance": 3002573552445901719n,
       "balanceShares": 2994045064012818466n,
       "change": 8110393719490n,
@@ -2201,7 +2201,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018110880392594227,
+      "apr": 1.8110880392594226,
       "balance": 3002581498272455628n,
       "balanceShares": 2994045064012818466n,
       "change": 7945826553909n,
@@ -2221,7 +2221,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.015936652062491202,
+      "apr": 1.5936652062491203,
       "balance": 3002588490213515316n,
       "balanceShares": 2994045064012818466n,
       "change": 6991941059688n,
@@ -2241,7 +2241,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018184106961909276,
+      "apr": 1.8184106961909277,
       "balance": 3002596468206613930n,
       "balanceShares": 2994045064012818466n,
       "change": 7977993098614n,
@@ -2261,7 +2261,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01997497972032601,
+      "apr": 1.997497972032601,
       "balance": 3002605231940467556n,
       "balanceShares": 2994045064012818466n,
       "change": 8763733853626n,
@@ -2281,7 +2281,7 @@ exports[`LidoSDKRewards rewards snapshot 1: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01970207746120426,
+      "apr": 1.9702077461204262,
       "balance": 3002613875967625927n,
       "balanceShares": 2994045064012818466n,
       "change": 8644027158371n,
@@ -2370,7 +2370,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "transfer_out",
     },
     {
-      "apr": 0.017,
+      "apr": 1.7484,
       "balance": 3002286087232350332n,
       "balanceShares": 2994045064012818466n,
       "change": 7670283839578n,
@@ -2379,7 +2379,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.017,
+      "apr": 1.7873,
       "balance": 3002293928193450731n,
       "balanceShares": 2994045064012818466n,
       "change": 7840961100399n,
@@ -2388,7 +2388,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.016,
+      "apr": 1.6154,
       "balance": 3002301015119934261n,
       "balanceShares": 2994045064012818466n,
       "change": 7086926483530n,
@@ -2397,7 +2397,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.017,
+      "apr": 1.7777,
       "balance": 3002308813885929811n,
       "balanceShares": 2994045064012818466n,
       "change": 7798765995550n,
@@ -2406,7 +2406,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.8754,
       "balance": 3002317041247613141n,
       "balanceShares": 2994045064012818466n,
       "change": 8227361683330n,
@@ -2415,7 +2415,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.016,
+      "apr": 1.6856,
       "balance": 3002324436133276853n,
       "balanceShares": 2994045064012818466n,
       "change": 7394885663712n,
@@ -2424,7 +2424,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.02,
+      "apr": 2.0444,
       "balance": 3002333404916906537n,
       "balanceShares": 2994045064012818466n,
       "change": 8968783629684n,
@@ -2433,7 +2433,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.017,
+      "apr": 1.7273,
       "balance": 3002340982925958612n,
       "balanceShares": 2994045064012818466n,
       "change": 7578009052075n,
@@ -2442,7 +2442,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.015,
+      "apr": 1.5877,
       "balance": 3002347948336635524n,
       "balanceShares": 2994045064012818466n,
       "change": 6965410676912n,
@@ -2451,7 +2451,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019,
+      "apr": 1.9914,
       "balance": 3002356684787266307n,
       "balanceShares": 2994045064012818466n,
       "change": 8736450630783n,
@@ -2460,7 +2460,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.016,
+      "apr": 1.6838,
       "balance": 3002364071974889264n,
       "balanceShares": 2994045064012818466n,
       "change": 7387187622957n,
@@ -2469,7 +2469,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.017,
+      "apr": 1.7884,
       "balance": 3002371917982690728n,
       "balanceShares": 2994045064012818466n,
       "change": 7846007801464n,
@@ -2478,7 +2478,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019,
+      "apr": 1.9273,
       "balance": 3002380373510549626n,
       "balanceShares": 2994045064012818466n,
       "change": 8455527858898n,
@@ -2487,7 +2487,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.016,
+      "apr": 1.6882,
       "balance": 3002387779763013648n,
       "balanceShares": 2994045064012818466n,
       "change": 7406252464022n,
@@ -2496,7 +2496,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.017,
+      "apr": 1.7828,
       "balance": 3002395601157989019n,
       "balanceShares": 2994045064012818466n,
       "change": 7821394975371n,
@@ -2505,7 +2505,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.8597,
       "balance": 3002403759845075658n,
       "balanceShares": 2994045064012818466n,
       "change": 8158687086639n,
@@ -2514,7 +2514,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.016,
+      "apr": 1.6243,
       "balance": 3002410885915344610n,
       "balanceShares": 2994045064012818466n,
       "change": 7126070268952n,
@@ -2523,7 +2523,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.8893,
       "balance": 3002419174490822108n,
       "balanceShares": 2994045064012818466n,
       "change": 8288575477498n,
@@ -2532,7 +2532,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019,
+      "apr": 1.9404,
       "balance": 3002427687628215252n,
       "balanceShares": 2994045064012818466n,
       "change": 8513137393144n,
@@ -2541,7 +2541,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.8457,
       "balance": 3002435785347639491n,
       "balanceShares": 2994045064012818466n,
       "change": 8097719424239n,
@@ -2550,7 +2550,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.869,
       "balance": 3002443985054921437n,
       "balanceShares": 2994045064012818466n,
       "change": 8199707281946n,
@@ -2559,7 +2559,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.017,
+      "apr": 1.7109,
       "balance": 3002451491070999555n,
       "balanceShares": 2994045064012818466n,
       "change": 7506016078118n,
@@ -2568,7 +2568,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.016,
+      "apr": 1.6123,
       "balance": 3002458564675092700n,
       "balanceShares": 2994045064012818466n,
       "change": 7073604093145n,
@@ -2577,7 +2577,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019,
+      "apr": 1.9611,
       "balance": 3002467168683945906n,
       "balanceShares": 2994045064012818466n,
       "change": 8604008853206n,
@@ -2586,7 +2586,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019,
+      "apr": 1.9767,
       "balance": 3002475840996261378n,
       "balanceShares": 2994045064012818466n,
       "change": 8672312315472n,
@@ -2595,7 +2595,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.021,
+      "apr": 2.1239,
       "balance": 3002485159222510595n,
       "balanceShares": 2994045064012818466n,
       "change": 9318226249217n,
@@ -2604,7 +2604,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.015,
+      "apr": 1.557,
       "balance": 3002491990378113983n,
       "balanceShares": 2994045064012818466n,
       "change": 6831155603388n,
@@ -2613,7 +2613,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019,
+      "apr": 1.9799,
       "balance": 3002500676645148996n,
       "balanceShares": 2994045064012818466n,
       "change": 8686267035013n,
@@ -2622,7 +2622,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.8255,
       "balance": 3002508685809438564n,
       "balanceShares": 2994045064012818466n,
       "change": 8009164289568n,
@@ -2631,7 +2631,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.8985,
       "balance": 3002517015209076428n,
       "balanceShares": 2994045064012818466n,
       "change": 8329399637864n,
@@ -2640,7 +2640,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.8978,
       "balance": 3002525341689347211n,
       "balanceShares": 2994045064012818466n,
       "change": 8326480270783n,
@@ -2649,7 +2649,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.8878,
       "balance": 3002533624024433919n,
       "balanceShares": 2994045064012818466n,
       "change": 8282335086708n,
@@ -2658,7 +2658,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.8889,
       "balance": 3002541911412674116n,
       "balanceShares": 2994045064012818466n,
       "change": 8287388240197n,
@@ -2667,7 +2667,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.016,
+      "apr": 1.6679,
       "balance": 3002549229384721995n,
       "balanceShares": 2994045064012818466n,
       "change": 7317972047879n,
@@ -2676,7 +2676,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019,
+      "apr": 1.9637,
       "balance": 3002557844798323669n,
       "balanceShares": 2994045064012818466n,
       "change": 8615413601674n,
@@ -2685,7 +2685,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.017,
+      "apr": 1.7316,
       "balance": 3002565442052182229n,
       "balanceShares": 2994045064012818466n,
       "change": 7597253858560n,
@@ -2694,7 +2694,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.8486,
       "balance": 3002573552445901719n,
       "balanceShares": 2994045064012818466n,
       "change": 8110393719490n,
@@ -2703,7 +2703,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.811,
       "balance": 3002581498272455628n,
       "balanceShares": 2994045064012818466n,
       "change": 7945826553909n,
@@ -2712,7 +2712,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.015,
+      "apr": 1.5936,
       "balance": 3002588490213515316n,
       "balanceShares": 2994045064012818466n,
       "change": 6991941059688n,
@@ -2721,7 +2721,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.018000000000000002,
+      "apr": 1.8184,
       "balance": 3002596468206613930n,
       "balanceShares": 2994045064012818466n,
       "change": 7977993098614n,
@@ -2730,7 +2730,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019,
+      "apr": 1.9974,
       "balance": 3002605231940467556n,
       "balanceShares": 2994045064012818466n,
       "change": 8763733853626n,
@@ -2739,7 +2739,7 @@ exports[`LidoSDKRewards rewards snapshot 1: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.019,
+      "apr": 1.9702,
       "balance": 3002613875967625927n,
       "balanceShares": 2994045064012818466n,
       "change": 8644027158371n,
@@ -2787,7 +2787,7 @@ exports[`LidoSDKRewards rewards snapshot 3: --graph 1`] = `
   "lastIndexedBlock": Any<BigInt>,
   "rewards": [
     {
-      "apr": 0.017484555972814887,
+      "apr": 1.7484555972814886,
       "balance": 3002286087232350332n,
       "balanceShares": 2994045064012818466n,
       "change": 7670283839578n,
@@ -2807,7 +2807,7 @@ exports[`LidoSDKRewards rewards snapshot 3: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.017873572328454643,
+      "apr": 1.7873572328454643,
       "balance": 3002293928193450731n,
       "balanceShares": 2994045064012818466n,
       "change": 7840961100399n,
@@ -2827,7 +2827,7 @@ exports[`LidoSDKRewards rewards snapshot 3: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.016154698467794028,
+      "apr": 1.6154698467794026,
       "balance": 3002301015119934261n,
       "balanceShares": 2994045064012818466n,
       "change": 7086926483530n,
@@ -2860,7 +2860,7 @@ exports[`LidoSDKRewards rewards snapshot 3: -chain 1`] = `
   "fromBlock": 466400n,
   "rewards": [
     {
-      "apr": 0.017,
+      "apr": 1.7484,
       "balance": 3002286087232350332n,
       "balanceShares": 2994045064012818466n,
       "change": 7670283839578n,
@@ -2869,7 +2869,7 @@ exports[`LidoSDKRewards rewards snapshot 3: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.017,
+      "apr": 1.7873,
       "balance": 3002293928193450731n,
       "balanceShares": 2994045064012818466n,
       "change": 7840961100399n,
@@ -2878,7 +2878,7 @@ exports[`LidoSDKRewards rewards snapshot 3: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.016,
+      "apr": 1.6154,
       "balance": 3002301015119934261n,
       "balanceShares": 2994045064012818466n,
       "change": 7086926483530n,
@@ -2926,7 +2926,7 @@ exports[`LidoSDKRewards rewards snapshot 5: --graph 1`] = `
   "lastIndexedBlock": Any<BigInt>,
   "rewards": [
     {
-      "apr": 0.013782142362888264,
+      "apr": 1.3782142362888263,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -2946,7 +2946,7 @@ exports[`LidoSDKRewards rewards snapshot 5: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.013670061576466082,
+      "apr": 1.3670061576466082,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -2966,7 +2966,7 @@ exports[`LidoSDKRewards rewards snapshot 5: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.014125136158637412,
+      "apr": 1.4125136158637412,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -2986,7 +2986,7 @@ exports[`LidoSDKRewards rewards snapshot 5: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.014227486392550783,
+      "apr": 1.4227486392550783,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -3006,7 +3006,7 @@ exports[`LidoSDKRewards rewards snapshot 5: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01376908811556794,
+      "apr": 1.376908811556794,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -3026,7 +3026,7 @@ exports[`LidoSDKRewards rewards snapshot 5: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.013763481179492235,
+      "apr": 1.3763481179492234,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -3046,7 +3046,7 @@ exports[`LidoSDKRewards rewards snapshot 5: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01337290411597289,
+      "apr": 1.337290411597289,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -3066,7 +3066,7 @@ exports[`LidoSDKRewards rewards snapshot 5: --graph 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.01357007865602105,
+      "apr": 1.357007865602105,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -3099,7 +3099,7 @@ exports[`LidoSDKRewards rewards snapshot 5: -chain 1`] = `
   "fromBlock": 60000n,
   "rewards": [
     {
-      "apr": 0.013000000000000001,
+      "apr": 1.3782,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -3108,7 +3108,7 @@ exports[`LidoSDKRewards rewards snapshot 5: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.013000000000000001,
+      "apr": 1.367,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -3117,7 +3117,7 @@ exports[`LidoSDKRewards rewards snapshot 5: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.013999999999999999,
+      "apr": 1.4125,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -3126,7 +3126,7 @@ exports[`LidoSDKRewards rewards snapshot 5: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.013999999999999999,
+      "apr": 1.4227,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -3135,7 +3135,7 @@ exports[`LidoSDKRewards rewards snapshot 5: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.013000000000000001,
+      "apr": 1.3769,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -3144,7 +3144,7 @@ exports[`LidoSDKRewards rewards snapshot 5: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.013000000000000001,
+      "apr": 1.3763,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -3153,7 +3153,7 @@ exports[`LidoSDKRewards rewards snapshot 5: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.013000000000000001,
+      "apr": 1.3372,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,
@@ -3162,7 +3162,7 @@ exports[`LidoSDKRewards rewards snapshot 5: -chain 1`] = `
       "type": "rebase",
     },
     {
-      "apr": 0.013000000000000001,
+      "apr": 1.357,
       "balance": 0n,
       "balanceShares": 0n,
       "change": 0n,

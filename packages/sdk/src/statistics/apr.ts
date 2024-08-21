@@ -24,7 +24,7 @@ export class LidoSDKApr extends LidoSDKModule {
   }: AprRebaseEvent): number {
     const preShareRate = (preTotalEther * BigInt(10 ** 27)) / preTotalShares;
     const postShareRate = (postTotalEther * BigInt(10 ** 27)) / postTotalShares;
-    const mulForPrecision = 1000;
+    const mulForPrecision = 1000000;
 
     const secondsInYear = 31536000n;
     const userAPR =
