@@ -1,10 +1,18 @@
 # 3.4.0
 
+## SDK
+
 ### Fixed
 
 - `apr` in `getRewardsFromChain` and `getRewardsFromSubgraph` is now in percents e.g 3.14 and not 0.314
-- package is build with ts@5.4.5
+- package is build with ts@5.4.5 with changes in bundle
 - `LidoSDKApr.calculateAprFromRebaseEvent` has increased precision
+
+## Playground
+
+### Fixed
+
+- updated version of `reef-knot` package with `wagmi@2`
 
 # 3.3.0
 
