@@ -1,4 +1,4 @@
-import { useWeb3 } from '@reef-knot/web3-react';
+import { useWeb3 } from 'reef-knot/web3-react';
 import { useEffect, useState } from 'react';
 import { Address } from 'viem';
 

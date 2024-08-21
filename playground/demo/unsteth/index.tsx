@@ -1,5 +1,5 @@
 import { Input, Accordion } from '@lidofinance/lido-ui';
-import { useWeb3 } from '@reef-knot/web3-react';
+import { useWeb3 } from 'reef-knot/web3-react';
 import { Action } from 'components/action';
 import { ToggleButton } from 'components/toggle-button';
 

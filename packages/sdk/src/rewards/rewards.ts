@@ -228,7 +228,7 @@ export class LidoSDKRewards extends LidoSDKModule {
         return {
           type: 'rebase',
           change,
-          apr: LidoSDKApr.calculateAprFromRebaseEvent(event.args) / 100,
+          apr: LidoSDKApr.calculateAprFromRebaseEvent(event.args),
           changeShares: 0n,
           balance: newBalance,
           balanceShares: prevSharesBalance,
@@ -442,7 +442,6 @@ export class LidoSDKRewards extends LidoSDKModule {
         const totalEther = BigInt(totalPooledEtherAfter);
         const totalShares = BigInt(totalSharesAfter);
 
-        const apr = Number(eventApr) / 100;
         const newBalance = sharesToSteth(
           prevBalanceShares,
           totalEther,
@@ -456,7 +455,7 @@ export class LidoSDKRewards extends LidoSDKModule {
         return {
           type: 'rebase',
           change,
-          apr,
+          apr: Number(eventApr),
           changeShares: 0n,
           balance: newBalance,
           balanceShares: prevBalanceShares,

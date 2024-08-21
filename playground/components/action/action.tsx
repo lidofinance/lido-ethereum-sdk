@@ -14,7 +14,7 @@ import {
   ResultCode,
   SuccessMessage,
 } from './styles';
-import { useWeb3 } from '@reef-knot/web3-react';
+import { useWeb3 } from 'reef-knot/web3-react';
 
 type ActionProps<TResult> = PropsWithChildren<{
   action: () => Promise<TResult> | TResult;
