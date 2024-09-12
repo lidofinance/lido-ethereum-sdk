@@ -1,4 +1,4 @@
-export const wqAbi = [
+export const wqWstethAddressAbi = [
   {
     inputs: [],
     name: 'WSTETH',
