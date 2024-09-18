@@ -177,20 +177,28 @@ export class LidoSDKShares extends LidoSDKModule {
       address: sharesContract.address,
       abi: sharesContract.abi,
     };
-    const [totalShares, totalEther] = await this.core.rpcProvider.multicall({
-      allowFailure: false,
-      contracts: [
-        {
-          ...contract,
-          functionName: 'getTotalShares',
-        },
-        {
-          ...contract,
-          functionName: 'getTotalPooledEther',
-        },
-      ] as const,
-    });
-    return { totalEther, totalShares };
+    if (this.core.rpcProvider.multicall) {
+      const [totalShares, totalEther] = await this.core.rpcProvider.multicall({
+        allowFailure: false,
+        contracts: [
+          {
+            ...contract,
+            functionName: 'getTotalShares',
+          },
+          {
+            ...contract,
+            functionName: 'getTotalPooledEther',
+          },
+        ] as const,
+      });
+      return { totalEther, totalShares };
+    } else {
+      const [totalShares, totalEther] = await Promise.all([
+        sharesContract.read.getTotalShares(),
+        sharesContract.read.getTotalPooledEther(),
+      ]);
+      return { totalEther, totalShares };
+    }
   }
 
   @Logger('Views:')

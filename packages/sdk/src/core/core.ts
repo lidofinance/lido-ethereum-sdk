@@ -357,7 +357,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     // eth_getCode returns hex string of bytecode at address
     // for accounts it's "0x"
     // for contract it's potentially very long hex (can't be safely&quickly parsed)
-    const result = await this.rpcProvider.getBytecode({ address: address });
+    const result = await this.rpcProvider.getCode({ address: address });
     return result ? result !== '0x' : false;
   }
 
