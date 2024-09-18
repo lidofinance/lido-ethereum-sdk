@@ -71,7 +71,7 @@ export class LidoSDKL2 extends LidoSDKModule {
 
   @Logger('Call:')
   @ErrorHandler()
-  public async approveWsethForWrap(
+  public async approveWstethForWrap(
     props: WrapProps,
   ): Promise<TransactionResult> {
     const stethAddress = await this.contractAddress();

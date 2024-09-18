@@ -39,7 +39,7 @@ export const WrapL2Demo = () => {
         walletAction
         title="Approve wstETH For Wrap to stETH"
         action={() =>
-          l2.approveWsethForWrap({
+          l2.approveWstethForWrap({
             value: wstethValue ?? ZERO,
 
             callback: transactionToast,
