@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@lidofinance/lido-ethereum-sdk": "workspace:*",
-    "viem": "^2.0.6"
+    "viem": "^2.21.9"
   },
   "devDependencies": {
     "rimraf": "^5.0.5",
