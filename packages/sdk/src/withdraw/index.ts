@@ -1,3 +1,4 @@
+export { WithdrawalQueueAbi } from './abi/withdrawalQueue.js';
 export { LidoSDKWithdraw } from './withdraw.js';
 export type {
   ClaimRequestsProps,

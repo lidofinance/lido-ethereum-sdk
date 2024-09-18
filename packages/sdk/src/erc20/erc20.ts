@@ -121,7 +121,9 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
 
     const contract = await this.getContract();
     return isTransferFrom
-      ? contract.simulate.transferFrom([from, to, amount], { account })
+      ? contract.simulate.transferFrom([from, to, amount], {
+          account,
+        })
       : contract.simulate.transfer([to, amount], { account });
   }
 
@@ -217,7 +219,9 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   public async simulateApprove(props: NoCallback<ApproveProps>) {
     const { account, amount, to } = await this.parseProps(props);
     const contract = await this.getContract();
-    return contract.simulate.approve([to, amount], { account });
+    return contract.simulate.approve([to, amount], {
+      account,
+    });
   }
 
   @Logger('Views:')
@@ -239,35 +243,51 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
     decimals: number;
     domainSeparator: Hash;
   }> {
-    const contract = { address: await this.contractAddress(), abi: erc20abi };
-    const [decimals, name, symbol, domainSeparator] =
-      await this.core.rpcProvider.multicall({
-        allowFailure: false,
-        contracts: [
-          {
-            ...contract,
-            functionName: 'decimals',
-          },
-          {
-            ...contract,
-            functionName: 'name',
-          },
-          {
-            ...contract,
-            functionName: 'symbol',
-          },
-          {
-            ...contract,
-            functionName: 'DOMAIN_SEPARATOR',
-          },
-        ] as const,
-      });
-    return {
-      decimals,
-      name,
-      symbol,
-      domainSeparator,
-    };
+    if (this.core.rpcProvider.multicall) {
+      const contract = { address: await this.contractAddress(), abi: erc20abi };
+      const [decimals, name, symbol, domainSeparator] =
+        await this.core.rpcProvider.multicall({
+          allowFailure: false,
+          contracts: [
+            {
+              ...contract,
+              functionName: 'decimals',
+            },
+            {
+              ...contract,
+              functionName: 'name',
+            },
+            {
+              ...contract,
+              functionName: 'symbol',
+            },
+            {
+              ...contract,
+              functionName: 'DOMAIN_SEPARATOR',
+            },
+          ] as const,
+        });
+      return {
+        decimals,
+        name,
+        symbol,
+        domainSeparator,
+      };
+    } else {
+      const contract = await this.getContract();
+      const [decimals, name, symbol, domainSeparator] = await Promise.all([
+        contract.read.decimals(),
+        contract.read.name(),
+        contract.read.symbol(),
+        contract.read.DOMAIN_SEPARATOR(),
+      ]);
+      return {
+        decimals,
+        name,
+        symbol,
+        domainSeparator,
+      };
+    }
   }
 
   @Logger('Views:')

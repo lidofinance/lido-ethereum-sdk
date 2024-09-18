@@ -11,6 +11,7 @@ import { LidoSDKRewards } from './rewards/index.js';
 import { LidoSDKShares } from './shares/shares.js';
 
 import { version } from './version.js';
+import { LidoSDKL2 } from './l2/l2.js';
 
 export class LidoSDK {
   readonly core: LidoSDKCore;
@@ -24,6 +25,7 @@ export class LidoSDK {
   readonly events: LidoSDKEvents;
   readonly statistics: LidoSDKStatistics;
   readonly rewards: LidoSDKRewards;
+  readonly l2: LidoSDKL2;
 
   constructor(props: LidoSDKCoreProps) {
     // Core functionality
@@ -46,5 +48,7 @@ export class LidoSDK {
     this.statistics = new LidoSDKStatistics({ ...props, core });
     // Rewards functionality
     this.rewards = new LidoSDKRewards({ ...props, core });
+    // L2 functionality
+    this.l2 = new LidoSDKL2({ ...props, core });
   }
 }

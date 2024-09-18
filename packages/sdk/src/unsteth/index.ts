@@ -1,3 +1,4 @@
+export { unstethAbi } from './abi/unsteth-abi.js';
 export { LidoSDKUnstETH } from './unsteth.js';
 export type {
   UnstethNFT,

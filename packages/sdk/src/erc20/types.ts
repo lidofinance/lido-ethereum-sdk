@@ -9,7 +9,7 @@ import {
 export type InnerTransactionProps = Required<CommonTransactionProps>;
 
 export type ParsedTransactionProps<TProps extends CommonTransactionProps> =
-  Omit<TProps, 'callback'> & {
+  Omit<TProps, 'callback' | 'account'> & {
     callback: NonNullable<TProps['callback']>;
     account: JsonRpcAccount;
   } & (TProps extends { amount: EtherValue } ? { amount: bigint } : object);

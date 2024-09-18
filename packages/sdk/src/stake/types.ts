@@ -7,7 +7,7 @@ export type StakeProps = CommonTransactionProps & {
   referralAddress?: Address;
 };
 
-export type StakeInnerProps = CommonTransactionProps & {
+export type StakeInnerProps = Omit<CommonTransactionProps, 'account'> & {
   value: bigint;
   referralAddress: Address;
   account: JsonRpcAccount;

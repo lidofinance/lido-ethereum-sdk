@@ -34,8 +34,8 @@
     "styled-components": "^5.3.5",
     "swr": "^1.3.0",
     "tiny-invariant": "^1.3.1",
-    "viem": "^2.0.6",
-    "wagmi": "2.11.2"
+    "viem": "^2.21.9",
+    "wagmi": "2.12.12"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^13.4.19",
