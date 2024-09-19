@@ -14454,13 +14454,13 @@ __metadata:
   linkType: hard
 
 "find-my-way@npm:^8.0.0":
-  version: 8.2.0
-  resolution: "find-my-way@npm:8.2.0"
+  version: 8.2.2
+  resolution: "find-my-way@npm:8.2.2"
   dependencies:
     fast-deep-equal: ^3.1.3
     fast-querystring: ^1.0.0
     safe-regex2: ^3.1.0
-  checksum: 4f59fe17a1431511ec172403da0d1ac05bf9efebfdd4c7149b658d748b2570b63d798847e08ceea00f57543611fdb64ba3793dfc67a9ed7b5bfa0d77c8693eb5
+  checksum: bba4feafece3ef012180e561d904ead38e1f2e089bd97dbcb2c628d38cb869918626c673b08b698d22ef46265a886aa535a650574801ecab9c8eb8db5437736a
   languageName: node
   linkType: hard
 
