@@ -66,7 +66,13 @@ export class LidoSDKRewards extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   private earliestRebaseEventBlock(): bigint {
-    return EARLIEST_TOKEN_REBASED_EVENT[this.core.chainId];
+    const block = EARLIEST_TOKEN_REBASED_EVENT[this.core.chainId];
+    invariant(
+      block,
+      `No rebase event for chain:${this.core.chainId}`,
+      ERROR_CODE.NOT_SUPPORTED,
+    );
+    return block;
   }
 
   @Logger('Contracts:')

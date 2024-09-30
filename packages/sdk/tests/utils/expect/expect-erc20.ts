@@ -1,7 +1,10 @@
 import { getContract } from 'viem';
 import { expect, describe, test } from '@jest/globals';
 import { AbstractLidoSDKErc20 } from '../../../src/erc20/erc20.js';
-import { LIDO_CONTRACT_NAMES } from '../../../src/index.js';
+import {
+  LIDO_CONTRACT_NAMES,
+  LIDO_L2_CONTRACT_NAMES,
+} from '../../../src/index.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
 import { expectContract } from '../../../tests/utils/expect/expect-contract.js';
 import { useAccount } from '../../../tests/utils/fixtures/use-wallet-client.js';
@@ -10,25 +13,34 @@ import { expectBn } from '../../../tests/utils/expect/expect-bn.js';
 import { expectSDKModule } from '../../../tests/utils/expect/expect-sdk-module.js';
 import { LidoSDKCommonProps } from '../../../src/core/types.js';
 
+type expectERC20Options<I> = {
+  contractName: LIDO_CONTRACT_NAMES | LIDO_L2_CONTRACT_NAMES;
+  constructedWithRpcCore: I;
+  constructedWithWeb3Core: I;
+  ModulePrototype: new (props: LidoSDKCommonProps) => I;
+  isL2?: boolean;
+};
+
 export const expectERC20 = <I extends AbstractLidoSDKErc20>({
   contractName,
   constructedWithRpcCore,
   constructedWithWeb3Core,
   ModulePrototype,
-}: {
-  contractName: LIDO_CONTRACT_NAMES;
-  constructedWithRpcCore: I;
-  constructedWithWeb3Core: I;
-  ModulePrototype: new (props: LidoSDKCommonProps) => I;
-}) => {
+  isL2 = false,
+}: expectERC20Options<I>) => {
   const token = constructedWithWeb3Core;
   const tokenRpc = constructedWithRpcCore;
   const web3Core = token.core;
   const rpcCore = tokenRpc.core;
 
   const getTokenAddress = async () => {
-    const address =
-      await constructedWithRpcCore.core.getContractAddress(contractName);
+    const address = await (isL2
+      ? constructedWithRpcCore.core.getL2ContractAddress(
+          contractName as LIDO_L2_CONTRACT_NAMES,
+        )
+      : constructedWithRpcCore.core.getContractAddress(
+          contractName as LIDO_CONTRACT_NAMES,
+        ));
     return address;
   };
 

@@ -97,7 +97,7 @@ export class LidoSDKWithdrawWaitingTime extends BusModule {
 
     const baseUrl =
       getCustomApiUrl && typeof getCustomApiUrl === 'function'
-        ? getCustomApiUrl(defaultUrl, this.bus.core.chainId)
+        ? getCustomApiUrl(defaultUrl ?? null, this.bus.core.chainId)
         : defaultUrl;
 
     if (!baseUrl) {

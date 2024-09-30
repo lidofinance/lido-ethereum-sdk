@@ -3,6 +3,7 @@ import { expect, describe, test, jest } from '@jest/globals';
 import { AbstractLidoSDKErc20 } from '../../../src/erc20/erc20.js';
 import {
   LIDO_CONTRACT_NAMES,
+  LIDO_L2_CONTRACT_NAMES,
   PERMIT_MESSAGE_TYPES,
 } from '../../../src/index.js';
 import {
@@ -51,10 +52,12 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
   contractName,
   constructedWithRpcCore,
   constructedWithWeb3Core,
+  isL2 = false,
 }: {
-  contractName: LIDO_CONTRACT_NAMES;
+  contractName: LIDO_CONTRACT_NAMES | LIDO_L2_CONTRACT_NAMES;
   constructedWithRpcCore: I;
   constructedWithWeb3Core: I;
+  isL2?: boolean;
 }) => {
   const token = constructedWithWeb3Core;
   const tokenRpc = constructedWithRpcCore;
@@ -62,11 +65,15 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
   const rpcCore = tokenRpc.core;
 
   const getTokenAddress = async () => {
-    const address =
-      await constructedWithRpcCore.core.getContractAddress(contractName);
+    const address = await (isL2
+      ? constructedWithRpcCore.core.getL2ContractAddress(
+          contractName as LIDO_L2_CONTRACT_NAMES,
+        )
+      : constructedWithRpcCore.core.getContractAddress(
+          contractName as LIDO_CONTRACT_NAMES,
+        ));
     return address;
   };
-
   const getTokenContract = async () => {
     const address = await getTokenAddress();
     return getContract({
