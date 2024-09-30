@@ -1,4 +1,4 @@
-import { encodeFunctionData, getContract } from 'viem';
+import { encodeFunctionData, getContract, maxUint256 } from 'viem';
 import { expect, describe, test, jest } from '@jest/globals';
 import { AbstractLidoSDKErc20 } from '../../../src/erc20/erc20.js';
 import {
@@ -275,37 +275,51 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
     describe('permit', () => {
       test('signPermit', async () => {
         const { address } = useAccount();
+        const altAccount = useAltAccount();
         const contract = await getTokenContract();
         const nonce = await contract.read.nonces([address]);
         const chainId = token.core.chainId;
 
         const params = {
           amount: 100n,
-          spender: address,
-          deadline: 86400n,
+          spender: altAccount.address,
+          deadline: maxUint256,
         };
 
-        const tx = await token.signPermit(params);
+        const signedPermit = await token.signPermit(params);
 
-        expect(tx).toHaveProperty('v');
-        expect(tx).toHaveProperty('r');
-        expect(tx).toHaveProperty('s');
-        expect(tx).toHaveProperty('chainId');
+        expect(signedPermit).toHaveProperty('v');
+        expect(signedPermit).toHaveProperty('r');
+        expect(signedPermit).toHaveProperty('s');
+        expect(signedPermit).toHaveProperty('chainId');
 
-        expect(typeof tx.v).toBe('number');
-        expect(typeof tx.r).toBe('string');
-        expect(typeof tx.s).toBe('string');
-        expect(tx.chainId).toBe(BigInt(chainId));
+        expect(typeof signedPermit.v).toBe('number');
+        expect(typeof signedPermit.r).toBe('string');
+        expect(typeof signedPermit.s).toBe('string');
+        expect(signedPermit.chainId).toBe(BigInt(chainId));
 
-        const { v, r, s, chainId: _, ...permitMessage } = tx;
+        const { v, r, s, chainId: _, ...permitMessage } = signedPermit;
 
         expectPermitMessage(permitMessage, {
           address: address,
-          spender: address,
+          spender: altAccount.address,
           amount: params.amount,
           nonce,
           deadline: params.deadline,
         });
+
+        await contract.simulate.permit(
+          [
+            permitMessage.owner,
+            permitMessage.spender,
+            permitMessage.value,
+            permitMessage.deadline,
+            v,
+            r,
+            s,
+          ],
+          { account: altAccount, maxFeePerGas: 0n, maxPriorityFeePerGas: 0n },
+        );
       });
 
       testSpending('populatePermit', async () => {
@@ -334,6 +348,7 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
         expect(tx.domain).toMatchObject(domain);
         expect(tx.types).toBe(PERMIT_MESSAGE_TYPES);
         expect(tx.primaryType).toBe('Permit');
+
         expectPermitMessage(tx.message, {
           address: address,
           spender: address,
