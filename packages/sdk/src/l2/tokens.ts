@@ -8,7 +8,7 @@ import {
   Hash,
 } from 'viem';
 
-import { LIDO_L2_CONTRACT_NAMES, NOOP } from '../common/constants.js';
+import { CHAINS, LIDO_L2_CONTRACT_NAMES, NOOP } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
 import { Cache, ErrorHandler, Logger } from '../common/decorators/index.js';
 import { AbstractLidoSDKErc20 } from '../erc20/erc20.js';
@@ -68,10 +68,14 @@ export class LidoSDKL2Wsteth extends AbstractLidoSDKErc20 {
       salt,
       extensions,
     ] = await contract.read.eip712Domain();
+
+    const fixedVersion =
+      this.core.chainId === CHAINS.OptimismSepolia ? '1' : version;
+
     return {
       fields,
       name,
-      version,
+      version: fixedVersion,
       chainId,
       verifyingContract,
       salt,
