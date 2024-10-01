@@ -69,6 +69,7 @@ export class LidoSDKL2Wsteth extends AbstractLidoSDKErc20 {
       extensions,
     ] = await contract.read.eip712Domain();
 
+    // Testnet misconfiguration
     const fixedVersion =
       this.core.chainId === CHAINS.OptimismSepolia ? '1' : version;
 
