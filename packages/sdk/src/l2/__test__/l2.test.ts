@@ -10,7 +10,10 @@ import { LidoSDKL2Steth, LidoSDKL2Wsteth } from '../tokens.js';
 import { expectERC20 } from '../../../tests/utils/expect/expect-erc20.js';
 import { LIDO_L2_CONTRACT_NAMES } from '../../common/constants.js';
 import { expectERC20Wallet } from '../../../tests/utils/expect/expect-erc20-wallet.js';
-import { useAccount } from '../../../tests/utils/fixtures/use-wallet-client.js';
+import {
+  useAccount,
+  useAltAccount,
+} from '../../../tests/utils/fixtures/use-wallet-client.js';
 import { getContract } from 'viem';
 import { bridgedWstethAbi } from '../abi/brigedWsteth.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
@@ -19,7 +22,10 @@ import {
   expectAlmostEqualBn,
   expectNonNegativeBn,
 } from '../../../tests/utils/expect/expect-bn.js';
-import { testSpending } from '../../../tests/utils/test-spending.js';
+import {
+  SPENDING_TIMEOUT,
+  testSpending,
+} from '../../../tests/utils/test-spending.js';
 import { expectTxCallback } from '../../../tests/utils/expect/expect-tx-callback.js';
 import {
   expectPopulatedTx,
@@ -262,4 +268,74 @@ describe('LidoSDKL2Steth', () => {
     isL2: true,
     constructedWithRpcCore: l2Rpc.steth,
   });
+});
+
+describe('LidoSDKL2Steth shares', () => {
+  const l2 = useL2();
+  const account = useAccount();
+  const { address: altAddress } = useAltAccount();
+  const value = 1000n;
+
+  beforeAll(async () => {
+    await prepareL2Wsteth();
+
+    await l2.approveWstethForWrap({ value, account });
+    await l2.wrapWstethToSteth({ value, account });
+  });
+
+  test('shares balance and conversions', async () => {
+    const balanceSteth = await l2.steth.balance();
+    const shares = await l2.steth.balanceShares(account);
+
+    const convertedToShares = await l2.steth.convertToShares(balanceSteth);
+    expectAlmostEqualBn(shares, convertedToShares);
+    const convertedToSteth = await l2.steth.convertToSteth(shares);
+    expectAlmostEqualBn(balanceSteth, convertedToSteth);
+  });
+
+  test('populate transfer', async () => {
+    const tx = await l2.steth.populateTransferShares({
+      to: altAddress,
+      amount: 100n,
+    });
+    expectPopulatedTx(tx, undefined, true);
+    await expectPopulatedTxToRun(tx, l2.core.rpcProvider);
+  });
+
+  test('simulate transfer', async () => {
+    const contractAddressSteth = await l2.steth.core.getL2ContractAddress(
+      LIDO_L2_CONTRACT_NAMES.steth,
+    );
+    const tx = await l2.steth.simulateTransferShares({
+      to: altAddress,
+      amount: 100n,
+    });
+    expectAddress(tx.request.address, contractAddressSteth);
+    expectAddress(tx.request.functionName, 'transferShares');
+  });
+
+  testSpending(
+    'can transfer shares',
+    async () => {
+      const amount = 100n;
+      const amountSteth = await l2.steth.convertToSteth(amount);
+      const balanceStethBefore = await l2.steth.balance(account.address);
+      const balanceSharesBefore = await l2.steth.balanceShares(account.address);
+      const mockTxCallback = jest.fn();
+
+      const tx = await l2.steth.transferShares({
+        amount,
+        to: altAddress,
+        callback: mockTxCallback,
+      });
+      expectTxCallback(mockTxCallback, tx);
+
+      const balanceStethAfter = await l2.steth.balance(account.address);
+      const balanceSharesAfter = await l2.steth.balanceShares(account.address);
+      expect(balanceSharesAfter - balanceSharesBefore).toEqual(-amount);
+      // due to protocol rounding error this can happen
+      expectAlmostEqualBn(balanceStethAfter - balanceStethBefore, -amountSteth);
+    },
+    SPENDING_TIMEOUT,
+  );
 });
