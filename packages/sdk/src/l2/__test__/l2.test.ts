@@ -85,14 +85,14 @@ describe('LidoSDKL2', () => {
 
   test('has correct address', async () => {
     const address = await l2.contractAddress();
-    const stethAddress = await l2.core.getL2ContractAddress(
+    const stethAddress = l2.core.getL2ContractAddress(
       LIDO_L2_CONTRACT_NAMES.steth,
     );
     expectAddress(address, stethAddress);
   });
 
   test('has contract', async () => {
-    const stethAddress = await l2.core.getL2ContractAddress(
+    const stethAddress = l2.core.getL2ContractAddress(
       LIDO_L2_CONTRACT_NAMES.steth,
     );
     const contract = await l2.getContract();
@@ -128,7 +128,7 @@ describe('LidoSDKL2 wrap', () => {
   });
 
   testSpending('wrap populate', async () => {
-    const stethAddress = await l2.core.getL2ContractAddress(
+    const stethAddress = l2.core.getL2ContractAddress(
       LIDO_L2_CONTRACT_NAMES.steth,
     );
     const tx = await l2.wrapWstethToStethPopulateTx({ value });
@@ -139,7 +139,7 @@ describe('LidoSDKL2 wrap', () => {
   });
 
   testSpending('wrap simulate', async () => {
-    const stethAddress = await l2.core.getL2ContractAddress(
+    const stethAddress = l2.core.getL2ContractAddress(
       LIDO_L2_CONTRACT_NAMES.steth,
     );
     const tx = await l2.wrapWstethToStethSimulateTx({ value });
@@ -174,7 +174,7 @@ describe('LidoSDKL2 wrap', () => {
   });
 
   testSpending('unwrap steth populate', async () => {
-    const stethAddress = await l2.core.getL2ContractAddress(
+    const stethAddress = l2.core.getL2ContractAddress(
       LIDO_L2_CONTRACT_NAMES.steth,
     );
     const tx = await l2.unwrapPopulateTx({ value });
@@ -185,7 +185,7 @@ describe('LidoSDKL2 wrap', () => {
   });
 
   testSpending('unwrap steth simulate', async () => {
-    const stethAddress = await l2.core.getL2ContractAddress(
+    const stethAddress = l2.core.getL2ContractAddress(
       LIDO_L2_CONTRACT_NAMES.steth,
     );
     const tx = await l2.unwrapSimulateTx({ value });
@@ -303,7 +303,7 @@ describe('LidoSDKL2Steth shares', () => {
   });
 
   test('simulate transfer', async () => {
-    const contractAddressSteth = await l2.steth.core.getL2ContractAddress(
+    const contractAddressSteth = l2.steth.core.getL2ContractAddress(
       LIDO_L2_CONTRACT_NAMES.steth,
     );
     const tx = await l2.steth.simulateTransferShares({
