@@ -218,6 +218,7 @@ export class LidoSDKL2 extends LidoSDKModule {
   }
 
   @Logger('Utils:')
+  @ErrorHandler()
   public async unwrapPopulateTx(
     props: Omit<WrapProps, 'callback'>,
   ): Promise<PopulatedTransaction> {
