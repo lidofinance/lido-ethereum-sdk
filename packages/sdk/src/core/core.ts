@@ -390,7 +390,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   @Logger('Utils:')
   @Cache(30 * 60 * 1000, ['chain.id'])
   public getL2ContractAddress(contract: LIDO_L2_CONTRACT_NAMES): Address {
-    const chainConfig = LIDO_L2_CONTRACT_ADDRESSES[this.chain.id];
+    const chainConfig = LIDO_L2_CONTRACT_ADDRESSES[this.chain.id as CHAINS];
     invariant(
       chainConfig,
       `Lido L2 contracts are not supported for ${this.chain.name}(${this.chain.id})`,
@@ -408,7 +408,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   @Logger('Utils:')
   @Cache(30 * 60 * 1000, ['chain.id'])
   public getSubgraphId(): string | null {
-    const id = SUBRGRAPH_ID_BY_CHAIN[this.chainId];
+    const id = SUBRGRAPH_ID_BY_CHAIN[this.chainId] ?? null;
     return id;
   }
 

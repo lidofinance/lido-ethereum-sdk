@@ -8,7 +8,7 @@ import {
   Hash,
 } from 'viem';
 
-import { LIDO_L2_CONTRACT_NAMES, NOOP } from '../common/constants.js';
+import { CHAINS, LIDO_L2_CONTRACT_NAMES, NOOP } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
 import { Cache, ErrorHandler, Logger } from '../common/decorators/index.js';
 import { AbstractLidoSDKErc20 } from '../erc20/erc20.js';
@@ -49,24 +49,38 @@ export class LidoSDKL2Wsteth extends AbstractLidoSDKErc20 {
   }
 
   @Cache(30 * 60 * 1000, ['core.chain.id'])
-  public async contractVersion(): Promise<bigint> {
-    const contract = await this.getL2Contract();
-    return contract.read.getContractVersion();
-  }
-
-  @Cache(30 * 60 * 1000, ['core.chain.id'])
   public override async erc721Domain(): Promise<{
     name: string;
     version: string;
     chainId: bigint;
-    verifyingContract: `0x${string}`;
+    verifyingContract: Address;
+    fields: Hash;
+    salt: Hash;
+    extensions: readonly bigint[];
   }> {
-    const { name } = await this.erc20Metadata();
+    const contract = await this.getL2Contract();
+    const [
+      fields,
+      name,
+      version,
+      chainId,
+      verifyingContract,
+      salt,
+      extensions,
+    ] = await contract.read.eip712Domain();
+
+    // Testnet misconfiguration
+    const fixedVersion =
+      this.core.chainId === CHAINS.OptimismSepolia ? '1' : version;
+
     return {
-      name: name,
-      version: (await this.contractVersion()).toString(),
-      chainId: BigInt(this.core.chain.id),
-      verifyingContract: await this.contractAddress(),
+      fields,
+      name,
+      version: fixedVersion,
+      chainId,
+      verifyingContract,
+      salt,
+      extensions,
     };
   }
 }
@@ -90,12 +104,6 @@ export class LidoSDKL2Steth extends AbstractLidoSDKErc20 {
         wallet: this.core.web3Provider as WalletClient,
       },
     });
-  }
-
-  @Cache(30 * 60 * 1000, ['core.chain.id'])
-  public async contractVersion(): Promise<bigint> {
-    const contract = await this.getL2Contract();
-    return contract.read.getContractVersion();
   }
 
   @Cache(30 * 60 * 1000, ['core.chain.id'])

@@ -16,7 +16,12 @@ import {
   type TransactionReceipt,
 } from 'viem';
 
-import { LIDO_L2_CONTRACT_NAMES, NOOP } from '../common/constants.js';
+import {
+  CHAINS,
+  LIDO_L2_CONTRACT_ADDRESSES,
+  LIDO_L2_CONTRACT_NAMES,
+  NOOP,
+} from '../common/constants.js';
 import { Cache, Logger, ErrorHandler } from '../common/decorators/index.js';
 
 import { rebasableL2StethAbi } from './abi/rebasableL2Steth.js';
@@ -35,6 +40,13 @@ export class LidoSDKL2 extends LidoSDKModule {
   private static TRANSFER_SIGNATURE = toEventHash(
     getAbiItem({ abi: rebasableL2StethAbi, name: 'Transfer' }),
   );
+
+  public static isContractAvailableOn(
+    contract: LIDO_L2_CONTRACT_NAMES,
+    chain: CHAINS,
+  ) {
+    return !!LIDO_L2_CONTRACT_ADDRESSES[chain]?.[contract];
+  }
 
   public readonly wsteth: LidoSDKL2Wsteth;
   public readonly steth: LidoSDKL2Steth;
