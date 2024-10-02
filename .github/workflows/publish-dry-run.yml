@@ -36,7 +36,7 @@ jobs:
         run: yarn build:packages
 
       - name: Dry run Publish
-        run: yarn multi-semantic-release --dry-run --silent | grep -E '#|###|\*'  > dry_run_output.txt
+        run: yarn multi-semantic-release --dry-run
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
