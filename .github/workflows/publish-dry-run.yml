@@ -7,10 +7,15 @@ on:
         description: 'NPM token'
         required: true
 
+permissions:
+  contents: write # to be able to publish a GitHub release
+  issues: write # to be able to comment on released issues
+  id-token: write # to enable use of OIDC for npm provenance
+
 jobs:
   publish-dry-run:
     runs-on: ubuntu-latest
-    environment: development
+    environment: pre-publish
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
