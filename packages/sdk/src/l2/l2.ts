@@ -199,7 +199,7 @@ export class LidoSDKL2 extends LidoSDKModule {
 
   @Logger('Call:')
   @ErrorHandler()
-  public async unwrap(
+  public async unwrapStethToWsteth(
     props: WrapProps,
   ): Promise<TransactionResult<UnwrapResults>> {
     this.core.useWeb3Provider();
@@ -219,7 +219,7 @@ export class LidoSDKL2 extends LidoSDKModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async unwrapPopulateTx(
+  public async unwrapStethPopulateTx(
     props: Omit<WrapProps, 'callback'>,
   ): Promise<PopulatedTransaction> {
     const { value, account } = await this.parseProps(props);
@@ -238,7 +238,7 @@ export class LidoSDKL2 extends LidoSDKModule {
 
   @Logger('Call:')
   @ErrorHandler()
-  public async unwrapSimulateTx(
+  public async unwrapStethSimulateTx(
     props: Omit<WrapProps, 'callback'>,
   ): Promise<WriteContractParameters> {
     const { value, account } = await this.parseProps(props);

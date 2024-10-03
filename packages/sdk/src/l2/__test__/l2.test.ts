@@ -177,7 +177,7 @@ describe('LidoSDKL2 wrap', () => {
     const stethAddress = l2.core.getL2ContractAddress(
       LIDO_L2_CONTRACT_NAMES.steth,
     );
-    const tx = await l2.unwrapPopulateTx({ value });
+    const tx = await l2.unwrapStethPopulateTx({ value });
     expectAddress(tx.to, stethAddress);
     expectAddress(tx.from, account.address);
     expectPopulatedTx(tx, undefined);
@@ -188,7 +188,7 @@ describe('LidoSDKL2 wrap', () => {
     const stethAddress = l2.core.getL2ContractAddress(
       LIDO_L2_CONTRACT_NAMES.steth,
     );
-    const tx = await l2.unwrapSimulateTx({ value });
+    const tx = await l2.unwrapStethSimulateTx({ value });
     expectAddress(tx.address, stethAddress);
   });
 
@@ -197,7 +197,10 @@ describe('LidoSDKL2 wrap', () => {
     const stethBalanceBefore = await l2.steth.balance(account.address);
     const wstethBalanceBefore = await l2.wsteth.balance(account.address);
     const mock = jest.fn();
-    const tx = await l2.unwrap({ value: stethValue, callback: mock });
+    const tx = await l2.unwrapStethToWsteth({
+      value: stethValue,
+      callback: mock,
+    });
     expectTxCallback(mock, tx);
     const stethBalanceAfter = await l2.steth.balance(account.address);
     const wstethBalanceAfter = await l2.wsteth.balance(account.address);
