@@ -87,7 +87,7 @@ export const WrapL2Demo = () => {
         walletAction
         title="Unwrap stETH to wstETH"
         action={() =>
-          l2.unwrap({
+          l2.unwrapStethToWsteth({
             value: stethValue ?? ZERO,
 
             callback: transactionToast,
@@ -105,7 +105,7 @@ export const WrapL2Demo = () => {
         title="Populate unwrap"
         walletAction
         action={() =>
-          l2.unwrapPopulateTx({
+          l2.unwrapStethPopulateTx({
             value: stethValue ?? ZERO,
           })
         }
@@ -114,7 +114,7 @@ export const WrapL2Demo = () => {
         title="Simulate unwrap"
         walletAction
         action={() =>
-          l2.unwrapSimulateTx({
+          l2.unwrapStethSimulateTx({
             value: stethValue ?? ZERO,
           })
         }

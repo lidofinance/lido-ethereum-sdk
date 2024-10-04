@@ -1,3 +1,7 @@
+# Migrating from V3 -> V4
+
+- `viem` is now a peer dependency and you will need to install it separately.
+
 # Migrating from V2 -> V3
 
 ## Common

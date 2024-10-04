@@ -10,11 +10,11 @@ y
 ## Common Options
 
 - **address** - (Type: Address) address of an account you want to query rewards for
-- **to** (Type: [`blockType`](/methods/lido-events#getrebaseevents)) defaults to `{block: "latest"}`, upper bound for query
+- **to** (Type: [`blockType`](/modules/lido-events#getrebaseevents)) defaults to `{block: "latest"}`, upper bound for query
 
-- **from** (Type: [`blockType`](/methods/lido-events#getrebaseevents)) lower bound for query
+- **from** (Type: [`blockType`](/modules/lido-events#getrebaseevents)) lower bound for query
   or
-- **back** (Type: [`backType`](/methods/lido-events#getrebaseevents)) alternative way to define lower bound relative to `to`
+- **back** (Type: [`backType`](/modules/lido-events#getrebaseevents)) alternative way to define lower bound relative to `to`
 
 - **includeZeroRebases** [default: `false` ] - include rebase events when users had no rewards(because of empty balance)
 - **includeOnlyRewards** [default: `false` ] - include only rebase events

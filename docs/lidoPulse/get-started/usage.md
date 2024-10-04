@@ -15,7 +15,7 @@ To form a JSON-RPC request, you need to specify:
 - `params`: The parameters required by the method.
 - `id`: A unique identifier for the request.
 
-The method names and their required parameters can be found in the [Lido SDK documentation](/category/methods).
+The method names and their required parameters can be found in the [Lido SDK documentation](/category/modules).
 
 ## Example JSON-RPC Request
 

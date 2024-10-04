@@ -24,12 +24,12 @@ export const SUPPORTED_CHAINS: CHAINS[] = [
   CHAINS.Mainnet,
   CHAINS.Holesky,
   CHAINS.Sepolia,
+  CHAINS.Optimism,
   CHAINS.OptimismSepolia,
 ];
 
 export const SUBMIT_EXTRA_GAS_TRANSACTION_RATIO = 1.05;
 export const GAS_TRANSACTION_RATIO_PRECISION = 10 ** 7;
-export const ESTIMATE_ACCOUNT = '0x87c0e047F4e4D3e289A56a36570D4CB957A37Ef1';
 
 export const LIDO_LOCATOR_BY_CHAIN: {
   [key in CHAINS]?: Address;
@@ -95,6 +95,7 @@ export const LIDO_L2_CONTRACT_ADDRESSES: {
   },
   [CHAINS.Optimism]: {
     wsteth: '0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb',
+    steth: '0x76A50b8c7349cCDDb7578c6627e79b5d99D24138',
   },
 };
 

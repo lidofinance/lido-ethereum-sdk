@@ -20,7 +20,7 @@ The first thing you need to do is subscribe to the `TokenRebased` event to recei
 
 Next, you need to calculate the user’s balance in stETH before the event (if unknown) and calculate the user’s balance in stETH after the event. The difference between these values will be the user’s rewards for the rebase.
 
-Docs: [Shares](/methods/shares)
+Docs: [Shares](/modules/shares)
 Simplified code example:
 
 ```ts

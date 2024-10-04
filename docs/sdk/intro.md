@@ -107,7 +107,7 @@ For breaking changes between versions see [MIGRATION.md](https://github.com/lido
 
 ## Documentation
 
-For additional information about available methods and functionality, refer to the [the documentation for the Lido Ethereum SDK](/category/methods).
+For additional information about available methods and functionality, refer to the [the documentation for the Lido Ethereum SDK](/category/modules).
 
 ## Playground
 

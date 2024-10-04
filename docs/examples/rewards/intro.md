@@ -26,7 +26,7 @@ The proposed approach involves maintaining an accounting model based on stETH [s
 ## Implementation notes
 
 Token shares are managed at the contract level, with dedicated methods for handling share-related operations. Detailed documentation on these methods can be found in the [shares-related methods](https://docs.lido.fi/contracts/lido/#shares-related-methods) section.
-You can also use [SDK methods](/methods/shares) to work with users’ shares directly.
+You can also use [SDK methods](/modules/shares) to work with users’ shares directly.
 
 ## Usage
 
@@ -40,13 +40,13 @@ By adopting this approach and leveraging the capabilities of the SDK, developers
 
 The [Lido Ethereum SDK](/) has the full set of features in this regard:
 
-- [estimating APR](/methods/lido-statistics#getlastapr) for the latest token rebase.
-- [calculating average APR](/methods/lido-statistics#getsmaapr) over a selected period.
-- [last rebase event](/methods/lido-events#getlastrebaseevent) (contains share rate)
-- [first rebase event](/methods/lido-events#getfirstrebaseevent) starting from the reference point in the past
-- [get last N](/methods/lido-events#getlastrebaseevents) rebase events
-- [get all rebase events](/methods/lido-events#getrebaseevents) for the last N days
+- [estimating APR](/modules/lido-statistics#getlastapr) for the latest token rebase.
+- [calculating average APR](/modules/lido-statistics#getsmaapr) over a selected period.
+- [last rebase event](/modules/lido-events#getlastrebaseevent) (contains share rate)
+- [first rebase event](/modules/lido-events#getfirstrebaseevent) starting from the reference point in the past
+- [get last N](/modules/lido-events#getlastrebaseevents) rebase events
+- [get all rebase events](/modules/lido-events#getrebaseevents) for the last N days
 - assessing specific rewards accrued over a chosen period by an address
-  - [On-chain](/methods/rewards#get-rewards-from-chain)
-  - [Subgraph](/methods/rewards#get-rewards-from-subgraph)
-- work with [user balances](/methods/shares) based on stETH shares
+  - [On-chain](/modules/rewards#get-rewards-from-chain)
+  - [Subgraph](/modules/rewards#get-rewards-from-subgraph)
+- work with [user balances](/modules/shares) based on stETH shares
