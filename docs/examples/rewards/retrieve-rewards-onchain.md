@@ -11,7 +11,7 @@ sidebar_position: 4
 [Implementation example](https://github.com/lidofinance/lido-ethereum-sdk/blob/main/examples/rewards/src/rewardsOnChain.ts)
 
 Information about the user’s rewards can be calculating from on-chain using SDK without the need to calculate using a formula.
-To do this, you need to use the `getRewardsFromChain` method ([Docs](/methods/rewards))
+To do this, you need to use the `getRewardsFromChain` method ([Docs](/modules/rewards))
 The method allows you to request rewards for a certain period of time (days, seconds, blocks)
 
 Simplified code example:
