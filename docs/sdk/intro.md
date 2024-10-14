@@ -18,11 +18,11 @@ For changes between versions see [CHANGELOG.MD](https://github.com/lidofinance/l
 
 ## Installation
 
-You can install the Lido Ethereum SDK using npm or yarn:
+You can install the Lido Ethereum SDK using npm or yarn. `viem` is required as a peer dep:
 
 ```bash
 // SDK (stakes, wrap, withdrawals)
-yarn add @lidofinance/lido-ethereum-sdk
+yarn add viem @lidofinance/lido-ethereum-sdk
 ```
 
 ## Usage
