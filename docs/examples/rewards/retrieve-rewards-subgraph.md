@@ -14,7 +14,7 @@ sidebar_position: 5
 [Implementation example](https://github.com/lidofinance/lido-ethereum-sdk/blob/main/examples/rewards/src/rewardsSubgraph.ts)
 
 Information about the user’s rewards can be obtained from off-chain using SDK without the need for calculation using a formula.
-To do this, you need to use the `getRewardsFromSubgraph` method [[Docs](/methods/rewards)]. You will also need a key to access `The Graph`. ([Docs](https://docs.lido.fi/integrations/subgraph/))
+To do this, you need to use the `getRewardsFromSubgraph` method [[Docs](/modules/rewards)]. You will also need a key to access `The Graph`. ([Docs](https://docs.lido.fi/integrations/subgraph/))
 
 Simplified code example:
 

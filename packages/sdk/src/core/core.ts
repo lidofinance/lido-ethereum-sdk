@@ -37,10 +37,12 @@ import {
   SUBRGRAPH_ID_BY_CHAIN,
   APPROX_SECONDS_PER_BLOCK,
   NOOP,
+  LIDO_L2_CONTRACT_NAMES,
+  LIDO_L2_CONTRACT_ADDRESSES,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
-import { wqAbi } from './abi/wq.js';
+import { wqWstethAddressAbi } from './abi/wq.js';
 import type {
   LidoSDKCoreProps,
   PermitSignature,
@@ -57,6 +59,7 @@ import type {
 import { TransactionCallbackStage } from './types.js';
 import { permitAbi } from './abi/permit.js';
 import { LidoSDKCacheable } from '../common/class-primitives/cacheable.js';
+import { readContract } from 'viem/actions';
 
 export default class LidoSDKCore extends LidoSDKCacheable {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
@@ -170,7 +173,13 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['chain.id'])
   public contractAddressLidoLocator(): Address {
-    return LIDO_LOCATOR_BY_CHAIN[this.chain.id as CHAINS];
+    const locator = LIDO_LOCATOR_BY_CHAIN[this.chain.id as CHAINS];
+    invariant(
+      locator,
+      `Lido Ethereum Contacts are not supported on ${this.chain.name}(${this.chain.id})`,
+      ERROR_CODE.NOT_SUPPORTED,
+    );
+    return locator;
   }
 
   @Logger('Contracts:')
@@ -182,18 +191,6 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     return getContract({
       address: this.contractAddressLidoLocator(),
       abi: LidoLocatorAbi,
-      client: this.rpcProvider,
-    });
-  }
-
-  @Logger('Contracts:')
-  @Cache(30 * 60 * 1000, ['chain.id'])
-  private getContractWQ(
-    address: Address,
-  ): GetContractReturnType<typeof wqAbi, PublicClient> {
-    return getContract({
-      address,
-      abi: wqAbi,
       client: this.rpcProvider,
     });
   }
@@ -360,7 +357,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     // eth_getCode returns hex string of bytecode at address
     // for accounts it's "0x"
     // for contract it's potentially very long hex (can't be safely&quickly parsed)
-    const result = await this.rpcProvider.getBytecode({ address: address });
+    const result = await this.rpcProvider.getCode({ address: address });
     return result ? result !== '0x' : false;
   }
 
@@ -377,8 +374,12 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     const lidoLocator = this.getContractLidoLocator();
     if (contract === 'wsteth') {
       const withdrawalQueue = await lidoLocator.read.withdrawalQueue();
-      const contract = this.getContractWQ(withdrawalQueue);
-      const wstethAddress = await contract.read.WSTETH();
+
+      const wstethAddress = await readContract(this.rpcProvider, {
+        abi: wqWstethAddressAbi,
+        address: withdrawalQueue,
+        functionName: 'WSTETH',
+      });
 
       return wstethAddress;
     } else {
@@ -388,8 +389,26 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
   @Logger('Utils:')
   @Cache(30 * 60 * 1000, ['chain.id'])
+  public getL2ContractAddress(contract: LIDO_L2_CONTRACT_NAMES): Address {
+    const chainConfig = LIDO_L2_CONTRACT_ADDRESSES[this.chain.id as CHAINS];
+    invariant(
+      chainConfig,
+      `Lido L2 contracts are not supported for ${this.chain.name}(${this.chain.id})`,
+      ERROR_CODE.NOT_SUPPORTED,
+    );
+    const address = chainConfig[contract];
+    invariant(
+      address,
+      `Lido L2 on ${this.chain.name}(${this.chain.id}) does not have ${contract} contract`,
+      ERROR_CODE.NOT_SUPPORTED,
+    );
+    return address;
+  }
+
+  @Logger('Utils:')
+  @Cache(30 * 60 * 1000, ['chain.id'])
   public getSubgraphId(): string | null {
-    const id = SUBRGRAPH_ID_BY_CHAIN[this.chainId];
+    const id = SUBRGRAPH_ID_BY_CHAIN[this.chainId] ?? null;
     return id;
   }
 

@@ -20,6 +20,7 @@ export const CoreDemo = () => {
   const dateAtTimestamp = new Date(
     Number(timestampSeconds) * 1000,
   ).toLocaleString(locale);
+
   const getStethContract = useCallback(async () => {
     const address = await stake.contractAddressStETH();
     setContractAddress(address);

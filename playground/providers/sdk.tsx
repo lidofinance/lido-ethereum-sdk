@@ -2,7 +2,7 @@ import { createContext, useMemo, PropsWithChildren, useContext } from 'react';
 
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import invariant from 'tiny-invariant';
-import { useClient, useConnectorClient } from 'wagmi';
+import { usePublicClient, useWalletClient } from 'wagmi';
 
 const context = createContext<LidoSDK | null>(null);
 
@@ -13,9 +13,9 @@ export const useLidoSDK = () => {
 };
 
 export const LidoSDKProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const publicClient = useClient();
+  const publicClient = usePublicClient();
   const chainId = publicClient?.chain.id;
-  const { data: walletClient } = useConnectorClient();
+  const { data: walletClient } = useWalletClient();
   const value = useMemo(() => {
     const sdk = new LidoSDK({
       chainId: chainId as any,

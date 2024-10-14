@@ -1,11 +1,20 @@
 import { type Address, type Chain } from 'viem';
-import { goerli, mainnet, holesky, sepolia } from 'viem/chains';
+import {
+  goerli,
+  mainnet,
+  holesky,
+  sepolia,
+  optimismSepolia,
+  optimism,
+} from 'viem/chains';
 
 export enum CHAINS {
   Goerli = 5,
   Mainnet = 1,
   Holesky = 17000,
   Sepolia = 11155111,
+  Optimism = 10,
+  OptimismSepolia = 11155420,
 }
 
 export const APPROX_BLOCKS_BY_DAY = 7600n;
@@ -15,14 +24,15 @@ export const SUPPORTED_CHAINS: CHAINS[] = [
   CHAINS.Mainnet,
   CHAINS.Holesky,
   CHAINS.Sepolia,
+  CHAINS.Optimism,
+  CHAINS.OptimismSepolia,
 ];
 
 export const SUBMIT_EXTRA_GAS_TRANSACTION_RATIO = 1.05;
 export const GAS_TRANSACTION_RATIO_PRECISION = 10 ** 7;
-export const ESTIMATE_ACCOUNT = '0x87c0e047F4e4D3e289A56a36570D4CB957A37Ef1';
 
 export const LIDO_LOCATOR_BY_CHAIN: {
-  [key in CHAINS]: Address;
+  [key in CHAINS]?: Address;
 } = {
   [CHAINS.Mainnet]: '0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb',
   [CHAINS.Goerli]: '0x1eDf09b5023DC86737b59dE68a8130De878984f5',
@@ -31,16 +41,14 @@ export const LIDO_LOCATOR_BY_CHAIN: {
 };
 
 export const SUBRGRAPH_ID_BY_CHAIN: {
-  [key in CHAINS]: string | null;
+  [key in CHAINS]?: string;
 } = {
   [CHAINS.Mainnet]: 'Sxx812XgeKyzQPaBpR5YZWmGV5fZuBaPdh7DFhzSwiQ',
   [CHAINS.Goerli]: 'QmeDfGTuNbSoZ71zi3Ch4WNRbzALfiFPnJMYUFPinLiFNa',
-  [CHAINS.Holesky]: null,
-  [CHAINS.Sepolia]: null,
 };
 
 export const EARLIEST_TOKEN_REBASED_EVENT: {
-  [key in CHAINS]: bigint;
+  [key in CHAINS]?: bigint;
 } = {
   [CHAINS.Mainnet]: 17272708n,
   [CHAINS.Goerli]: 8712039n,
@@ -72,6 +80,24 @@ export const enum LIDO_CONTRACT_NAMES {
   oracleDaemonConfig = 'oracleDaemonConfig',
   wsteth = 'wsteth',
 }
+
+export const enum LIDO_L2_CONTRACT_NAMES {
+  wsteth = 'wsteth',
+  steth = 'steth',
+}
+
+export const LIDO_L2_CONTRACT_ADDRESSES: {
+  [key in CHAINS]?: { [key2 in LIDO_L2_CONTRACT_NAMES]?: Address };
+} = {
+  [CHAINS.OptimismSepolia]: {
+    wsteth: '0x24B47cd3A74f1799b32B2de11073764Cb1bb318B',
+    steth: '0xf49d208b5c7b10415c7beafe9e656f2df9edfe3b',
+  },
+  [CHAINS.Optimism]: {
+    wsteth: '0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb',
+    steth: '0x76A50b8c7349cCDDb7578c6627e79b5d99D24138',
+  },
+};
 
 export const CONTRACTS_BY_TOKENS = {
   [LIDO_TOKENS.steth]: LIDO_CONTRACT_NAMES.lido,
@@ -110,11 +136,12 @@ export const VIEM_CHAINS: { [key in CHAINS]: Chain } = {
   [CHAINS.Goerli]: goerli,
   [CHAINS.Holesky]: holesky,
   [CHAINS.Sepolia]: sepolia,
+  [CHAINS.Optimism]: optimism,
+  [CHAINS.OptimismSepolia]: optimismSepolia,
 };
 
-export const WQ_API_URLS: { [key in CHAINS]: string | null } = {
+export const WQ_API_URLS: { [key in CHAINS]?: string } = {
   [CHAINS.Mainnet]: 'https://wq-api.lido.fi',
   [CHAINS.Goerli]: 'https://wq-api.testnet.fi',
   [CHAINS.Holesky]: 'https://wq-api-holesky.testnet.fi',
-  [CHAINS.Sepolia]: null,
 };

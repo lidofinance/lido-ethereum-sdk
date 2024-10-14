@@ -10,7 +10,7 @@ on:
 jobs:
   publish-dry-run:
     runs-on: ubuntu-latest
-    environment: development
+    environment: pre-publish
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -31,14 +31,16 @@ jobs:
         run: yarn build:packages
 
       - name: Dry run Publish
-        run: yarn multi-semantic-release --dry-run --silent | grep -E '#|###|\*'  > dry_run_output.txt
+        run: |
+          yarn multi-semantic-release --dry-run --silent > /tmp/multi-semantic-release-output
+          grep -E '#|###|\*' /tmp/multi-semantic-release-output > dry_run_output.txt || [ $? -eq 1 ]
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Write results to summary
         run: |
-          if [ -s dry_run_output.txt ]; then 
+          if [ -s dry_run_output.txt ]; then
             echo "# Packages to be published:" >> $GITHUB_STEP_SUMMARY
             cat dry_run_output.txt >> $GITHUB_STEP_SUMMARY
           else

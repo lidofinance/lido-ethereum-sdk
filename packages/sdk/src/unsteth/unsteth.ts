@@ -281,36 +281,52 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   @ErrorHandler()
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContractMetadata() {
-    const address = await this.contractAddress();
-    const common = { abi: unstethAbi, address } as const;
-    const [name, version, symbol, baseURI] =
-      await this.core.rpcProvider.multicall({
-        allowFailure: false,
-        contracts: [
-          {
-            ...common,
-            functionName: 'name',
-          },
-          {
-            ...common,
-            functionName: 'getContractVersion',
-          },
-          {
-            ...common,
-            functionName: 'symbol',
-          },
-          {
-            ...common,
-            functionName: 'getBaseURI',
-          },
-        ] as const,
-      });
-    return {
-      name,
-      version,
-      symbol,
-      baseURI,
-    };
+    if (this.core.rpcProvider.multicall) {
+      const address = await this.contractAddress();
+      const common = { abi: unstethAbi, address } as const;
+      const [name, version, symbol, baseURI] =
+        await this.core.rpcProvider.multicall({
+          allowFailure: false,
+          contracts: [
+            {
+              ...common,
+              functionName: 'name',
+            },
+            {
+              ...common,
+              functionName: 'getContractVersion',
+            },
+            {
+              ...common,
+              functionName: 'symbol',
+            },
+            {
+              ...common,
+              functionName: 'getBaseURI',
+            },
+          ] as const,
+        });
+      return {
+        name,
+        version,
+        symbol,
+        baseURI,
+      };
+    } else {
+      const contract = await this.getContract();
+      const [name, version, symbol, baseURI] = await Promise.all([
+        contract.read.name(),
+        contract.read.getContractVersion(),
+        contract.read.symbol(),
+        contract.read.getBaseURI(),
+      ]);
+      return {
+        name,
+        version,
+        symbol,
+        baseURI,
+      };
+    }
   }
 
   @Logger('Views:')

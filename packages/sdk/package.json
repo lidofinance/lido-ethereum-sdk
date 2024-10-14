@@ -71,6 +71,11 @@
       "default": "./dist/cjs/shares/index.js",
       "types": "./dist/types/shares/index.d.ts"
     },
+    "./l2": {
+      "import": "./dist/esm/l2/index.js",
+      "default": "./dist/cjs/l2/index.js",
+      "types": "./dist/types/l2/index.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -104,6 +109,9 @@
       ],
       "shares": [
         "./dist/types/shares/index.d.ts"
+      ],
+      "l2": [
+        "./dist/types/l2/index.d.ts"
       ]
     }
   },
@@ -145,8 +153,10 @@
   "dependencies": {
     "@ethersproject/bytes": "^5.7.0",
     "graphql": "^16.8.1",
-    "graphql-request": "^6.1.0",
-    "viem": "^2.0.6"
+    "graphql-request": "^6.1.0"
+  },
+  "peerDependencies": {
+    "viem": "^2.21"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

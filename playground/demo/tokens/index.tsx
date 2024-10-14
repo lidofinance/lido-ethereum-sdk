@@ -25,7 +25,7 @@ export const WstethDemo = () => {
   return <TokenDemo name="wstETH" instance={wsteth} />;
 };
 
-const TokenDemo = ({ instance, name }: TokenDemoProps) => {
+export const TokenDemo = ({ instance, name }: TokenDemoProps) => {
   const { account: web3account = '0x0' } = useWeb3();
   const [transferAmountState, setTransferAmount] =
     useState<ValueType>(DEFAULT_VALUE);

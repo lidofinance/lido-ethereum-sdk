@@ -1,3 +1,26 @@
+# 3.5.0
+
+## Breaking change
+
+- `viem` is no longer an internal dependency and is listed as peer dependency
+
+## SDK
+
+### Added
+
+- `LidoSDKL2` module is added to support Lido on L2 networks functionality
+- `Optimism` and `Optimism-sepolia` chains are added as separate L2 chains
+- `core.getL2ContractAddress` and `LIDO_L2_CONTRACT_NAMES enum` are added to support l2 contracts
+- ABIs are exported from corresponding modules to support custom functionality and direct viem access
+
+### Fixed
+
+- `multicall` is used only if supported by client
+
+## Playground
+
+- L2 and updated reef-knot support
+
 # 3.4.0
 
 ## SDK

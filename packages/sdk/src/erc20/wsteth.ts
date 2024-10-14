@@ -12,6 +12,8 @@ export class LidoSDKwstETH extends AbstractLidoSDKErc20 {
     return this.core.getContractAddress(LIDO_CONTRACT_NAMES.wsteth);
   }
 
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
   public override async erc721Domain(): Promise<{
     name: string;
     version: string;
