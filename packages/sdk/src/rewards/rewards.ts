@@ -192,58 +192,65 @@ export class LidoSDKRewards extends LidoSDKModule {
     let totalRewards = 0n;
     let shareRate = baseShareRate;
     let prevSharesBalance = baseBalanceShares;
-    let rewards: Reward<RewardsChainEvents>[] = events.map((event) => {
-      if (event.eventName === 'TransferShares') {
-        const { from, to, sharesValue } = event.args;
-        let type: Reward<RewardsChainEvents>['type'],
-          changeShares: Reward<RewardsChainEvents>['changeShares'],
-          balanceShares: Reward<RewardsChainEvents>['balanceShares'];
+    let rewards = events
+      .map((event) => {
+        if (event.eventName === 'TransferShares') {
+          const { from, to, sharesValue } = event.args;
 
-        if (isAddressEqual(to, address)) {
-          type = isAddressEqual(from, zeroAddress) ? 'submit' : 'transfer_in';
-          balanceShares = prevSharesBalance + sharesValue;
-          changeShares = sharesValue;
-        } else {
-          type = isAddressEqual(to, withdrawalQueueAddress)
-            ? 'withdrawal'
-            : 'transfer_out';
-          balanceShares = prevSharesBalance - sharesValue;
-          changeShares = -sharesValue;
+          if (isAddressEqual(to, from)) {
+            return null;
+          }
+
+          let type: Reward<RewardsChainEvents>['type'],
+            changeShares: Reward<RewardsChainEvents>['changeShares'],
+            balanceShares: Reward<RewardsChainEvents>['balanceShares'];
+
+          if (isAddressEqual(to, address)) {
+            type = isAddressEqual(from, zeroAddress) ? 'submit' : 'transfer_in';
+            balanceShares = prevSharesBalance + sharesValue;
+            changeShares = sharesValue;
+          } else {
+            type = isAddressEqual(to, withdrawalQueueAddress)
+              ? 'withdrawal'
+              : 'transfer_out';
+            balanceShares = prevSharesBalance - sharesValue;
+            changeShares = -sharesValue;
+          }
+
+          prevSharesBalance = balanceShares;
+          return {
+            type,
+            balanceShares,
+            changeShares,
+            change: getCurrentStethFromShares(changeShares),
+            balance: getCurrentStethFromShares(balanceShares),
+            shareRate,
+            originalEvent: event,
+          };
         }
-
-        prevSharesBalance = balanceShares;
-        return {
-          type,
-          balanceShares,
-          changeShares,
-          change: getCurrentStethFromShares(changeShares),
-          balance: getCurrentStethFromShares(balanceShares),
-          shareRate,
-          originalEvent: event,
-        };
-      }
-      if (event.eventName === 'TokenRebased') {
-        const { postTotalEther, postTotalShares } = event.args;
-        const oldBalance = getCurrentStethFromShares(prevSharesBalance);
-        currentTotalEther = postTotalEther;
-        currentTotalShares = postTotalShares;
-        const newBalance = getCurrentStethFromShares(prevSharesBalance);
-        shareRate = getCurrentShareRate();
-        const change = newBalance - oldBalance;
-        totalRewards += change;
-        return {
-          type: 'rebase',
-          change,
-          apr: LidoSDKApr.calculateAprFromRebaseEvent(event.args),
-          changeShares: 0n,
-          balance: newBalance,
-          balanceShares: prevSharesBalance,
-          shareRate,
-          originalEvent: event,
-        };
-      }
-      invariant(false, 'Impossible event');
-    });
+        if (event.eventName === 'TokenRebased') {
+          const { postTotalEther, postTotalShares } = event.args;
+          const oldBalance = getCurrentStethFromShares(prevSharesBalance);
+          currentTotalEther = postTotalEther;
+          currentTotalShares = postTotalShares;
+          const newBalance = getCurrentStethFromShares(prevSharesBalance);
+          shareRate = getCurrentShareRate();
+          const change = newBalance - oldBalance;
+          totalRewards += change;
+          return {
+            type: 'rebase',
+            change,
+            apr: LidoSDKApr.calculateAprFromRebaseEvent(event.args),
+            changeShares: 0n,
+            balance: newBalance,
+            balanceShares: prevSharesBalance,
+            shareRate,
+            originalEvent: event,
+          };
+        }
+        invariant(false, 'Impossible event');
+      })
+      .filter((event) => !!event) as Reward<RewardsChainEvents>[];
 
     if (includeOnlyRebases) {
       rewards = rewards.filter((r) => r.type === 'rebase');
@@ -380,101 +387,107 @@ export class LidoSDKRewards extends LidoSDKModule {
     const baseBalanceShares = prevBalanceShares;
 
     let totalRewards = 0n;
-    let rewards: Reward<RewardsSubgraphEvents>[] = events.map((event) => {
-      // it's a transfer
-      if ('value' in event) {
-        const {
-          from,
-          to,
-          shares,
-          sharesAfterIncrease,
-          value,
-          balanceAfterDecrease,
-          balanceAfterIncrease,
-          sharesAfterDecrease,
-          totalPooledEther,
-          totalShares,
-        } = event;
-        let type: Reward<RewardsSubgraphEvents>['type'],
-          changeShares: Reward<RewardsSubgraphEvents>['changeShares'],
-          balanceShares: Reward<RewardsSubgraphEvents>['balanceShares'],
-          change: Reward<RewardsSubgraphEvents>['change'],
-          balance: Reward<RewardsSubgraphEvents>['balance'];
+    let rewards = events
+      .map((event) => {
+        // it's a transfer
+        if ('value' in event) {
+          const {
+            from,
+            to,
+            shares,
+            sharesAfterIncrease,
+            value,
+            balanceAfterDecrease,
+            balanceAfterIncrease,
+            sharesAfterDecrease,
+            totalPooledEther,
+            totalShares,
+          } = event;
+          let type: Reward<RewardsSubgraphEvents>['type'],
+            changeShares: Reward<RewardsSubgraphEvents>['changeShares'],
+            balanceShares: Reward<RewardsSubgraphEvents>['balanceShares'],
+            change: Reward<RewardsSubgraphEvents>['change'],
+            balance: Reward<RewardsSubgraphEvents>['balance'];
 
-        if (isAddressEqual(to as Address, address)) {
-          type = isAddressEqual(from as Address, zeroAddress)
-            ? 'submit'
-            : 'transfer_in';
-          changeShares = BigInt(shares);
-          balanceShares = BigInt(sharesAfterIncrease);
-          change = BigInt(value);
-          balance = BigInt(balanceAfterIncrease);
-        } else {
-          type = isAddressEqual(to as Address, withdrawalQueueAddress)
-            ? 'withdrawal'
-            : 'transfer_out';
-          balance = BigInt(balanceAfterDecrease);
-          change = -BigInt(value);
-          changeShares = -BigInt(shares);
-          balanceShares = BigInt(sharesAfterDecrease);
+          if (isAddressEqual(to as Address, from as Address)) {
+            return null;
+          }
+
+          if (isAddressEqual(to as Address, address)) {
+            type = isAddressEqual(from as Address, zeroAddress)
+              ? 'submit'
+              : 'transfer_in';
+            changeShares = BigInt(shares);
+            balanceShares = BigInt(sharesAfterIncrease);
+            change = BigInt(value);
+            balance = BigInt(balanceAfterIncrease);
+          } else {
+            type = isAddressEqual(to as Address, withdrawalQueueAddress)
+              ? 'withdrawal'
+              : 'transfer_out';
+            balance = BigInt(balanceAfterDecrease);
+            change = -BigInt(value);
+            changeShares = -BigInt(shares);
+            balanceShares = BigInt(sharesAfterDecrease);
+          }
+
+          const shareRate = calcShareRate(
+            BigInt(totalPooledEther),
+            BigInt(totalShares),
+            LidoSDKRewards.PRECISION,
+          );
+          prevBalance = balance;
+          prevBalanceShares = balanceShares;
+
+          return {
+            type,
+            balanceShares,
+            changeShares,
+            change,
+            balance,
+            shareRate,
+            originalEvent: event,
+          };
         }
+        // it's a rebase
+        if ('apr' in event) {
+          const {
+            totalPooledEtherAfter,
+            totalSharesAfter,
+            apr: eventApr,
+          } = event;
 
-        const shareRate = calcShareRate(
-          BigInt(totalPooledEther),
-          BigInt(totalShares),
-          LidoSDKRewards.PRECISION,
-        );
-        prevBalance = balance;
-        prevBalanceShares = balanceShares;
+          const totalEther = BigInt(totalPooledEtherAfter);
+          const totalShares = BigInt(totalSharesAfter);
 
-        return {
-          type,
-          balanceShares,
-          changeShares,
-          change,
-          balance,
-          shareRate,
-          originalEvent: event,
-        };
-      }
-      // it's a rebase
-      if ('apr' in event) {
-        const {
-          totalPooledEtherAfter,
-          totalSharesAfter,
-          apr: eventApr,
-        } = event;
-
-        const totalEther = BigInt(totalPooledEtherAfter);
-        const totalShares = BigInt(totalSharesAfter);
-
-        const newBalance = sharesToSteth(
-          prevBalanceShares,
-          totalEther,
-          totalShares,
-          LidoSDKRewards.PRECISION,
-        );
-        const change = newBalance - prevBalance;
-        totalRewards += change;
-        prevBalance = newBalance;
-
-        return {
-          type: 'rebase',
-          change,
-          apr: Number(eventApr),
-          changeShares: 0n,
-          balance: newBalance,
-          balanceShares: prevBalanceShares,
-          shareRate: calcShareRate(
+          const newBalance = sharesToSteth(
+            prevBalanceShares,
             totalEther,
             totalShares,
             LidoSDKRewards.PRECISION,
-          ),
-          originalEvent: event,
-        };
-      }
-      invariant(false, 'impossible event');
-    });
+          );
+          const change = newBalance - prevBalance;
+          totalRewards += change;
+          prevBalance = newBalance;
+
+          return {
+            type: 'rebase',
+            change,
+            apr: Number(eventApr),
+            changeShares: 0n,
+            balance: newBalance,
+            balanceShares: prevBalanceShares,
+            shareRate: calcShareRate(
+              totalEther,
+              totalShares,
+              LidoSDKRewards.PRECISION,
+            ),
+            originalEvent: event,
+          };
+        }
+        invariant(false, 'impossible event');
+      })
+      .filter((events) => !!events) as Reward<RewardsSubgraphEvents>[];
 
     if (includeOnlyRebases) {
       rewards = rewards.filter((r) => r.type === 'rebase');

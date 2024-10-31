@@ -1,3 +1,11 @@
+# 4.0.1
+
+## SDK
+
+### Fixed
+
+- `LidoSDKRewards` now filter outs edgecases with self-transfers
+
 # 4.0.0
 
 ## Breaking change
