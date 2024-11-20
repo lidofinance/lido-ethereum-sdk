@@ -541,7 +541,12 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       }
     }
 
-    callback({ stage: TransactionCallbackStage.SIGN, payload: overrides.gas });
+    const customGas = callback({
+      stage: TransactionCallbackStage.SIGN,
+      payload: overrides.gas,
+    });
+
+    if (typeof customGas === 'bigint') overrides.gas = customGas;
 
     const hash = await withSDKError(
       sendTransaction({

@@ -11,6 +11,7 @@ import {
   LidoSDKStake,
   LidoSDKstETH,
   LidoSDKwstETH,
+  TransactionCallback,
 } from '../../index.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
 import {
@@ -36,7 +37,7 @@ describe('LidoSDKWrap wallet methods', () => {
   });
 
   testSpending('reset allowance', async () => {
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await wrap.approveStethForWrap({ value: 0n, callback: mock });
     expectTxCallback(mock, tx);
     await expect(wrap.getStethForWrapAllowance(address)).resolves.toEqual(0n);
@@ -47,7 +48,7 @@ describe('LidoSDKWrap wallet methods', () => {
   });
 
   testSpending('set allowance', async () => {
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await wrap.approveStethForWrap({ value, callback: mock });
     expectTxCallback(mock, tx);
     await expect(wrap.getStethForWrapAllowance(address)).resolves.toEqual(
@@ -78,7 +79,7 @@ describe('LidoSDKWrap wallet methods', () => {
     wstethValue = await wrap.convertStethToWsteth(value);
     const stethBalanceBefore = await steth.balance(address);
     const wstethBalanceBefore = await wsteth.balance(address);
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await wrap.wrapSteth({ value, callback: mock });
     expectTxCallback(mock, tx);
     const stethBalanceAfter = await steth.balance(address);
@@ -121,7 +122,7 @@ describe('LidoSDKWrap wallet methods', () => {
   testSpending('unwrap steth', async () => {
     const stethBalanceBefore = await steth.balance(address);
     const wstethBalanceBefore = await wsteth.balance(address);
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await wrap.unwrap({ value: wstethValue, callback: mock });
     expectTxCallback(mock, tx);
     const stethBalanceAfter = await steth.balance(address);
