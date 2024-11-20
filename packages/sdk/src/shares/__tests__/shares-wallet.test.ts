@@ -11,6 +11,7 @@ import {
 } from '../../../tests/utils/fixtures/use-wallet-client.js';
 import { expectTxCallback } from '../../../tests/utils/expect/expect-tx-callback.js';
 import { expectAlmostEqualBn } from '../../../tests/utils/expect/expect-bn.js';
+import { TransactionCallback } from '../../core/types.js';
 
 describe('LidoSDKStake wallet methods', () => {
   const steth = useSteth();
@@ -25,7 +26,7 @@ describe('LidoSDKStake wallet methods', () => {
       const amountSteth = await shares.convertToShares(amount);
       const balanceStethBefore = await steth.balance(address);
       const balanceSharesBefore = await shares.balance(address);
-      const mockTxCallback = jest.fn();
+      const mockTxCallback = jest.fn<TransactionCallback>();
       const tx = await shares.transfer({
         amount,
         to: alt.address,

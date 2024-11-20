@@ -60,6 +60,22 @@ export class LidoSDKWithdrawClaim extends BusModule {
 
   @Logger('Views:')
   @ErrorHandler()
+  public async claimRequestsEstimateGas(props: NoCallback<ClaimRequestsProps>) {
+    const account = await this.bus.core.useAccount(props.account);
+    const { requestsIds, hints } = await this.sortRequestsWithHints(
+      props.requestsIds,
+      props.hints,
+    );
+
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
+
+    return contract.estimateGas.claimWithdrawals([requestsIds, hints], {
+      account,
+    });
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
   public async claimRequestsSimulateTx(props: NoCallback<ClaimRequestsProps>) {
     const account = await this.bus.core.useAccount(props.account);
     const { requestsIds, hints } = await this.sortRequestsWithHints(

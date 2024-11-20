@@ -23,6 +23,7 @@ import {
   LidoSDKStake,
   PerformTransactionGasLimit,
   PerformTransactionSendTransaction,
+  TransactionCallback,
   VIEM_CHAINS,
 } from '../../index.js';
 import {
@@ -177,7 +178,7 @@ describe('Account hoisting', () => {
   });
 
   test('useAccount requests account from web3Provider', async () => {
-    const mockFn = jest.fn();
+    const mockFn = jest.fn<TransactionCallback>();
     const mockTransport = useMockTransport(async (args, originalRequest) => {
       mockFn(args.method);
       if (args.method === 'eth_requestAccounts') {
@@ -239,7 +240,7 @@ describe('Perform Transaction', () => {
       (options) =>
         rawContract.write.submit([zeroAddress], { ...options, value }),
     );
-    const mockTxCallback = jest.fn();
+    const mockTxCallback = jest.fn<TransactionCallback>();
 
     const txResult = await core.performTransaction({
       getGasLimit: mockGetGasLimit,
@@ -303,7 +304,7 @@ describe('Perform Transaction', () => {
       (options) =>
         rawContract.write.submit([zeroAddress], { ...options, value }),
     );
-    const mockTxCallback = jest.fn();
+    const mockTxCallback = jest.fn<TransactionCallback>();
 
     const txResult = await core.performTransaction({
       getGasLimit: mockGetGasLimit,

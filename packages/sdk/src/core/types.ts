@@ -122,7 +122,15 @@ export type TransactionCallbackProps =
   | { stage: TransactionCallbackStage.MULTISIG_DONE; payload?: undefined }
   | { stage: TransactionCallbackStage.ERROR; payload: SDKError };
 
-export type TransactionCallback = (props: TransactionCallbackProps) => void;
+export type TransactionCallbackResult<TProps> = TProps extends {
+  stage: TransactionCallbackStage.SIGN;
+}
+  ? bigint | undefined
+  : void;
+
+export type TransactionCallback = (
+  props: TransactionCallbackProps,
+) => TransactionCallbackResult<TransactionCallbackProps>;
 
 export type PermitCallbackProps =
   | { stage: TransactionCallbackStage.SIGN; payload?: undefined }

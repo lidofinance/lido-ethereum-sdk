@@ -9,7 +9,11 @@ import { useWrap } from '../../../tests/utils/fixtures/use-wrap.js';
 import { useAccount } from '../../../tests/utils/fixtures/use-wallet-client.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
 import { useWeb3Core } from '../../../tests/utils/fixtures/use-core.js';
-import { ERROR_CODE, PermitSignature } from '../../index.js';
+import {
+  ERROR_CODE,
+  PermitSignature,
+  TransactionCallback,
+} from '../../index.js';
 import { useStake } from '../../../tests/utils/fixtures/use-stake.js';
 import {
   expectPopulatedTx,
@@ -96,10 +100,19 @@ const testWithdrawalsWithPermit = (
     expectAddress(tx.request.address, wqAddress);
   });
 
+  testSpending('can estimate request', async () => {
+    const gasLimit = await request.requestWithdrawalWithPermitEstimateGas({
+      permit,
+      token,
+      amount,
+    });
+    expectPositiveBn(gasLimit);
+  });
+
   testSpending('can request withdrawals with permit', async () => {
     const balanceBefore = await tokenContract.balance(address);
     const nftsBefore = await unsteth.getNFTsByAccount(address);
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await request.requestWithdrawalWithPermit({
       permit,
       token,
@@ -215,7 +228,7 @@ const testWithdrawals = (token: WithdrawableTokens, ethAmount: bigint) => {
   });
 
   testSpending('can approve', async () => {
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await approval.approve({
       token,
       amount,
@@ -264,10 +277,18 @@ const testWithdrawals = (token: WithdrawableTokens, ethAmount: bigint) => {
     expectAddress(tx.request.address, wqAddress);
   });
 
+  testSpending('can estimate request', async () => {
+    const gasLimit = await request.requestWithdrawalEstimateGas({
+      token,
+      amount,
+    });
+    expectPositiveBn(gasLimit);
+  });
+
   testSpending('can request withdrawals', async () => {
     const balanceBefore = await tokenContract.balance(address);
     const nftsBefore = await unsteth.getNFTsByAccount(address);
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await request.requestWithdrawal({
       token,
       amount,

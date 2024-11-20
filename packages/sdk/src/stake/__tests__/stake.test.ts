@@ -8,6 +8,7 @@ import {
 } from '../../../tests/utils/expect/expect-populated-tx.js';
 import { useStake } from '../../../tests/utils/fixtures/use-stake.js';
 import { expectSDKModule } from '../../../tests/utils/expect/expect-sdk-module.js';
+import { expectPositiveBn } from '../../../tests/utils/expect/expect-bn.js';
 
 describe('LidoSDKStake constructor', () => {
   test('is correct module', () => {
@@ -34,6 +35,11 @@ describe('LidoSDKStake read methods', () => {
     const tx = await stake.stakeEthPopulateTx({ value: 100n });
     expectPopulatedTx(tx, 100n);
     await expectPopulatedTxToRun(tx, stake.core.rpcProvider);
+  });
+
+  test('stakeEthEstimateGas', async () => {
+    const gas = await stake.stakeEthEstimateGas({ value: 100n });
+    expectPositiveBn(gas);
   });
 
   test('stakeEthSimulateTx', async () => {

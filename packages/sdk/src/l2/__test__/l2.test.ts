@@ -31,6 +31,7 @@ import {
   expectPopulatedTx,
   expectPopulatedTxToRun,
 } from '../../../tests/utils/expect/expect-populated-tx.js';
+import { TransactionCallback } from '../../core/types.js';
 
 const prepareL2Wsteth = async () => {
   const l2 = useL2();
@@ -121,7 +122,7 @@ describe('LidoSDKL2 wrap', () => {
   beforeAll(prepareL2Wsteth);
 
   testSpending('set allowance', async () => {
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await l2.approveWstethForWrap({ value, callback: mock });
     expectTxCallback(mock, tx);
     await expect(l2.getWstethForWrapAllowance(account)).resolves.toEqual(value);
@@ -150,7 +151,7 @@ describe('LidoSDKL2 wrap', () => {
     const stethValue = await l2.steth.convertToSteth(value);
     const stethBalanceBefore = await l2.steth.balance(account.address);
     const wstethBalanceBefore = await l2.wsteth.balance(account.address);
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await l2.wrapWstethToSteth({ value, callback: mock });
     expectTxCallback(mock, tx);
     const stethBalanceAfter = await l2.steth.balance(account.address);
@@ -196,7 +197,7 @@ describe('LidoSDKL2 wrap', () => {
     const stethValue = await l2.steth.convertToSteth(value);
     const stethBalanceBefore = await l2.steth.balance(account.address);
     const wstethBalanceBefore = await l2.wsteth.balance(account.address);
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await l2.unwrapStethToWsteth({
       value: stethValue,
       callback: mock,
@@ -324,7 +325,7 @@ describe('LidoSDKL2Steth shares', () => {
       const amountSteth = await l2.steth.convertToSteth(amount);
       const balanceStethBefore = await l2.steth.balance(account.address);
       const balanceSharesBefore = await l2.steth.balanceShares(account.address);
-      const mockTxCallback = jest.fn();
+      const mockTxCallback = jest.fn<TransactionCallback>();
 
       const tx = await l2.steth.transferShares({
         amount,

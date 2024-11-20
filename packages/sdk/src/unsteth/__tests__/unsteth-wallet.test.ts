@@ -14,7 +14,7 @@ import {
   testSpending,
 } from '../../../tests/utils/test-spending.js';
 import { useRpcCore } from '../../../tests/utils/fixtures/use-core.js';
-import { LIDO_CONTRACT_NAMES } from '../../index.js';
+import { LIDO_CONTRACT_NAMES, TransactionCallback } from '../../index.js';
 import {
   expectPopulatedTx,
   expectPopulatedTxToRun,
@@ -121,7 +121,7 @@ describe('unsteth wallet tests', () => {
   });
 
   testSpending('can transfer token', async () => {
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await unsteth.transfer({
       id: nftId,
       to: altAccount.address,
@@ -168,7 +168,7 @@ describe('unsteth wallet tests', () => {
   });
 
   testSpending('can approve single token', async () => {
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await unsteth.setSingleTokenApproval({
       id: nftId,
       to: altAccount.address,
@@ -195,7 +195,7 @@ describe('unsteth wallet tests', () => {
   });
 
   testSpending('can revoke approve single token', async () => {
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await unsteth.setSingleTokenApproval({
       id: nftId,
       callback: mock,
@@ -254,7 +254,7 @@ describe('unsteth wallet tests', () => {
   });
 
   testSpending('can approve for all tokens', async () => {
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await unsteth.setAllTokensApproval({
       to: altAccount.address,
       allow: true,
@@ -282,7 +282,7 @@ describe('unsteth wallet tests', () => {
   });
 
   testSpending('can revoke approve for all tokens', async () => {
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await unsteth.setAllTokensApproval({
       to: altAccount.address,
       allow: false,

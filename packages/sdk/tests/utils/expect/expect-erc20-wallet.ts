@@ -5,6 +5,7 @@ import {
   LIDO_CONTRACT_NAMES,
   LIDO_L2_CONTRACT_NAMES,
   PERMIT_MESSAGE_TYPES,
+  TransactionCallback,
 } from '../../../src/index.js';
 import {
   useAccount,
@@ -98,7 +99,7 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
         const params = {
           to: account,
           amount: 100n,
-          callback: jest.fn(),
+          callback: jest.fn<TransactionCallback>(),
         };
 
         const tx = await token.approve(params);
@@ -169,7 +170,7 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
           to: altAddress,
           from: address,
           amount: 100n,
-          callback: jest.fn(),
+          callback: jest.fn<TransactionCallback>(),
         };
 
         const tx = await token.transfer(params);
