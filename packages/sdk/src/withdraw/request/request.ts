@@ -131,6 +131,31 @@ export class LidoSDKWithdrawRequest extends BusModule {
 
   @Logger('Views:')
   @ErrorHandler()
+  public async requestWithdrawalEstimateGas(props: NoCallback<RequestProps>) {
+    const account = await this.bus.core.useAccount(props.account);
+    const {
+      token,
+      receiver = account.address,
+      amount = 0n,
+      requests: _requests,
+    } = props;
+    const requests =
+      _requests ?? (await this.splitAmountToRequests({ amount, token }));
+    const isSteth = token === 'stETH';
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
+
+    const args = [requests, receiver] as const;
+    const estimatePromise = isSteth
+      ? contract.estimateGas.requestWithdrawals(args, { account })
+      : contract.estimateGas.requestWithdrawalsWstETH(args, {
+          account,
+        });
+
+    return await estimatePromise;
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
   public async requestWithdrawalSimulateTx(props: NoCallback<RequestProps>) {
     const account = await this.bus.core.useAccount(props.account);
     const {
@@ -261,6 +286,36 @@ export class LidoSDKWithdrawRequest extends BusModule {
       sendTransaction,
       decodeResult: (receipt) => this.decodeWithdrawEvents(receipt),
     });
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
+  public async requestWithdrawalWithPermitEstimateGas(
+    props: NoCallback<RequirePermit<RequestWithPermitProps>>,
+  ) {
+    const account = await this.bus.core.useAccount(props.account);
+    const {
+      token,
+      receiver = account.address,
+      permit,
+      amount = 0n,
+      requests: _requests,
+    } = props;
+    const requests =
+      _requests ?? (await this.splitAmountToRequests({ amount, token }));
+    const isSteth = token === 'stETH';
+    const contract = await this.bus.contract.getContractWithdrawalQueue();
+
+    const args = [requests, receiver, permit] as const;
+    const estimatePromise = isSteth
+      ? contract.estimateGas.requestWithdrawalsWithPermit(args, {
+          account,
+        })
+      : contract.estimateGas.requestWithdrawalsWstETHWithPermit(args, {
+          account,
+        });
+
+    return await estimatePromise;
   }
 
   @Logger('Views:')

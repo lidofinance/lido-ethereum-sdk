@@ -100,6 +100,15 @@ const testWithdrawalsWithPermit = (
     expectAddress(tx.request.address, wqAddress);
   });
 
+  testSpending('can estimate request', async () => {
+    const gasLimit = await request.requestWithdrawalWithPermitEstimateGas({
+      permit,
+      token,
+      amount,
+    });
+    expectPositiveBn(gasLimit);
+  });
+
   testSpending('can request withdrawals with permit', async () => {
     const balanceBefore = await tokenContract.balance(address);
     const nftsBefore = await unsteth.getNFTsByAccount(address);
@@ -266,6 +275,14 @@ const testWithdrawals = (token: WithdrawableTokens, ethAmount: bigint) => {
       amount,
     });
     expectAddress(tx.request.address, wqAddress);
+  });
+
+  testSpending('can estimate request', async () => {
+    const gasLimit = await request.requestWithdrawalEstimateGas({
+      token,
+      amount,
+    });
+    expectPositiveBn(gasLimit);
   });
 
   testSpending('can request withdrawals', async () => {
