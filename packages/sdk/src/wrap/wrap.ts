@@ -13,11 +13,17 @@ import {
   isAddressEqual,
 } from 'viem';
 
-import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
+import {
+  GAS_TRANSACTION_RATIO_PRECISION,
+  LIDO_CONTRACT_NAMES,
+  NOOP,
+  SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
+} from '../common/constants.js';
 import {
   AccountValue,
   EtherValue,
   PopulatedTransaction,
+  TransactionOptions,
   TransactionResult,
 } from '../core/types.js';
 import { parseValue } from '../common/utils/parse-value.js';
@@ -135,7 +141,7 @@ export class LidoSDKWrap extends LidoSDKModule {
     };
   }
 
-  @Logger('Call:')
+  @Logger('Utils:')
   @ErrorHandler()
   public async wrapEthEstimateGas(
     props: WrapPropsWithoutCallback,
@@ -143,11 +149,20 @@ export class LidoSDKWrap extends LidoSDKModule {
     const { value, account } = await this.parseProps(props);
 
     const address = await this.contractAddressWstETH();
-    return this.core.rpcProvider.estimateGas({
+
+    const originalGasLimit = await this.core.rpcProvider.estimateGas({
       account,
       to: address,
       value,
     });
+
+    return (
+      (originalGasLimit *
+        BigInt(
+          GAS_TRANSACTION_RATIO_PRECISION * SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
+        )) /
+      BigInt(GAS_TRANSACTION_RATIO_PRECISION)
+    );
   }
 
   /// Wrap stETH
@@ -169,6 +184,17 @@ export class LidoSDKWrap extends LidoSDKModule {
       sendTransaction: (options) => contract.write.wrap([value], options),
       decodeResult: (receipt) => this.wrapParseEvents(receipt, account.address),
     });
+  }
+
+  @Logger('Utils:')
+  public async wrapStethEstimateGas(
+    props: WrapPropsWithoutCallback,
+    options?: TransactionOptions,
+  ): Promise<bigint> {
+    const { value, account } = await this.parseProps(props);
+    const contract = await this.getContractWstETH();
+
+    return await contract.estimateGas.wrap([value], { account, ...options });
   }
 
   @Logger('Utils:')
@@ -261,6 +287,22 @@ export class LidoSDKWrap extends LidoSDKModule {
     };
   }
 
+  @Logger('Utils:')
+  public async approveStethForWrapEstimateGas(
+    props: WrapPropsWithoutCallback,
+    options?: TransactionOptions,
+  ): Promise<bigint> {
+    const { value, account } = await this.parseProps(props);
+
+    const stethContract = await this.getPartialContractSteth();
+    const wstethContractAddress = await this.contractAddressWstETH();
+
+    return await stethContract.estimateGas.approve(
+      [wstethContractAddress, value],
+      { account, ...options },
+    );
+  }
+
   @Logger('Call:')
   @ErrorHandler()
   public async approveStethForWrapSimulateTx(
@@ -317,6 +359,16 @@ export class LidoSDKWrap extends LidoSDKModule {
         args: [value],
       }),
     };
+  }
+
+  @Logger('Utils:')
+  public async unwrapEstimateGas(
+    props: Omit<WrapProps, 'callback'>,
+    options?: TransactionOptions,
+  ): Promise<bigint> {
+    const { value, account } = await this.parseProps(props);
+    const contract = await this.getContractWstETH();
+    return contract.estimateGas.unwrap([value], { account, ...options });
   }
 
   @Logger('Call:')

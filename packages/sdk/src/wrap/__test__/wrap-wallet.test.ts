@@ -18,7 +18,10 @@ import {
   expectPopulatedTx,
   expectPopulatedTxToRun,
 } from '../../../tests/utils/expect/expect-populated-tx.js';
-import { expectAlmostEqualBn } from '../../../tests/utils/expect/expect-bn.js';
+import {
+  expectAlmostEqualBn,
+  expectPositiveBn,
+} from '../../../tests/utils/expect/expect-bn.js';
 
 describe('LidoSDKWrap wallet methods', () => {
   const wrap = useWrap();
@@ -65,6 +68,11 @@ describe('LidoSDKWrap wallet methods', () => {
     expectAddress(tx.from, address);
     expectPopulatedTx(tx, undefined);
     await expectPopulatedTxToRun(tx, wrap.core.rpcProvider);
+  });
+
+  testSpending('wrap steth estimate', async () => {
+    const gasLimit = await wrap.wrapStethEstimateGas({ value });
+    expectPositiveBn(gasLimit);
   });
 
   testSpending('wrap steth simulate', async () => {
@@ -117,6 +125,11 @@ describe('LidoSDKWrap wallet methods', () => {
     );
     const tx = await wrap.unwrapSimulateTx({ value });
     expectAddress(tx.address, wstethAddress);
+  });
+
+  testSpending('unwrap estimate', async () => {
+    const gasLimit = await wrap.unwrapEstimateGas({ value });
+    expectPositiveBn(gasLimit);
   });
 
   testSpending('unwrap steth', async () => {

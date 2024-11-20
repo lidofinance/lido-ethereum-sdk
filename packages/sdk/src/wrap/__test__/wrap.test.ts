@@ -68,6 +68,11 @@ describe('LidoSDKWrap read methods', () => {
     expect(allowance).toEqual(altAllowance);
   });
 
+  test('approve estimate', async () => {
+    const gasLimit = await wrap.approveStethForWrapEstimateGas({ value });
+    expectPositiveBn(gasLimit);
+  });
+
   test('approve populate', async () => {
     const stethAddress = await wrap.core.getContractAddress(
       LIDO_CONTRACT_NAMES.lido,
