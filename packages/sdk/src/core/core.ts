@@ -518,7 +518,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
         nonce: 1,
       };
     } else {
-      callback({ stage: TransactionCallbackStage.GAS_LIMIT });
+      await callback({ stage: TransactionCallbackStage.GAS_LIMIT });
       const feeData = await this.getFeeData();
       overrides.maxFeePerGas = feeData.maxFeePerGas;
       overrides.maxPriorityFeePerGas = feeData.maxPriorityFeePerGas;
@@ -541,7 +541,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       }
     }
 
-    const customGas = callback({
+    const customGas = await callback({
       stage: TransactionCallbackStage.SIGN,
       payload: overrides.gas,
     });
@@ -556,11 +556,11 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     );
 
     if (isContract) {
-      callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
+      await callback({ stage: TransactionCallbackStage.MULTISIG_DONE });
       return { hash };
     }
 
-    callback({
+    await callback({
       stage: TransactionCallbackStage.RECEIPT,
       payload: hash,
     });
@@ -574,7 +574,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       ERROR_CODE.TRANSACTION_ERROR,
     );
 
-    callback({
+    await callback({
       stage: TransactionCallbackStage.CONFIRMATION,
       payload: receipt,
     });
@@ -585,7 +585,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
     const result = await decodeResult?.(receipt);
 
-    callback({
+    await callback({
       stage: TransactionCallbackStage.DONE,
       payload: confirmations,
     });
