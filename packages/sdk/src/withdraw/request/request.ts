@@ -234,7 +234,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
     if (permitProp) {
       permit = permitProp;
     } else {
-      callback({ stage: TransactionCallbackStage.PERMIT });
+      await callback({ stage: TransactionCallbackStage.PERMIT });
       const isContract = await this.bus.core.isContract(account.address);
       invariant(
         !isContract,

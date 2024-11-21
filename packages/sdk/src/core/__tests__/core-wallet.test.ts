@@ -178,7 +178,7 @@ describe('Account hoisting', () => {
   });
 
   test('useAccount requests account from web3Provider', async () => {
-    const mockFn = jest.fn<TransactionCallback>();
+    const mockFn = jest.fn();
     const mockTransport = useMockTransport(async (args, originalRequest) => {
       mockFn(args.method);
       if (args.method === 'eth_requestAccounts') {
