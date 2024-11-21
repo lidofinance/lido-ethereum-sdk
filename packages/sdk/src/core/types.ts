@@ -122,11 +122,17 @@ export type TransactionCallbackProps =
   | { stage: TransactionCallbackStage.MULTISIG_DONE; payload?: undefined }
   | { stage: TransactionCallbackStage.ERROR; payload: SDKError };
 
-export type TransactionCallbackResult<TProps> = TProps extends {
+// callback return type based on stage
+type TransactionCallbackReturn<TProps> = TProps extends {
   stage: TransactionCallbackStage.SIGN;
 }
   ? bigint | undefined
   : void;
+
+// support both async and non async callbacks
+export type TransactionCallbackResult<TProps> =
+  | TransactionCallbackReturn<TProps>
+  | Promise<TransactionCallbackReturn<TProps>>;
 
 export type TransactionCallback = (
   props: TransactionCallbackProps,
