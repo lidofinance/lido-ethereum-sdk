@@ -1,5 +1,7 @@
 export { LIDO_TOKENS, CHAINS } from '../common/constants.js';
 
+export { LidoLocatorAbi } from './abi/lidoLocator.js';
+
 export { default as LidoSDKCore } from './core.js';
 export type {
   LidoSDKCoreProps,
