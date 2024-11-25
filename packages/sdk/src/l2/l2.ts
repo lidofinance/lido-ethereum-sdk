@@ -142,6 +142,18 @@ export class LidoSDKL2 extends LidoSDKModule {
   }
 
   @Logger('Utils:')
+  public async wrapWstethToStethEstimateGas(
+    props: WrapPropsWithoutCallback,
+  ): Promise<bigint> {
+    const { value, account } = await this.parseProps(props);
+    const contract = await this.getContract();
+
+    return contract.estimateGas.wrap([value], {
+      account,
+    });
+  }
+
+  @Logger('Utils:')
   private async wrapWstethToStethParseEvents(
     receipt: TransactionReceipt,
     address: Address,
@@ -249,6 +261,19 @@ export class LidoSDKL2 extends LidoSDKModule {
     });
 
     return request;
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async unwrapStethEstimateGas(
+    props: Omit<WrapProps, 'callback'>,
+  ): Promise<bigint> {
+    const { value, account } = await this.parseProps(props);
+    const contract = await this.getContract();
+
+    return contract.estimateGas.unwrap([value], {
+      account,
+    });
   }
 
   @Logger('Utils:')
