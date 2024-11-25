@@ -21,6 +21,7 @@ import { expectContract } from '../../../tests/utils/expect/expect-contract.js';
 import {
   expectAlmostEqualBn,
   expectNonNegativeBn,
+  expectPositiveBn,
 } from '../../../tests/utils/expect/expect-bn.js';
 import {
   SPENDING_TIMEOUT,
@@ -147,6 +148,11 @@ describe('LidoSDKL2 wrap', () => {
     expectAddress(tx.address, stethAddress);
   });
 
+  testSpending('wrap estimate gas', async () => {
+    const gas = await l2.wrapWstethToStethEstimateGas({ value });
+    expectPositiveBn(gas);
+  });
+
   testSpending('wrap wsteth to steth', async () => {
     const stethValue = await l2.steth.convertToSteth(value);
     const stethBalanceBefore = await l2.steth.balance(account.address);
@@ -191,6 +197,11 @@ describe('LidoSDKL2 wrap', () => {
     );
     const tx = await l2.unwrapStethSimulateTx({ value });
     expectAddress(tx.address, stethAddress);
+  });
+
+  testSpending('unwrap estimate gas', async () => {
+    const gas = await l2.unwrapStethEstimateGas({ value });
+    expectPositiveBn(gas);
   });
 
   testSpending('unwrap', async () => {
