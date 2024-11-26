@@ -94,6 +94,19 @@ export class LidoSDKL2 extends LidoSDKModule {
     });
   }
 
+  @Logger('Call:')
+  @ErrorHandler()
+  public async approveWstethForWrapEstimateGas(
+    props: WrapProps,
+  ): Promise<bigint> {
+    const stethAddress = await this.contractAddress();
+    return this.wsteth.estimateApprove({
+      ...props,
+      amount: props.value,
+      to: stethAddress,
+    });
+  }
+
   @Logger('Utils:')
   @ErrorHandler()
   public async getWstethForWrapAllowance(

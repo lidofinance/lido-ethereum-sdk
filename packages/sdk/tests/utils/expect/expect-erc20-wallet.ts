@@ -17,7 +17,10 @@ import {
 } from '../../../tests/utils/expect/expect-populated-tx.js';
 import { erc20abi } from '../../../src/erc20/abi/erc20abi.js';
 import { expectTxCallback } from '../../../tests/utils/expect/expect-tx-callback.js';
-import { expectAlmostEqualBn } from '../../../tests/utils/expect/expect-bn.js';
+import {
+  expectAlmostEqualBn,
+  expectPositiveBn,
+} from '../../../tests/utils/expect/expect-bn.js';
 import {
   SPENDING_TIMEOUT,
   testSpending,
@@ -138,6 +141,16 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
         expectPopulatedTx(tx, undefined, dataEncoded);
         expect(tx.to).toBe(contractAddress);
         expect(tx.from).toBe(account);
+      });
+
+      test('estimateApprove', async () => {
+        const { address: altAddress } = useAltAccount();
+        const params = {
+          to: altAddress,
+          amount: 100n,
+        };
+        const gas = await token.estimateApprove(params);
+        expectPositiveBn(gas);
       });
 
       test('simulateApprove', async () => {
@@ -267,6 +280,21 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
         expect(tx.request.args[0]).toBe(params.from);
         expect(tx.request.args[1]).toBe(params.to);
         expect(tx.request.args[2]).toBe(params.amount);
+      });
+
+      test('estimateTransfer', async () => {
+        const { address } = useAccount();
+        const { address: altAddress } = useAltAccount();
+        const params = {
+          account: altAddress,
+          to: altAddress,
+          from: address,
+          amount: 100n,
+        };
+
+        const gas = await token.estimateTransfer(params);
+
+        expectPositiveBn(gas);
       });
     });
 
