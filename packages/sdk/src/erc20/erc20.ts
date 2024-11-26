@@ -127,6 +127,21 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
       : contract.simulate.transfer([to, amount], { account });
   }
 
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async estimateTransfer(props: NoCallback<TransferProps>) {
+    const parsedProps = await this.parseProps(props);
+    const { account, amount, to, from = account.address } = parsedProps;
+    const isTransferFrom = from !== account.address;
+
+    const contract = await this.getContract();
+    return isTransferFrom
+      ? contract.estimateGas.transferFrom([from, to, amount], {
+          account,
+        })
+      : contract.estimateGas.transfer([to, amount], { account });
+  }
+
   // PERMIT
   @Logger('Permit:')
   @ErrorHandler()
@@ -220,6 +235,16 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
     const { account, amount, to } = await this.parseProps(props);
     const contract = await this.getContract();
     return contract.simulate.approve([to, amount], {
+      account,
+    });
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async estimateApprove(props: NoCallback<ApproveProps>) {
+    const { account, amount, to } = await this.parseProps(props);
+    const contract = await this.getContract();
+    return contract.estimateGas.approve([to, amount], {
       account,
     });
   }
