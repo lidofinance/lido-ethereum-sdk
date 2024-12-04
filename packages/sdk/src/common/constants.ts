@@ -63,7 +63,7 @@ export const LIDO_TOKENS = {
   unsteth: 'unstETH',
 } as const;
 
-export const enum LIDO_CONTRACT_NAMES {
+export enum LIDO_CONTRACT_NAMES {
   accountingOracle = 'accountingOracle',
   depositSecurityModule = 'depositSecurityModule',
   elRewardsVault = 'elRewardsVault',
@@ -81,7 +81,7 @@ export const enum LIDO_CONTRACT_NAMES {
   wsteth = 'wsteth',
 }
 
-export const enum LIDO_L2_CONTRACT_NAMES {
+export enum LIDO_L2_CONTRACT_NAMES {
   wsteth = 'wsteth',
   steth = 'steth',
 }
