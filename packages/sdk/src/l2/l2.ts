@@ -1,5 +1,9 @@
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
-import type { AccountValue, LidoSDKCommonProps } from '../core/types.js';
+import type {
+  AccountValue,
+  LidoSDKCommonProps,
+  TransactionOptions,
+} from '../core/types.js';
 import { LidoSDKL2Steth, LidoSDKL2Wsteth } from './tokens.js';
 
 import {
@@ -30,7 +34,7 @@ import {
   UnwrapResults,
   WrapInnerProps,
   WrapProps,
-  WrapPropsWithoutCallback,
+  WrapPropsWithoutTxOptions,
   WrapResults,
 } from './types.js';
 import { PopulatedTransaction, TransactionResult } from '../core/types.js';
@@ -97,10 +101,26 @@ export class LidoSDKL2 extends LidoSDKModule {
   @Logger('Call:')
   @ErrorHandler()
   public async approveWstethForWrapEstimateGas(
-    props: WrapProps,
+    props: WrapPropsWithoutTxOptions,
+    options?: TransactionOptions,
   ): Promise<bigint> {
     const stethAddress = await this.contractAddress();
-    return this.wsteth.estimateApprove({
+    return this.wsteth.estimateApprove(
+      {
+        ...props,
+        amount: props.value,
+        to: stethAddress,
+      },
+      options,
+    );
+  }
+
+  @Logger('Utils:')
+  public async approveWstethForWrapPopulateTx(
+    props: WrapPropsWithoutTxOptions,
+  ): Promise<PopulatedTransaction> {
+    const stethAddress = await this.contractAddress();
+    return this.wsteth.populateApprove({
       ...props,
       amount: props.value,
       to: stethAddress,
@@ -138,7 +158,7 @@ export class LidoSDKL2 extends LidoSDKModule {
 
   @Logger('Utils:')
   public async wrapWstethToStethPopulateTx(
-    props: WrapPropsWithoutCallback,
+    props: WrapPropsWithoutTxOptions,
   ): Promise<PopulatedTransaction> {
     const { value, account } = await this.parseProps(props);
     const address = await this.contractAddress();
@@ -156,13 +176,15 @@ export class LidoSDKL2 extends LidoSDKModule {
 
   @Logger('Utils:')
   public async wrapWstethToStethEstimateGas(
-    props: WrapPropsWithoutCallback,
+    props: WrapPropsWithoutTxOptions,
+    options?: TransactionOptions,
   ): Promise<bigint> {
     const { value, account } = await this.parseProps(props);
     const contract = await this.getContract();
 
     return contract.estimateGas.wrap([value], {
       account,
+      ...options,
     });
   }
 
@@ -208,7 +230,7 @@ export class LidoSDKL2 extends LidoSDKModule {
   @Logger('Call:')
   @ErrorHandler()
   public async wrapWstethToStethSimulateTx(
-    props: WrapPropsWithoutCallback,
+    props: WrapPropsWithoutTxOptions,
   ): Promise<WriteContractParameters> {
     const { value, account } = await this.parseProps(props);
     const contract = await this.getContract();
@@ -245,7 +267,7 @@ export class LidoSDKL2 extends LidoSDKModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async unwrapStethPopulateTx(
-    props: Omit<WrapProps, 'callback'>,
+    props: WrapPropsWithoutTxOptions,
   ): Promise<PopulatedTransaction> {
     const { value, account } = await this.parseProps(props);
     const to = await this.contractAddress();
@@ -264,7 +286,7 @@ export class LidoSDKL2 extends LidoSDKModule {
   @Logger('Call:')
   @ErrorHandler()
   public async unwrapStethSimulateTx(
-    props: Omit<WrapProps, 'callback'>,
+    props: WrapPropsWithoutTxOptions,
   ): Promise<WriteContractParameters> {
     const { value, account } = await this.parseProps(props);
     const contract = await this.getContract();
@@ -279,13 +301,15 @@ export class LidoSDKL2 extends LidoSDKModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async unwrapStethEstimateGas(
-    props: Omit<WrapProps, 'callback'>,
+    props: WrapPropsWithoutTxOptions,
+    options?: TransactionOptions,
   ): Promise<bigint> {
     const { value, account } = await this.parseProps(props);
     const contract = await this.getContract();
 
     return contract.estimateGas.unwrap([value], {
       account,
+      ...options,
     });
   }
 

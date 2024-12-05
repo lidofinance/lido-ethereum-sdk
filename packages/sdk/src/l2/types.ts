@@ -1,5 +1,9 @@
 import type { Address } from 'viem';
-import type { CommonTransactionProps, EtherValue } from '../core/types.js';
+import type {
+  CommonTransactionProps,
+  EtherValue,
+  NoTxOptions,
+} from '../core/types.js';
 import type { FormattedTransactionRequest, JsonRpcAccount } from 'viem';
 
 export type SharesTransferProps = CommonTransactionProps & {
@@ -22,7 +26,7 @@ export type UnwrapResults = {
   wstethReceived: bigint;
 };
 
-export type WrapPropsWithoutCallback = Omit<WrapProps, 'callback'>;
+export type WrapPropsWithoutTxOptions = NoTxOptions<WrapProps>;
 
 export type WrapInnerProps = Omit<CommonTransactionProps, 'account'> & {
   value: bigint;

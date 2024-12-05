@@ -13,7 +13,7 @@ import type {
 } from './types.js';
 import type {
   AccountValue,
-  NoCallback,
+  NoTxOptions,
   PopulatedTransaction,
 } from '../core/types.js';
 import {
@@ -109,7 +109,7 @@ export class LidoSDKUnstETH extends LidoSDKModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async transferSimulateTx(props: NoCallback<UnstethTransferProps>) {
+  public async transferSimulateTx(props: NoTxOptions<UnstethTransferProps>) {
     const { account, id, to, from: _from, data } = await this.parseProps(props);
     const from = _from ?? account.address;
     const args = (
@@ -124,7 +124,7 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async transferPopulateTx(
-    props: NoCallback<UnstethTransferProps>,
+    props: NoTxOptions<UnstethTransferProps>,
   ): Promise<PopulatedTransaction> {
     const { account, id, to, from: _from, data } = await this.parseProps(props);
     const from = _from ?? account.address;
@@ -182,7 +182,7 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async setSingleTokenApprovalPopulateTx(
-    props: NoCallback<UnstethApproveProps>,
+    props: NoTxOptions<UnstethApproveProps>,
   ): Promise<PopulatedTransaction> {
     const { account, to = zeroAddress, id } = await this.parseProps(props);
     const args = [to, id] as const;
@@ -201,7 +201,7 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async setSingleTokenApprovalSimulateTx(
-    props: NoCallback<UnstethApproveProps>,
+    props: NoTxOptions<UnstethApproveProps>,
   ) {
     const { account, to = zeroAddress, id } = await this.parseProps(props);
     const args = [to, id] as const;
@@ -246,7 +246,7 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   @Logger('Call:')
   @ErrorHandler()
   public async setAllTokensApprovalPopulateTx(
-    props: NoCallback<UnstethApproveAllProps>,
+    props: NoTxOptions<UnstethApproveAllProps>,
   ): Promise<PopulatedTransaction> {
     const { account, to, allow } = await this.parseProps(props);
     const args = [to, allow] as const;
@@ -265,7 +265,7 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   @Logger('Call:')
   @ErrorHandler()
   public async setAllTokensApprovalSimulateTx(
-    props: NoCallback<UnstethApproveAllProps>,
+    props: NoTxOptions<UnstethApproveAllProps>,
   ) {
     const { account, to, allow } = await this.parseProps(props);
     const args = [to, allow] as const;

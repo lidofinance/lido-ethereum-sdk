@@ -8,8 +8,9 @@ import {
 
 import { Logger, ErrorHandler } from '../../common/decorators/index.js';
 import type {
-  NoCallback,
+  NoTxOptions,
   PopulatedTransaction,
+  TransactionOptions,
   TransactionResult,
 } from '../../core/types.js';
 import { NOOP } from '../../common/constants.js';
@@ -60,7 +61,10 @@ export class LidoSDKWithdrawClaim extends BusModule {
 
   @Logger('Views:')
   @ErrorHandler()
-  public async claimRequestsEstimateGas(props: NoCallback<ClaimRequestsProps>) {
+  public async claimRequestsEstimateGas(
+    props: NoTxOptions<ClaimRequestsProps>,
+    options?: TransactionOptions,
+  ) {
     const account = await this.bus.core.useAccount(props.account);
     const { requestsIds, hints } = await this.sortRequestsWithHints(
       props.requestsIds,
@@ -71,12 +75,13 @@ export class LidoSDKWithdrawClaim extends BusModule {
 
     return contract.estimateGas.claimWithdrawals([requestsIds, hints], {
       account,
+      ...options,
     });
   }
 
   @Logger('Views:')
   @ErrorHandler()
-  public async claimRequestsSimulateTx(props: NoCallback<ClaimRequestsProps>) {
+  public async claimRequestsSimulateTx(props: NoTxOptions<ClaimRequestsProps>) {
     const account = await this.bus.core.useAccount(props.account);
     const { requestsIds, hints } = await this.sortRequestsWithHints(
       props.requestsIds,
@@ -93,7 +98,7 @@ export class LidoSDKWithdrawClaim extends BusModule {
   @Logger('Views:')
   @ErrorHandler()
   public async claimRequestsPopulateTx(
-    props: NoCallback<ClaimRequestsProps>,
+    props: NoTxOptions<ClaimRequestsProps>,
   ): Promise<PopulatedTransaction> {
     const account = await this.bus.core.useAccount(props.account);
     const { requestsIds, hints } = await this.sortRequestsWithHints(
