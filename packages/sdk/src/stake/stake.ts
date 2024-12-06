@@ -22,7 +22,7 @@ import {
   type PopulatedTransaction,
   TransactionOptions,
 } from '../core/index.js';
-import type { NoCallback } from '../core/types.js';
+import type { NoTxOptions } from '../core/types.js';
 import { ERROR_CODE, invariant } from '../common/utils/sdk-error.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import {
@@ -148,7 +148,7 @@ export class LidoSDKStake extends LidoSDKModule {
   @Logger('Utils:')
   @Cache(30 * 1000, ['core.chain.id'])
   public async stakeEthEstimateGas(
-    props: NoCallback<StakeProps>,
+    props: NoTxOptions<StakeProps>,
     options?: TransactionOptions,
   ): Promise<bigint> {
     const { referralAddress, value, account } = await this.parseProps(props);

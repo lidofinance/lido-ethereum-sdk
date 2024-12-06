@@ -145,6 +145,7 @@ export class LidoSDKWrap extends LidoSDKModule {
   @ErrorHandler()
   public async wrapEthEstimateGas(
     props: WrapPropsWithoutCallback,
+    options?: TransactionOptions,
   ): Promise<bigint> {
     const { value, account } = await this.parseProps(props);
 
@@ -154,6 +155,7 @@ export class LidoSDKWrap extends LidoSDKModule {
       account,
       to: address,
       value,
+      ...options,
     });
 
     return (

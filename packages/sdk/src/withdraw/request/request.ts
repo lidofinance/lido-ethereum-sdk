@@ -5,8 +5,9 @@ import {
   type PerformTransactionGasLimit,
   type PerformTransactionSendTransaction,
   type TransactionResult,
-  NoCallback,
+  NoTxOptions,
   PopulatedTransaction,
+  TransactionOptions,
 } from '../../core/types.js';
 
 import { BusModule } from '../bus-module.js';
@@ -131,7 +132,10 @@ export class LidoSDKWithdrawRequest extends BusModule {
 
   @Logger('Views:')
   @ErrorHandler()
-  public async requestWithdrawalEstimateGas(props: NoCallback<RequestProps>) {
+  public async requestWithdrawalEstimateGas(
+    props: NoTxOptions<RequestProps>,
+    options?: TransactionOptions,
+  ) {
     const account = await this.bus.core.useAccount(props.account);
     const {
       token,
@@ -146,9 +150,10 @@ export class LidoSDKWithdrawRequest extends BusModule {
 
     const args = [requests, receiver] as const;
     const estimatePromise = isSteth
-      ? contract.estimateGas.requestWithdrawals(args, { account })
+      ? contract.estimateGas.requestWithdrawals(args, { account, ...options })
       : contract.estimateGas.requestWithdrawalsWstETH(args, {
           account,
+          ...options,
         });
 
     return await estimatePromise;
@@ -156,7 +161,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
 
   @Logger('Views:')
   @ErrorHandler()
-  public async requestWithdrawalSimulateTx(props: NoCallback<RequestProps>) {
+  public async requestWithdrawalSimulateTx(props: NoTxOptions<RequestProps>) {
     const account = await this.bus.core.useAccount(props.account);
     const {
       token,
@@ -182,7 +187,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
   @Logger('Views:')
   @ErrorHandler()
   public async requestWithdrawalPopulateTx(
-    props: NoCallback<RequestWithPermitProps>,
+    props: NoTxOptions<RequestWithPermitProps>,
   ): Promise<PopulatedTransaction> {
     const account = await this.bus.core.useAccount(props.account);
     const {
@@ -223,6 +228,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
       receiver = account.address,
       callback = NOOP,
       permit: permitProp,
+      deadline,
       ...rest
     } = props;
     const requests =
@@ -247,6 +253,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
         spender: contract.address,
         amount,
         token,
+        deadline,
       });
       permit = {
         deadline: signature.deadline,
@@ -291,7 +298,8 @@ export class LidoSDKWithdrawRequest extends BusModule {
   @Logger('Views:')
   @ErrorHandler()
   public async requestWithdrawalWithPermitEstimateGas(
-    props: NoCallback<RequirePermit<RequestWithPermitProps>>,
+    props: NoTxOptions<RequirePermit<RequestWithPermitProps>>,
+    options?: TransactionOptions,
   ) {
     const account = await this.bus.core.useAccount(props.account);
     const {
@@ -310,9 +318,11 @@ export class LidoSDKWithdrawRequest extends BusModule {
     const estimatePromise = isSteth
       ? contract.estimateGas.requestWithdrawalsWithPermit(args, {
           account,
+          ...options,
         })
       : contract.estimateGas.requestWithdrawalsWstETHWithPermit(args, {
           account,
+          ...options,
         });
 
     return await estimatePromise;
@@ -321,7 +331,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
   @Logger('Views:')
   @ErrorHandler()
   public async requestWithdrawalWithPermitSimulateTx(
-    props: NoCallback<RequirePermit<RequestWithPermitProps>>,
+    props: NoTxOptions<RequirePermit<RequestWithPermitProps>>,
   ) {
     const account = await this.bus.core.useAccount(props.account);
     const {
@@ -351,7 +361,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
   @Logger('Views:')
   @ErrorHandler()
   public async requestWithdrawalWithPermitPopulateTx(
-    props: NoCallback<RequirePermit<RequestWithPermitProps>>,
+    props: NoTxOptions<RequirePermit<RequestWithPermitProps>>,
   ): Promise<PopulatedTransaction> {
     const account = await this.bus.core.useAccount(props.account);
     const {

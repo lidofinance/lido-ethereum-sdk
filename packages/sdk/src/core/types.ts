@@ -5,7 +5,6 @@ import type {
   TransactionReceipt,
   Address,
   Chain,
-  FormattedTransactionRequest,
   BlockTag,
   Account,
   WaitForTransactionReceiptParameters,
@@ -104,10 +103,18 @@ export type TransactionResult<TDecodedResult = undefined> = {
   result?: TDecodedResult;
 };
 
-export type PopulatedTransaction = Omit<FormattedTransactionRequest, 'type'>;
+export type PopulatedTransaction = {
+  to: Address;
+  from: Address;
+  data?: Hash;
+  value?: bigint;
+  gas?: bigint;
+};
 
-export type NoCallback<TProps extends { callback?: TransactionCallback }> =
-  Omit<TProps, 'callback'>;
+export type NoTxOptions<TProps extends CommonTransactionProps> = Omit<
+  TProps,
+  'callback' | 'waitForTransactionReceiptParameters'
+>;
 
 export type TransactionCallbackProps =
   | { stage: TransactionCallbackStage.PERMIT; payload?: undefined }

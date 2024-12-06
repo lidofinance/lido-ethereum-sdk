@@ -1,8 +1,9 @@
 import { encodeFunctionData } from 'viem';
 
 import type {
-  NoCallback,
+  NoTxOptions,
   PopulatedTransaction,
+  TransactionOptions,
   TransactionResult,
 } from '../../core/types.js';
 import { NOOP } from '../../common/constants.js';
@@ -54,7 +55,7 @@ export class LidoSDKWithdrawApprove extends BusModule {
 
   @Logger('Views:')
   @ErrorHandler()
-  public async approveSimulateTx(props: NoCallback<WithdrawApproveProps>) {
+  public async approveSimulateTx(props: NoTxOptions<WithdrawApproveProps>) {
     const account = await this.bus.core.useAccount(props.account);
     const { token, amount: _amount } = props;
     const amount = parseValue(_amount);
@@ -79,7 +80,7 @@ export class LidoSDKWithdrawApprove extends BusModule {
   @Logger('Views:')
   @ErrorHandler()
   public async approvePopulateTx(
-    props: NoCallback<WithdrawApproveProps>,
+    props: NoTxOptions<WithdrawApproveProps>,
   ): Promise<PopulatedTransaction> {
     const { token, amount: _amount } = props;
     const account = await this.bus.core.useAccount(props.account);
@@ -109,11 +110,14 @@ export class LidoSDKWithdrawApprove extends BusModule {
 
   @Logger('Utils:')
   @Cache(30 * 1000, ['bus.core.chain.id'])
-  public async approveGasLimit({
-    account: accountProp,
-    token,
-    amount,
-  }: Required<NoCallback<WithdrawApproveProps>>): Promise<bigint> {
+  public async approveGasLimit(
+    {
+      account: accountProp,
+      token,
+      amount,
+    }: Required<NoTxOptions<WithdrawApproveProps>>,
+    options?: TransactionOptions,
+  ): Promise<bigint> {
     const account = await this.bus.core.useAccount(accountProp);
     const value = parseValue(amount);
     const isSteth = token === 'stETH';
@@ -132,7 +136,7 @@ export class LidoSDKWithdrawApprove extends BusModule {
     const gasLimit = await estimateGasMethod.call(
       this,
       [addressWithdrawalsQueue, value],
-      { account: account },
+      { account, ...options },
     );
 
     return gasLimit;
