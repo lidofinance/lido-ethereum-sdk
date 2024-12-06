@@ -228,6 +228,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
       receiver = account.address,
       callback = NOOP,
       permit: permitProp,
+      deadline,
       ...rest
     } = props;
     const requests =
@@ -252,6 +253,7 @@ export class LidoSDKWithdrawRequest extends BusModule {
         spender: contract.address,
         amount,
         token,
+        deadline,
       });
       permit = {
         deadline: signature.deadline,

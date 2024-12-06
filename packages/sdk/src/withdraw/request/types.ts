@@ -51,6 +51,7 @@ export type SignedPermit = {
 
 export type RequestWithPermitProps = RequestProps & {
   permit?: SignedPermit;
+  deadline?: bigint;
 };
 
 export type RequirePermit<TProps> = Omit<TProps, 'permit'> & {
