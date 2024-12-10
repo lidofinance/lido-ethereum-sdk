@@ -1,5 +1,5 @@
 /* eslint-disable func-style */
-export const enum ERROR_CODE {
+export enum ERROR_CODE {
   INVALID_ARGUMENT = 'INVALID_ARGUMENT',
   NOT_SUPPORTED = 'NOT_SUPPORTED',
   PROVIDER_ERROR = 'PROVIDER_ERROR',

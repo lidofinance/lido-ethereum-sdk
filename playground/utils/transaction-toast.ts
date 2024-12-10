@@ -7,20 +7,29 @@ import { toast } from '@lidofinance/lido-ui';
 export const transactionToast: TransactionCallback = ({ stage }) => {
   switch (stage) {
     case TransactionCallbackStage.PERMIT:
-      return toast('Permit', { type: 'info' });
+      toast('Permit', { type: 'info' });
+      break;
     case TransactionCallbackStage.GAS_LIMIT:
-      return toast('Gas limit', { type: 'info' });
+      toast('Gas limit', { type: 'info' });
+      break;
     case TransactionCallbackStage.SIGN:
-      return toast('Signing', { type: 'info' });
+      toast('Signing', { type: 'info' });
+      break;
     case TransactionCallbackStage.RECEIPT:
-      return toast('Receipt', { type: 'info' });
+      toast('Receipt', { type: 'info' });
+      break;
     case TransactionCallbackStage.CONFIRMATION:
-      return toast('Confirmation', { type: 'success' });
+      toast('Confirmation', { type: 'success' });
+      break;
     case TransactionCallbackStage.ERROR:
-      return toast('Error', { type: 'error' });
+      toast('Error', { type: 'error' });
+      break;
     case TransactionCallbackStage.DONE:
-      return toast('Success', { type: 'success' });
+      toast('Success', { type: 'success' });
+      break;
     case TransactionCallbackStage.MULTISIG_DONE:
-      return toast('Multisig Success', { type: 'success' });
+      toast('Multisig Success', { type: 'success' });
+      break;
   }
+  return undefined;
 };

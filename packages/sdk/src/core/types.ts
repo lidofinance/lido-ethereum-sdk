@@ -5,7 +5,6 @@ import type {
   TransactionReceipt,
   Address,
   Chain,
-  FormattedTransactionRequest,
   BlockTag,
   Account,
   WaitForTransactionReceiptParameters,
@@ -104,10 +103,18 @@ export type TransactionResult<TDecodedResult = undefined> = {
   result?: TDecodedResult;
 };
 
-export type PopulatedTransaction = Omit<FormattedTransactionRequest, 'type'>;
+export type PopulatedTransaction = {
+  to: Address;
+  from: Address;
+  data?: Hash;
+  value?: bigint;
+  gas?: bigint;
+};
 
-export type NoCallback<TProps extends { callback?: TransactionCallback }> =
-  Omit<TProps, 'callback'>;
+export type NoTxOptions<TProps extends CommonTransactionProps> = Omit<
+  TProps,
+  'callback' | 'waitForTransactionReceiptParameters'
+>;
 
 export type TransactionCallbackProps =
   | { stage: TransactionCallbackStage.PERMIT; payload?: undefined }
@@ -122,7 +129,21 @@ export type TransactionCallbackProps =
   | { stage: TransactionCallbackStage.MULTISIG_DONE; payload?: undefined }
   | { stage: TransactionCallbackStage.ERROR; payload: SDKError };
 
-export type TransactionCallback = (props: TransactionCallbackProps) => void;
+// callback return type based on stage
+type TransactionCallbackReturn<TProps> = TProps extends {
+  stage: TransactionCallbackStage.SIGN;
+}
+  ? bigint | undefined
+  : void;
+
+// support both async and non async callbacks
+export type TransactionCallbackResult<TProps> =
+  | TransactionCallbackReturn<TProps>
+  | Promise<TransactionCallbackReturn<TProps>>;
+
+export type TransactionCallback = (
+  props: TransactionCallbackProps,
+) => TransactionCallbackResult<TransactionCallbackProps>;
 
 export type PermitCallbackProps =
   | { stage: TransactionCallbackStage.SIGN; payload?: undefined }

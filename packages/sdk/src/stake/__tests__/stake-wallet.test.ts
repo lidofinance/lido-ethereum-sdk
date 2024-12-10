@@ -8,6 +8,7 @@ import { expectTxCallback } from '../../../tests/utils/expect/expect-tx-callback
 import { expectAlmostEqualBn } from '../../../tests/utils/expect/expect-bn.js';
 import { useSteth } from '../../../tests/utils/fixtures/use-steth.js';
 import { useShares } from '../../../tests/utils/fixtures/use-shares.js';
+import { TransactionCallback } from '../../core/types.js';
 
 describe('LidoSDKStake wallet methods', () => {
   const stake = useStake();
@@ -19,7 +20,7 @@ describe('LidoSDKStake wallet methods', () => {
       const stakeValue = 100n;
       const balanceBefore = await steth.balance();
       const balanceSharesBefore = await shares.balance();
-      const mockTxCallback = jest.fn();
+      const mockTxCallback = jest.fn<TransactionCallback>();
       const tx = await stake.stakeEth({
         value: stakeValue,
         callback: mockTxCallback,

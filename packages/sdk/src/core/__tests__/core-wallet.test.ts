@@ -23,6 +23,7 @@ import {
   LidoSDKStake,
   PerformTransactionGasLimit,
   PerformTransactionSendTransaction,
+  TransactionCallback,
   VIEM_CHAINS,
 } from '../../index.js';
 import {
@@ -239,7 +240,7 @@ describe('Perform Transaction', () => {
       (options) =>
         rawContract.write.submit([zeroAddress], { ...options, value }),
     );
-    const mockTxCallback = jest.fn();
+    const mockTxCallback = jest.fn<TransactionCallback>();
 
     const txResult = await core.performTransaction({
       getGasLimit: mockGetGasLimit,
@@ -303,7 +304,7 @@ describe('Perform Transaction', () => {
       (options) =>
         rawContract.write.submit([zeroAddress], { ...options, value }),
     );
-    const mockTxCallback = jest.fn();
+    const mockTxCallback = jest.fn<TransactionCallback>();
 
     const txResult = await core.performTransaction({
       getGasLimit: mockGetGasLimit,

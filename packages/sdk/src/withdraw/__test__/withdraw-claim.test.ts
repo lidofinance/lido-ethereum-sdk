@@ -14,8 +14,9 @@ import {
 } from '../../../tests/utils/expect/expect-populated-tx.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
 import { useRpcCore } from '../../../tests/utils/fixtures/use-core.js';
-import { LIDO_CONTRACT_NAMES } from '../../index.js';
+import { LIDO_CONTRACT_NAMES, TransactionCallback } from '../../index.js';
 import { expectTxCallback } from '../../../tests/utils/expect/expect-tx-callback.js';
+import { expectPositiveBn } from '../../../tests/utils/expect/expect-bn.js';
 
 describe('withdraw request claim', () => {
   const core = useRpcCore();
@@ -62,11 +63,18 @@ describe('withdraw request claim', () => {
     expectAddress(tx.request.functionName, 'claimWithdrawals');
   });
 
+  testSpending('can estimate claim', async () => {
+    const gasLimit = await claim.claimRequestsEstimateGas({
+      requestsIds: [request.id],
+    });
+    expectPositiveBn(gasLimit);
+  });
+
   testSpending('can claim', async () => {
     const balanceBefore = await core.balanceETH(address);
     const owner = await unsteth.getAccountByNFT(request.id);
     expectAddress(owner, address);
-    const mock = jest.fn();
+    const mock = jest.fn<TransactionCallback>();
     const tx = await claim.claimRequests({
       requestsIds: [request.id],
       callback: mock,

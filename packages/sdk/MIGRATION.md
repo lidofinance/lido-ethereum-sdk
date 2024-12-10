@@ -31,16 +31,16 @@ Internal utilities:
 ## Events
 
 - `getRebaseEventsByDays` was removed
-- `getRebaseEvents` arguments signature was changed to fit wide range of use-cases, [see docs](./README.md#`getRebaseEvents`)
+- `getRebaseEvents` arguments signature was changed to fit wide range of use-cases, [see docs](https://lidofinance.github.io/lido-ethereum-sdk/modules/lido-events#getrebaseevents)
 - `getLastRebaseEvents` covers previous use case of `getRebaseEvents`
 
 ## Rewards
 
-`getRewards...` props signature changed to fit wide range of use cases [see docs](./README.md#Rewards)
+`getRewards...` props signature changed to fit wide range of use cases [see docs](https://lidofinance.github.io/lido-ethereum-sdk/modules/rewards)
 
 Props:
 
-- `to`, `from`, `back` props, [see docs](./README.md#Rewards).
+- `to`, `from`, `back` props, [see docs](https://lidofinance.github.io/lido-ethereum-sdk/modules/reward).
 - `step` prop was removed due to conflicting defaults. Replaced with `stepEntities`(defaults 1000) and `stepBlocks`(defaults 50000) for subgraph and chain methods accordingly.
 - `getSubgraphUrl` now can receive subgraph id `null` for chains where it is not available
 

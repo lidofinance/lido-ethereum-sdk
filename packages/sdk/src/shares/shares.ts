@@ -16,7 +16,7 @@ import { parseValue } from '../common/utils/parse-value.js';
 import type {
   AccountValue,
   EtherValue,
-  NoCallback,
+  NoTxOptions,
   TransactionOptions,
 } from '../core/types.js';
 import { calcShareRate } from '../rewards/utils.js';
@@ -104,7 +104,7 @@ export class LidoSDKShares extends LidoSDKModule {
     to,
     amount: _amount,
     from: _from,
-  }: NoCallback<SharesTransferProps>) {
+  }: NoTxOptions<SharesTransferProps>) {
     const account = await this.core.useAccount(accountProp);
     const amount = parseValue(_amount);
     const from = _from ?? account.address;
@@ -135,7 +135,7 @@ export class LidoSDKShares extends LidoSDKModule {
     to,
     amount: _amount,
     from: _from,
-  }: NoCallback<SharesTransferProps>) {
+  }: NoTxOptions<SharesTransferProps>) {
     const amount = parseValue(_amount);
     const account = await this.core.useAccount(_account);
     const from = _from ?? account.address;

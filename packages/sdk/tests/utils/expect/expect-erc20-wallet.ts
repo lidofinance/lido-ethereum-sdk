@@ -5,6 +5,7 @@ import {
   LIDO_CONTRACT_NAMES,
   LIDO_L2_CONTRACT_NAMES,
   PERMIT_MESSAGE_TYPES,
+  TransactionCallback,
 } from '../../../src/index.js';
 import {
   useAccount,
@@ -16,7 +17,10 @@ import {
 } from '../../../tests/utils/expect/expect-populated-tx.js';
 import { erc20abi } from '../../../src/erc20/abi/erc20abi.js';
 import { expectTxCallback } from '../../../tests/utils/expect/expect-tx-callback.js';
-import { expectAlmostEqualBn } from '../../../tests/utils/expect/expect-bn.js';
+import {
+  expectAlmostEqualBn,
+  expectPositiveBn,
+} from '../../../tests/utils/expect/expect-bn.js';
 import {
   SPENDING_TIMEOUT,
   testSpending,
@@ -98,7 +102,7 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
         const params = {
           to: account,
           amount: 100n,
-          callback: jest.fn(),
+          callback: jest.fn<TransactionCallback>(),
         };
 
         const tx = await token.approve(params);
@@ -139,6 +143,16 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
         expect(tx.from).toBe(account);
       });
 
+      test('estimateApprove', async () => {
+        const { address: altAddress } = useAltAccount();
+        const params = {
+          to: altAddress,
+          amount: 100n,
+        };
+        const gas = await token.estimateApprove(params);
+        expectPositiveBn(gas);
+      });
+
       test('simulateApprove', async () => {
         const { address: altAddress } = useAltAccount();
         const contractAddress = await getTokenAddress();
@@ -169,7 +183,7 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
           to: altAddress,
           from: address,
           amount: 100n,
-          callback: jest.fn(),
+          callback: jest.fn<TransactionCallback>(),
         };
 
         const tx = await token.transfer(params);
@@ -266,6 +280,21 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
         expect(tx.request.args[0]).toBe(params.from);
         expect(tx.request.args[1]).toBe(params.to);
         expect(tx.request.args[2]).toBe(params.amount);
+      });
+
+      test('estimateTransfer', async () => {
+        const { address } = useAccount();
+        const { address: altAddress } = useAltAccount();
+        const params = {
+          account: altAddress,
+          to: altAddress,
+          from: address,
+          amount: 100n,
+        };
+
+        const gas = await token.estimateTransfer(params);
+
+        expectPositiveBn(gas);
       });
     });
 

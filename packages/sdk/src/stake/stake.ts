@@ -22,6 +22,7 @@ import {
   type PopulatedTransaction,
   TransactionOptions,
 } from '../core/index.js';
+import type { NoTxOptions } from '../core/types.js';
 import { ERROR_CODE, invariant } from '../common/utils/sdk-error.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import {
@@ -94,7 +95,7 @@ export class LidoSDKStake extends LidoSDKModule {
       callback,
       account,
       getGasLimit: async (options) =>
-        this.submitGasLimit(value, referralAddress, options),
+        this.stakeEthEstimateGas({ value, account, referralAddress }, options),
       sendTransaction: (options) =>
         contract.write.submit([referralAddress], { ...options, value }),
       decodeResult: async (receipt) => this.submitParseEvents(receipt, address),
@@ -146,15 +147,15 @@ export class LidoSDKStake extends LidoSDKModule {
 
   @Logger('Utils:')
   @Cache(30 * 1000, ['core.chain.id'])
-  private async submitGasLimit(
-    value: bigint,
-    referralAddress: Address,
-    options: TransactionOptions,
+  public async stakeEthEstimateGas(
+    props: NoTxOptions<StakeProps>,
+    options?: TransactionOptions,
   ): Promise<bigint> {
+    const { referralAddress, value, account } = await this.parseProps(props);
     const contract = await this.getContractStETH();
     const originalGasLimit = await contract.estimateGas.submit(
       [referralAddress],
-      { ...options, value },
+      { account, ...options, value },
     );
 
     const gasLimit =
@@ -239,9 +240,9 @@ export class LidoSDKStake extends LidoSDKModule {
   ): Promise<PopulatedTransaction> {
     const { referralAddress, value, account } = await this.parseProps(props);
     const data = this.stakeEthEncodeData({ referralAddress });
-    const gas = await this.submitGasLimit(value, referralAddress, {
-      account,
+    const gas = await this.stakeEthEstimateGas(props, {
       chain: this.core.chain,
+      account,
     });
     const address = await this.contractAddressStETH();
     return {

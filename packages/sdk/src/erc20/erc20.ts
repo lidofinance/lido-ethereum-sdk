@@ -21,7 +21,7 @@ import { parseValue } from '../common/utils/parse-value.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 import type {
   CommonTransactionProps,
-  NoCallback,
+  NoTxOptions,
   PermitSignature,
   TransactionOptions,
   TransactionResult,
@@ -89,7 +89,7 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async populateTransfer(props: NoCallback<TransferProps>) {
+  public async populateTransfer(props: NoTxOptions<TransferProps>) {
     const parsedProps = await this.parseProps(props);
     const { account, amount, to, from = account.address } = parsedProps;
     const isTransferFrom = from !== account.address;
@@ -114,7 +114,7 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async simulateTransfer(props: NoCallback<TransferProps>) {
+  public async simulateTransfer(props: NoTxOptions<TransferProps>) {
     const parsedProps = await this.parseProps(props);
     const { account, amount, to, from = account.address } = parsedProps;
     const isTransferFrom = from !== account.address;
@@ -125,6 +125,21 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
           account,
         })
       : contract.simulate.transfer([to, amount], { account });
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async estimateTransfer(props: NoTxOptions<TransferProps>) {
+    const parsedProps = await this.parseProps(props);
+    const { account, amount, to, from = account.address } = parsedProps;
+    const isTransferFrom = from !== account.address;
+
+    const contract = await this.getContract();
+    return isTransferFrom
+      ? contract.estimateGas.transferFrom([from, to, amount], {
+          account,
+        })
+      : contract.estimateGas.transfer([to, amount], { account });
   }
 
   // PERMIT
@@ -199,7 +214,7 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async populateApprove(props: NoCallback<ApproveProps>) {
+  public async populateApprove(props: NoTxOptions<ApproveProps>) {
     const { account, amount, to } = await this.parseProps(props);
     const address = await this.contractAddress();
 
@@ -216,11 +231,25 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async simulateApprove(props: NoCallback<ApproveProps>) {
+  public async simulateApprove(props: NoTxOptions<ApproveProps>) {
     const { account, amount, to } = await this.parseProps(props);
     const contract = await this.getContract();
     return contract.simulate.approve([to, amount], {
       account,
+    });
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async estimateApprove(
+    props: NoTxOptions<ApproveProps>,
+    options?: TransactionOptions,
+  ) {
+    const { account, amount, to } = await this.parseProps(props);
+    const contract = await this.getContract();
+    return contract.estimateGas.approve([to, amount], {
+      account,
+      ...options,
     });
   }
 
