@@ -1,3 +1,26 @@
+# 4.1.0
+
+## SDK
+
+### Added
+
+- `TransactionCallback` can be async and are now awaited
+- `TransactionCallbackStage.SIGN` stage in callback can now return custom gas limit that overrides estimated one
+- `estimateTransfer` and `estimateApprove` for all (w)stETH instances
+- `LidoSDKL2` now has `approveWstethForWrapEstimateGas`, `wrapWstethToStethEstimateGas`,`unwrapStethEstimateGas` helpers
+- `LidoSDKStake` now has `stakeEthEstimateGas` helper
+- `LidoSDKWrap` now has `wrapStethEstimateGas`, `approveStethForWrapEstimateGas` and `unwrapEstimateGas` helpers
+- `LidoSDKWithdraw.claim` now has `claimRequestsEstimateGas` helper
+- `LidoSDKWithdraw.request` now has `requestWithdrawalEstimateGas`,`requestWithdrawalWithPermitEstimateGas` helpers
+- `LidoSDKWithdraw.request.requestWithdrawalWithPermit` now accepts custom `deadline` prop for permit signature
+
+### Fixed
+
+- `LIDO_CONTRACT_NAMES`, `LIDO_L2_CONTRACT_NAMES`, `LIDO_L2_CONTRACT_NAMES` can now be used directly as non-const enums
+- `LidoLocatorAbi` is now exported from `core`
+- `PopulatedTransaction` that is returned from `populateTX` helpers now only has relevant fields
+- `LidoSDKWrap.wrapEthEstimateGas`now applies correct gas limit
+
 # 4.0.1
 
 ## SDK
