@@ -8,9 +8,11 @@ slug: /
 
 ## Changelog
 
-For changes between versions see [CHANGELOG.MD](https://github.com/lidofinance/lido-ethereum-sdk/blob/main/packages/sdk/CHANGELOG.md)
+For changes between versions see [Changelog](./changelog.mdx)
 
 ## Migration
+
+For migration guide between major versions see [Migration](./migration.mdx)
 
 ## Installation
 
