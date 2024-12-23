@@ -31,8 +31,8 @@ sidebar_position: 11
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['https://rpc-url'],
-  chainId: 5,
+  rpcUrls: ['<RPC_URL>'],
+  chainId: 17000,
 });
 
 const lastApr = await lidoSDK.statistics.apr.getLastApr();
