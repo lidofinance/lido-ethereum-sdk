@@ -31,9 +31,9 @@ import {
 } from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['https://rpc-url'],
-  chainId: 5,
-  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
+  rpcUrls: ['<RPC_URL>'],
+  chainId: 17000,
+  web3Provider: LidoSDKCore.createWeb3Provider(1700, window.ethereum),
 });
 
 const callback: StakeStageCallback = ({ stage, payload }) => {
@@ -86,8 +86,8 @@ try {
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['https://rpc-url'],
-  chainId: 5,
+  rpcUrls: ['<RPC_URL>'],
+  chainId: 17000,
 });
 
 const populateResult = await lidoSDK.stake.stakeEthPopulateTx({
@@ -106,8 +106,8 @@ console.log(populateResult, 'to, from, value, data');
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['https://rpc-url'],
-  chainId: 5,
+  rpcUrls: ['<RPC_URL>'],
+  chainId: 17000,
 });
 
 const simulateResult = await lidoSDK.staking.stakeEthSimulateTx({

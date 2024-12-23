@@ -52,8 +52,8 @@ This method heavily utilizes RPC fetching chain event logs. It's better suited f
 
 ```ts
 const lidoSDK = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  chainId: 17000,
+  rpcUrls: ['<RPC_URL>'],
 });
 
 const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
@@ -78,8 +78,8 @@ This method requires you to provide API URL to send subgraph requests to. It's b
 
 ```ts
 const lidoSDK = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  chainId: 1,
+  rpcUrls: ['<RPC_URL>'],
 });
 
 const rewardsQuery = await lidoSDK.rewards.getRewardsFromSubgraph({

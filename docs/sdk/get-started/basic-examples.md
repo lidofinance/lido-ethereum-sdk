@@ -8,8 +8,8 @@ sidebar_position: 2
 
 ```ts
 const lidoSDK = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  chainId: 17000,
+  rpcUrls: ['<RPC_URL>'],
 });
 
 // Views
@@ -22,8 +22,8 @@ console.log(balanceETH.toString(), 'ETH balance');
 
 ```ts
 const lidoSDK = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  chainId: 17000,
+  rpcUrls: ['<RPC_URL>'],
   web3provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
 
@@ -47,9 +47,9 @@ console.log(stakeTx, 'stake tx result');
 
 ```ts
 const lidoSDK = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
-  web3provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
+  chainId: 17000,
+  rpcUrls: ['<RPC_URL>'],
+  web3provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
 });
 
 // Contracts
@@ -74,8 +74,8 @@ console.log(requestTx.result.requests, 'array of created requests');
 
 ```ts
 const lidoSDK = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  chainId: 17000,
+  rpcUrls: ['<RPC_URL>'],
   web3provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
 });
 

@@ -8,9 +8,9 @@ stETH and wstETH tokens functionality is presented trough modules with same ERC2
 
 ```ts
 const lidoSDK = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
-  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
+  chainId: 17000,
+  rpcUrls: ['<RPC_URL>'],
+  web3Provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
 });
 
 // Views
