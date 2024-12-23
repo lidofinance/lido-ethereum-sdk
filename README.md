@@ -58,14 +58,15 @@ Before using the SDK, you need to create an instance of the LidoSDK class:
 // Pass your own viem PublicClient
 
 import { createPublicClient, http } from 'viem';
-import { goerli } from 'viem/chains';
+import { holesky } from 'viem/chains';
 
 const rpcProvider = createPublicClient({
-  chain: goerli,
+  chain: holesky,
   transport: http(),
 });
+
 const sdk = new LidoSDK({
-  chainId: 5,
+  chainId: 17000,
   rpcProvider,
   web3Provider: provider, // optional
 });
@@ -74,13 +75,13 @@ const sdk = new LidoSDK({
 ```ts
 // Or just rpc urls so it can be created under the hood
 const sdk = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  chainId: 17000,
+  rpcUrls: ['<RPC_URL>'],
   web3Provider: provider, // optional
 });
 ```
 
-Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address of your Ethereum provider.
+Replace `<RPC_URL>` with the url of your Ethereum RPC provider.
 
 ## Examples
 
@@ -88,8 +89,8 @@ All examples and usage instructions can be found in the [Docs SDK package](https
 
 ```ts
 const lidoSDK = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  chainId: 17000,
+  rpcUrls: ['<RPC_URL>'],
   web3Provider: provider,
 });
 

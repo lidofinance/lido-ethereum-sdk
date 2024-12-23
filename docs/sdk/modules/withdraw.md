@@ -30,9 +30,9 @@ import {
 } from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['https://rpc-url'],
-  chainId: 5,
-  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
+  rpcUrls: ['<RPC_URL>'],
+  chainId: 17000,
+  web3Provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
 });
 
 const callback: TransactionCallback = ({ stage, payload }) => {
@@ -112,9 +112,9 @@ import {
 } from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['https://rpc-url'],
-  chainId: 5,
-  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
+  rpcUrls: ['<RPC_URL>'],
+  chainId: 17000,
+  web3Provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
 });
 
 const callback: TransactionCallback = ({ stage, payload }) => {
@@ -184,9 +184,9 @@ import {
 } from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['https://rpc-url'],
-  chainId: 5,
-  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
+  rpcUrls: ['<RPC_URL>'],
+  chainId: 17000,
+  web3Provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
 });
 
 const callback: TransactionCallback = ({ stage, payload }) => {
@@ -253,9 +253,9 @@ import {
 } from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['https://rpc-url'],
-  chainId: 5,
-  web3Provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
+  rpcUrls: ['<RPC_URL>'],
+  chainId: 17000,
+  web3Provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
 });
 
 const callback: ApproveStageCallback = ({ stage, payload }) => {

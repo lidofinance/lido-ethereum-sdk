@@ -8,8 +8,8 @@ This modules exposes NFT functionality of Lido Withdrawal Request NFT.
 
 ```ts
 const lidoSDK = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  chainId: 17000,
+  rpcUrls: ['<RPC_URL>'],
 });
 
 // Contracts

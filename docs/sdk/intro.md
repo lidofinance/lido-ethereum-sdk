@@ -12,7 +12,7 @@ For changes between versions see [Changelog](./changelog.mdx)
 
 ## Migration
 
-For migration guide between major versions see [Migration](./migration.mdx)
+For migration guide between major versions see [Migration Guide](./migration.mdx)
 
 ## Installation
 
@@ -47,14 +47,14 @@ Before using the SDK, you need to create an instance of the LidoSDK class:
 // Pass your own viem PublicClient
 
 import { createPublicClient, http } from 'viem';
-import { goerli } from 'viem/chains';
+import { holesky } from 'viem/chains';
 
 const rpcProvider = createPublicClient({
-  chain: goerli,
+  chain: holesky,
   transport: http(),
 });
 const sdk = new LidoSDK({
-  chainId: 5,
+  chainId: 17000,
   rpcProvider,
   web3Provider: provider, // optional
 });
@@ -63,13 +63,13 @@ const sdk = new LidoSDK({
 ```ts
 // Or just rpc urls so it can be created under the hood
 const sdk = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  chainId: 17000,
+  rpcUrls: ['<RPC_URL>'],
   web3Provider: provider, // optional
 });
 ```
 
-Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address of your Ethereum provider.
+Replace `<RPC_URL>` with the URL of your Ethereum RPC provider.
 
 ## Example
 
@@ -77,8 +77,8 @@ Basic examples and usage instructions can be found in [here](/category/get-start
 
 ```ts
 const lidoSDK = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  chainId: 17000,
+  rpcUrls: ['<RPC_URL>'],
   web3Provider: provider,
 });
 
@@ -98,10 +98,6 @@ const { stethReceived, sharesReceived } = stakeTx.result;
 
 console.log(balanceETH.toString(), 'ETH balance');
 ```
-
-## Migration
-
-For breaking changes between versions see [MIGRATION.md](https://github.com/lidofinance/lido-ethereum-sdk/blob/main/packages/sdk/MIGRATION.md)
 
 ## Documentation
 

@@ -44,14 +44,14 @@ Pass your own viem PublicClient:
 ```ts
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import { createPublicClient, http } from 'viem';
-import { goerli } from 'viem/chains';
+import { holesky } from 'viem/chains';
 
 const rpcProvider = createPublicClient({
-  chain: goerli,
+  chain: holesky,
   transport: http(),
 });
 const sdk = new LidoSDK({
-  chainId: 5,
+  chainId: 17000,
   rpcProvider,
   web3Provider: provider, // optional
 });
@@ -61,13 +61,13 @@ Or just rpc urls so it can be created under the hood:
 
 ```ts
 const sdk = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  chainId: 17000,
+  rpcUrls: ['<RPC_URL>'],
   web3Provider: provider, // optional
 });
 ```
 
-Replace "https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}" with the address of your Ethereum provider.
+Replace `<RPC_URL>` with the address of your Ethereum provider.
 
 ## With web3Provider
 
@@ -79,19 +79,19 @@ Some functions don't usually require web3provider to be present like `simulate..
 ```ts
 import { LidoSDK, LidoSDKCore } from '@lidofinance/lido-ethereum-sdk';
 import { createWalletClient, custom } from 'viem';
-import { goerli } from 'viem/chains';
+import { holesky } from 'viem/chains';
 
 let web3Provider = createWalletClient({
-  chain: goerli,
+  chain: holesky,
   transport: custom(window.ethereum),
 });
 
 // or use our helper to pass any eip-1193 provider
-let web3Provider = LidoSDKCore.createWeb3Provider(5, window.ethereum);
+let web3Provider = LidoSDKCore.createWeb3Provider(17000, window.ethereum);
 
 const sdk = new LidoSDK({
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  chainId: 17000,
+  rpcUrls: ['<RPC_URL>'],
   web3Provider,
 });
 ```
@@ -106,8 +106,8 @@ import { LidoSDKWrap } from '@lidofinance/lido-ethereum-sdk/stake';
 import { LidoSDKCore } from '@lidofinance/lido-ethereum-sdk/core';
 
 const params = {
-  chainId: 5,
-  rpcUrls: ['https://eth-goerli.alchemyapi.io/v2/{ALCHEMY_API_KEY}'],
+  chainId: 1700,
+  rpcUrls: ['<RPC_URL>'],
 };
 // core is created under the hood
 const stake = new LidoSDKStake(params);
