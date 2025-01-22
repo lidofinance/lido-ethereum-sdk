@@ -25,9 +25,10 @@ jobs:
         run: yarn build
         env:
           RPC_PROVIDER_URL_1: ${{ vars.RPC_PROVIDER_URL_1 }}
-          RPC_PROVIDER_URL_5: ${{ vars.RPC_PROVIDER_URL_5 }}
           RPC_PROVIDER_URL_17000: ${{ vars.RPC_PROVIDER_URL_17000 }}
           RPC_PROVIDER_URL_11155111: ${{ vars.RPC_PROVIDER_URL_11155111 }}
+          RPC_PROVIDER_URL_11155420: ${{ vars.RPC_PROVIDER_URL_11155420 }}
+          RPC_PROVIDER_URL_1946: ${{ vars.RPC_PROVIDER_URL_1946 }}
           WALLETCONNECT_PROJECT_ID: ${{ vars.WALLETCONNECT_PROJECT_ID }}
           SUPPORTED_CHAINS: ${{ vars.SUPPORTED_CHAINS }}
           DEFAULT_CHAIN: ${{ vars.DEFAULT_CHAIN }}
