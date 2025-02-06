@@ -18,13 +18,13 @@ import {
 import { createConfig, http, WagmiProvider } from 'wagmi';
 import * as wagmiChains from 'wagmi/chains';
 import invariant from 'tiny-invariant';
-import { CHAINS } from '@lido-sdk/constants';
+import { CHAINS } from '@lidofinance/lido-ethereum-sdk';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useThemeToggle } from '@lidofinance/lido-ui';
 
 type ChainsList = [wagmiChains.Chain, ...wagmiChains.Chain[]];
 
-export const L2_CHAINS = [10, 11155420];
+export const L2_CHAINS = [10, 11155420, 1946];
 
 const wagmiChainsArray = Object.values(wagmiChains) as any as ChainsList;
 
@@ -62,11 +62,12 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
       customRpc[chain] ?? dynamics.rpcProviderUrls[chain];
     return {
       [CHAINS.Mainnet]: getRpc(CHAINS.Mainnet),
-      [CHAINS.Goerli]: getRpc(CHAINS.Goerli),
       [CHAINS.Holesky]: getRpc(CHAINS.Holesky),
       [CHAINS.Sepolia]: getRpc(CHAINS.Sepolia),
       // OP sepolia
-      [11155420]: getRpc(11155420),
+      [CHAINS.OptimismSepolia]: getRpc(CHAINS.OptimismSepolia),
+      // Soneium Minato
+      [CHAINS.SoneiumMinato]: getRpc(CHAINS.SoneiumMinato),
     };
   }, [customRpc]);
 
