@@ -1,3 +1,19 @@
+# 4.2.0
+
+## SDK
+
+### Added
+
+- `Soneium` and `SoneiumMinato` chains are added as separate L2 chains
+- `Goerli` chain is removed
+- `viem` version up to `^2.22.11`
+
+## Playground
+
+- `Soneium` and `SoneiumMinato` chains are added as separate L2 chains
+- `Goerli` chain is removed
+- `viem` version up to `^2.22.11`
+
 # 4.1.0
 
 ## SDK
