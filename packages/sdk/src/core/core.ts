@@ -238,6 +238,42 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     };
   }
 
+
+  //simulate
+
+  @Logger('Simulation:')
+public async simulateTransaction(
+  options: PerformTransactionOptions
+): Promise<{ success: boolean; gasEstimate?: bigint; error?: string }> {
+  try {
+    const account = await this.useAccount(options.account);
+
+    // Simulate the transaction using callStatic
+    await this.rpcProvider.call({
+      account,
+      data: options.sendTransaction().data,
+      to: options.sendTransaction().to,
+    });
+
+    // Estimate gas usage
+    const gasEstimate = await this.rpcProvider.estimateGas({
+      account,
+      data: options.sendTransaction().data,
+      to: options.sendTransaction().to,
+    });
+
+    return {
+      success: true,
+      gasEstimate,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message || 'Transaction simulation failed',
+    };
+  }
+}
+
   // Utils
 
   @Logger('Utils:')
