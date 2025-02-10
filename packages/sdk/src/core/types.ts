@@ -223,3 +223,19 @@ export default interface LidoSDKCore {
     options: PerformTransactionOptions<undefined>
   ): Promise<SimulateTransactionResult>;
 }
+// Reward Estimation Types
+export type RewardEstimate = {
+  periodInDays: number;
+  rewards: bigint;
+};
+
+export type HistoricalReward = {
+  timestamp: bigint;
+  rewards: bigint;
+};
+
+export default interface LidoSDKCore {
+  getCurrentAPR(): Promise<number>;
+  estimateRewards(balance: bigint, periodInDays: number): Promise<bigint>;
+  getHistoricalRewards(account: Address, daysBack: number): Promise<HistoricalReward[]>;
+}
