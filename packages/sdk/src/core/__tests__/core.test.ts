@@ -15,6 +15,40 @@ describe('Core Tests', () => {
   const { rpcUrl, chainId } = useTestsEnvs();
   const { account } = useWalletClient();
   const rpcCore = useRpcCore();
+ /**
+   * Simulate Transaction Tests
+   */
+  describe('simulateTransaction', () => {
+    test('should simulate a successful transaction', async () => {
+      const simulationResult = await rpcCore.simulateTransaction({
+        account: account.address,
+        sendTransaction: async () => ({
+          to: rpcCore.contractAddressLidoLocator(),
+          data: '0x',
+        }),
+      });
+
+      expect(simulationResult.success).toBe(true);
+      expect(simulationResult.gasEstimate).toBeDefined();
+      expect(typeof simulationResult.gasEstimate).toBe('bigint');
+      expect(simulationResult.error).toBeUndefined();
+    });
+
+    test('should handle failed simulations', async () => {
+      const simulationResult = await rpcCore.simulateTransaction({
+        account: account.address,
+        sendTransaction: async () => ({
+          to: '0xInvalidAddress',
+          data: '0xInvalidData',
+        }),
+      });
+
+      expect(simulationResult.success).toBe(false);
+      expect(simulationResult.gasEstimate).toBeUndefined();
+      expect(simulationResult.error).toBeDefined();
+      expect(simulationResult.error?.length).toBeGreaterThan(0);
+    });
+  });
 
   test('Core can be created', () => {
     const core = new LidoSDKCore({
