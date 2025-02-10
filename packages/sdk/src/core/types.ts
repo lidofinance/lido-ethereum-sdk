@@ -209,3 +209,17 @@ export type GetFeeDataResult = {
   maxPriorityFeePerGas: bigint;
   gasPrice: bigint;
 };
+
+
+export interface SimulateTransactionResult {
+  success: boolean;
+  gasEstimate?: bigint;
+  error?: string;
+}
+
+// Extend LidoSDKCore with the new method
+export default interface LidoSDKCore {
+  simulateTransaction(
+    options: PerformTransactionOptions<undefined>
+  ): Promise<SimulateTransactionResult>;
+}
