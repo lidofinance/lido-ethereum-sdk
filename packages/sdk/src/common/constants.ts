@@ -7,6 +7,8 @@ import {
   optimism,
   soneiumMinato,
   soneium,
+  unichain,
+  unichainSepolia,
 } from 'viem/chains';
 
 export enum CHAINS {
@@ -17,6 +19,8 @@ export enum CHAINS {
   OptimismSepolia = 11155420,
   Soneium = 1868,
   SoneiumMinato = 1946,
+  Unichain = 130,
+  UnichainSepolia = 1301,
 }
 
 export const APPROX_BLOCKS_BY_DAY = 7600n;
@@ -29,6 +33,8 @@ export const SUPPORTED_CHAINS: CHAINS[] = [
   CHAINS.OptimismSepolia,
   CHAINS.Soneium,
   CHAINS.SoneiumMinato,
+  CHAINS.Unichain,
+  CHAINS.UnichainSepolia,
 ];
 
 export const SUBMIT_EXTRA_GAS_TRANSACTION_RATIO = 1.05;
@@ -105,6 +111,14 @@ export const LIDO_L2_CONTRACT_ADDRESSES: {
     wsteth: '0xf7489b8d220DCf33bAe6b594C070061E4da9fDa9',
     steth: '0x4e55E2d4c83df2E0083f1D616AFf007ac420b110',
   },
+  [CHAINS.Unichain]: {
+    wsteth: '0xace7519036b2815b4Dd9F173e6feaeC92942a3F0',
+    steth: '0x0e7598aB63CBb7548750D18998390BB044c3B0d6',
+  },
+  [CHAINS.UnichainSepolia]: {
+    wsteth: '0xE66e1B0931345900024b524A88BBE58f09A18FD0',
+    steth: '0x4436b2d6A2a0807b211c6a725E905b736dF8511F',
+  },
 };
 
 export const CONTRACTS_BY_TOKENS = {
@@ -147,6 +161,8 @@ export const VIEM_CHAINS: { [key in CHAINS]: Chain } = {
   [CHAINS.OptimismSepolia]: optimismSepolia,
   [CHAINS.Soneium]: soneium,
   [CHAINS.SoneiumMinato]: soneiumMinato,
+  [CHAINS.Unichain]: unichain,
+  [CHAINS.UnichainSepolia]: unichainSepolia,
 };
 
 export const WQ_API_URLS: { [key in CHAINS]?: string } = {
