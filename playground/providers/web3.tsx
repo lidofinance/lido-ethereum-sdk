@@ -24,7 +24,7 @@ import { useThemeToggle } from '@lidofinance/lido-ui';
 
 type ChainsList = [wagmiChains.Chain, ...wagmiChains.Chain[]];
 
-export const L2_CHAINS = [10, 11155420, 1946];
+export const L2_CHAINS = [10, 11155420, 1946, 1301];
 
 const wagmiChainsArray = Object.values(wagmiChains) as any as ChainsList;
 
@@ -68,6 +68,8 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
       [CHAINS.OptimismSepolia]: getRpc(CHAINS.OptimismSepolia),
       // Soneium Minato
       [CHAINS.SoneiumMinato]: getRpc(CHAINS.SoneiumMinato),
+      // Unichain
+      [CHAINS.UnichainSepolia]: getRpc(CHAINS.UnichainSepolia),
     };
   }, [customRpc]);
 
