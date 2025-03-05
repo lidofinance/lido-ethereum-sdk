@@ -1,3 +1,11 @@
+# 4.3.0
+
+## SDK
+
+### Added
+
+- `Unichain`, `UnichainSepolia` L2 chains support
+
 # 4.2.0
 
 ## SDK
