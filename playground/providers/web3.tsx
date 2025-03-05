@@ -68,7 +68,7 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
       [CHAINS.OptimismSepolia]: getRpc(CHAINS.OptimismSepolia),
       // Soneium Minato
       [CHAINS.SoneiumMinato]: getRpc(CHAINS.SoneiumMinato),
-      // Unichain
+      // Unichain Sepolia
       [CHAINS.UnichainSepolia]: getRpc(CHAINS.UnichainSepolia),
     };
   }, [customRpc]);
