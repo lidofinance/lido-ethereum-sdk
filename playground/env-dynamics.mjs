@@ -9,6 +9,8 @@ export const rpcProviderUrls = {
   11155420: process.env[`RPC_PROVIDER_URL_11155420`],
   // Soneium Minato
   1946: process.env[`RPC_PROVIDER_URL_1946`],
+  // Unichain Sepolia
+  1301: process.env[`RPC_PROVIDER_URL_1301`],
 };
 /** @type number */
 export const defaultChain = parseInt(process.env.DEFAULT_CHAIN, 10) || 17000;
