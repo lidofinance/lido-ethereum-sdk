@@ -238,6 +238,105 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     };
   }
 
+
+  //simulate
+
+  @Logger('Simulation:')
+public async simulateTransaction(
+  options: PerformTransactionOptions
+): Promise<{ success: boolean; gasEstimate?: bigint; error?: string }> {
+  try {
+    const account = await this.useAccount(options.account);
+
+    // Simulate the transaction using callStatic
+    await this.rpcProvider.call({
+      account,
+      data: options.sendTransaction().data,
+      to: options.sendTransaction().to,
+    });
+
+    // Estimate gas usage
+    const gasEstimate = await this.rpcProvider.estimateGas({
+      account,
+      data: options.sendTransaction().data,
+      to: options.sendTransaction().to,
+    });
+
+    return {
+      success: true,
+      gasEstimate,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message || 'Transaction simulation failed',
+    };
+  }
+}
+
+
+  
+  // Rewards Calculation
+  @Logger('Rewards:')
+  @Cache(30 * 60 * 1000, ['chain.id'])
+  public async getCurrentAPR(): Promise<number> {
+    const lidoLocator = this.getContractLidoLocator();
+    const stakingRouter = await lidoLocator.read.stakingRouter();
+    const { modulesFee, treasuryFee } = await stakingRouter.read.getStakingFeeAggregateDistributionE4Precision();
+    const totalFee = (modulesFee + treasuryFee) / 10000; // Converted to the percentage 
+    return totalFee;
+  }
+
+  @Logger('Rewards:')
+  public async estimateRewards(
+    balance: bigint,
+    periodInDays: number
+  ): Promise<bigint> {
+    const apr = await this.getCurrentAPR();
+    const periodInSeconds = BigInt(periodInDays * 24 * 60 * 60);
+    const rewards =
+      (balance * BigInt(apr) * periodInSeconds) /
+      BigInt(365 * 24 * 60 * 60 * 100);
+    return rewards;
+  }
+
+  @Logger('Rewards:')
+  public async getHistoricalRewards(
+    account: Address,
+    daysBack: number
+  ): Promise<{ timestamp: bigint; rewards: bigint }[]> {
+    const subgraphId = this.getSubgraphId();
+    invariant(subgraphId, 'Subgraph ID is not available', ERROR_CODE.NOT_SUPPORTED);
+
+    const now = BigInt(Math.floor(Date.now() / 1000));
+    const startTimestamp = now - BigInt(daysBack * 24 * 60 * 60);
+
+    const query = `
+      query GetRewards($account: String!, $startTimestamp: BigInt!) {
+        rewardEvents(
+          where: { account: $account, timestamp_gt: $startTimestamp }
+          orderBy: timestamp
+          orderDirection: asc
+        ) {
+          timestamp
+          amount
+        }
+      }
+    `;
+
+    const response = await fetch(`https://api.thegraph.com/subgraphs/id/${subgraphId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables: { account, startTimestamp } }),
+    });
+
+    const { data } = await response.json();
+    return data.rewardEvents.map((event: any) => ({
+      timestamp: BigInt(event.timestamp),
+      rewards: BigInt(event.amount),
+    }));
+  }
+
   // Utils
 
   @Logger('Utils:')
