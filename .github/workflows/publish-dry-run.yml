@@ -7,6 +7,10 @@ on:
         description: 'NPM token'
         required: true
 
+permissions:
+  contents: write # to be able to publish a GitHub release
+  id-token: write # to enable use of OIDC for npm provenance
+
 jobs:
   publish-dry-run:
     runs-on: ubuntu-latest
