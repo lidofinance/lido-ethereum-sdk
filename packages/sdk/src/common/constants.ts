@@ -7,9 +7,9 @@ import {
   optimism,
   soneiumMinato,
   soneium,
-  unichain,
-  unichainSepolia,
 } from 'viem/chains';
+import { unichain } from './chains/unichain.js';
+import { unichainSepolia } from './chains/unichain-sepolia.js';
 
 export enum CHAINS {
   Mainnet = 1,
