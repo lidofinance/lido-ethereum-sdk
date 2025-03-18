@@ -74,6 +74,7 @@ const REWARDS_SNAPSHOTS_PARAMS: RewardsSnapshotType[] = [
 // TODO
 // transfer from Holesky to Mainnet, then unskip
 
+/* eslint-disable jest/no-disabled-tests */
 describe.skip('LidoSDKRewards', () => {
   const rewards = useRewards({ useDirectRpc: true });
   const { address } = useAccount();
