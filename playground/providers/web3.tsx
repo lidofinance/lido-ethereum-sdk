@@ -16,16 +16,18 @@ import {
   ReefKnot,
 } from 'reef-knot/core-react';
 import { createConfig, http, WagmiProvider } from 'wagmi';
-import * as wagmiChains from 'wagmi/chains';
+import * as _wagmiChains from 'wagmi/chains';
+import { Chain } from 'wagmi/chains';
 import invariant from 'tiny-invariant';
-import { CHAINS } from '@lidofinance/lido-ethereum-sdk';
+import { CHAINS, hoodi, unichainSepolia } from '@lidofinance/lido-ethereum-sdk';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useThemeToggle } from '@lidofinance/lido-ui';
 
-type ChainsList = [wagmiChains.Chain, ...wagmiChains.Chain[]];
+type ChainsList = [Chain, ...Chain[]];
 
 export const L2_CHAINS = [10, 11155420, 1946, 1301];
 
+const wagmiChains = { ..._wagmiChains, unichainSepolia, hoodi };
 const wagmiChainsArray = Object.values(wagmiChains) as any as ChainsList;
 
 const supportedChains = wagmiChainsArray.filter((chain) =>
@@ -63,6 +65,7 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
     return {
       [CHAINS.Mainnet]: getRpc(CHAINS.Mainnet),
       [CHAINS.Holesky]: getRpc(CHAINS.Holesky),
+      [CHAINS.Hoodi]: getRpc(CHAINS.Hoodi),
       [CHAINS.Sepolia]: getRpc(CHAINS.Sepolia),
       // OP sepolia
       [CHAINS.OptimismSepolia]: getRpc(CHAINS.OptimismSepolia),

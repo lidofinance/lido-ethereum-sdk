@@ -8,12 +8,12 @@ import {
   soneiumMinato,
   soneium,
 } from 'viem/chains';
-import { unichain } from './chains/unichain.js';
-import { unichainSepolia } from './chains/unichain-sepolia.js';
+import { unichain, unichainSepolia, hoodi } from './chains/index.js';
 
 export enum CHAINS {
   Mainnet = 1,
   Holesky = 17000,
+  Hoodi = 560048,
   Sepolia = 11155111,
   Optimism = 10,
   OptimismSepolia = 11155420,
@@ -28,6 +28,7 @@ export const APPROX_SECONDS_PER_BLOCK = 12n;
 export const SUPPORTED_CHAINS: CHAINS[] = [
   CHAINS.Mainnet,
   CHAINS.Holesky,
+  CHAINS.Hoodi,
   CHAINS.Sepolia,
   CHAINS.Optimism,
   CHAINS.OptimismSepolia,
@@ -45,6 +46,7 @@ export const LIDO_LOCATOR_BY_CHAIN: {
 } = {
   [CHAINS.Mainnet]: '0xC1d0b3DE6792Bf6b4b37EccdcC24e45978Cfd2Eb',
   [CHAINS.Holesky]: '0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8',
+  [CHAINS.Hoodi]: '0xe2EF9536DAAAEBFf5b1c130957AB3E80056b06D8',
   [CHAINS.Sepolia]: '0x8f6254332f69557A72b0DA2D5F0Bc07d4CA991E7',
 };
 
@@ -60,6 +62,7 @@ export const EARLIEST_TOKEN_REBASED_EVENT: {
   [CHAINS.Mainnet]: 17272708n,
   [CHAINS.Holesky]: 52174n,
   [CHAINS.Sepolia]: 5434668n,
+  [CHAINS.Hoodi]: 6372n,
 } as const;
 
 export const LIDO_TOKENS = {
@@ -156,6 +159,7 @@ export const PERMIT_MESSAGE_TYPES = {
 export const VIEM_CHAINS: { [key in CHAINS]: Chain } = {
   [CHAINS.Mainnet]: mainnet,
   [CHAINS.Holesky]: holesky,
+  [CHAINS.Hoodi]: hoodi,
   [CHAINS.Sepolia]: sepolia,
   [CHAINS.Optimism]: optimism,
   [CHAINS.OptimismSepolia]: optimismSepolia,
@@ -168,4 +172,5 @@ export const VIEM_CHAINS: { [key in CHAINS]: Chain } = {
 export const WQ_API_URLS: { [key in CHAINS]?: string } = {
   [CHAINS.Mainnet]: 'https://wq-api.lido.fi',
   [CHAINS.Holesky]: 'https://wq-api-holesky.testnet.fi',
+  [CHAINS.Hoodi]: 'https://wq-api-hoodi.testnet.fi',
 };
