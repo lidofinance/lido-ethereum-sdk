@@ -19,12 +19,7 @@ import { createConfig, http, WagmiProvider } from 'wagmi';
 import * as _wagmiChains from 'wagmi/chains';
 import { Chain } from 'wagmi/chains';
 import invariant from 'tiny-invariant';
-import {
-  CHAINS,
-  hoodi,
-  unichain,
-  unichainSepolia,
-} from '@lidofinance/lido-ethereum-sdk';
+import { CHAINS, hoodi, unichainSepolia } from '@lidofinance/lido-ethereum-sdk';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useThemeToggle } from '@lidofinance/lido-ui';
 
@@ -32,7 +27,7 @@ type ChainsList = [Chain, ...Chain[]];
 
 export const L2_CHAINS = [10, 11155420, 1946, 1301];
 
-const wagmiChains = { ..._wagmiChains, unichain, unichainSepolia, hoodi };
+const wagmiChains = { ..._wagmiChains, unichainSepolia, hoodi };
 const wagmiChainsArray = Object.values(wagmiChains) as any as ChainsList;
 
 const supportedChains = wagmiChainsArray.filter((chain) =>
