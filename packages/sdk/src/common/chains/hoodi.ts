@@ -6,7 +6,7 @@ export const hoodi = defineChain({
   nativeCurrency: { name: 'Hoodi Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
     default: {
-      http: ['https://rpc.hoodi.ethpandaops.io'],
+      http: ['https://hoodi.drpc.org'],
     },
   },
   blockExplorers: {
