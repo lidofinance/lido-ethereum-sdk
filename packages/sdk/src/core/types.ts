@@ -32,6 +32,7 @@ export type LidoSDKCoreProps = {
   chainId: (typeof SUPPORTED_CHAINS)[number];
   web3Provider?: WalletClient;
   logMode?: LOG_MODE;
+  customLidoLocatorAddress?: Address;
 } & LidoSDKCorePropsRpcProps;
 
 export type LidoSDKCommonProps =
