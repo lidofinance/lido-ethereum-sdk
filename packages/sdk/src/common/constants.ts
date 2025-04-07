@@ -2,13 +2,15 @@ import { type Address, type Chain } from 'viem';
 import {
   mainnet,
   holesky,
+  hoodi,
   sepolia,
   optimismSepolia,
   optimism,
   soneiumMinato,
   soneium,
+  unichain,
+  unichainSepolia,
 } from 'viem/chains';
-import { unichain, unichainSepolia, hoodi } from './chains/index.js';
 
 export enum CHAINS {
   Mainnet = 1,
