@@ -16059,12 +16059,11 @@ __metadata:
   linkType: hard
 
 "estree-util-value-to-estree@npm:^3.0.1":
-  version: 3.1.1
-  resolution: "estree-util-value-to-estree@npm:3.1.1"
+  version: 3.3.3
+  resolution: "estree-util-value-to-estree@npm:3.3.3"
   dependencies:
     "@types/estree": ^1.0.0
-    is-plain-obj: ^4.0.0
-  checksum: 80e1d227ac80fab0b148c40427af31ad4dd37a3a4a0e0894d7975370284ea39566fe7df132f3454cf0e47adcc79b47ae0737464a85a413bce6f8d159336f8a37
+  checksum: 73851f26715300046228cf8a36986c101d6741d7a2b024f684675e75d1191bc07b0dc069926876729efd5650343d23bffe76104221b7dc862965632302b05524
   languageName: node
   linkType: hard
 
