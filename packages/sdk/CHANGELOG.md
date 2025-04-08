@@ -1,3 +1,17 @@
+# 4.4.0
+
+## SDK
+
+### Added
+
+- `Hoodi` testnet support
+- `viem` version up to `^2.26.0`
+
+## Playground
+
+- `Hoodi` testnet support
+- `viem` version up to `^2.26.0`
+
 # 4.3.0
 
 ## SDK
