@@ -156,7 +156,7 @@
     "graphql-request": "^6.1.0"
   },
   "peerDependencies": {
-    "viem": "^2.22"
+    "viem": "^2.26.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

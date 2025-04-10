@@ -72,6 +72,8 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   readonly chain: Chain;
   readonly rpcProvider: PublicClient;
   readonly logMode: LOG_MODE;
+  // for devnnets actual
+  readonly customLidoLocatorAddress: Address | undefined;
 
   public get web3Provider(): WalletClient | undefined {
     return this.#web3Provider;
@@ -82,6 +84,8 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     this.chainId = props.chainId;
     this.rpcUrls = props.rpcUrls;
     this.logMode = props.logMode ?? 'info';
+    // for devnnets actual
+    this.customLidoLocatorAddress = props.customLidoLocatorAddress;
 
     const { chain, rpcProvider, web3Provider } = this.init(props, version);
 
@@ -173,6 +177,11 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['chain.id'])
   public contractAddressLidoLocator(): Address {
+    // for devnnets actual
+    if (this.customLidoLocatorAddress) {
+      return this.customLidoLocatorAddress;
+    }
+
     const locator = LIDO_LOCATOR_BY_CHAIN[this.chain.id as CHAINS];
     invariant(
       locator,
