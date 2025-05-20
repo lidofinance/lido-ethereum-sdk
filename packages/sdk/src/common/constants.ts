@@ -92,6 +92,14 @@ export enum LIDO_CONTRACT_NAMES {
   wsteth = 'wsteth',
 }
 
+export const EMERGENCY_PROTECTED_TIMELOCK_ADDRESSES: {
+  [key in CHAINS]?: Address;
+} = {
+  [CHAINS.Mainnet]: '0xd70D836D60622D48648AA1dE759361D6B9a4Baa0',
+  [CHAINS.Holesky]: '0xd70D836D60622D48648AA1dE759361D6B9a4Baa0',
+  [CHAINS.Hoodi]: '0xbcdD50FEAE9584308c12321b8A0f68Fe81EC04a8', // MOCK
+};
+
 export enum LIDO_L2_CONTRACT_NAMES {
   wsteth = 'wsteth',
   steth = 'steth',

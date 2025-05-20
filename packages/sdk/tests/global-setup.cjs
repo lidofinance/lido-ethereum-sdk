@@ -55,11 +55,11 @@ module.exports = async function () {
   globalThis.__ganache_provider__ = await setupGanacheProvider(chainId, rpcUrl);
 
   // L2
-  const l2RpcUrl = process.env.TEST_L2_RPC_URL;
-  const l2ChainId = Number(process.env.TEST_L2_CHAIN_ID);
-
-  globalThis.__l2_ganache_provider__ = await setupGanacheProvider(
-    l2ChainId,
-    l2RpcUrl,
-  );
+  // const l2RpcUrl = process.env.TEST_L2_RPC_URL;
+  // const l2ChainId = Number(process.env.TEST_L2_CHAIN_ID);
+  //
+  // globalThis.__l2_ganache_provider__ = await setupGanacheProvider(
+  //   l2ChainId,
+  //   l2RpcUrl,
+  // );
 };

@@ -10,4 +10,4 @@ export * from './stake/index.js';
 export * from './statistics/index.js';
 export * from './unsteth/index.js';
 export * from './withdraw/index.js';
-export * from './wrap/index.js';
+export * from './dual-governance/index.js';
