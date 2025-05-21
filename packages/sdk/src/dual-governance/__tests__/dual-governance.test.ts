@@ -26,26 +26,11 @@ describe('LidoSDKDualGovernance', () => {
   });
 
   test('gets stETH address', async () => {
-    const stETHAddress = await dualGovernance.getStETHAddress();
-
-    if (stETHAddress !== undefined) {
-      expect(stETHAddress).toBeDefined();
-      expectAddress(stETHAddress);
-    } else {
-      expect(stETHAddress).toBeUndefined();
-    }
+    expectAddress(await dualGovernance.getStETHAddress());
   });
 
   test('gets DualGovernance ConfigProvider address', async () => {
-    const configProviderAddress =
-      await dualGovernance.getDualGovernanceConfigProviderAddress();
-
-    if (configProviderAddress !== undefined) {
-      expect(configProviderAddress).toBeDefined();
-      expectAddress(configProviderAddress);
-    } else {
-      expect(configProviderAddress).toBeUndefined();
-    }
+      expectAddress(await dualGovernance.getDualGovernanceConfigProviderAddress());
   });
 
   // ---- Contracts ----
@@ -69,9 +54,7 @@ describe('LidoSDKDualGovernance', () => {
     expectContract(stETHContract);
 
     const stETHAddress = await dualGovernance.getStETHAddress();
-    if (stETHAddress !== undefined) {
-      expectAddress(stETHContract.address, stETHAddress);
-    }
+    expectAddress(stETHContract.address, stETHAddress);
   });
 
   test('gets DualGovernanceConfigProvider', async () => {
@@ -85,6 +68,9 @@ describe('LidoSDKDualGovernance', () => {
   test('gets VetoSignallingEscrow locked assets', async () => {
     const result = await dualGovernance.getVetoSignallingEscrowLockedAssets();
 
+    expect(result).toBeDefined();
+
+    // Expect above doesn't solve 'possibly undefined' linter warning, so we still have a condition as below
     if (result !== undefined) {
       expect(result).toBeDefined();
       expect(typeof result).toBe('object');
@@ -103,25 +89,21 @@ describe('LidoSDKDualGovernance', () => {
       expectNonNegativeBn(result.totalStETHClaimedETH);
       expectNonNegativeBn(result.totalUnstETHUnfinalizedShares);
       expectNonNegativeBn(result.totalUnstETHFinalizedETH);
-    } else {
-      expect(result).toBeUndefined();
     }
   });
 
   test('gets total stETH in VetoSignallingEscrow', async () => {
     const totalStEthInEscrow = await dualGovernance.getTotalStEthInEscrow();
 
-    if (totalStEthInEscrow !== undefined) {
       expect(totalStEthInEscrow).toBeDefined();
       expect(typeof totalStEthInEscrow).toBe('bigint');
       expectNonNegativeBn(totalStEthInEscrow);
-    } else {
-      expect(totalStEthInEscrow).toBeUndefined();
-    }
   });
 
   test('gets DualGovernance config', async () => {
     const config = await dualGovernance.getDualGovernanceConfig();
+
+    expect(config).toBeDefined();
 
     if (config !== undefined) {
       expect(config).toBeDefined();
@@ -156,21 +138,14 @@ describe('LidoSDKDualGovernance', () => {
       expect(config.rageQuitEthWithdrawalsDelayGrowth).toBeGreaterThanOrEqual(
         0,
       );
-    } else {
-      expect(config).toBeUndefined();
     }
   });
 
   test('gets total stETH supply', async () => {
     const totalStETHSupply = await dualGovernance.getTotalStETHSupply();
-
-    if (totalStETHSupply !== undefined) {
       expect(totalStETHSupply).toBeDefined();
       expect(typeof totalStETHSupply).toBe('bigint');
       expectNonNegativeBn(totalStETHSupply);
-    } else {
-      expect(totalStETHSupply).toBeUndefined();
-    }
   });
 
   test('calculates current VetoSignalling threshold progress', async () => {
@@ -178,8 +153,9 @@ describe('LidoSDKDualGovernance', () => {
       const result =
         await dualGovernance.calculateCurrentVetoSignallingThresholdProgress();
 
+      expect(result).toBeDefined();
+
       if (result !== undefined) {
-        expect(result).toBeDefined();
         expect(typeof result).toBe('object');
         expect('currentSupportPercent' in result).toBe(true);
         expect(typeof result.currentSupportPercent).toBe('number');

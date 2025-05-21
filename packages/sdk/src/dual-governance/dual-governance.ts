@@ -301,12 +301,12 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
     }
 
     if (totalStEthInEscrow === undefined) {
-      console.debug('totalStEthInEscrow is undefined!', totalStEthInEscrow);
+      console.debug('totalStEthInEscrow is undefined!',);
       return { currentSupportPercent: 0 };
     }
 
     if (totalStETHSupply === undefined) {
-      console.debug('totalStETHSupply is undefined!', totalStEthInEscrow);
+      console.debug('totalStETHSupply is undefined!');
       return { currentSupportPercent: 0 };
     }
 

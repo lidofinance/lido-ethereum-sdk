@@ -32,7 +32,7 @@ tsconfig.tsbuildinfo
 
 # env
 .env
-.env
+.env.local
 .env.production
 .env.development
 
