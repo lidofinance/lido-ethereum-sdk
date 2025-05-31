@@ -22,12 +22,14 @@ import {
 } from './types.js';
 import { stETH } from './abi/StETH.js';
 import { dgConfigProviderAbi } from './abi/DGConfigProvider.js';
-import { Cache } from '../common/decorators/index.js';
+import { Cache, ErrorHandler, Logger } from '../common/decorators/index.js';
 
 export class LidoSDKDualGovernance extends LidoSDKModule {
   // ---- Contract Addresses ----
 
   @Cache(30 * 60 * 1000, ['core.chain.id'])
+  @Logger('Views:')
+  @ErrorHandler()
   public async getGovernanceAddress(): Promise<Address | undefined> {
     const emergencyProtectedTimelockContract =
       await this.getContractEmergencyProtectedTimelock();
@@ -38,14 +40,12 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
       ERROR_CODE.READ_ERROR,
     );
 
-    try {
-      return await emergencyProtectedTimelockContract.read.getGovernance();
-    } catch (error) {
-      return undefined;
-    }
+    return await emergencyProtectedTimelockContract.read.getGovernance();
   }
 
   @Cache(30 * 60 * 1000, ['core.chain.id'])
+  @Logger('Views:')
+  @ErrorHandler()
   public async getVetoSignallingEscrowAddress(): Promise<Address | undefined> {
     const dualGovernanceContract = await this.getContractDualGovernance();
 
@@ -55,14 +55,12 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
       ERROR_CODE.READ_ERROR,
     );
 
-    try {
-      return await dualGovernanceContract.read.getVetoSignallingEscrow();
-    } catch (error) {
-      return undefined;
-    }
+    return await dualGovernanceContract.read.getVetoSignallingEscrow();
   }
 
   @Cache(30 * 60 * 1000, ['core.chain.id'])
+  @Logger('Views:')
+  @ErrorHandler()
   public async getStETHAddress(): Promise<Address | undefined> {
     const vetoSignallingContract = await this.getContractVetoSignallingEscrow();
 
@@ -72,14 +70,12 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
       ERROR_CODE.READ_ERROR,
     );
 
-    try {
-      return await vetoSignallingContract.read.ST_ETH();
-    } catch (error) {
-      return undefined;
-    }
+    return await vetoSignallingContract.read.ST_ETH();
   }
 
   @Cache(30 * 60 * 1000, ['core.chain.id'])
+  @Logger('Views:')
+  @ErrorHandler()
   public async getDualGovernanceConfigProviderAddress(): Promise<
     Address | undefined
   > {
@@ -91,11 +87,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
       ERROR_CODE.READ_ERROR,
     );
 
-    try {
-      return await dualGovernanceContract.read.getConfigProvider();
-    } catch (error) {
-      return undefined;
-    }
+    return await dualGovernanceContract.read.getConfigProvider();
   }
 
   // ---- Contracts ----
@@ -197,9 +189,10 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
 
   // ---- Data Preparation ----
 
-  public async getVetoSignallingEscrowLockedAssets(): Promise<
-    SignallingEscrowDetails | undefined
-  > {
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  @Logger('Views:')
+  @ErrorHandler()
+  public async getVetoSignallingEscrowLockedAssets(): Promise<SignallingEscrowDetails> {
     const vetoSignallingContract = await this.getContractVetoSignallingEscrow();
 
     invariant(
@@ -208,14 +201,13 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
       ERROR_CODE.READ_ERROR,
     );
 
-    try {
-      return await vetoSignallingContract.read.getSignallingEscrowDetails();
-    } catch (error) {
-      return undefined;
-    }
+    return await vetoSignallingContract.read.getSignallingEscrowDetails();
   }
 
-  public async getTotalStEthInEscrow(): Promise<bigint | undefined> {
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  @Logger('Views:')
+  @ErrorHandler()
+  public async getTotalStEthInEscrow(): Promise<bigint> {
     const stETHContract = await this.getContractStETH();
     const vetoSignallingEscrowLockedAssets =
       await this.getVetoSignallingEscrowLockedAssets();
@@ -226,49 +218,41 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
       ERROR_CODE.READ_ERROR,
     );
 
-    invariant(
-      vetoSignallingEscrowLockedAssets,
-      `Couldn't get vetoSignallingEscrowLockedAssets on chain ${this.core.chain.name}`,
-      ERROR_CODE.READ_ERROR,
-    );
-
     const unfinalizedShares =
       vetoSignallingEscrowLockedAssets.totalStETHLockedShares +
       vetoSignallingEscrowLockedAssets.totalUnstETHUnfinalizedShares;
 
-    try {
-      const pooledEthByShares = await stETHContract.read.getPooledEthByShares([
-        unfinalizedShares,
-      ]);
+    const pooledEthByShares = await stETHContract.read.getPooledEthByShares([
+      unfinalizedShares,
+    ]);
 
-      return (
-        pooledEthByShares +
-        vetoSignallingEscrowLockedAssets.totalUnstETHFinalizedETH
-      );
-    } catch (error) {
-      return undefined;
-    }
+    return (
+      pooledEthByShares +
+      vetoSignallingEscrowLockedAssets.totalUnstETHFinalizedETH
+    );
   }
 
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  @Logger('Views:')
+  @ErrorHandler()
   public async getDualGovernanceConfig(): Promise<
     DualGovernanceConfig | undefined
   > {
-    const dualGovernanceConfigProviderContract =
+    const dualGovernanceConfigProvider =
       await this.getContractDualGovernanceConfigProvider();
 
     invariant(
-      dualGovernanceConfigProviderContract,
-      `Couldn't get dualGovernanceConfigProviderContract on chain ${this.core.chain.name}`,
+      dualGovernanceConfigProvider,
+      `Couldn't get dualGovernanceConfigProvider on chain ${this.core.chain.name}`,
       ERROR_CODE.READ_ERROR,
     );
 
-    try {
-      return await dualGovernanceConfigProviderContract.read.getDualGovernanceConfig();
-    } catch (error) {
-      return undefined;
-    }
+    return await dualGovernanceConfigProvider.read.getDualGovernanceConfig();
   }
 
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  @Logger('Views:')
+  @ErrorHandler()
   public async getTotalStETHSupply(): Promise<bigint | undefined> {
     const stETHContract = await this.getContractStETH();
 
@@ -278,35 +262,33 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
       ERROR_CODE.READ_ERROR,
     );
 
-    try {
-      return await stETHContract.read.totalSupply();
-    } catch (error) {
-      return undefined;
-    }
+    return await stETHContract.read.totalSupply();
   }
 
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  @Logger('Views:')
+  @ErrorHandler()
   public async calculateCurrentVetoSignallingThresholdProgress(): Promise<
     | {
         currentSupportPercent: number;
       }
     | undefined
   > {
-    const totalStETHSupply = await this.getTotalStETHSupply();
-    const dualGovernanceConfig = await this.getDualGovernanceConfig();
-    const totalStEthInEscrow = await this.getTotalStEthInEscrow();
+    const [totalStETHSupply, dualGovernanceConfig, totalStEthInEscrow] = await Promise.all([
+      this.getTotalStETHSupply(),
+      this.getDualGovernanceConfig(),
+      this.getTotalStEthInEscrow(),
+    ])
 
     if (dualGovernanceConfig === undefined) {
-      console.debug('dualGovernanceConfig is undefined!');
       return { currentSupportPercent: 0 };
     }
 
     if (totalStEthInEscrow === undefined) {
-      console.debug('totalStEthInEscrow is undefined!',);
       return { currentSupportPercent: 0 };
     }
 
     if (totalStETHSupply === undefined) {
-      console.debug('totalStETHSupply is undefined!');
       return { currentSupportPercent: 0 };
     }
 
@@ -349,26 +331,27 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
     };
   }
 
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  @Logger('Views:')
+  @ErrorHandler()
   public async getDualGovernanceState(): Promise<
     DualGovernanceState['persistedState'] | undefined
   > {
     const dualGovernanceContract = await this.getContractDualGovernance();
 
     if (dualGovernanceContract === undefined) {
-      console.debug('dualGovernance contract is undefined!');
       return undefined;
     }
 
-    try {
-      const dualGovernanceState =
-        await dualGovernanceContract.read.getStateDetails();
+    const dualGovernanceState =
+      await dualGovernanceContract.read.getStateDetails();
 
-      return dualGovernanceState.persistedState;
-    } catch (error) {
-      return undefined;
-    }
+    return dualGovernanceState.persistedState;
   }
 
+  @Cache(30 * 60 * 1000, ['core.chain.id', 'triggerPercent'])
+  @Logger('Views:')
+  @ErrorHandler()
   public async getGovernanceWarningStatus({
     triggerPercent,
   }:  GetGovernanceWarningStatusProps): Promise<GetGovernanceWarningStatusReturnType> {
@@ -387,7 +370,6 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
     ]
 
     if (currentGovernanceState === undefined) {
-      console.debug('dualGovernanceWarningStatus is undefined!');
       return undefined;
     }
 
@@ -399,30 +381,23 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
     }
 
     if (NORMAL_STATES.includes(currentGovernanceState)) {
-      try {
-        const response = await this.calculateCurrentVetoSignallingThresholdProgress()
-        if (response) {
-          const currentVetoPercent = response.currentSupportPercent
+      const response = await this.calculateCurrentVetoSignallingThresholdProgress()
+      if (response) {
+        const currentVetoPercent = response.currentSupportPercent
 
-          if (currentVetoPercent > triggerPercent) {
-            return {
-              state: 'Warning',
-              currentVetoSupportPercent: currentVetoPercent
-            }
-          } else {
-            return {
-              state: 'Normal',
-              currentVetoSupportPercent: null,
-            }
+        if (currentVetoPercent > triggerPercent) {
+          return {
+            state: 'Warning',
+            currentVetoSupportPercent: currentVetoPercent
           }
         } else {
-          console.debug(`Couldn't get current veto percent`)
-          return undefined;
+          return {
+            state: 'Normal',
+            currentVetoSupportPercent: null,
+          }
         }
-
-      } catch (error) {
-        console.debug(`Couldn't get Governance warning status`, error);
-        return undefined
+      } else {
+        return undefined;
       }
     }
 
