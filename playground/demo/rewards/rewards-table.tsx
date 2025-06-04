@@ -98,7 +98,7 @@ const RewardsTable = ({
                   {changeSteth(r.change)}
                   <br />({changeShares(r.changeShares)})
                 </Td>
-                <Td>{r.apr ? `${r.apr * 100}%` : '-'}</Td>
+                <Td>{r.apr ? `${r.apr}%` : '-'}</Td>
               </Tr>
             ))}
           </Tbody>
