@@ -1,7 +1,7 @@
 import {
   Address,
-  getContract,
   formatUnits,
+  getContract,
   type GetContractReturnType,
   type PublicClient,
 } from 'viem';
@@ -33,11 +33,9 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public getContractEmergencyProtectedTimelockAddress(): Address {
-    const address = this.core.getDualGovernanceContractAddress(
+    return this.core.getDualGovernanceContractAddress(
       DUAL_GOVERNANCE_CONTRACT_NAMES.EPT,
     );
-
-    return address;
   }
 
   // Contracts
@@ -293,7 +291,6 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
     const currentGovernanceState = await this.getDualGovernanceState();
 
     const NORMAL_STATES = [
-      GovernanceState.NotInitialized,
       GovernanceState.Normal,
       GovernanceState.VetoCooldown,
     ];
@@ -322,7 +319,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
       } else {
         return {
           state: 'Normal',
-          currentVetoSupportPercent: null,
+          currentVetoSupportPercent: currentSupportPercent,
         };
       }
     }
