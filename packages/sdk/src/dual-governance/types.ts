@@ -42,10 +42,9 @@ export enum GovernanceState {
 
 export type GetGovernanceWarningStatusProps = {
   triggerPercent: number;
-}
+};
 
 export type GetGovernanceWarningStatusReturnType = {
-  state: 'Blocked' | 'Warning' | 'Normal'
+  state: 'Blocked' | 'Warning' | 'Normal' | 'Unknown';
   currentVetoSupportPercent: number | null;
-} | undefined;
-
+};

@@ -1,102 +1,50 @@
-import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 import {
   Address,
-  getContract,
   formatUnits,
+  getContract,
   type GetContractReturnType,
   type PublicClient,
 } from 'viem';
-import { emergencyProtectedTimelockAbi } from './abi/EmergencyProtectedTimelock.js';
+
 import {
-  CHAINS,
-  EMERGENCY_PROTECTED_TIMELOCK_ADDRESSES,
+  DUAL_GOVERNANCE_CONTRACT_NAMES,
   ERROR_CODE,
   invariant,
 } from '../common/index.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import { Cache, Logger } from '../common/decorators/index.js';
+
 import { dualGovernanceAbi } from './abi/DualGovernance.js';
 import { escrow } from './abi/Escrow.js';
-import {
-  DualGovernanceConfig,
-  DualGovernanceState, GetGovernanceWarningStatusProps, GetGovernanceWarningStatusReturnType, GovernanceState,
-  SignallingEscrowDetails,
-} from './types.js';
+import { emergencyProtectedTimelockAbi } from './abi/EmergencyProtectedTimelock.js';
 import { stETH } from './abi/StETH.js';
 import { dgConfigProviderAbi } from './abi/DGConfigProvider.js';
-import { Cache, ErrorHandler, Logger } from '../common/decorators/index.js';
+import {
+  DualGovernanceConfig,
+  DualGovernanceState,
+  GetGovernanceWarningStatusProps,
+  GetGovernanceWarningStatusReturnType,
+  GovernanceState,
+  SignallingEscrowDetails,
+} from './types.js';
 
 export class LidoSDKDualGovernance extends LidoSDKModule {
-  // ---- Contract Addresses ----
-
+  // Contracts Addresses
+  @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
-  @Logger('Views:')
-  @ErrorHandler()
-  public async getGovernanceAddress(): Promise<Address | undefined> {
-    const emergencyProtectedTimelockContract =
-      await this.getContractEmergencyProtectedTimelock();
-
-    invariant(
-      emergencyProtectedTimelockContract,
-      `Couldn't get emergencyProtectedTimelockContract on chain ${this.core.chain.name}`,
-      ERROR_CODE.READ_ERROR,
+  public getContractEmergencyProtectedTimelockAddress(): Address {
+    return this.core.getDualGovernanceContractAddress(
+      DUAL_GOVERNANCE_CONTRACT_NAMES.EPT,
     );
-
-    return await emergencyProtectedTimelockContract.read.getGovernance();
   }
 
-  @Cache(30 * 60 * 1000, ['core.chain.id'])
-  @Logger('Views:')
-  @ErrorHandler()
-  public async getVetoSignallingEscrowAddress(): Promise<Address | undefined> {
-    const dualGovernanceContract = await this.getContractDualGovernance();
-
-    invariant(
-      dualGovernanceContract,
-      `Couldn't get dualGovernanceContract on chain ${this.core.chain.name}`,
-      ERROR_CODE.READ_ERROR,
-    );
-
-    return await dualGovernanceContract.read.getVetoSignallingEscrow();
-  }
-
-  @Cache(30 * 60 * 1000, ['core.chain.id'])
-  @Logger('Views:')
-  @ErrorHandler()
-  public async getStETHAddress(): Promise<Address | undefined> {
-    const vetoSignallingContract = await this.getContractVetoSignallingEscrow();
-
-    invariant(
-      vetoSignallingContract,
-      `Couldn't get vetoSignallingContract on chain ${this.core.chain.name}`,
-      ERROR_CODE.READ_ERROR,
-    );
-
-    return await vetoSignallingContract.read.ST_ETH();
-  }
-
-  @Cache(30 * 60 * 1000, ['core.chain.id'])
-  @Logger('Views:')
-  @ErrorHandler()
-  public async getDualGovernanceConfigProviderAddress(): Promise<
-    Address | undefined
-  > {
-    const dualGovernanceContract = await this.getContractDualGovernance();
-
-    invariant(
-      dualGovernanceContract,
-      `Couldn't get dualGovernanceContract on chain ${this.core.chain.name}`,
-      ERROR_CODE.READ_ERROR,
-    );
-
-    return await dualGovernanceContract.read.getConfigProvider();
-  }
-
-  // ---- Contracts ----
+  // Contracts
+  @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContractEmergencyProtectedTimelock(): Promise<
     GetContractReturnType<typeof emergencyProtectedTimelockAbi, PublicClient>
   > {
-    const address =
-      EMERGENCY_PROTECTED_TIMELOCK_ADDRESSES[this.core.chain.id as CHAINS];
+    const address = this.getContractEmergencyProtectedTimelockAddress();
 
     invariant(
       address,
@@ -111,6 +59,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
     });
   }
 
+  @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContractDualGovernance(): Promise<
     GetContractReturnType<typeof dualGovernanceAbi, PublicClient>
@@ -130,6 +79,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
     });
   }
 
+  @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContractVetoSignallingEscrow(): Promise<
     GetContractReturnType<typeof escrow, PublicClient>
@@ -149,6 +99,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
     });
   }
 
+  @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContractStETH(): Promise<
     GetContractReturnType<typeof stETH, PublicClient>
@@ -168,6 +119,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
     });
   }
 
+  @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContractDualGovernanceConfigProvider(): Promise<
     GetContractReturnType<typeof dgConfigProviderAbi, PublicClient>
@@ -187,36 +139,57 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
     });
   }
 
-  // ---- Data Preparation ----
+  // Views
 
-  @Cache(30 * 60 * 1000, ['core.chain.id'])
   @Logger('Views:')
-  @ErrorHandler()
-  public async getVetoSignallingEscrowLockedAssets(): Promise<SignallingEscrowDetails> {
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  public async getGovernanceAddress(): Promise<Address> {
+    const emergencyProtectedTimelockContract =
+      await this.getContractEmergencyProtectedTimelock();
+
+    return await emergencyProtectedTimelockContract.read.getGovernance();
+  }
+
+  @Logger('Views:')
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  public async getVetoSignallingEscrowAddress(): Promise<Address> {
+    const dualGovernanceContract = await this.getContractDualGovernance();
+
+    return await dualGovernanceContract.read.getVetoSignallingEscrow();
+  }
+
+  @Logger('Views:')
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  public async getStETHAddress(): Promise<Address> {
     const vetoSignallingContract = await this.getContractVetoSignallingEscrow();
 
-    invariant(
-      vetoSignallingContract,
-      `Couldn't get vetoSignallingContract on chain ${this.core.chain.name}`,
-      ERROR_CODE.READ_ERROR,
-    );
+    return await vetoSignallingContract.read.ST_ETH();
+  }
+
+  @Logger('Views:')
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  public async getDualGovernanceConfigProviderAddress(): Promise<Address> {
+    const dualGovernanceContract = await this.getContractDualGovernance();
+
+    return await dualGovernanceContract.read.getConfigProvider();
+  }
+
+  // Data Preparation
+
+  @Logger('Views:')
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  public async getVetoSignallingEscrowLockedAssets(): Promise<SignallingEscrowDetails> {
+    const vetoSignallingContract = await this.getContractVetoSignallingEscrow();
 
     return await vetoSignallingContract.read.getSignallingEscrowDetails();
   }
 
-  @Cache(30 * 60 * 1000, ['core.chain.id'])
   @Logger('Views:')
-  @ErrorHandler()
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getTotalStEthInEscrow(): Promise<bigint> {
     const stETHContract = await this.getContractStETH();
     const vetoSignallingEscrowLockedAssets =
       await this.getVetoSignallingEscrowLockedAssets();
-
-    invariant(
-      stETHContract,
-      `Couldn't get stETHContract on chain ${this.core.chain.name}`,
-      ERROR_CODE.READ_ERROR,
-    );
 
     const unfinalizedShares =
       vetoSignallingEscrowLockedAssets.totalStETHLockedShares +
@@ -232,70 +205,38 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
     );
   }
 
-  @Cache(30 * 60 * 1000, ['core.chain.id'])
   @Logger('Views:')
-  @ErrorHandler()
-  public async getDualGovernanceConfig(): Promise<
-    DualGovernanceConfig | undefined
-  > {
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  public async getDualGovernanceConfig(): Promise<DualGovernanceConfig> {
     const dualGovernanceConfigProvider =
       await this.getContractDualGovernanceConfigProvider();
-
-    invariant(
-      dualGovernanceConfigProvider,
-      `Couldn't get dualGovernanceConfigProvider on chain ${this.core.chain.name}`,
-      ERROR_CODE.READ_ERROR,
-    );
 
     return await dualGovernanceConfigProvider.read.getDualGovernanceConfig();
   }
 
-  @Cache(30 * 60 * 1000, ['core.chain.id'])
   @Logger('Views:')
-  @ErrorHandler()
-  public async getTotalStETHSupply(): Promise<bigint | undefined> {
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  public async getTotalStETHSupply(): Promise<bigint> {
     const stETHContract = await this.getContractStETH();
-
-    invariant(
-      stETHContract,
-      `Couldn't get stETHContract on chain ${this.core.chain.name}`,
-      ERROR_CODE.READ_ERROR,
-    );
 
     return await stETHContract.read.totalSupply();
   }
 
-  @Cache(30 * 60 * 1000, ['core.chain.id'])
   @Logger('Views:')
-  @ErrorHandler()
-  public async calculateCurrentVetoSignallingThresholdProgress(): Promise<
-    | {
-        currentSupportPercent: number;
-      }
-    | undefined
-  > {
-    const [totalStETHSupply, dualGovernanceConfig, totalStEthInEscrow] = await Promise.all([
-      this.getTotalStETHSupply(),
-      this.getDualGovernanceConfig(),
-      this.getTotalStEthInEscrow(),
-    ])
-
-    if (dualGovernanceConfig === undefined) {
-      return { currentSupportPercent: 0 };
-    }
-
-    if (totalStEthInEscrow === undefined) {
-      return { currentSupportPercent: 0 };
-    }
-
-    if (totalStETHSupply === undefined) {
-      return { currentSupportPercent: 0 };
-    }
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  public async calculateCurrentVetoSignallingThresholdProgress(): Promise<{
+    currentSupportPercent: number;
+  }> {
+    const [totalStETHSupply, dualGovernanceConfig, totalStEthInEscrow] =
+      await Promise.all([
+        this.getTotalStETHSupply(),
+        this.getDualGovernanceConfig(),
+        this.getTotalStEthInEscrow(),
+      ]);
 
     const targetPercent = Number(
       formatUnits(dualGovernanceConfig.firstSealRageQuitSupport, 16),
     );
-
     const currentSupport = totalStEthInEscrow;
 
     if (targetPercent < 0 || currentSupport < 0n || totalStETHSupply < 0n) {
@@ -304,6 +245,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
 
     if (totalStETHSupply === 0n) {
       const percent = currentSupport > 0n ? 100 : 0;
+
       return { currentSupportPercent: percent };
     }
 
@@ -311,96 +253,80 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
 
     if (targetValue === 0n) {
       const percent = currentSupport > 0n ? 100 : 0;
+
       return { currentSupportPercent: percent };
     }
 
     const thresholdSupportPercentBigInt = (currentSupport * 100n) / targetValue;
-
     let thresholdSupportPercentNumber = Number(thresholdSupportPercentBigInt);
 
-    if (thresholdSupportPercentNumber > 100) {
+    if (thresholdSupportPercentNumber > 100)
       thresholdSupportPercentNumber = 100;
-    }
 
-    if (thresholdSupportPercentNumber < 0) {
-      thresholdSupportPercentNumber = 0;
-    }
+    if (thresholdSupportPercentNumber < 0) thresholdSupportPercentNumber = 0;
 
     return {
       currentSupportPercent: thresholdSupportPercentNumber,
     };
   }
 
-  @Cache(30 * 60 * 1000, ['core.chain.id'])
   @Logger('Views:')
-  @ErrorHandler()
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getDualGovernanceState(): Promise<
-    DualGovernanceState['persistedState'] | undefined
+    DualGovernanceState['persistedState']
   > {
     const dualGovernanceContract = await this.getContractDualGovernance();
 
-    if (dualGovernanceContract === undefined) {
-      return undefined;
-    }
-
-    const dualGovernanceState =
+    const { persistedState } =
       await dualGovernanceContract.read.getStateDetails();
 
-    return dualGovernanceState.persistedState;
+    return persistedState;
   }
 
-  @Cache(30 * 60 * 1000, ['core.chain.id', 'triggerPercent'])
   @Logger('Views:')
-  @ErrorHandler()
+  @Cache(30 * 60 * 1000, ['core.chain.id', 'triggerPercent'])
   public async getGovernanceWarningStatus({
     triggerPercent,
-  }:  GetGovernanceWarningStatusProps): Promise<GetGovernanceWarningStatusReturnType> {
+  }: GetGovernanceWarningStatusProps): Promise<GetGovernanceWarningStatusReturnType> {
     const currentGovernanceState = await this.getDualGovernanceState();
 
     const NORMAL_STATES = [
-      GovernanceState.NotInitialized,
       GovernanceState.Normal,
-      GovernanceState.VetoCooldown
-    ]
-
+      GovernanceState.VetoCooldown,
+    ];
     const BLOCKED_STATES = [
       GovernanceState.VetoSignalling,
       GovernanceState.VetoSignallingDeactivation,
       GovernanceState.RageQuit,
-    ]
-
-    if (currentGovernanceState === undefined) {
-      return undefined;
-    }
+    ];
 
     if (BLOCKED_STATES.includes(currentGovernanceState)) {
       return {
         state: 'Blocked',
         currentVetoSupportPercent: null,
-      }
+      };
     }
 
     if (NORMAL_STATES.includes(currentGovernanceState)) {
-      const response = await this.calculateCurrentVetoSignallingThresholdProgress()
-      if (response) {
-        const currentVetoPercent = response.currentSupportPercent
+      const { currentSupportPercent } =
+        await this.calculateCurrentVetoSignallingThresholdProgress();
 
-        if (currentVetoPercent > triggerPercent) {
-          return {
-            state: 'Warning',
-            currentVetoSupportPercent: currentVetoPercent
-          }
-        } else {
-          return {
-            state: 'Normal',
-            currentVetoSupportPercent: null,
-          }
-        }
+      if (currentSupportPercent > triggerPercent) {
+        return {
+          state: 'Warning',
+          currentVetoSupportPercent: currentSupportPercent,
+        };
       } else {
-        return undefined;
+        return {
+          state: 'Normal',
+          currentVetoSupportPercent: currentSupportPercent,
+        };
       }
     }
 
-    return undefined;
+    return {
+      state: 'Unknown',
+      currentVetoSupportPercent: null,
+    };
   }
 }

@@ -1,5 +1,5 @@
 /* eslint-disable jest/no-conditional-expect */
-import { describe, test, expect, beforeEach, jest } from '@jest/globals';
+import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 import { expectSDKModule } from '../../../tests/utils/expect/expect-sdk-module.js';
 import { LidoSDKDualGovernance } from '../../index.js';
 import { useDualGovernance } from '../../../tests/utils/fixtures/use-dual-governance.js';
@@ -11,7 +11,6 @@ import {
   DualGovernanceState,
   GovernanceState,
 } from '../types.js';
-
 
 describe('LidoSDKDualGovernance', () => {
   const dualGovernance = useDualGovernance();
@@ -106,40 +105,36 @@ describe('LidoSDKDualGovernance', () => {
 
     expect(config).toBeDefined();
 
-    if (config !== undefined) {
-      expect(config).toBeDefined();
-      expect(typeof config).toBe('object');
+    expect(config).toBeDefined();
+    expect(typeof config).toBe('object');
 
-      expect('firstSealRageQuitSupport' in config).toBe(true);
-      expect('secondSealRageQuitSupport' in config).toBe(true);
-      expect('minAssetsLockDuration' in config).toBe(true);
-      expect('vetoSignallingMinDuration' in config).toBe(true);
-      expect('vetoSignallingMaxDuration' in config).toBe(true);
-      expect('vetoSignallingMinActiveDuration' in config).toBe(true);
-      expect('vetoSignallingDeactivationMaxDuration' in config).toBe(true);
-      expect('vetoCooldownDuration' in config).toBe(true);
-      expect('rageQuitExtensionPeriodDuration' in config).toBe(true);
-      expect('rageQuitEthWithdrawalsMinDelay' in config).toBe(true);
-      expect('rageQuitEthWithdrawalsMaxDelay' in config).toBe(true);
-      expect('rageQuitEthWithdrawalsDelayGrowth' in config).toBe(true);
+    expect('firstSealRageQuitSupport' in config).toBe(true);
+    expect('secondSealRageQuitSupport' in config).toBe(true);
+    expect('minAssetsLockDuration' in config).toBe(true);
+    expect('vetoSignallingMinDuration' in config).toBe(true);
+    expect('vetoSignallingMaxDuration' in config).toBe(true);
+    expect('vetoSignallingMinActiveDuration' in config).toBe(true);
+    expect('vetoSignallingDeactivationMaxDuration' in config).toBe(true);
+    expect('vetoCooldownDuration' in config).toBe(true);
+    expect('rageQuitExtensionPeriodDuration' in config).toBe(true);
+    expect('rageQuitEthWithdrawalsMinDelay' in config).toBe(true);
+    expect('rageQuitEthWithdrawalsMaxDelay' in config).toBe(true);
+    expect('rageQuitEthWithdrawalsDelayGrowth' in config).toBe(true);
 
-      expectNonNegativeBn(config.firstSealRageQuitSupport);
-      expectNonNegativeBn(config.secondSealRageQuitSupport);
-      expect(config.minAssetsLockDuration).toBeGreaterThanOrEqual(0);
-      expect(config.vetoSignallingMinDuration).toBeGreaterThanOrEqual(0);
-      expect(config.vetoSignallingMaxDuration).toBeGreaterThanOrEqual(0);
-      expect(config.vetoSignallingMinActiveDuration).toBeGreaterThanOrEqual(0);
-      expect(
-        config.vetoSignallingDeactivationMaxDuration,
-      ).toBeGreaterThanOrEqual(0);
-      expect(config.vetoCooldownDuration).toBeGreaterThanOrEqual(0);
-      expect(config.rageQuitExtensionPeriodDuration).toBeGreaterThanOrEqual(0);
-      expect(config.rageQuitEthWithdrawalsMinDelay).toBeGreaterThanOrEqual(0);
-      expect(config.rageQuitEthWithdrawalsMaxDelay).toBeGreaterThanOrEqual(0);
-      expect(config.rageQuitEthWithdrawalsDelayGrowth).toBeGreaterThanOrEqual(
-        0,
-      );
-    }
+    expectNonNegativeBn(config.firstSealRageQuitSupport);
+    expectNonNegativeBn(config.secondSealRageQuitSupport);
+    expect(config.minAssetsLockDuration).toBeGreaterThanOrEqual(0);
+    expect(config.vetoSignallingMinDuration).toBeGreaterThanOrEqual(0);
+    expect(config.vetoSignallingMaxDuration).toBeGreaterThanOrEqual(0);
+    expect(config.vetoSignallingMinActiveDuration).toBeGreaterThanOrEqual(0);
+    expect(config.vetoSignallingDeactivationMaxDuration).toBeGreaterThanOrEqual(
+      0,
+    );
+    expect(config.vetoCooldownDuration).toBeGreaterThanOrEqual(0);
+    expect(config.rageQuitExtensionPeriodDuration).toBeGreaterThanOrEqual(0);
+    expect(config.rageQuitEthWithdrawalsMinDelay).toBeGreaterThanOrEqual(0);
+    expect(config.rageQuitEthWithdrawalsMaxDelay).toBeGreaterThanOrEqual(0);
+    expect(config.rageQuitEthWithdrawalsDelayGrowth).toBeGreaterThanOrEqual(0);
   });
 
   test('gets total stETH supply', async () => {
@@ -155,48 +150,41 @@ describe('LidoSDKDualGovernance', () => {
 
     expect(result).toBeDefined();
 
-    if (result !== undefined) {
-      expect(typeof result).toBe('object');
-      expect('currentSupportPercent' in result).toBe(true);
-      expect(typeof result.currentSupportPercent).toBe('number');
-      expect(result.currentSupportPercent).toBeGreaterThanOrEqual(0);
-      expect(result.currentSupportPercent).toBeLessThanOrEqual(100);
+    expect(typeof result).toBe('object');
+    expect('currentSupportPercent' in result).toBe(true);
+    expect(typeof result.currentSupportPercent).toBe('number');
+    expect(result.currentSupportPercent).toBeGreaterThanOrEqual(0);
+    expect(result.currentSupportPercent).toBeLessThanOrEqual(100);
 
-      const dualGovernanceConfig =
-        await dualGovernance.getDualGovernanceConfig();
-      const totalStEthInEscrow = await dualGovernance.getTotalStEthInEscrow();
-      const totalStETHSupply = await dualGovernance.getTotalStETHSupply();
+    const dualGovernanceConfig = await dualGovernance.getDualGovernanceConfig();
+    const totalStEthInEscrow = await dualGovernance.getTotalStEthInEscrow();
+    const totalStETHSupply = await dualGovernance.getTotalStETHSupply();
 
-      if (dualGovernanceConfig && totalStETHSupply !== undefined) {
-        if (
-          dualGovernanceConfig.firstSealRageQuitSupport < 0 ||
-          totalStEthInEscrow < 0n ||
-          totalStETHSupply < 0n
-        ) {
-          expect(result.currentSupportPercent).toBe(0);
-        } else if (totalStETHSupply === 0n) {
-          expect(result.currentSupportPercent).toBe(
-            totalStEthInEscrow > 0n ? 100 : 0,
-          );
-        } else {
-          const targetValue =
-            (totalStETHSupply *
-              BigInt(dualGovernanceConfig.firstSealRageQuitSupport)) /
-            100n;
-          if (targetValue === 0n) {
-            expect(result.currentSupportPercent).toBe(
-              totalStEthInEscrow > 0n ? 100 : 0,
-            );
-          } else {
-            const expectedPercent = Number(
-              (totalStEthInEscrow * 100n) / targetValue,
-            );
-            const cappedPercent = Math.min(Math.max(expectedPercent, 0), 100);
-            expect(result.currentSupportPercent).toBe(cappedPercent);
-          }
-        }
+    if (
+      dualGovernanceConfig.firstSealRageQuitSupport < 0 ||
+      totalStEthInEscrow < 0n ||
+      totalStETHSupply < 0n
+    ) {
+      expect(result.currentSupportPercent).toBe(0);
+    } else if (totalStETHSupply === 0n) {
+      expect(result.currentSupportPercent).toBe(
+        totalStEthInEscrow > 0n ? 100 : 0,
+      );
+    } else {
+      const targetValue =
+        (totalStETHSupply *
+          BigInt(dualGovernanceConfig.firstSealRageQuitSupport)) /
+        100n;
+      if (targetValue === 0n) {
+        expect(result.currentSupportPercent).toBe(
+          totalStEthInEscrow > 0n ? 100 : 0,
+        );
       } else {
-        expect(result.currentSupportPercent).toBe(0);
+        const expectedPercent = Number(
+          (totalStEthInEscrow * 100n) / targetValue,
+        );
+        const cappedPercent = Math.min(Math.max(expectedPercent, 0), 100);
+        expect(result.currentSupportPercent).toBe(cappedPercent);
       }
     }
   });
@@ -227,9 +215,9 @@ describe('LidoSDKDualGovernance - calculateCurrentVetoSignallingThresholdProgres
   });
 
   const setupMocks = (
-    config: DualGovernanceConfig | undefined,
-    escrow: bigint | null,
-    supply: bigint | undefined,
+    config: DualGovernanceConfig,
+    escrow: bigint,
+    supply: bigint,
   ) => {
     jest
       .spyOn(dualGovernance, 'getDualGovernanceConfig')
@@ -306,29 +294,6 @@ describe('LidoSDKDualGovernance - calculateCurrentVetoSignallingThresholdProgres
     expect(result).toEqual({ currentSupportPercent: 0 });
   });
 
-  test('returns 0 when config is undefined', async () => {
-    setupMocks(undefined, null, undefined);
-
-    const result =
-      await dualGovernance.calculateCurrentVetoSignallingThresholdProgress();
-    expect(result).toEqual({ currentSupportPercent: 0 });
-  });
-
-  test('returns 0 when escrow is undefined', async () => {
-    setupMocks(
-      {
-        firstSealRageQuitSupport: 200000000000000000n,
-        ...mockDualGovernanceConfigResponse,
-      },
-      null,
-      1000n,
-    );
-
-    const result =
-      await dualGovernance.calculateCurrentVetoSignallingThresholdProgress();
-    expect(result).toEqual({ currentSupportPercent: 0 });
-  });
-
   test('returns 100 for zero target percent with positive escrow', async () => {
     setupMocks(
       { firstSealRageQuitSupport: 0n, ...mockDualGovernanceConfigResponse },
@@ -392,23 +357,6 @@ describe('LidoSDKDualGovernance - getDualGovernanceState', () => {
 
     expect(result).toEqual(GovernanceState.RageQuit);
   });
-
-  test('returns undefined if contract is not available', async () => {
-    jest
-      .spyOn(dualGovernance, 'getContractDualGovernance')
-      .mockResolvedValue(undefined as any);
-
-    const result = await dualGovernance.getDualGovernanceState();
-
-    expect(result).toBeUndefined();
-  });
-
-  test('handles contract read errors gracefully', async () => {
-    jest.spyOn(dualGovernance, 'getDualGovernanceState').mockResolvedValue(undefined);
-
-    const result = await dualGovernance.getDualGovernanceState();
-    expect(result).toBeUndefined();
-  });
 });
 
 describe('LidoSDKDualGovernance - getGovernanceWarningStatus', () => {
@@ -422,21 +370,19 @@ describe('LidoSDKDualGovernance - getGovernanceWarningStatus', () => {
   });
 
   const setupMocks = (
-    governanceState: GovernanceState | undefined,
-    vetoSignalingProgress: { currentSupportPercent: number } | undefined | null,
+    governanceState: GovernanceState,
+    vetoSignalingProgress: { currentSupportPercent: number },
   ) => {
     jest
       .spyOn(dualGovernance, 'getDualGovernanceState')
       .mockResolvedValue(governanceState);
     jest
       .spyOn(dualGovernance, 'calculateCurrentVetoSignallingThresholdProgress')
-      .mockResolvedValue(
-        vetoSignalingProgress === null ? undefined : vetoSignalingProgress,
-      );
+      .mockResolvedValue(vetoSignalingProgress);
   };
 
   test('returns "Blocked" state when in VetoSignalling', async () => {
-    setupMocks(GovernanceState.VetoSignalling, null);
+    setupMocks(GovernanceState.VetoSignalling, { currentSupportPercent: 60 });
 
     const result = await dualGovernance.getGovernanceWarningStatus({
       triggerPercent: 90,
@@ -449,7 +395,9 @@ describe('LidoSDKDualGovernance - getGovernanceWarningStatus', () => {
   });
 
   test('returns "Blocked" state when in VetoSignallingDeactivation', async () => {
-    setupMocks(GovernanceState.VetoSignallingDeactivation, null);
+    setupMocks(GovernanceState.VetoSignallingDeactivation, {
+      currentSupportPercent: 60,
+    });
 
     const result = await dualGovernance.getGovernanceWarningStatus({
       triggerPercent: 90,
@@ -462,7 +410,7 @@ describe('LidoSDKDualGovernance - getGovernanceWarningStatus', () => {
   });
 
   test('returns "Blocked" state when in RageQuit', async () => {
-    setupMocks(GovernanceState.RageQuit, null);
+    setupMocks(GovernanceState.RageQuit, { currentSupportPercent: 60 });
 
     const result = await dualGovernance.getGovernanceWarningStatus({
       triggerPercent: 90,
@@ -483,40 +431,20 @@ describe('LidoSDKDualGovernance - getGovernanceWarningStatus', () => {
 
     expect(result).toEqual({
       state: 'Normal',
-      currentVetoSupportPercent: null,
+      currentVetoSupportPercent: 50,
     });
   });
 
-  test('returns "Warning" when above threshold and in NotInitialized state', async () => {
+  test('returns "Unknown" in NotInitialized state', async () => {
     setupMocks(GovernanceState.NotInitialized, { currentSupportPercent: 95 });
 
     const result = await dualGovernance.getGovernanceWarningStatus({
       triggerPercent: 90,
     });
 
-    expect(result).toEqual({ state: 'Warning', currentVetoSupportPercent: 95 });
-  });
-
-  test('returns undefined if governance state is undefined', async () => {
-    setupMocks(undefined, null);
-
-    const result = await dualGovernance.getGovernanceWarningStatus({
-      triggerPercent: 90,
+    expect(result).toEqual({
+      state: 'Unknown',
+      currentVetoSupportPercent: null,
     });
-
-    expect(result).toBeUndefined();
-  });
-
-  test('returns undefined if calculateCurrentVetoSignallingThresholdProgress returns undefined', async () => {
-    setupMocks(GovernanceState.Normal, null);
-    jest
-      .spyOn(dualGovernance, 'calculateCurrentVetoSignallingThresholdProgress')
-      .mockResolvedValueOnce(undefined);
-
-    const result = await dualGovernance.getGovernanceWarningStatus({
-      triggerPercent: 90,
-    });
-
-    expect(result).toBeUndefined();
   });
 });
