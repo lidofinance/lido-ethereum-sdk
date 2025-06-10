@@ -6809,7 +6809,7 @@ __metadata:
     rimraf: ^5.0.5
     ts-node: ^10.9.2
     typescript: 5.1.6
-    viem: ^2.26.0
+    viem: ^2.31.0
   languageName: unknown
   linkType: soft
 
@@ -15315,7 +15315,7 @@ __metadata:
   resolution: "erlang-bridge-examples@workspace:examples/erlang-bridge"
   dependencies:
     "@lidofinance/lido-ethereum-sdk": "workspace:*"
-    viem: ^2.26.0
+    viem: ^2.31.0
   languageName: unknown
   linkType: soft
 
@@ -26115,7 +26115,7 @@ __metadata:
     "@lidofinance/lido-ethereum-sdk": "workspace:*"
     rimraf: ^5.0.5
     typescript: 5.1.6
-    viem: ^2.26.0
+    viem: ^2.31.0
   languageName: unknown
   linkType: soft
 
@@ -29092,7 +29092,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:^2.1.1, viem@npm:^2.26.0":
+"viem@npm:^2.1.1":
   version: 2.26.0
   resolution: "viem@npm:2.26.0"
   dependencies:
