@@ -27,6 +27,11 @@ For changes between versions see [CHANGELOG.MD](CHANGELOG.md)
 
 For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
 
+## Requirements
+
+- Node.js 20.x or higher (for development and testing)
+- Note: Node.js 22+ has compatibility issues with Ganache used in tests
+
 ## Installation
 
 You can install the Lido Ethereum SDK using npm or yarn:
