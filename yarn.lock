@@ -15912,12 +15912,11 @@ __metadata:
   linkType: hard
 
 "estree-util-value-to-estree@npm:^3.0.1":
-  version: 3.1.1
-  resolution: "estree-util-value-to-estree@npm:3.1.1"
+  version: 3.4.0
+  resolution: "estree-util-value-to-estree@npm:3.4.0"
   dependencies:
     "@types/estree": ^1.0.0
-    is-plain-obj: ^4.0.0
-  checksum: 80e1d227ac80fab0b148c40427af31ad4dd37a3a4a0e0894d7975370284ea39566fe7df132f3454cf0e47adcc79b47ae0737464a85a413bce6f8d159336f8a37
+  checksum: a0cb37c756b5493a6a4227c299b3bfa717ccd08d58207586e84aff4d4bd84bb784bdd5c532e112e1686c7fe519b1bb01c48a62d1188e466d085ababb66decc62
   languageName: node
   linkType: hard
 
