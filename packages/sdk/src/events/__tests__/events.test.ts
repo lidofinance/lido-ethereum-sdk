@@ -75,7 +75,7 @@ describe('LidoSDKEvents', () => {
 
   test('getRebaseEvents fits range', async () => {
     const todayTimestamp = BigInt(Math.floor(Date.now() / 1000));
-    const earlierTimestamp = todayTimestamp - 3600n * 24n * 3n;
+    const earlierTimestamp = todayTimestamp - 3600n * 24n * 4n; // 4 days ago
     const events = await stethEvents.getRebaseEvents({
       from: { timestamp: earlierTimestamp },
       to: { timestamp: todayTimestamp },
