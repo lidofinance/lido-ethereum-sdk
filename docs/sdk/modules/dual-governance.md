@@ -36,7 +36,7 @@ The Dual Governance system can be in one of the following states:
 ### Contract Address Methods
 
 - [`getGovernanceAddress()`](https://github.com/lidofinance/dual-governance/blob/main/docs/specification.md#function-emergencyprotectedtimelockgetgovernance): Returns the address of the DualGovernance contract.
-- `getVetoSignallingEscrowAddress()]: Returns the address of the `VetoSignallingEscrow` contract.
+- `getVetoSignallingEscrowAddress()`: Returns the address of the `VetoSignallingEscrow` contract.
 - `getStETHAddress()`: Returns the address of the `stETH` contract.
 - [`getDualGovernanceConfigProviderAddress()`](https://github.com/lidofinance/dual-governance/blob/main/docs/specification.md#function-dualgovernancegetconfigprovider): Returns the address of the DualGovernanceConfigProvider contract.
 
