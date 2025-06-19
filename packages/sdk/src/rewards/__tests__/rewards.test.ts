@@ -12,12 +12,12 @@ import {
   expectRewardsSnapshot,
 } from '../../../tests/utils/expect/expect-rewards-snapshot.js';
 
-const HOLESKY = 17000;
+const HOODI = 560048;
 const REWARDS_ADDRESS = '0x386BB4957595Df94c8F44A4f8fF99c9fef57017f';
 
 const REWARDS_SNAPSHOTS_PARAMS: RewardsSnapshotType[] = [
   {
-    chain: HOLESKY,
+    chain: HOODI,
     params: {
       address: REWARDS_ADDRESS,
       from: { block: 452867n },
@@ -25,7 +25,7 @@ const REWARDS_SNAPSHOTS_PARAMS: RewardsSnapshotType[] = [
     },
   },
   {
-    chain: HOLESKY,
+    chain: HOODI,
     params: {
       address: REWARDS_ADDRESS,
       from: { timestamp: 1701858240n },
@@ -34,7 +34,7 @@ const REWARDS_SNAPSHOTS_PARAMS: RewardsSnapshotType[] = [
     },
   },
   {
-    chain: HOLESKY,
+    chain: HOODI,
     params: {
       address: REWARDS_ADDRESS,
       back: { blocks: 10000n },
@@ -43,7 +43,7 @@ const REWARDS_SNAPSHOTS_PARAMS: RewardsSnapshotType[] = [
     },
   },
   {
-    chain: HOLESKY,
+    chain: HOODI,
     params: {
       address: REWARDS_ADDRESS,
       back: { blocks: 467245n - 466400n },
@@ -52,7 +52,7 @@ const REWARDS_SNAPSHOTS_PARAMS: RewardsSnapshotType[] = [
     },
   },
   {
-    chain: HOLESKY,
+    chain: HOODI,
     params: {
       address: REWARDS_ADDRESS,
       back: { blocks: 10000n },
@@ -61,7 +61,7 @@ const REWARDS_SNAPSHOTS_PARAMS: RewardsSnapshotType[] = [
     },
   },
   {
-    chain: HOLESKY,
+    chain: HOODI,
     params: {
       address: REWARDS_ADDRESS,
       back: { blocks: 10000n },

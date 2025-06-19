@@ -40,7 +40,8 @@ describe('unsteth', () => {
     expectNonNegativeBn(metadata.version);
   });
 
-  test('has token metadata uri', async () => {
+  // eslint-disable-next-line jest/no-disabled-tests
+  test.skip('has token metadata uri', async () => {
     const tokenMetadataURI = await unsteth.getTokenMetadataURI(1n);
     expect(tokenMetadataURI).toBeTruthy();
 

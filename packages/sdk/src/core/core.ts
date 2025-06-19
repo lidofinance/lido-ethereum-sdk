@@ -39,6 +39,8 @@ import {
   NOOP,
   LIDO_L2_CONTRACT_NAMES,
   LIDO_L2_CONTRACT_ADDRESSES,
+  DUAL_GOVERNANCE_CONTRACT_ADDRESSES,
+  DUAL_GOVERNANCE_CONTRACT_NAMES,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
@@ -409,6 +411,27 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     invariant(
       address,
       `Lido L2 on ${this.chain.name}(${this.chain.id}) does not have ${contract} contract`,
+      ERROR_CODE.NOT_SUPPORTED,
+    );
+    return address;
+  }
+
+  @Logger('Utils:')
+  @Cache(30 * 60 * 1000, ['chain.id'])
+  public getDualGovernanceContractAddress(
+    contract: DUAL_GOVERNANCE_CONTRACT_NAMES,
+  ): Address {
+    const chainConfig =
+      DUAL_GOVERNANCE_CONTRACT_ADDRESSES[this.chain.id as CHAINS];
+    invariant(
+      chainConfig,
+      `${this.chain.name} contracts are not found for chain ${this.chain.id}`,
+      ERROR_CODE.NOT_SUPPORTED,
+    );
+    const address = chainConfig[contract];
+    invariant(
+      address,
+      `Dual Governance on ${this.chain.name}(${this.chain.id}) does not have ${contract} contract`,
       ERROR_CODE.NOT_SUPPORTED,
     );
     return address;
