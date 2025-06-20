@@ -76,6 +76,11 @@
       "default": "./dist/cjs/l2/index.js",
       "types": "./dist/types/l2/index.d.ts"
     },
+    "./dual-governance": {
+      "import": "./dist/esm/dual-governance/index.js",
+      "default": "./dist/cjs/dual-governance/index.js",
+      "types": "./dist/types/dual-governance/index.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -112,6 +117,9 @@
       ],
       "l2": [
         "./dist/types/l2/index.d.ts"
+      ],
+      "dual-governance": [
+        "./dist/types/dual-governance/index.d.ts"
       ]
     }
   },
