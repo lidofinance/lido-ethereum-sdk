@@ -390,7 +390,7 @@ describe('LidoSDKDualGovernance - getGovernanceWarningStatus', () => {
 
     expect(result).toEqual({
       state: 'Blocked',
-      currentVetoSupportPercent: null,
+      currentVetoSupportPercent: 60,
     });
   });
 
@@ -405,7 +405,7 @@ describe('LidoSDKDualGovernance - getGovernanceWarningStatus', () => {
 
     expect(result).toEqual({
       state: 'Blocked',
-      currentVetoSupportPercent: null,
+      currentVetoSupportPercent: 60,
     });
   });
 
@@ -418,7 +418,7 @@ describe('LidoSDKDualGovernance - getGovernanceWarningStatus', () => {
 
     expect(result).toEqual({
       state: 'Blocked',
-      currentVetoSupportPercent: null,
+      currentVetoSupportPercent: 60,
     });
   });
 

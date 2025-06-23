@@ -289,6 +289,8 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
     triggerPercent,
   }: GetGovernanceWarningStatusProps): Promise<GetGovernanceWarningStatusReturnType> {
     const currentGovernanceState = await this.getDualGovernanceState();
+    const { currentSupportPercent } =
+      await this.calculateCurrentVetoSignallingThresholdProgress();
 
     const NORMAL_STATES = [
       GovernanceState.Normal,
@@ -303,14 +305,11 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
     if (BLOCKED_STATES.includes(currentGovernanceState)) {
       return {
         state: 'Blocked',
-        currentVetoSupportPercent: null,
+        currentVetoSupportPercent: currentSupportPercent,
       };
     }
 
     if (NORMAL_STATES.includes(currentGovernanceState)) {
-      const { currentSupportPercent } =
-        await this.calculateCurrentVetoSignallingThresholdProgress();
-
       if (currentSupportPercent > triggerPercent) {
         return {
           state: 'Warning',
