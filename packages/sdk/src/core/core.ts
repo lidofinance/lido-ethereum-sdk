@@ -187,7 +187,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     const locator = LIDO_LOCATOR_BY_CHAIN[this.chain.id as CHAINS];
     invariant(
       locator,
-      `Lido Ethereum Contacts are not supported on ${this.chain.name}(${this.chain.id})`,
+      `Lido Ethereum Contracts are not supported on ${this.chain.name}(${this.chain.id})`,
       ERROR_CODE.NOT_SUPPORTED,
     );
     return locator;
@@ -366,10 +366,13 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   @Cache(60 * 60 * 1000, ['chain.id'])
   public async isContract(address: Address): Promise<boolean> {
     // eth_getCode returns hex string of bytecode at address
-    // for accounts it's "0x"
     // for contract it's potentially very long hex (can't be safely&quickly parsed)
-    const result = await this.rpcProvider.getCode({ address: address });
-    return result ? result !== '0x' : false;
+    const bytecode = await this.rpcProvider.getCode({ address: address });
+
+    const isEOA = bytecode === '0x'; // regular accounts (EOA) have no bytecode
+    const isDelegatedEOA = bytecode?.startsWith('0xef0100'); // EIP-7702 delegation designator code prefix
+
+    return Boolean(bytecode && !isEOA && !isDelegatedEOA);
   }
 
   @Logger('Utils:')
