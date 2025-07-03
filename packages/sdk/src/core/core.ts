@@ -39,6 +39,8 @@ import {
   NOOP,
   LIDO_L2_CONTRACT_NAMES,
   LIDO_L2_CONTRACT_ADDRESSES,
+  DUAL_GOVERNANCE_CONTRACT_ADDRESSES,
+  DUAL_GOVERNANCE_CONTRACT_NAMES,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
@@ -185,7 +187,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     const locator = LIDO_LOCATOR_BY_CHAIN[this.chain.id as CHAINS];
     invariant(
       locator,
-      `Lido Ethereum Contacts are not supported on ${this.chain.name}(${this.chain.id})`,
+      `Lido Ethereum Contracts are not supported on ${this.chain.name}(${this.chain.id})`,
       ERROR_CODE.NOT_SUPPORTED,
     );
     return locator;
@@ -364,10 +366,13 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   @Cache(60 * 60 * 1000, ['chain.id'])
   public async isContract(address: Address): Promise<boolean> {
     // eth_getCode returns hex string of bytecode at address
-    // for accounts it's "0x"
     // for contract it's potentially very long hex (can't be safely&quickly parsed)
-    const result = await this.rpcProvider.getCode({ address: address });
-    return result ? result !== '0x' : false;
+    const bytecode = await this.rpcProvider.getCode({ address: address });
+
+    const isEOA = bytecode === '0x'; // regular accounts (EOA) have no bytecode
+    const isDelegatedEOA = bytecode?.startsWith('0xef0100'); // EIP-7702 delegation designator code prefix
+
+    return Boolean(bytecode && !isEOA && !isDelegatedEOA);
   }
 
   @Logger('Utils:')
@@ -409,6 +414,27 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     invariant(
       address,
       `Lido L2 on ${this.chain.name}(${this.chain.id}) does not have ${contract} contract`,
+      ERROR_CODE.NOT_SUPPORTED,
+    );
+    return address;
+  }
+
+  @Logger('Utils:')
+  @Cache(30 * 60 * 1000, ['chain.id'])
+  public getDualGovernanceContractAddress(
+    contract: DUAL_GOVERNANCE_CONTRACT_NAMES,
+  ): Address {
+    const chainConfig =
+      DUAL_GOVERNANCE_CONTRACT_ADDRESSES[this.chain.id as CHAINS];
+    invariant(
+      chainConfig,
+      `${this.chain.name} contracts are not found for chain ${this.chain.id}`,
+      ERROR_CODE.NOT_SUPPORTED,
+    );
+    const address = chainConfig[contract];
+    invariant(
+      address,
+      `Dual Governance on ${this.chain.name}(${this.chain.id}) does not have ${contract} contract`,
       ERROR_CODE.NOT_SUPPORTED,
     );
     return address;

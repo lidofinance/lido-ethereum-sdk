@@ -92,6 +92,23 @@ export enum LIDO_CONTRACT_NAMES {
   wsteth = 'wsteth',
 }
 
+export enum DUAL_GOVERNANCE_CONTRACT_NAMES {
+  EPT = 'EPT',
+}
+export const DUAL_GOVERNANCE_CONTRACT_ADDRESSES: {
+  [key in CHAINS]?: { [key2 in DUAL_GOVERNANCE_CONTRACT_NAMES]?: Address };
+} = {
+  [CHAINS.Mainnet]: {
+    EPT: '0xCE0425301C85c5Ea2A0873A2dEe44d78E02D2316',
+  },
+  [CHAINS.Holesky]: {
+    EPT: '0xe9c5FfEAd0668AFdBB9aac16163840d649DB76DD',
+  },
+  [CHAINS.Hoodi]: {
+    EPT: '0x0A5E22782C0Bd4AddF10D771f0bF0406B038282d',
+  },
+};
+
 export enum LIDO_L2_CONTRACT_NAMES {
   wsteth = 'wsteth',
   steth = 'steth',

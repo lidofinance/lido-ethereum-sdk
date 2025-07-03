@@ -76,32 +76,32 @@ const APR_SPEC: Array<[AprRebaseEvent, number]> = [
 ];
 
 const APR_SPEC_BLOCK: Record<string, { block: bigint; apr: number }[]> = {
-  '17000': [
+  '560048': [
     {
-      block: 500726n,
-      apr: 1.7265,
+      block: 542808n,
+      apr: 2.23,
     },
     {
-      block: 493967n,
-      apr: 1.9044,
+      block: 549557n,
+      apr: 1.6888,
     },
     {
-      block: 491753n,
-      apr: 1.5673,
+      block: 556191n,
+      apr: 1.8502,
     },
     {
-      block: 94120n,
-      apr: 1.3987,
-    },
-
-    {
-      block: 103607n,
-      apr: 6.3928,
+      block: 565167n,
+      apr: 2.2178,
     },
 
     {
-      block: 77212n,
-      apr: 1.3269,
+      block: 569612n,
+      apr: 2.2412,
+    },
+
+    {
+      block: 574108n,
+      apr: 2.3137,
     },
   ],
 };
