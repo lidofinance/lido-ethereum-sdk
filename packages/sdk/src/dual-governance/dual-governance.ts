@@ -15,7 +15,7 @@ import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 import { Cache, Logger } from '../common/decorators/index.js';
 
 import { dualGovernanceAbi } from './abi/DualGovernance.js';
-import { escrow } from './abi/Escrow.js';
+import { escrowAbi } from './abi/Escrow.js';
 import { emergencyProtectedTimelockAbi } from './abi/EmergencyProtectedTimelock.js';
 import { stETH } from './abi/StETH.js';
 import { dgConfigProviderAbi } from './abi/DGConfigProvider.js';
@@ -82,7 +82,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContractVetoSignallingEscrow(): Promise<
-    GetContractReturnType<typeof escrow, PublicClient>
+    GetContractReturnType<typeof escrowAbi, PublicClient>
   > {
     const address = await this.getVetoSignallingEscrowAddress();
 
@@ -94,7 +94,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
 
     return getContract({
       address,
-      abi: escrow,
+      abi: escrowAbi,
       client: this.core.rpcProvider,
     });
   }
