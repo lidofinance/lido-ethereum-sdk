@@ -1,4 +1,4 @@
-export const escrow = [
+export const escrowAbi = [
   {
     inputs: [],
     name: 'ST_ETH',
