@@ -12,17 +12,19 @@ import { UnstethDemo } from './unsteth';
 import { EventsDemo } from './events';
 import { StatisticsDemo } from './statistics';
 import { RewardsDemo } from './rewards';
-import { ShareDemo } from './shares'
-import { DualGovernanceDemo } from './dual-governance';;
+import { ShareDemo } from './shares';
+import { DualGovernanceDemo } from './dual-governance';
 import { useChainId } from 'wagmi';
 import { L2_CHAINS } from 'providers/web3';
 import { L2 } from './l2';
+import { VaultDemo } from './vault';
 
 export const Demo = () => {
   const chain = useChainId();
   if (L2_CHAINS.includes(chain)) return <L2 />;
   return (
     <>
+      <VaultDemo />
       <StakeDemo />
       <WrapDemo />
       <CoreDemo />

@@ -81,6 +81,11 @@
       "default": "./dist/cjs/dual-governance/index.js",
       "types": "./dist/types/dual-governance/index.d.ts"
     },
+    "./vault": {
+      "import": "./dist/esm/vault/index.js",
+      "default": "./dist/cjs/vault/index.js",
+      "types": "./dist/types/vault/index.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -120,6 +125,9 @@
       ],
       "dual-governance": [
         "./dist/types/dual-governance/index.d.ts"
+      ],
+      "vault": [
+        "./dist/types/vault/index.d.ts"
       ]
     }
   },
