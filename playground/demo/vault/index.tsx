@@ -1,25 +1,19 @@
-import { Input, Accordion } from '@lidofinance/lido-ui';
+import { Accordion, Input } from '@lidofinance/lido-ui';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { Action } from 'components/action';
-import { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
-import TokenInput from 'components/tokenInput/tokenInput';
+import TokenInput, { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
-import { transactionToast } from 'utils/transaction-toast';
 import type { Address } from 'viem';
 
 export const VaultDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
-  const [stakingValueState, setStakingValue] =
-    useState<ValueType>(DEFAULT_VALUE);
-  const stakingValue = stakingValueState ?? BigInt(0);
-  const [referralAddressState, setReferralAddress] = useState('');
-  const { vault } = useLidoSDK();
+  const { vaultFactory, vaultViewer, vault } = useLidoSDK();
+
+  const [fundEthValue, setFundEthValue] = useState<ValueType>(DEFAULT_VALUE);
+  const [fundAddress, setFundAddress] = useState<Address>('0x0');
 
   const account = web3account as `0x{string}`;
-  const referralAddress = referralAddressState
-    ? (referralAddressState as `0x{string}`)
-    : undefined;
 
   return (
     <Accordion summary="Vault">
@@ -27,7 +21,7 @@ export const VaultDemo = () => {
         title="Create Vault"
         walletAction
         action={() =>
-          vault.createVault({
+          vaultFactory.createVault({
             account,
             confirmExpiry: BigInt(3600),
             nodeOperatorFeeBP: BigInt(1),
@@ -40,8 +34,47 @@ export const VaultDemo = () => {
       />
       <Action
         title="Get Contract Vault Factory"
-        action={async () => (await vault.getContractVaultFactory()).abi}
+        action={async () => (await vaultFactory.getContractVaultFactory()).abi}
       />
+
+      <Action
+        title="Get Vault List"
+        walletAction
+        action={async () => {
+          const result = await vaultViewer.fetchConnectedVaults({
+            account,
+            page: 1,
+            perPage: 10,
+          });
+          return { result };
+        }}
+      />
+
+      <Action
+        title="Fund"
+        walletAction
+        action={() =>
+          vault.fund({
+            account,
+            address: fundAddress,
+            value: fundEthValue ?? BigInt(0),
+          })
+        }
+      >
+        <Input
+          label="Vault address"
+          placeholder="0x0000000"
+          value={fundAddress}
+          onChange={(e) => setFundAddress(e.currentTarget.value as Address)}
+        />
+
+        <TokenInput
+          label="Vault amount"
+          value={fundEthValue}
+          placeholder="0.0"
+          onChange={setFundEthValue}
+        />
+      </Action>
     </Accordion>
   );
 };

@@ -1,60 +1,58 @@
-import {
-  type Address,
-  decodeEventLog,
-  getAbiItem,
-  getContract,
-  isAddress,
-  toEventHash,
-  TransactionReceipt,
-} from 'viem';
-
-import type { GetContractReturnType, WalletClient } from 'viem';
-
-import { type TransactionResult, TransactionOptions } from '../core/index.js';
-import type { NoTxOptions } from '../core/types.js';
-import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
-import {
-  SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
-  NOOP,
-  GAS_TRANSACTION_RATIO_PRECISION,
-} from '../common/constants.js';
-import { CreateVaultProps, CreateVaultResult } from './types.js';
-
-import {
-  DashboardCreatedEventAbi,
-  VaultCreatedEventAbi,
-  VaultFactoryAbi,
-} from './abi/VaultFactory.js';
-import { vaultsAddresses } from './consts/vaults-addresses.js';
-import { VAULTS_CONNECT_DEPOSIT } from './consts/common.js';
-import { ERROR_CODE, invariant } from '../common/index.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import { Cache, Logger } from '../common/decorators/index.js';
+import {
+  Address,
+  encodeFunctionData,
+  getContract,
+  GetContractReturnType,
+  WalletClient,
+} from 'viem';
+import { DashboardAbi, StakingVaultAbi, VaultHubAbi } from './abi/index.js';
+import {
+  type PopulatedTransaction,
+  type TransactionResult,
+} from '../core/index.js';
+import { NOOP } from '../common/index.js';
+import { FundByDashboardPros, FundByVaultPros } from './types.js';
+import { vaultsAddresses } from './consts/vaults-addresses.js';
 
 export class LidoSDKVault extends LidoSDKModule {
-  // Precomputed event signatures
-  private static VAULT_CREATED_SIGNATURE = toEventHash(
-    getAbiItem({
-      abi: VaultCreatedEventAbi,
-      name: 'VaultCreated',
-    }),
-  );
-  private static DASHBOARD_CREATED_SIGNATURE = toEventHash(
-    getAbiItem({
-      abi: DashboardCreatedEventAbi,
-      name: 'DashboardCreated',
-    }),
-  );
-
   @Logger('Contracts:')
-  @Cache(30 * 60 * 1000, [])
-  public async getContractVaultFactory(): Promise<
-    GetContractReturnType<typeof VaultFactoryAbi, WalletClient>
-  > {
-    const address = vaultsAddresses.vaultFactory;
-
+  public async getContractVault(
+    address: Address,
+  ): Promise<GetContractReturnType<typeof StakingVaultAbi, WalletClient>> {
     return getContract({
       address,
-      abi: VaultFactoryAbi,
+      abi: StakingVaultAbi,
+      client: {
+        public: this.core.rpcProvider,
+        wallet: this.core.web3Provider as WalletClient,
+      },
+    });
+  }
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  public async getVaultDashboard(
+    address: Address,
+  ): Promise<GetContractReturnType<typeof DashboardAbi, WalletClient>> {
+    return getContract({
+      address,
+      abi: DashboardAbi,
+      client: {
+        public: this.core.rpcProvider,
+        wallet: this.core.web3Provider as WalletClient,
+      },
+    });
+  }
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  public async getVaultHub(): Promise<
+    GetContractReturnType<typeof VaultHubAbi, WalletClient>
+  > {
+    const address = vaultsAddresses.vaultHub;
+    return getContract({
+      address,
+      abi: VaultHubAbi,
       client: {
         public: this.core.rpcProvider,
         wallet: this.core.web3Provider as WalletClient,
@@ -62,160 +60,66 @@ export class LidoSDKVault extends LidoSDKModule {
     });
   }
 
-  // Calls
+  public fund(props: FundByVaultPros): Promise<TransactionResult>;
+  public fund(props: FundByDashboardPros): Promise<TransactionResult>;
 
-  @Logger('Call:')
-  @ErrorHandler()
-  public async createVault(
-    props: CreateVaultProps,
-  ): Promise<TransactionResult<CreateVaultResult>> {
-    this.core.useWeb3Provider();
-    const { callback, account, ...rest } = await this.parseProps(props);
+  public async fund(
+    props: FundByVaultPros | FundByDashboardPros,
+  ): Promise<TransactionResult> {
+    const parsedProps = await this.parseProps(props);
 
-    const {
-      defaultAdmin,
-      nodeOperator,
-      nodeOperatorManager,
-      nodeOperatorFeeBP,
-      confirmExpiry,
-      roleAssignments,
-    } = props;
-
-    const contract = await this.getContractVaultFactory();
-    return this.core.performTransaction<CreateVaultResult>({
-      ...rest,
-      callback,
-      account,
-      getGasLimit: async (options) =>
-        this.createVaultEstimateGas(
-          {
-            account,
-            defaultAdmin,
-            nodeOperator,
-            nodeOperatorManager,
-            nodeOperatorFeeBP,
-            confirmExpiry,
-            roleAssignments,
-          },
-          options,
-        ),
+    return this.core.performTransaction({
+      ...parsedProps,
+      getGasLimit: (options) =>
+        parsedProps.dashboard.estimateGas.fund({
+          ...options,
+          value: props.value,
+        }),
       sendTransaction: (options) =>
-        contract.write.createVaultWithDashboard(
-          [
-            defaultAdmin,
-            nodeOperator,
-            nodeOperatorManager,
-            nodeOperatorFeeBP,
-            confirmExpiry,
-            roleAssignments,
-          ],
-          {
-            ...options,
-            value: VAULTS_CONNECT_DEPOSIT,
-          },
-        ),
-      decodeResult: async (receipt) => this.createVaultParseEvents(receipt),
+        parsedProps.dashboard.write.fund({ ...options, value: props.value }),
     });
   }
 
-  // Utils
+  public fundPopulateTx(props: FundByVaultPros): Promise<PopulatedTransaction>;
+  public fundPopulateTx(
+    props: FundByDashboardPros,
+  ): Promise<PopulatedTransaction>;
 
-  @Logger('Utils:')
-  private async createVaultParseEvents(
-    receipt: TransactionReceipt,
-  ): Promise<CreateVaultResult> {
-    let vault: Address | undefined;
-    let dashboard: Address | undefined;
-    for (const log of receipt.logs) {
-      if (log.topics[0] === LidoSDKVault.VAULT_CREATED_SIGNATURE) {
-        const parsedLog = decodeEventLog({
-          abi: VaultCreatedEventAbi,
-          strict: true,
-          ...log,
-        });
-
-        if (isAddress(parsedLog.args.vault)) {
-          vault = parsedLog.args.vault;
-        }
-      } else if (log.topics[0] === LidoSDKVault.DASHBOARD_CREATED_SIGNATURE) {
-        const parsedLog = decodeEventLog({
-          abi: DashboardCreatedEventAbi,
-          strict: true,
-          ...log,
-        });
-
-        if (isAddress(parsedLog.args.dashboard)) {
-          dashboard = parsedLog.args.dashboard;
-        }
-      }
-    }
-
-    invariant(
-      dashboard,
-      'could not find DashboardCreated event in transaction',
-      ERROR_CODE.TRANSACTION_ERROR,
-    );
-
-    invariant(
-      vault,
-      'could not find VaultCreated event in transaction',
-      ERROR_CODE.TRANSACTION_ERROR,
-    );
+  async fundPopulateTx(
+    props: FundByVaultPros | FundByDashboardPros,
+  ): Promise<PopulatedTransaction> {
+    const parsedProps = await this.parseProps(props);
 
     return {
-      vault,
-      dashboard,
+      from: parsedProps.account.address,
+      to: parsedProps.dashboard.address,
+      value: parsedProps.value,
+      data: encodeFunctionData({
+        abi: parsedProps.dashboard.abi,
+        functionName: 'fund',
+        args: [],
+      }),
     };
   }
 
-  @Logger('Utils:')
-  @Cache(30 * 1000, ['core.chain.id'])
-  public async createVaultEstimateGas(
-    props: NoTxOptions<CreateVaultProps>,
-    options?: TransactionOptions,
-  ): Promise<bigint> {
-    const {
-      defaultAdmin,
-      nodeOperator,
-      nodeOperatorManager,
-      nodeOperatorFeeBP,
-      confirmExpiry,
-      roleAssignments,
-    } = props;
-    const { account } = await this.parseProps(props);
-    const contract = await this.getContractVaultFactory();
-    const originalGasLimit =
-      await contract.estimateGas.createVaultWithDashboard(
-        [
-          defaultAdmin,
-          nodeOperator,
-          nodeOperatorManager,
-          nodeOperatorFeeBP,
-          confirmExpiry,
-          roleAssignments,
-        ],
-        {
-          account,
-          ...options,
-          value: VAULTS_CONNECT_DEPOSIT,
-        },
-      );
+  private async parseProps(props: FundByVaultPros | FundByDashboardPros) {
+    let dashboard;
+    if ('dashboardAddress' in props) {
+      dashboard = await this.getVaultDashboard(props.dashboardAddress);
+    } else {
+      const vaultHub = await this.getVaultHub();
+      const vaultConnection = await vaultHub.read.vaultConnection([
+        props.vaultAddress,
+      ]);
+      const dashboardAddress = vaultConnection.owner;
+      dashboard = await this.getVaultDashboard(dashboardAddress);
+    }
 
-    const gasLimit =
-      (originalGasLimit *
-        BigInt(
-          GAS_TRANSACTION_RATIO_PRECISION * SUBMIT_EXTRA_GAS_TRANSACTION_RATIO,
-        )) /
-      BigInt(GAS_TRANSACTION_RATIO_PRECISION);
-
-    return gasLimit;
-  }
-
-  private async parseProps(props: CreateVaultProps) {
     return {
       ...props,
-      account: await this.core.useAccount(props.account),
+      dashboard,
       callback: props.callback ?? NOOP,
+      account: await this.core.useAccount(props.account),
     };
   }
 }
