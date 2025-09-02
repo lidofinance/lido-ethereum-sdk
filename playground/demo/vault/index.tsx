@@ -56,7 +56,7 @@ export const VaultDemo = () => {
         action={() =>
           vault.fund({
             account,
-            address: fundAddress,
+            vaultAddress: fundAddress,
             value: fundEthValue ?? BigInt(0),
           })
         }
