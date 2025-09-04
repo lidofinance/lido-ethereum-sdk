@@ -1,39 +1,19 @@
-import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
-import { Cache, Logger } from '../common/decorators/index.js';
+import { Address } from 'viem';
 import {
-  Address,
-  getContract,
-  GetContractReturnType,
-  WalletClient,
-} from 'viem';
-import { VaultViewerAbi } from './abi/index.js';
-import { vaultsAddresses } from './consts/vaults-addresses.js';
-import { FetchVaultsProps, FetchVaultsResult } from './types.js';
+  FetchVaultsEntitiesResult,
+  FetchVaultsProps,
+  FetchVaultsResult,
+} from './types.js';
+import { BusModule } from './bus-module.js';
+import { LidoSDKVaultEntity } from './vault-entity.js';
 
-export class LidoSDKVaultViewer extends LidoSDKModule {
-  @Logger('Contracts:')
-  @Cache(30 * 60 * 1000, [])
-  public async getContractVaultViewer(): Promise<
-    GetContractReturnType<typeof VaultViewerAbi, WalletClient>
-  > {
-    const address = vaultsAddresses.vaultViewer;
-
-    return getContract({
-      address,
-      abi: VaultViewerAbi,
-      client: {
-        public: this.core.rpcProvider,
-        wallet: this.core.web3Provider as WalletClient,
-      },
-    });
-  }
-
+export class LidoSDKVaultViewer extends BusModule {
   public async fetchConnectedVaults(
     params: FetchVaultsProps,
   ): Promise<FetchVaultsResult> {
-    const vaultViewer = await this.getContractVaultViewer();
+    const vaultViewer = await this.bus.contracts.getContractVaultViewer();
     const account = params.account
-      ? await this.core.useAccount(params.account)
+      ? await this.bus.core.useAccount(params.account)
       : null;
 
     const fromCursor = BigInt(params.perPage * (params.page - 1));
@@ -52,6 +32,37 @@ export class LidoSDKVaultViewer extends LidoSDKModule {
 
     return {
       data: vaultAddresses as Address[],
+      total: totalVaultsCount,
+    };
+  }
+
+  public async fetchConnectedVaultEntities(
+    params: FetchVaultsProps,
+  ): Promise<FetchVaultsEntitiesResult> {
+    const vaultViewer = await this.bus.contracts.getContractVaultViewer();
+    const account = params.account
+      ? await this.bus.core.useAccount(params.account)
+      : null;
+
+    const fromCursor = BigInt(params.perPage * (params.page - 1));
+    const toCursor = BigInt(params.page * params.perPage);
+
+    const [vaultAddresses, leftOver] = await (account
+      ? vaultViewer.read.vaultsByOwnerBound([
+          account.address,
+          fromCursor,
+          toCursor,
+        ])
+      : vaultViewer.read.vaultsConnectedBound([fromCursor, toCursor]));
+
+    const totalVaultsCount =
+      Number(fromCursor) + vaultAddresses.length + Number(leftOver);
+
+    const data = vaultAddresses.map(
+      (v) => new LidoSDKVaultEntity({ bus: this.bus, vaultAddress: v }),
+    );
+    return {
+      data,
       total: totalVaultsCount,
     };
   }

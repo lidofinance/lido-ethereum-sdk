@@ -1,62 +1,26 @@
 import {
   type Address,
   decodeEventLog,
-  getAbiItem,
-  getContract,
   isAddress,
-  toEventHash,
   TransactionReceipt,
   type WriteContractParameters,
 } from 'viem';
-import type { GetContractReturnType, WalletClient } from 'viem';
 import { type TransactionResult, TransactionOptions } from '../core/index.js';
 import type { NoTxOptions } from '../core/types.js';
-import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
+import { Logger, ErrorHandler } from '../common/decorators/index.js';
 import { NOOP } from '../common/constants.js';
 import { CreateVaultProps, CreateVaultResult } from './types.js';
 
 import {
   DashboardCreatedEventAbi,
   VaultCreatedEventAbi,
-  VaultFactoryAbi,
 } from './abi/VaultFactory.js';
-import { vaultsAddresses } from './consts/vaults-addresses.js';
 import { VAULTS_CONNECT_DEPOSIT } from './consts/common.js';
 import { ERROR_CODE, invariant } from '../common/index.js';
-import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import { BusModule } from './bus-module.js';
+import { LidoSDKVaultContracts } from './vault-contracts.js';
 
-export class LidoSDKVaultFactory extends LidoSDKModule {
-  // Precomputed event signatures
-  private static VAULT_CREATED_SIGNATURE = toEventHash(
-    getAbiItem({
-      abi: VaultCreatedEventAbi,
-      name: 'VaultCreated',
-    }),
-  );
-  private static DASHBOARD_CREATED_SIGNATURE = toEventHash(
-    getAbiItem({
-      abi: DashboardCreatedEventAbi,
-      name: 'DashboardCreated',
-    }),
-  );
-
-  @Logger('Contracts:')
-  @Cache(30 * 60 * 1000, [])
-  public async getContractVaultFactory(): Promise<
-    GetContractReturnType<typeof VaultFactoryAbi, WalletClient>
-  > {
-    const address = vaultsAddresses.vaultFactory;
-
-    return getContract({
-      address,
-      abi: VaultFactoryAbi,
-      client: {
-        public: this.core.rpcProvider,
-        wallet: this.core.web3Provider as WalletClient,
-      },
-    });
-  }
-
+export class LidoSDKVaultFactory extends BusModule {
   // Calls
   // todo min max confirmExpiry
   // todo roles enum
@@ -65,11 +29,11 @@ export class LidoSDKVaultFactory extends LidoSDKModule {
   public async createVault(
     props: CreateVaultProps,
   ): Promise<TransactionResult<CreateVaultResult>> {
-    this.core.useWeb3Provider();
+    this.bus.core.useWeb3Provider();
     const { callback, account, txArgs, ...rest } = await this.parseProps(props);
-    const contract = await this.getContractVaultFactory();
+    const contract = await this.bus.contracts.getContractVaultFactory();
 
-    return this.core.performTransaction<CreateVaultResult>({
+    return this.bus.core.performTransaction<CreateVaultResult>({
       ...rest,
       callback,
       account,
@@ -89,9 +53,9 @@ export class LidoSDKVaultFactory extends LidoSDKModule {
   public async createVaultSimulateTx(
     props: CreateVaultProps,
   ): Promise<WriteContractParameters> {
-    this.core.useWeb3Provider();
+    this.bus.core.useWeb3Provider();
     const { account, txArgs } = await this.parseProps(props);
-    const contract = await this.getContractVaultFactory();
+    const contract = await this.bus.contracts.getContractVaultFactory();
     const { request } = await contract.simulate.createVaultWithDashboard(
       txArgs,
       {
@@ -112,7 +76,7 @@ export class LidoSDKVaultFactory extends LidoSDKModule {
     let vault: Address | undefined;
     let dashboard: Address | undefined;
     for (const log of receipt.logs) {
-      if (log.topics[0] === LidoSDKVaultFactory.VAULT_CREATED_SIGNATURE) {
+      if (log.topics[0] === LidoSDKVaultContracts.VAULT_CREATED_SIGNATURE) {
         const parsedLog = decodeEventLog({
           abi: VaultCreatedEventAbi,
           strict: true,
@@ -123,7 +87,7 @@ export class LidoSDKVaultFactory extends LidoSDKModule {
           vault = parsedLog.args.vault;
         }
       } else if (
-        log.topics[0] === LidoSDKVaultFactory.DASHBOARD_CREATED_SIGNATURE
+        log.topics[0] === LidoSDKVaultContracts.DASHBOARD_CREATED_SIGNATURE
       ) {
         const parsedLog = decodeEventLog({
           abi: DashboardCreatedEventAbi,
@@ -161,7 +125,7 @@ export class LidoSDKVaultFactory extends LidoSDKModule {
     options?: TransactionOptions,
   ): Promise<bigint> {
     const { account, txArgs } = await this.parseProps(props);
-    const contract = await this.getContractVaultFactory();
+    const contract = await this.bus.contracts.getContractVaultFactory();
     return await contract.estimateGas.createVaultWithDashboard(txArgs, {
       account,
       ...options,
@@ -189,7 +153,7 @@ export class LidoSDKVaultFactory extends LidoSDKModule {
         confirmExpiry,
         roleAssignments,
       ] as const,
-      account: await this.core.useAccount(props.account),
+      account: await this.bus.core.useAccount(props.account),
       callback: props.callback ?? NOOP,
     };
   }
