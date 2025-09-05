@@ -70,7 +70,7 @@ jobs:
       - name: Move artifacts
         run: mkdir -p ./apps && mkdir -p ./apps/playground && mv ./playground/out/* ./apps/playground && mv ./docs/build/* ./apps
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./apps
 
