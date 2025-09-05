@@ -13,8 +13,7 @@ export type CreateVaultProps = CommonTransactionProps & {
 };
 
 export type CreateVaultResult = {
-  vault: Address;
-  dashboard: Address;
+  vault: LidoSDKVaultEntity;
 };
 
 export type FundPros = CommonTransactionProps & {
@@ -29,6 +28,16 @@ export type WithdrawProps = CommonTransactionProps & {
 export type FetchVaultsProps = CommonTransactionProps & {
   perPage: number;
   page: number;
+};
+
+export type MintSharesProps = CommonTransactionProps & {
+  recipient: Address;
+  amountOfShares: bigint;
+};
+
+export type MintEthProps = CommonTransactionProps & {
+  recipient: Address;
+  amount: bigint;
 };
 
 export type FetchVaultsResult = {

@@ -19,6 +19,7 @@ import { VAULTS_CONNECT_DEPOSIT } from './consts/common.js';
 import { ERROR_CODE, invariant } from '../common/index.js';
 import { BusModule } from './bus-module.js';
 import { LidoSDKVaultContracts } from './vault-contracts.js';
+import { LidoSDKVaultEntity } from './vault-entity.js';
 
 export class LidoSDKVaultFactory extends BusModule {
   // Calls
@@ -114,8 +115,7 @@ export class LidoSDKVaultFactory extends BusModule {
     );
 
     return {
-      vault,
-      dashboard,
+      vault: this.vaultFromAddress(vault, dashboard),
     };
   }
 
@@ -156,5 +156,13 @@ export class LidoSDKVaultFactory extends BusModule {
       account: await this.bus.core.useAccount(props.account),
       callback: props.callback ?? NOOP,
     };
+  }
+
+  vaultFromAddress(vaultAddress: Address, dashboardAddress?: Address) {
+    return new LidoSDKVaultEntity({
+      bus: this.bus,
+      vaultAddress,
+      dashboardAddress,
+    });
   }
 }

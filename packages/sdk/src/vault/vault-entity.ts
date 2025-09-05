@@ -13,6 +13,8 @@ import { BusModule } from './bus-module.js';
 import {
   FundPros,
   type LidoSDKVaultsModuleProps,
+  MintEthProps,
+  MintSharesProps,
   WithdrawProps,
 } from './types.js';
 import { NOOP } from '../common/index.js';
@@ -32,6 +34,27 @@ export class LidoSDKVaultEntity extends BusModule {
     super(props);
     this.vaultAddress = props.vaultAddress;
     this.dashboardAddress = props.dashboardAddress;
+  }
+
+  private async parseProps<TProps extends CommonTransactionProps>(
+    props: TProps,
+  ): Promise<
+    ParsedProps<
+      TProps & {
+        dashboard: GetContractReturnType<typeof DashboardAbi, WalletClient>;
+      }
+    >
+  > {
+    const dashboardAddress = await this.getDashboardAddress();
+    const dashboard =
+      await this.bus.contracts.getVaultDashboard(dashboardAddress);
+
+    return {
+      ...props,
+      dashboard,
+      callback: props.callback ?? NOOP,
+      account: await this.bus.core.useAccount(props.account),
+    };
   }
 
   public getVaultAddress(): Address {
@@ -84,27 +107,7 @@ export class LidoSDKVaultEntity extends BusModule {
     };
   }
 
-  private async parseProps<TProps extends CommonTransactionProps>(
-    props: TProps,
-  ): Promise<
-    ParsedProps<
-      TProps & {
-        dashboard: GetContractReturnType<typeof DashboardAbi, WalletClient>;
-      }
-    >
-  > {
-    const dashboardAddress = await this.getDashboardAddress();
-    const dashboard =
-      await this.bus.contracts.getVaultDashboard(dashboardAddress);
-
-    return {
-      ...props,
-      dashboard,
-      callback: props.callback ?? NOOP,
-      account: await this.bus.core.useAccount(props.account),
-    };
-  }
-
+  // todo populateTx
   async withdraw(props: WithdrawProps) {
     const parsedProps = await this.parseProps(props);
 
@@ -120,6 +123,101 @@ export class LidoSDKVaultEntity extends BusModule {
           [props.address, props.amount],
           options,
         ),
+    });
+  }
+
+  async mintShares(props: MintSharesProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return this.bus.core.performTransaction({
+      ...parsedProps,
+      getGasLimit: (options) =>
+        parsedProps.dashboard.estimateGas.mintShares(
+          [props.recipient, props.amountOfShares],
+          options,
+        ),
+      sendTransaction: (options) =>
+        parsedProps.dashboard.write.mintShares(
+          [props.recipient, props.amountOfShares],
+          options,
+        ),
+    });
+  }
+
+  async mintStETH(props: MintEthProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return this.bus.core.performTransaction({
+      ...parsedProps,
+      getGasLimit: (options) =>
+        parsedProps.dashboard.estimateGas.mintStETH(
+          [props.recipient, props.amount],
+          options,
+        ),
+      sendTransaction: (options) =>
+        parsedProps.dashboard.write.mintStETH(
+          [props.recipient, props.amount],
+          options,
+        ),
+    });
+  }
+
+  async mintWstETH(props: MintEthProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return this.bus.core.performTransaction({
+      ...parsedProps,
+      getGasLimit: (options) =>
+        parsedProps.dashboard.estimateGas.mintWstETH(
+          [props.recipient, props.amount],
+          options,
+        ),
+      sendTransaction: (options) =>
+        parsedProps.dashboard.write.mintWstETH(
+          [props.recipient, props.amount],
+          options,
+        ),
+    });
+  }
+
+  // burn
+
+  async burnShares(props: MintSharesProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return this.bus.core.performTransaction({
+      ...parsedProps,
+      getGasLimit: (options) =>
+        parsedProps.dashboard.estimateGas.burnShares(
+          [props.amountOfShares],
+          options,
+        ),
+      sendTransaction: (options) =>
+        parsedProps.dashboard.write.burnShares([props.amountOfShares], options),
+    });
+  }
+
+  async burnStETH(props: MintEthProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return this.bus.core.performTransaction({
+      ...parsedProps,
+      getGasLimit: (options) =>
+        parsedProps.dashboard.estimateGas.burnStETH([props.amount], options),
+      sendTransaction: (options) =>
+        parsedProps.dashboard.write.burnStETH([props.amount], options),
+    });
+  }
+
+  async burnWstETH(props: MintEthProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return this.bus.core.performTransaction({
+      ...parsedProps,
+      getGasLimit: (options) =>
+        parsedProps.dashboard.estimateGas.burnWstETH([props.amount], options),
+      sendTransaction: (options) =>
+        parsedProps.dashboard.write.burnWstETH([props.amount], options),
     });
   }
 }
