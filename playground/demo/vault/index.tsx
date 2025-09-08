@@ -121,6 +121,16 @@ export const VaultDemo = () => {
           onChange={setWithdrawEthValue}
         />
       </Action>
+
+      <Action
+        title="Submit Report"
+        walletAction
+        action={() =>
+          vault.submitReport({
+            account,
+          })
+        }
+      />
     </Accordion>
   );
 };

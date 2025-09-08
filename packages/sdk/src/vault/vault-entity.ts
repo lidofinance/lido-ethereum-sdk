@@ -15,11 +15,14 @@ import {
   type LidoSDKVaultsModuleProps,
   MintEthProps,
   MintSharesProps,
+  SetRolesProps,
+  SubmitReportProps,
   WithdrawProps,
 } from './types.js';
 import { NOOP } from '../common/index.js';
 import type { ParsedProps } from '../unsteth/types.js';
 import { DashboardAbi } from './abi/index.js';
+import { getReportProofByVault } from './utils/report-proof.js';
 
 type LidoSDKVaultEntityProps = LidoSDKVaultsModuleProps & {
   dashboardAddress?: Address;
@@ -220,4 +223,71 @@ export class LidoSDKVaultEntity extends BusModule {
         parsedProps.dashboard.write.burnWstETH([props.amount], options),
     });
   }
+
+  // todo validate roles
+  async setRole(props: SetRolesProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return this.bus.core.performTransaction({
+      ...parsedProps,
+      getGasLimit: (options) =>
+        parsedProps.dashboard.estimateGas.grantRoles([props.roles], options),
+      sendTransaction: (options) =>
+        parsedProps.dashboard.write.grantRoles([props.roles], options),
+    });
+  }
+
+  async disburseNodeOperatorFee(props: CommonTransactionProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return this.bus.core.performTransaction({
+      ...parsedProps,
+      getGasLimit: (options) =>
+        parsedProps.dashboard.estimateGas.disburseNodeOperatorFee(options),
+      sendTransaction: (options) =>
+        parsedProps.dashboard.write.disburseNodeOperatorFee(options),
+    });
+  }
+
+  submitReport = async (props: SubmitReportProps) => {
+    const vaultAddress = this.getVaultAddress();
+    const { gateway } = props;
+    const parsedProps = await this.parseProps(props);
+
+    const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
+    const vaultHubContract = await this.bus.contracts.getVaultHub();
+
+    const [_vaultsDataTimestamp, _vaultsDataTreeRoot, vaultsDataReportCid] =
+      await lazyOracleContract.read.latestReportData();
+    const isReportFresh = await vaultHubContract.read.isReportFresh([
+      vaultAddress,
+    ]);
+
+    if (isReportFresh) {
+      throw new Error('Report is fresh. You dont need to submit it again');
+    }
+
+    const proof = await getReportProofByVault({
+      vault: vaultAddress,
+      cid: vaultsDataReportCid,
+      gateway,
+    });
+
+    const txArgs = [
+      vaultAddress,
+      BigInt(proof.data.totalValueWei),
+      BigInt(proof.data.fee),
+      BigInt(proof.data.liabilityShares),
+      BigInt(proof.data.slashingReserve),
+      proof.proof,
+    ] as const;
+
+    return this.bus.core.performTransaction({
+      ...parsedProps,
+      getGasLimit: (options) =>
+        lazyOracleContract.estimateGas.updateVaultData(txArgs, options),
+      sendTransaction: (options) =>
+        lazyOracleContract.write.updateVaultData(txArgs, options),
+    });
+  };
 }

@@ -18,6 +18,7 @@ import {
 } from './abi/index.js';
 import { vaultsAddresses } from './consts/vaults-addresses.js';
 import { BusModule } from './bus-module.js';
+import { LazyOracleAbi } from './abi/LazyOracle.js';
 
 export class LidoSDKVaultContracts extends BusModule {
   // Precomputed event signatures
@@ -109,6 +110,23 @@ export class LidoSDKVaultContracts extends BusModule {
     return getContract({
       address,
       abi: VaultViewerAbi,
+      client: {
+        public: this.bus.core.rpcProvider,
+        wallet: this.bus.core.web3Provider as WalletClient,
+      },
+    });
+  }
+
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
+  public async getContractLazyOracle(): Promise<
+    GetContractReturnType<typeof LazyOracleAbi, WalletClient>
+  > {
+    const address = vaultsAddresses.lazyOracle;
+
+    return getContract({
+      address,
+      abi: LazyOracleAbi,
       client: {
         public: this.bus.core.rpcProvider,
         wallet: this.bus.core.web3Provider as WalletClient,
