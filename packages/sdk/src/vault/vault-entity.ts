@@ -2,6 +2,7 @@ import {
   Address,
   encodeFunctionData,
   GetContractReturnType,
+  type Hash,
   WalletClient,
 } from 'viem';
 import {
@@ -11,18 +12,22 @@ import {
 } from '../core/types.js';
 import { BusModule } from './bus-module.js';
 import {
+  BurnProps,
+  BurnSharesProps,
   FundPros,
   type LidoSDKVaultsModuleProps,
-  MintEthProps,
+  MintProps,
   MintSharesProps,
   SetRolesProps,
   SubmitReportProps,
   WithdrawProps,
 } from './types.js';
-import { NOOP } from '../common/index.js';
+import { ERROR_CODE, NOOP } from '../common/index.js';
 import type { ParsedProps } from '../unsteth/types.js';
 import { DashboardAbi } from './abi/index.js';
 import { getReportProofByVault } from './utils/report-proof.js';
+import { ErrorHandler, Logger } from '../common/decorators/index.js';
+import { validateRole } from './consts/roles.js';
 
 type LidoSDKVaultEntityProps = LidoSDKVaultsModuleProps & {
   dashboardAddress?: Address;
@@ -78,6 +83,9 @@ export class LidoSDKVaultEntity extends BusModule {
     return this.dashboardAddress;
   }
 
+  // fund methods
+  @Logger('Call:')
+  @ErrorHandler()
   public async fund(props: FundPros): Promise<TransactionResult> {
     const parsedProps = await this.parseProps(props);
 
@@ -93,9 +101,9 @@ export class LidoSDKVaultEntity extends BusModule {
     });
   }
 
-  public fundPopulateTx(props: FundPros): Promise<PopulatedTransaction>;
-
-  async fundPopulateTx(props: FundPros): Promise<PopulatedTransaction> {
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async fundPopulateTx(props: FundPros): Promise<PopulatedTransaction> {
     const parsedProps = await this.parseProps(props);
 
     return {
@@ -110,8 +118,21 @@ export class LidoSDKVaultEntity extends BusModule {
     };
   }
 
-  // todo populateTx
-  async withdraw(props: WithdrawProps) {
+  @Logger('Call:')
+  @ErrorHandler()
+  public async fundSimulateTx(props: FundPros) {
+    this.bus.core.useWeb3Provider();
+    const { dashboard, account } = await this.parseProps(props);
+    return await dashboard.simulate.fund({
+      account,
+      value: props.value,
+    });
+  }
+
+  // withdraw methods
+  @Logger('Call:')
+  @ErrorHandler()
+  public async withdraw(props: WithdrawProps) {
     const parsedProps = await this.parseProps(props);
 
     return this.bus.core.performTransaction({
@@ -129,7 +150,39 @@ export class LidoSDKVaultEntity extends BusModule {
     });
   }
 
-  async mintShares(props: MintSharesProps) {
+  @Logger('Call:')
+  @ErrorHandler()
+  public async withdrawSimulateTx(props: WithdrawProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return await parsedProps.dashboard.simulate.withdraw(
+      [props.address, props.amount],
+      { account: parsedProps.account },
+    );
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async withdrawPopulateTx(
+    props: WithdrawProps,
+  ): Promise<PopulatedTransaction> {
+    const parsedProps = await this.parseProps(props);
+
+    return {
+      from: parsedProps.account.address,
+      to: parsedProps.dashboard.address,
+      data: encodeFunctionData({
+        abi: parsedProps.dashboard.abi,
+        functionName: 'withdraw',
+        args: [props.address, props.amount],
+      }),
+    };
+  }
+
+  // mint methods
+  @Logger('Call:')
+  @ErrorHandler()
+  public async mintShares(props: MintSharesProps) {
     const parsedProps = await this.parseProps(props);
 
     return this.bus.core.performTransaction({
@@ -147,7 +200,86 @@ export class LidoSDKVaultEntity extends BusModule {
     });
   }
 
-  async mintStETH(props: MintEthProps) {
+  @Logger('Call:')
+  @ErrorHandler()
+  public async mintSharesSimulateTx(props: MintSharesProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return await parsedProps.dashboard.simulate.mintShares(
+      [props.recipient, props.amountOfShares],
+      { account: parsedProps.account },
+    );
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async mintSharesPopulateTx(props: MintSharesProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return {
+      from: parsedProps.account.address,
+      to: parsedProps.dashboard.address,
+      data: encodeFunctionData({
+        abi: parsedProps.dashboard.abi,
+        functionName: 'mintShares',
+        args: [props.recipient, props.amountOfShares],
+      }),
+    };
+  }
+
+  @Logger('Call:')
+  @ErrorHandler()
+  public async mint(props: MintProps) {
+    if (props.token === 'wsteth') {
+      return this._mintWstETH(props);
+    } else if (props.token === 'steth') {
+      return this._mintStETH(props);
+    }
+
+    throw new Error('Unsupported token');
+  }
+
+  @Logger('Call:')
+  @ErrorHandler()
+  public async mintSimulateTx(props: MintProps) {
+    if (props.token === 'wsteth') {
+      return this._mintWstETHSimulateTx(props);
+    } else if (props.token === 'steth') {
+      return this._mintStETHSimulateTx(props);
+    }
+
+    throw new Error('Unsupported token');
+  }
+
+  private _validateToken(token: string) {
+    if (!['wsteth', 'steth'].includes(token)) {
+      throw this.bus.core.error({
+        code: ERROR_CODE.TRANSACTION_ERROR,
+        message: `Invalid token ${token}.`,
+      });
+    }
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async mintPopulateTx(props: MintProps) {
+    this._validateToken(props.token);
+
+    const parsedProps = await this.parseProps(props);
+    const functionName = props.token === 'steth' ? 'mintStETH' : 'mintWstETH';
+
+    return {
+      from: parsedProps.account.address,
+      to: parsedProps.dashboard.address,
+      data: encodeFunctionData({
+        abi: parsedProps.dashboard.abi,
+        functionName,
+        args: [props.recipient, props.amount],
+      }),
+    };
+  }
+
+  private async _mintStETH(props: MintProps) {
     const parsedProps = await this.parseProps(props);
 
     return this.bus.core.performTransaction({
@@ -165,7 +297,16 @@ export class LidoSDKVaultEntity extends BusModule {
     });
   }
 
-  async mintWstETH(props: MintEthProps) {
+  private async _mintStETHSimulateTx(props: MintProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return await parsedProps.dashboard.simulate.mintStETH(
+      [props.recipient, props.amount],
+      { account: parsedProps.account },
+    );
+  }
+
+  private async _mintWstETH(props: MintProps) {
     const parsedProps = await this.parseProps(props);
 
     return this.bus.core.performTransaction({
@@ -183,9 +324,19 @@ export class LidoSDKVaultEntity extends BusModule {
     });
   }
 
-  // burn
+  private async _mintWstETHSimulateTx(props: MintProps) {
+    const parsedProps = await this.parseProps(props);
 
-  async burnShares(props: MintSharesProps) {
+    return await parsedProps.dashboard.simulate.mintWstETH(
+      [props.recipient, props.amount],
+      { account: parsedProps.account },
+    );
+  }
+
+  // burn methods
+  @Logger('Call:')
+  @ErrorHandler()
+  public async burnShares(props: BurnSharesProps) {
     const parsedProps = await this.parseProps(props);
 
     return this.bus.core.performTransaction({
@@ -200,7 +351,46 @@ export class LidoSDKVaultEntity extends BusModule {
     });
   }
 
-  async burnStETH(props: MintEthProps) {
+  @Logger('Call:')
+  @ErrorHandler()
+  public async burnSharesSimulateTx(props: BurnSharesProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return await parsedProps.dashboard.simulate.burnShares(
+      [props.amountOfShares],
+      { account: parsedProps.account },
+    );
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async burnSharesPopulateTx(props: BurnSharesProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return {
+      from: parsedProps.account.address,
+      to: parsedProps.dashboard.address,
+      data: encodeFunctionData({
+        abi: parsedProps.dashboard.abi,
+        functionName: 'burnShares',
+        args: [props.amountOfShares],
+      }),
+    };
+  }
+
+  @Logger('Call:')
+  @ErrorHandler()
+  public burn(props: BurnProps) {
+    if (props.token === 'wsteth') {
+      return this._burnWstETH(props);
+    } else if (props.token === 'steth') {
+      return this._burnStETH(props);
+    }
+
+    throw new Error('Unsupported token');
+  }
+
+  private async _burnStETH(props: BurnProps) {
     const parsedProps = await this.parseProps(props);
 
     return this.bus.core.performTransaction({
@@ -212,7 +402,7 @@ export class LidoSDKVaultEntity extends BusModule {
     });
   }
 
-  async burnWstETH(props: MintEthProps) {
+  private async _burnWstETH(props: BurnProps) {
     const parsedProps = await this.parseProps(props);
 
     return this.bus.core.performTransaction({
@@ -224,8 +414,69 @@ export class LidoSDKVaultEntity extends BusModule {
     });
   }
 
-  // todo validate roles
-  async setRole(props: SetRolesProps) {
+  @Logger('Call:')
+  @ErrorHandler()
+  public async burnSimulateTx(props: BurnProps) {
+    if (props.token === 'wsteth') {
+      return this._burnWstETHSimulateTx(props);
+    } else if (props.token === 'steth') {
+      return this._burnStETHSimulateTx(props);
+    }
+
+    throw new Error('Unsupported token');
+  }
+
+  private async _burnStETHSimulateTx(props: BurnProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return await parsedProps.dashboard.simulate.burnStETH([props.amount], {
+      account: parsedProps.account,
+    });
+  }
+
+  private async _burnWstETHSimulateTx(props: BurnProps) {
+    const parsedProps = await this.parseProps(props);
+
+    return await parsedProps.dashboard.simulate.burnWstETH([props.amount], {
+      account: parsedProps.account,
+    });
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async burnPopulateTx(props: BurnProps) {
+    this._validateToken(props.token);
+
+    const parsedProps = await this.parseProps(props);
+    const functionName = props.token === 'steth' ? 'burnStETH' : 'burnWstETH';
+
+    return {
+      from: parsedProps.account.address,
+      to: parsedProps.dashboard.address,
+      data: encodeFunctionData({
+        abi: parsedProps.dashboard.abi,
+        functionName,
+        args: [props.amount],
+      }),
+    };
+  }
+
+  private _validateRoles(roles: Array<{ account: Address; role: Hash }>) {
+    for (const role of roles) {
+      if (!validateRole(role.role)) {
+        throw this.bus.core.error({
+          code: ERROR_CODE.TRANSACTION_ERROR,
+          message: `Invalid role "${role.role}" found.`,
+        });
+      }
+    }
+  }
+
+  // set role methods
+  @Logger('Call:')
+  @ErrorHandler()
+  public async grantRoles(props: SetRolesProps) {
+    this._validateRoles(props.roles);
     const parsedProps = await this.parseProps(props);
 
     return this.bus.core.performTransaction({
@@ -237,7 +488,38 @@ export class LidoSDKVaultEntity extends BusModule {
     });
   }
 
-  async disburseNodeOperatorFee(props: CommonTransactionProps) {
+  @Logger('Call:')
+  @ErrorHandler()
+  public async grantRolesSimulateTx(props: SetRolesProps) {
+    this._validateRoles(props.roles);
+    const parsedProps = await this.parseProps(props);
+
+    return parsedProps.dashboard.simulate.grantRoles([props.roles], {
+      account: parsedProps.account,
+    });
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async grantRolesPopulateTx(props: SetRolesProps) {
+    this._validateRoles(props.roles);
+    const parsedProps = await this.parseProps(props);
+
+    return {
+      from: parsedProps.account.address,
+      to: parsedProps.dashboard.address,
+      data: encodeFunctionData({
+        abi: parsedProps.dashboard.abi,
+        functionName: 'grantRoles',
+        args: [props.roles],
+      }),
+    };
+  }
+
+  // disburseNodeOperatorFee methods
+  @Logger('Call:')
+  @ErrorHandler()
+  public async disburseNodeOperatorFee(props: CommonTransactionProps) {
     const parsedProps = await this.parseProps(props);
 
     return this.bus.core.performTransaction({
@@ -249,22 +531,54 @@ export class LidoSDKVaultEntity extends BusModule {
     });
   }
 
-  submitReport = async (props: SubmitReportProps) => {
+  @Logger('Call:')
+  @ErrorHandler()
+  public async disburseNodeOperatorFeeSimulateTx(
+    props: CommonTransactionProps,
+  ) {
+    const parsedProps = await this.parseProps(props);
+
+    return parsedProps.dashboard.simulate.disburseNodeOperatorFee({
+      account: parsedProps.account,
+    });
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async disburseNodeOperatorFeePopulateTx(
+    props: CommonTransactionProps,
+  ) {
+    const parsedProps = await this.parseProps(props);
+
+    return {
+      from: parsedProps.account.address,
+      to: parsedProps.dashboard.address,
+      data: encodeFunctionData({
+        abi: parsedProps.dashboard.abi,
+        functionName: 'disburseNodeOperatorFee',
+        args: [],
+      }),
+    };
+  }
+
+  private async getSubmitReportTxArgs(props: SubmitReportProps) {
     const vaultAddress = this.getVaultAddress();
     const { gateway } = props;
-    const parsedProps = await this.parseProps(props);
 
     const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
     const vaultHubContract = await this.bus.contracts.getVaultHub();
 
     const [_vaultsDataTimestamp, _vaultsDataTreeRoot, vaultsDataReportCid] =
       await lazyOracleContract.read.latestReportData();
-    const isReportFresh = await vaultHubContract.read.isReportFresh([
-      vaultAddress,
-    ]);
 
-    if (isReportFresh) {
-      throw new Error('Report is fresh. You dont need to submit it again');
+    if (!props.skipIsFresh) {
+      const isReportFresh = await vaultHubContract.read.isReportFresh([
+        vaultAddress,
+      ]);
+
+      if (isReportFresh) {
+        throw new Error('Report is fresh. You dont need to submit it again');
+      }
     }
 
     const proof = await getReportProofByVault({
@@ -273,7 +587,7 @@ export class LidoSDKVaultEntity extends BusModule {
       gateway,
     });
 
-    const txArgs = [
+    return [
       vaultAddress,
       BigInt(proof.data.totalValueWei),
       BigInt(proof.data.fee),
@@ -281,6 +595,14 @@ export class LidoSDKVaultEntity extends BusModule {
       BigInt(proof.data.slashingReserve),
       proof.proof,
     ] as const;
+  }
+
+  @Logger('Call:')
+  @ErrorHandler()
+  async submitReport(props: SubmitReportProps) {
+    const parsedProps = await this.parseProps(props);
+    const txArgs = await this.getSubmitReportTxArgs(props);
+    const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
 
     return this.bus.core.performTransaction({
       ...parsedProps,
@@ -289,5 +611,35 @@ export class LidoSDKVaultEntity extends BusModule {
       sendTransaction: (options) =>
         lazyOracleContract.write.updateVaultData(txArgs, options),
     });
-  };
+  }
+
+  @Logger('Call:')
+  @ErrorHandler()
+  async submitReportSimulateTx(props: SubmitReportProps) {
+    const parsedProps = await this.parseProps(props);
+    const txArgs = await this.getSubmitReportTxArgs(props);
+    const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
+
+    return lazyOracleContract.estimateGas.updateVaultData(txArgs, {
+      account: parsedProps.account,
+    });
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  async submitReportPopulateTx(props: SubmitReportProps) {
+    const parsedProps = await this.parseProps(props);
+    const txArgs = await this.getSubmitReportTxArgs(props);
+    const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
+
+    return {
+      from: parsedProps.account.address,
+      to: lazyOracleContract.address,
+      data: encodeFunctionData({
+        abi: lazyOracleContract.abi,
+        functionName: 'updateVaultData',
+        args: txArgs,
+      }),
+    };
+  }
 }

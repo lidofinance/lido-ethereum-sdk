@@ -1,13 +1,14 @@
 import {
   type Address,
   decodeEventLog,
+  type Hash,
   isAddress,
   TransactionReceipt,
   type WriteContractParameters,
 } from 'viem';
-import { type TransactionResult, TransactionOptions } from '../core/index.js';
+import { TransactionOptions, type TransactionResult } from '../core/index.js';
 import type { NoTxOptions } from '../core/types.js';
-import { Logger, ErrorHandler } from '../common/decorators/index.js';
+import { ErrorHandler, Logger } from '../common/decorators/index.js';
 import { NOOP } from '../common/constants.js';
 import { CreateVaultProps, CreateVaultResult } from './types.js';
 
@@ -15,21 +16,59 @@ import {
   DashboardCreatedEventAbi,
   VaultCreatedEventAbi,
 } from './abi/VaultFactory.js';
-import { VAULTS_CONNECT_DEPOSIT } from './consts/common.js';
+import {
+  MAX_CONFIRM_EXPIRY,
+  MIN_CONFIRM_EXPIRY,
+  VAULTS_CONNECT_DEPOSIT,
+} from './consts/common.js';
 import { ERROR_CODE, invariant } from '../common/index.js';
 import { BusModule } from './bus-module.js';
 import { LidoSDKVaultContracts } from './vault-contracts.js';
 import { LidoSDKVaultEntity } from './vault-entity.js';
+import { validateRole } from './consts/roles.js';
 
 export class LidoSDKVaultFactory extends BusModule {
-  // Calls
-  // todo min max confirmExpiry
-  // todo roles enum
+  private _validateNodeOperatorFeeRate(nodeOperatorFeeRate: bigint) {
+    if (nodeOperatorFeeRate > 100) {
+      throw this.bus.core.error({
+        code: ERROR_CODE.INVALID_ARGUMENT,
+        message: 'Invalid node operator fee rate.',
+      });
+    }
+  }
+
+  private _validateConfirmExpiry(confirmExpiry: bigint) {
+    if (
+      confirmExpiry < MIN_CONFIRM_EXPIRY ||
+      confirmExpiry > MAX_CONFIRM_EXPIRY
+    ) {
+      throw this.bus.core.error({
+        code: ERROR_CODE.INVALID_ARGUMENT,
+        message: 'Invalid confirm expiry.',
+      });
+    }
+  }
+
+  private _validateRoles(roles: Array<{ account: Address; role: Hash }>) {
+    for (const role of roles) {
+      if (!validateRole(role.role)) {
+        throw this.bus.core.error({
+          code: ERROR_CODE.INVALID_ARGUMENT,
+          message: `Invalid role "${role.role}" found.`,
+        });
+      }
+    }
+  }
+
   @Logger('Call:')
   @ErrorHandler()
   public async createVault(
     props: CreateVaultProps,
   ): Promise<TransactionResult<CreateVaultResult>> {
+    this._validateRoles(props.roleAssignments);
+    this._validateNodeOperatorFeeRate(props.nodeOperatorFeeBP);
+    this._validateConfirmExpiry(props.confirmExpiry);
+
     this.bus.core.useWeb3Provider();
     const { callback, account, txArgs, ...rest } = await this.parseProps(props);
     const contract = await this.bus.contracts.getContractVaultFactory();
@@ -114,9 +153,7 @@ export class LidoSDKVaultFactory extends BusModule {
       ERROR_CODE.TRANSACTION_ERROR,
     );
 
-    return {
-      vault: this.vaultFromAddress(vault, dashboard),
-    };
+    return this.vaultFromAddress(vault, dashboard);
   }
 
   @Logger('Utils:')
@@ -158,6 +195,7 @@ export class LidoSDKVaultFactory extends BusModule {
     };
   }
 
+  @Logger('Utils:')
   vaultFromAddress(vaultAddress: Address, dashboardAddress?: Address) {
     return new LidoSDKVaultEntity({
       bus: this.bus,

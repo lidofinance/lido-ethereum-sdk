@@ -1,4 +1,4 @@
-import { Accordion, Input } from '@lidofinance/lido-ui';
+import { Accordion, Input, Select, Option, Block } from '@lidofinance/lido-ui';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { Action } from 'components/action';
 import TokenInput, { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
@@ -6,6 +6,7 @@ import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
 import type { Address } from 'viem';
 import { LidoSDKVaultEntity } from '@lidofinance/lido-ethereum-sdk';
+import { ActionBlock } from '../../components/action/styles';
 
 export const VaultDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
@@ -14,9 +15,10 @@ export const VaultDemo = () => {
   const { vaultFactory, vaultViewer, contracts } = vaultModule;
 
   const [fundEthValue, setFundEthValue] = useState<ValueType>(DEFAULT_VALUE);
-  const [fundAddress, setFundAddress] = useState<Address>('0x0');
   const [vaults, setVaults] = useState<LidoSDKVaultEntity[]>([]);
-  const vault = vaults[0];
+  const [currentVault, setCurrentVault] = useState<LidoSDKVaultEntity | null>(
+    null,
+  );
 
   const [withdrawEthValue, setWithdrawEthValue] =
     useState<ValueType>(DEFAULT_VALUE);
@@ -24,6 +26,24 @@ export const VaultDemo = () => {
 
   return (
     <Accordion summary="Vault">
+      <ActionBlock>
+        <Select
+          fullwidth
+          label="Select current Vault"
+          onChange={(v) =>
+            setCurrentVault(vaultFactory.vaultFromAddress(v as Address))
+          }
+        >
+          {vaults.map((vault) => (
+            <Option
+              key={vault.getVaultAddress()}
+              value={vault.getVaultAddress()}
+            >
+              {vault.getVaultAddress()}
+            </Option>
+          ))}
+        </Select>
+      </ActionBlock>
       <Action
         title="Create Vault"
         walletAction
@@ -75,21 +95,14 @@ export const VaultDemo = () => {
         title="Fund"
         walletAction
         action={() =>
-          vault.fund({
+          currentVault?.fund({
             account,
             value: fundEthValue ?? BigInt(0),
           })
         }
       >
-        <Input
-          label="Vault address"
-          placeholder="0x0000000"
-          value={fundAddress}
-          onChange={(e) => setFundAddress(e.currentTarget.value as Address)}
-        />
-
         <TokenInput
-          label="Vault amount"
+          label="Fund amount"
           value={fundEthValue}
           placeholder="0.0"
           onChange={setFundEthValue}
@@ -100,7 +113,7 @@ export const VaultDemo = () => {
         title="Withdraw"
         walletAction
         action={() =>
-          vault.withdraw({
+          currentVault?.withdraw({
             account,
             address: withdrawAddress,
             amount: withdrawEthValue ?? BigInt(0),
@@ -126,7 +139,7 @@ export const VaultDemo = () => {
         title="Submit Report"
         walletAction
         action={() =>
-          vault.submitReport({
+          currentVault?.submitReport({
             account,
           })
         }

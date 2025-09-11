@@ -1,4 +1,4 @@
-import type { Address, Hex } from 'viem';
+import type { Address, Hash, Hex } from 'viem';
 import type { Bus } from './bus.js';
 import type { CommonTransactionProps } from '../core/types.js';
 import { LidoSDKVaultEntity } from './vault-entity.js';
@@ -14,9 +14,7 @@ export type CreateVaultProps = CommonTransactionProps & {
   roleAssignments: Array<{ account: Address; role: `0x${string}` }>;
 };
 
-export type CreateVaultResult = {
-  vault: LidoSDKVaultEntity;
-};
+export type CreateVaultResult = LidoSDKVaultEntity;
 
 export type FundPros = CommonTransactionProps & {
   value: bigint;
@@ -37,9 +35,19 @@ export type MintSharesProps = CommonTransactionProps & {
   amountOfShares: bigint;
 };
 
-export type MintEthProps = CommonTransactionProps & {
+export type BurnSharesProps = CommonTransactionProps & {
+  amountOfShares: bigint;
+};
+
+export type MintProps = CommonTransactionProps & {
   recipient: Address;
   amount: bigint;
+  token: 'wsteth' | 'steth';
+};
+
+export type BurnProps = CommonTransactionProps & {
+  amount: bigint;
+  token: 'wsteth' | 'steth';
 };
 
 export type FetchVaultsResult = {
@@ -53,11 +61,12 @@ export type FetchVaultsEntitiesResult = {
 };
 
 export type SetRolesProps = CommonTransactionProps & {
-  roles: Array<{ account: Address; role: `0x${string}` }>;
+  roles: Array<{ account: Address; role: Hash }>;
 };
 
 export type SubmitReportProps = CommonTransactionProps & {
   gateway?: string;
+  skipIsFresh?: boolean;
 };
 
 // report proof types
