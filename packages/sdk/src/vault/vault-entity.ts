@@ -601,8 +601,8 @@ export class LidoSDKVaultEntity extends BusModule {
     const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
     const vaultHubContract = await this.bus.contracts.getVaultHub();
 
-    const [_vaultsDataTimestamp, _vaultsDataTreeRoot, vaultsDataReportCid] =
-      await lazyOracleContract.read.latestReportData();
+    const latestReportData = await lazyOracleContract.read.latestReportData();
+    const vaultsDataReportCid = latestReportData[2];
 
     if (!props.skipIsFresh) {
       const isReportFresh = await vaultHubContract.read.isReportFresh([

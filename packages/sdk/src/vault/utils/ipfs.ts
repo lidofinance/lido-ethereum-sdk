@@ -18,7 +18,6 @@ export const fetchIPFSBuffer = async (
 ): Promise<Uint8Array> => {
   const { cid, gateway = IPFS_GATEWAY } = args;
   const ipfsUrl = `${gateway}/${cid}`;
-  console.log('Fetching content from', ipfsUrl);
 
   const response = await fetch(ipfsUrl);
   if (!response.ok) {
@@ -67,16 +66,6 @@ export const fetchIPFSDirectAndVerify = async <T>(
     );
   }
 
-  console.log({
-    data: [
-      ['✅ CID verified, file matches IPFS hash'],
-      ['Original CID', originalCID.toString()],
-      ['Calculated CID', calculatedCID.toString()],
-    ],
-    params: {
-      head: ['Type', 'CID'],
-    },
-  });
   const json = JSON.parse(new TextDecoder().decode(fileContent)) as T;
   return {
     fileContent,
