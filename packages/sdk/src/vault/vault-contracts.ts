@@ -72,7 +72,10 @@ export class LidoSDKVaultContracts extends BusModule {
   public async getVaultHub(): Promise<
     GetContractReturnType<typeof VaultHubAbi, WalletClient>
   > {
-    const address = vaultsAddresses.vaultHub;
+    const address = await this.bus.core
+      .getContractLidoLocator()
+      .read.vaultHub();
+
     return getContract({
       address,
       abi: VaultHubAbi,
@@ -88,7 +91,9 @@ export class LidoSDKVaultContracts extends BusModule {
   public async getContractVaultFactory(): Promise<
     GetContractReturnType<typeof VaultFactoryAbi, WalletClient>
   > {
-    const address = vaultsAddresses.vaultFactory;
+    const address = await this.bus.core
+      .getContractLidoLocator()
+      .read.vaultFactory();
 
     return getContract({
       address,
@@ -122,7 +127,9 @@ export class LidoSDKVaultContracts extends BusModule {
   public async getContractLazyOracle(): Promise<
     GetContractReturnType<typeof LazyOracleAbi, WalletClient>
   > {
-    const address = vaultsAddresses.lazyOracle;
+    const address = await this.bus.core
+      .getContractLidoLocator()
+      .read.lazyOracle();
 
     return getContract({
       address,

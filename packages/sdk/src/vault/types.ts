@@ -3,6 +3,8 @@ import type { Bus } from './bus.js';
 import type { CommonTransactionProps } from '../core/types.js';
 import { LidoSDKVaultEntity } from './vault-entity.js';
 
+export type Token = 'steth' | 'wsteth';
+
 export type LidoSDKVaultsModuleProps = { bus: Bus; version?: string };
 
 export type CreateVaultProps = CommonTransactionProps & {
@@ -42,12 +44,17 @@ export type BurnSharesProps = CommonTransactionProps & {
 export type MintProps = CommonTransactionProps & {
   recipient: Address;
   amount: bigint;
-  token: 'wsteth' | 'steth';
+  token: Token;
 };
 
 export type BurnProps = CommonTransactionProps & {
   amount: bigint;
-  token: 'wsteth' | 'steth';
+  token: Token;
+};
+
+export type PopulateProps = CommonTransactionProps & {
+  amount: bigint;
+  token: Token;
 };
 
 export type FetchVaultsResult = {

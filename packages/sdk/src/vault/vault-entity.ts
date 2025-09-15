@@ -18,6 +18,7 @@ import {
   type LidoSDKVaultsModuleProps,
   MintProps,
   MintSharesProps,
+  PopulateProps,
   SetRolesProps,
   SubmitReportProps,
   WithdrawProps,
@@ -380,7 +381,39 @@ export class LidoSDKVaultEntity extends BusModule {
 
   @Logger('Call:')
   @ErrorHandler()
-  public burn(props: BurnProps) {
+  public async approve(props: PopulateProps) {
+    const isSteth = props.token === 'steth';
+    const tokenContract = isSteth ? this.bus.steth : this.bus.wsteth;
+    const dashboardAddress = await this.getDashboardAddress();
+
+    return await tokenContract.approve({
+      to: dashboardAddress,
+      amount: props.amount,
+    });
+  }
+
+  private async _validateAllowance(props: BurnProps) {
+    const isSteth = props.token === 'steth';
+    const tokenContract = isSteth ? this.bus.steth : this.bus.wsteth;
+    const dashboardAddress = await this.getDashboardAddress();
+
+    const allowance = await tokenContract.allowance({
+      to: dashboardAddress,
+    });
+
+    if (allowance < props.amount) {
+      throw this.bus.core.error({
+        code: ERROR_CODE.INVALID_ARGUMENT,
+        message: `Allowance less then amount. Required to populate approve for ${props.token}`,
+      });
+    }
+  }
+
+  @Logger('Call:')
+  @ErrorHandler()
+  public async burn(props: BurnProps) {
+    await this._validateAllowance(props);
+
     if (props.token === 'wsteth') {
       return this._burnWstETH(props);
     } else if (props.token === 'steth') {

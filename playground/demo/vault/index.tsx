@@ -7,12 +7,13 @@ import { useState } from 'react';
 import type { Address } from 'viem';
 import { LidoSDKVaultEntity } from '@lidofinance/lido-ethereum-sdk';
 import { ActionBlock } from '../../components/action/styles';
+import { Token } from '@lidofinance/lido-ethereum-sdk/src';
 
 export const VaultDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
   const account = web3account as `0x{string}`;
   const { vaultModule } = useLidoSDK();
-  const { vaultFactory, vaultViewer, contracts } = vaultModule;
+  const { vaultFactory, vaultViewer } = vaultModule;
 
   const [fundEthValue, setFundEthValue] = useState<ValueType>(DEFAULT_VALUE);
   const [vaults, setVaults] = useState<LidoSDKVaultEntity[]>([]);
@@ -23,6 +24,14 @@ export const VaultDemo = () => {
   const [withdrawEthValue, setWithdrawEthValue] =
     useState<ValueType>(DEFAULT_VALUE);
   const [withdrawAddress, setWithdrawAddress] = useState<Address>(account);
+  const [minRecipient, setMinRecipient] = useState<Address>(account);
+  const [mintEthValue, setMintEthValue] = useState<ValueType>(DEFAULT_VALUE);
+  const [mintTokenValue, setMintTokenValue] = useState<Token>('steth');
+  const [burnEthValue, setBurnEthValue] = useState<ValueType>(DEFAULT_VALUE);
+  const [burnTokenValue, setBurnTokenValue] = useState<Token>('steth');
+  const [approveEthValue, setApproveEthValue] =
+    useState<ValueType>(DEFAULT_VALUE);
+  const [approveTokenValue, setApproveTokenValue] = useState<Token>('steth');
 
   return (
     <Accordion summary="Vault">
@@ -30,6 +39,7 @@ export const VaultDemo = () => {
         <Select
           fullwidth
           label="Select current Vault"
+          value={currentVault?.getVaultAddress()}
           onChange={(v) =>
             setCurrentVault(vaultFactory.vaultFromAddress(v as Address))
           }
@@ -44,6 +54,22 @@ export const VaultDemo = () => {
           ))}
         </Select>
       </ActionBlock>
+
+      <Action
+        title="Get Vault Entities List"
+        walletAction
+        action={async () => {
+          const result = await vaultViewer.fetchConnectedVaultEntities({
+            account,
+            page: 1,
+            perPage: 10,
+          });
+          setVaults(result.data);
+          setCurrentVault(result.data[0]);
+          return { result: result.data.length };
+        }}
+      />
+
       <Action
         title="Create Vault"
         walletAction
@@ -58,37 +84,6 @@ export const VaultDemo = () => {
             roleAssignments: [],
           })
         }
-      />
-      <Action
-        title="Get Contract Vault Factory"
-        action={async () => (await contracts.getContractVaultFactory()).abi}
-      />
-
-      <Action
-        title="Get Vault List Addresses"
-        walletAction
-        action={async () => {
-          const result = await vaultViewer.fetchConnectedVaults({
-            account,
-            page: 1,
-            perPage: 10,
-          });
-          return { result };
-        }}
-      />
-
-      <Action
-        title="Get Vault Entities List"
-        walletAction
-        action={async () => {
-          const result = await vaultViewer.fetchConnectedVaultEntities({
-            account,
-            page: 1,
-            perPage: 10,
-          });
-          setVaults(result.data);
-          return { result: result.data.length };
-        }}
       />
 
       <Action
@@ -132,6 +127,85 @@ export const VaultDemo = () => {
           value={withdrawEthValue}
           placeholder="0.0"
           onChange={setWithdrawEthValue}
+        />
+      </Action>
+
+      <Action
+        title="Mint"
+        walletAction
+        action={() =>
+          currentVault?.mint({
+            recipient: minRecipient,
+            amount: mintEthValue ?? BigInt(0),
+            token: mintTokenValue,
+          })
+        }
+      >
+        <Input
+          label="Mint recipient"
+          placeholder="0x0000000"
+          value={minRecipient}
+          onChange={(e) => setMinRecipient(e.currentTarget.value as Address)}
+        />
+        <Input
+          label="Mint token"
+          value={mintTokenValue}
+          placeholder="steth"
+          onChange={(e) => setMintTokenValue(e.currentTarget.value as Token)}
+        />
+        <TokenInput
+          label="Mint amount"
+          value={mintEthValue}
+          placeholder="0.0"
+          onChange={setMintEthValue}
+        />
+      </Action>
+
+      <Action
+        title="Approve"
+        walletAction
+        action={() =>
+          currentVault?.approve({
+            amount: approveEthValue ?? BigInt(0),
+            token: 'steth',
+          })
+        }
+      >
+        <TokenInput
+          label="Approve amount"
+          value={approveEthValue}
+          placeholder="0.0"
+          onChange={setApproveEthValue}
+        />
+        <Input
+          label="Approve token"
+          value={approveTokenValue}
+          placeholder="steth"
+          onChange={(e) => setApproveTokenValue(e.currentTarget.value as Token)}
+        />
+      </Action>
+
+      <Action
+        title="Burn"
+        walletAction
+        action={() =>
+          currentVault?.burn({
+            amount: burnEthValue ?? BigInt(0),
+            token: 'steth',
+          })
+        }
+      >
+        <TokenInput
+          label="Burn amount"
+          value={burnEthValue}
+          placeholder="0.0"
+          onChange={setBurnEthValue}
+        />
+        <Input
+          label="Burn token"
+          value={burnTokenValue}
+          placeholder="steth"
+          onChange={(e) => setBurnTokenValue(e.currentTarget.value as Token)}
         />
       </Action>
 
