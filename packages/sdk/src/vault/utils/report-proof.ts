@@ -8,7 +8,7 @@ import {
   VaultReport,
   VaultReportArgs,
 } from '../types.js';
-import { snakeToCamel } from './snake-to-camel.js';
+import { snakeToCamel } from '../../common/utils/snake-to-camel.js';
 
 export const getReportProofByVault = async (args: VaultReportArgs) => {
   const { vault } = args;

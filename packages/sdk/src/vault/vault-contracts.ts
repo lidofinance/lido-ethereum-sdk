@@ -1,4 +1,3 @@
-import { Cache, Logger } from '../common/decorators/index.js';
 import {
   Address,
   getAbiItem,
@@ -16,6 +15,7 @@ import {
   VaultHubAbi,
   VaultViewerAbi,
 } from './abi/index.js';
+import { Cache, Logger } from '../common/decorators/index.js';
 import { vaultsAddresses } from './consts/vaults-addresses.js';
 import { BusModule } from './bus-module.js';
 import { LazyOracleAbi } from './abi/LazyOracle.js';
@@ -117,7 +117,6 @@ export class LidoSDKVaultContracts extends BusModule {
       abi: VaultViewerAbi,
       client: {
         public: this.bus.core.rpcProvider,
-        wallet: this.bus.core.web3Provider as WalletClient,
       },
     });
   }

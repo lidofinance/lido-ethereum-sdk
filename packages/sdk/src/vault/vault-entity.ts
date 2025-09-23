@@ -1,10 +1,5 @@
-import {
-  Address,
-  encodeFunctionData,
-  GetContractReturnType,
-  type Hash,
-  WalletClient,
-} from 'viem';
+import { encodeFunctionData } from 'viem';
+import type { Address, Hash, GetContractReturnType, WalletClient } from 'viem';
 import {
   CommonTransactionProps,
   PopulatedTransaction,
@@ -27,7 +22,7 @@ import { ERROR_CODE, NOOP } from '../common/index.js';
 import type { ParsedProps } from '../unsteth/types.js';
 import { DashboardAbi } from './abi/index.js';
 import { getReportProofByVault } from './utils/report-proof.js';
-import { ErrorHandler, Logger } from '../common/decorators/index.js';
+import { Cache, ErrorHandler, Logger } from '../common/decorators/index.js';
 import { validateRole } from './consts/roles.js';
 
 type LidoSDKVaultEntityProps = LidoSDKVaultsModuleProps & {
@@ -70,6 +65,7 @@ export class LidoSDKVaultEntity extends BusModule {
     return this.vaultAddress;
   }
 
+  @Cache(30 * 60 * 1000, ['dashboardAddress'])
   public async getDashboardAddress(): Promise<Address> {
     if (this.dashboardAddress) {
       return this.dashboardAddress;
@@ -280,6 +276,8 @@ export class LidoSDKVaultEntity extends BusModule {
     };
   }
 
+  @Logger('Call:')
+  @ErrorHandler()
   private async _mintStETH(props: MintProps) {
     const parsedProps = await this.parseProps(props);
 
@@ -298,6 +296,8 @@ export class LidoSDKVaultEntity extends BusModule {
     });
   }
 
+  @Logger('Call:')
+  @ErrorHandler()
   private async _mintStETHSimulateTx(props: MintProps) {
     const parsedProps = await this.parseProps(props);
 
@@ -307,6 +307,8 @@ export class LidoSDKVaultEntity extends BusModule {
     );
   }
 
+  @Logger('Call:')
+  @ErrorHandler()
   private async _mintWstETH(props: MintProps) {
     const parsedProps = await this.parseProps(props);
 
@@ -325,6 +327,8 @@ export class LidoSDKVaultEntity extends BusModule {
     });
   }
 
+  @Logger('Call:')
+  @ErrorHandler()
   private async _mintWstETHSimulateTx(props: MintProps) {
     const parsedProps = await this.parseProps(props);
 
@@ -459,6 +463,8 @@ export class LidoSDKVaultEntity extends BusModule {
     throw new Error('Unsupported token');
   }
 
+  @Logger('Call:')
+  @ErrorHandler()
   private async _burnStETHSimulateTx(props: BurnProps) {
     const parsedProps = await this.parseProps(props);
 
@@ -467,6 +473,8 @@ export class LidoSDKVaultEntity extends BusModule {
     });
   }
 
+  @Logger('Call:')
+  @ErrorHandler()
   private async _burnWstETHSimulateTx(props: BurnProps) {
     const parsedProps = await this.parseProps(props);
 
@@ -594,6 +602,8 @@ export class LidoSDKVaultEntity extends BusModule {
     };
   }
 
+  @Logger('Utils:')
+  @ErrorHandler()
   private async getSubmitReportTxArgs(props: SubmitReportProps) {
     const vaultAddress = this.getVaultAddress();
     const { gateway } = props;

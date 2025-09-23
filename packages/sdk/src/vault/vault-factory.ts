@@ -1,16 +1,16 @@
-import {
-  type Address,
-  decodeEventLog,
-  type Hash,
-  isAddress,
+import { decodeEventLog, isAddress } from 'viem';
+import type {
+  Address,
+  Hash,
+  WriteContractParameters,
   TransactionReceipt,
-  type WriteContractParameters,
 } from 'viem';
-import { TransactionOptions, type TransactionResult } from '../core/index.js';
-import type { NoTxOptions } from '../core/types.js';
+
 import { ErrorHandler, Logger } from '../common/decorators/index.js';
 import { NOOP } from '../common/constants.js';
 import { CreateVaultProps, CreateVaultResult } from './types.js';
+import type { TransactionOptions, TransactionResult } from '../core/index.js';
+import type { NoTxOptions } from '../core/types.js';
 
 import {
   DashboardCreatedEventAbi,
@@ -18,6 +18,7 @@ import {
 } from './abi/VaultFactory.js';
 import {
   MAX_CONFIRM_EXPIRY,
+  MAX_NODE_OPERATOR_FEE_RATE,
   MIN_CONFIRM_EXPIRY,
   VAULTS_CONNECT_DEPOSIT,
 } from './consts/common.js';
@@ -29,7 +30,7 @@ import { validateRole } from './consts/roles.js';
 
 export class LidoSDKVaultFactory extends BusModule {
   private _validateNodeOperatorFeeRate(nodeOperatorFeeRate: bigint) {
-    if (nodeOperatorFeeRate > 100) {
+    if (nodeOperatorFeeRate > MAX_NODE_OPERATOR_FEE_RATE) {
       throw this.bus.core.error({
         code: ERROR_CODE.INVALID_ARGUMENT,
         message: 'Invalid node operator fee rate.',
