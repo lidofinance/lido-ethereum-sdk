@@ -1,4 +1,4 @@
-import { encodeFunctionData } from 'viem';
+import { encodeFunctionData, isAddressEqual, zeroAddress } from 'viem';
 import type { Address, Hash, GetContractReturnType, WalletClient } from 'viem';
 import {
   CommonTransactionProps,
@@ -65,6 +65,7 @@ export class LidoSDKVaultEntity extends BusModule {
     return this.vaultAddress;
   }
 
+  @Logger('Utils:')
   @Cache(30 * 60 * 1000, ['dashboardAddress'])
   public async getDashboardAddress(): Promise<Address> {
     if (this.dashboardAddress) {
@@ -75,6 +76,21 @@ export class LidoSDKVaultEntity extends BusModule {
     const vaultConnection = await vaultHub.read.vaultConnection([
       this.vaultAddress,
     ]);
+
+    if (!vaultConnection) {
+      throw this.bus.core.error({
+        code: ERROR_CODE.READ_ERROR,
+        message: 'Vault connection is not found.',
+      });
+    }
+
+    if (isAddressEqual(vaultConnection.owner, zeroAddress)) {
+      throw this.bus.core.error({
+        code: ERROR_CODE.READ_ERROR,
+        message: 'Vault owner is not found.',
+      });
+    }
+
     this.dashboardAddress = vaultConnection.owner;
 
     return this.dashboardAddress;
@@ -251,7 +267,7 @@ export class LidoSDKVaultEntity extends BusModule {
   private _validateToken(token: string) {
     if (!['wsteth', 'steth'].includes(token)) {
       throw this.bus.core.error({
-        code: ERROR_CODE.TRANSACTION_ERROR,
+        code: ERROR_CODE.INVALID_ARGUMENT,
         message: `Invalid token ${token}.`,
       });
     }
