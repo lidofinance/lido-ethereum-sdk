@@ -73,16 +73,21 @@ export class LidoSDKVaultEntity extends BusModule {
     }
 
     const vaultHub = await this.bus.contracts.getVaultHub();
-    const vaultConnection = await vaultHub.read.vaultConnection([
+
+    const isVaultConnected = await vaultHub.read.isVaultConnected([
       this.vaultAddress,
     ]);
 
-    if (!vaultConnection) {
+    if (!isVaultConnected) {
       throw this.bus.core.error({
         code: ERROR_CODE.READ_ERROR,
         message: 'Vault connection is not found.',
       });
     }
+
+    const vaultConnection = await vaultHub.read.vaultConnection([
+      this.vaultAddress,
+    ]);
 
     if (isAddressEqual(vaultConnection.owner, zeroAddress)) {
       throw this.bus.core.error({
