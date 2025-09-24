@@ -40,11 +40,10 @@ export class LidoSDKVaultEntity extends BusModule {
     this.dashboardAddress = props.dashboardAddress;
   }
 
-  private async parseProps<TProps extends CommonTransactionProps>(
-    props: TProps,
-  ): Promise<
+  @Logger('Utils:')
+  private async parseProps(props: CommonTransactionProps): Promise<
     ParsedProps<
-      TProps & {
+      CommonTransactionProps & {
         dashboard: GetContractReturnType<typeof DashboardAbi, WalletClient>;
       }
     >
@@ -127,7 +126,7 @@ export class LidoSDKVaultEntity extends BusModule {
     return {
       from: parsedProps.account.address,
       to: parsedProps.dashboard.address,
-      value: parsedProps.value,
+      value: props.value,
       data: encodeFunctionData({
         abi: parsedProps.dashboard.abi,
         functionName: 'fund',

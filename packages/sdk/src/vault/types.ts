@@ -14,6 +14,7 @@ export type CreateVaultProps = CommonTransactionProps & {
   nodeOperatorFeeBP: bigint;
   confirmExpiry: bigint;
   roleAssignments: Array<{ account: Address; role: `0x${string}` }>;
+  withoutConnectingToVaultHub?: boolean;
 };
 
 export type CreateVaultResult = LidoSDKVaultEntity;

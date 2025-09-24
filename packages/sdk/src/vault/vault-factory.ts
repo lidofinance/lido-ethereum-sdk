@@ -9,9 +9,7 @@ import type {
 import { ErrorHandler, Logger } from '../common/decorators/index.js';
 import { NOOP } from '../common/constants.js';
 import { CreateVaultProps, CreateVaultResult } from './types.js';
-import type { TransactionOptions, TransactionResult } from '../core/index.js';
-import type { NoTxOptions } from '../core/types.js';
-
+import type { TransactionResult } from '../core/index.js';
 import {
   DashboardCreatedEventAbi,
   VaultCreatedEventAbi,
@@ -25,7 +23,6 @@ import {
 import { ERROR_CODE, invariant } from '../common/index.js';
 import { BusModule } from './bus-module.js';
 import { LidoSDKVaultContracts } from './vault-contracts.js';
-import { LidoSDKVaultEntity } from './vault-entity.js';
 import { validateRole } from './consts/roles.js';
 
 export class LidoSDKVaultFactory extends BusModule {
@@ -73,15 +70,21 @@ export class LidoSDKVaultFactory extends BusModule {
     this.bus.core.useWeb3Provider();
     const { callback, account, txArgs, ...rest } = await this.parseProps(props);
     const contract = await this.bus.contracts.getContractVaultFactory();
+    const methodName = !props.withoutConnectingToVaultHub
+      ? 'createVaultWithDashboard'
+      : 'createVaultWithDashboardWithoutConnectingToVaultHub';
 
     return this.bus.core.performTransaction<CreateVaultResult>({
       ...rest,
       callback,
       account,
       getGasLimit: async (options) =>
-        this.createVaultEstimateGas({ account, ...rest }, options),
+        contract.estimateGas[methodName](txArgs, {
+          ...options,
+          value: VAULTS_CONNECT_DEPOSIT,
+        }),
       sendTransaction: (options) =>
-        contract.write.createVaultWithDashboard(txArgs, {
+        contract.write[methodName](txArgs, {
           ...options,
           value: VAULTS_CONNECT_DEPOSIT,
         }),
@@ -154,21 +157,7 @@ export class LidoSDKVaultFactory extends BusModule {
       ERROR_CODE.TRANSACTION_ERROR,
     );
 
-    return this.vaultFromAddress(vault, dashboard);
-  }
-
-  @Logger('Utils:')
-  public async createVaultEstimateGas(
-    props: NoTxOptions<CreateVaultProps>,
-    options?: TransactionOptions,
-  ): Promise<bigint> {
-    const { account, txArgs } = await this.parseProps(props);
-    const contract = await this.bus.contracts.getContractVaultFactory();
-    return await contract.estimateGas.createVaultWithDashboard(txArgs, {
-      account,
-      ...options,
-      value: VAULTS_CONNECT_DEPOSIT,
-    });
+    return this.bus.vaultFromAddress(vault, dashboard);
   }
 
   private async parseProps(props: CreateVaultProps) {
@@ -194,14 +183,5 @@ export class LidoSDKVaultFactory extends BusModule {
       account: await this.bus.core.useAccount(props.account),
       callback: props.callback ?? NOOP,
     };
-  }
-
-  @Logger('Utils:')
-  vaultFromAddress(vaultAddress: Address, dashboardAddress?: Address) {
-    return new LidoSDKVaultEntity({
-      bus: this.bus,
-      vaultAddress,
-      dashboardAddress,
-    });
   }
 }

@@ -5,7 +5,6 @@ import {
   FetchVaultsResult,
 } from './types.js';
 import { BusModule } from './bus-module.js';
-import { LidoSDKVaultEntity } from './vault-entity.js';
 
 export class LidoSDKVaultViewer extends BusModule {
   public async fetchConnectedVaults(
@@ -42,9 +41,7 @@ export class LidoSDKVaultViewer extends BusModule {
     const { data, total } = await this.fetchConnectedVaults(params);
 
     return {
-      data: data.map(
-        (v) => new LidoSDKVaultEntity({ bus: this.bus, vaultAddress: v }),
-      ),
+      data: data.map((v) => this.bus.vaultFromAddress(v)),
       total,
     };
   }

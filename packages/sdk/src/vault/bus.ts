@@ -3,6 +3,9 @@ import { LidoSDKVaultContracts } from './vault-contracts.js';
 import { LidoSDKVaultFactory } from './vault-factory.js';
 import { LidoSDKVaultViewer } from './vault-viewer.js';
 import { LidoSDKstETH, LidoSDKwstETH } from '../erc20/index.js';
+import { Logger } from '../common/decorators/index.js';
+import type { Address } from 'viem';
+import { LidoSDKVaultEntity } from './vault-entity.js';
 
 export class Bus extends LidoSDKModule {
   private version: string | undefined;
@@ -61,5 +64,14 @@ export class Bus extends LidoSDKModule {
       });
     }
     return this.stethInstance;
+  }
+
+  @Logger('Utils:')
+  vaultFromAddress(vaultAddress: Address, dashboardAddress?: Address) {
+    return new LidoSDKVaultEntity({
+      bus: this,
+      vaultAddress,
+      dashboardAddress,
+    });
   }
 }

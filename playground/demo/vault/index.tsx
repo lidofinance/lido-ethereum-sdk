@@ -1,4 +1,10 @@
-import { Accordion, Input, Select, Option, Block } from '@lidofinance/lido-ui';
+import {
+  Accordion,
+  Input,
+  Select,
+  Option,
+  Checkbox,
+} from '@lidofinance/lido-ui';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { Action } from 'components/action';
 import TokenInput, { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
@@ -23,6 +29,10 @@ export const VaultDemo = () => {
 
   const [withdrawEthValue, setWithdrawEthValue] =
     useState<ValueType>(DEFAULT_VALUE);
+  const [withoutConnectingToVaultHub, setWithoutConnectingToVaultHub] =
+    useState<boolean>(false);
+  const [confirmExpiry, setConfirmExpiry] = useState<number>(24 * 3600);
+  const [nodeOperatorFee, setNodeOperatorFee] = useState<number>(2);
   const [withdrawAddress, setWithdrawAddress] = useState<Address>(account);
   const [minRecipient, setMinRecipient] = useState<Address>(account);
   const [mintEthValue, setMintEthValue] = useState<ValueType>(DEFAULT_VALUE);
@@ -41,7 +51,7 @@ export const VaultDemo = () => {
           label="Select current Vault"
           value={currentVault?.getVaultAddress()}
           onChange={(v) =>
-            setCurrentVault(vaultFactory.vaultFromAddress(v as Address))
+            setCurrentVault(vaultModule.vaultFromAddress(v as Address))
           }
         >
           {vaults.map((vault) => (
@@ -73,18 +83,44 @@ export const VaultDemo = () => {
       <Action
         title="Create Vault"
         walletAction
-        action={() =>
-          vaultFactory.createVault({
+        action={async () => {
+          const { result } = await vaultFactory.createVault({
             account,
-            confirmExpiry: BigInt(3600),
-            nodeOperatorFeeBP: BigInt(1),
+            confirmExpiry: BigInt(confirmExpiry),
+            nodeOperatorFeeBP: BigInt(nodeOperatorFee),
             defaultAdmin: account,
             nodeOperator: account,
             nodeOperatorManager: account,
             roleAssignments: [],
-          })
-        }
-      />
+            withoutConnectingToVaultHub,
+          });
+
+          return {
+            result: {
+              vaultAddress: result?.getVaultAddress(),
+            },
+          };
+        }}
+      >
+        <Input
+          label="Node operator fee"
+          type="number"
+          placeholder="2"
+          value={nodeOperatorFee}
+          onChange={(e) => setNodeOperatorFee(+e.currentTarget.value)}
+        />
+        <Input
+          label="Confirm expiry"
+          type="number"
+          placeholder="2"
+          value={confirmExpiry}
+          onChange={(e) => setConfirmExpiry(+e.currentTarget.value)}
+        />
+        <Checkbox
+          onChange={() => setWithoutConnectingToVaultHub((v) => !v)}
+          label="Create without connecting to vault hub"
+        ></Checkbox>
+      </Action>
 
       <Action
         title="Fund"
