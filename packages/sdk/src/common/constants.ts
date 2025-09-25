@@ -78,7 +78,6 @@ export enum LIDO_CONTRACT_NAMES {
   accountingOracle = 'accountingOracle',
   depositSecurityModule = 'depositSecurityModule',
   elRewardsVault = 'elRewardsVault',
-  legacyOracle = 'legacyOracle',
   lido = 'lido',
   oracleReportSanityChecker = 'oracleReportSanityChecker',
   postTokenRebaseReceiver = 'postTokenRebaseReceiver',
