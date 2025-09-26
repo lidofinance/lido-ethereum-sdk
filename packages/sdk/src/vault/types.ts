@@ -93,16 +93,24 @@ export type LeafDataFields = {
   totalValueWei: string;
   fee: string;
   liabilityShares: string;
+  maxLiabilityShares: string;
   slashingReserve: string;
 };
 
 export type Report = {
   format: 'standard-v1';
-  leafEncoding: ['address', 'uint256', 'uint256', 'uint256', 'uint256'];
+  leafEncoding: [
+    'address',
+    'uint256',
+    'uint256',
+    'uint256',
+    'uint256',
+    'uint256',
+  ];
   tree: Hex[];
   values: {
     treeIndex: bigint;
-    value: [Address, string, string, string, string];
+    value: [Address, string, string, string, string, string];
   }[];
   refSlot: number;
   timestamp: number;

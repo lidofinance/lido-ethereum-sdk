@@ -11,9 +11,8 @@ import TokenInput, { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
 import type { Address } from 'viem';
-import { LidoSDKVaultEntity } from '@lidofinance/lido-ethereum-sdk';
+import { LidoSDKVaultEntity, Token } from '@lidofinance/lido-ethereum-sdk';
 import { ActionBlock } from '../../components/action/styles';
-import { Token } from '@lidofinance/lido-ethereum-sdk/src';
 
 export const VaultDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();

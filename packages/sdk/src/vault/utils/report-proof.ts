@@ -91,6 +91,7 @@ export const getVaultData = (
     fee: '',
     totalValueWei: '',
     liabilityShares: '',
+    maxLiabilityShares: '',
     slashingReserve: '',
   };
 

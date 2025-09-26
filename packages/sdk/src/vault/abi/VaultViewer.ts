@@ -216,9 +216,9 @@ export const VaultViewerAbi = [
                 type: 'uint96',
               },
               {
-                internalType: 'bool',
-                name: 'pendingDisconnect',
-                type: 'bool',
+                internalType: 'uint48',
+                name: 'disconnectInitiatedTs',
+                type: 'uint48',
               },
               {
                 internalType: 'uint16',
@@ -260,19 +260,19 @@ export const VaultViewerAbi = [
               {
                 components: [
                   {
-                    internalType: 'uint112',
+                    internalType: 'uint104',
                     name: 'totalValue',
-                    type: 'uint112',
+                    type: 'uint104',
                   },
                   {
-                    internalType: 'int112',
+                    internalType: 'int104',
                     name: 'inOutDelta',
-                    type: 'int112',
+                    type: 'int104',
                   },
                   {
-                    internalType: 'uint32',
+                    internalType: 'uint48',
                     name: 'timestamp',
-                    type: 'uint32',
+                    type: 'uint48',
                   },
                 ],
                 internalType: 'struct VaultHub.Report',
@@ -280,9 +280,9 @@ export const VaultViewerAbi = [
                 type: 'tuple',
               },
               {
-                internalType: 'uint128',
-                name: 'locked',
-                type: 'uint128',
+                internalType: 'uint96',
+                name: 'maxLiabilityShares',
+                type: 'uint96',
               },
               {
                 internalType: 'uint96',
@@ -292,24 +292,44 @@ export const VaultViewerAbi = [
               {
                 components: [
                   {
-                    internalType: 'int112',
+                    internalType: 'int104',
                     name: 'value',
-                    type: 'int112',
+                    type: 'int104',
                   },
                   {
-                    internalType: 'int112',
+                    internalType: 'int104',
                     name: 'valueOnRefSlot',
-                    type: 'int112',
+                    type: 'int104',
                   },
                   {
-                    internalType: 'uint32',
+                    internalType: 'uint48',
                     name: 'refSlot',
-                    type: 'uint32',
+                    type: 'uint48',
                   },
                 ],
-                internalType: 'struct RefSlotCache.Int112WithRefSlotCache',
+                internalType: 'struct DoubleRefSlotCache.Int104WithCache[2]',
                 name: 'inOutDelta',
-                type: 'tuple',
+                type: 'tuple[2]',
+              },
+              {
+                internalType: 'uint128',
+                name: 'minimalReserve',
+                type: 'uint128',
+              },
+              {
+                internalType: 'uint128',
+                name: 'redemptionShares',
+                type: 'uint128',
+              },
+              {
+                internalType: 'uint128',
+                name: 'cumulativeLidoFees',
+                type: 'uint128',
+              },
+              {
+                internalType: 'uint128',
+                name: 'settledLidoFees',
+                type: 'uint128',
               },
             ],
             internalType: 'struct VaultHub.VaultRecord',
@@ -412,9 +432,9 @@ export const VaultViewerAbi = [
                 type: 'uint96',
               },
               {
-                internalType: 'bool',
-                name: 'pendingDisconnect',
-                type: 'bool',
+                internalType: 'uint48',
+                name: 'disconnectInitiatedTs',
+                type: 'uint48',
               },
               {
                 internalType: 'uint16',
@@ -456,19 +476,19 @@ export const VaultViewerAbi = [
               {
                 components: [
                   {
-                    internalType: 'uint112',
+                    internalType: 'uint104',
                     name: 'totalValue',
-                    type: 'uint112',
+                    type: 'uint104',
                   },
                   {
-                    internalType: 'int112',
+                    internalType: 'int104',
                     name: 'inOutDelta',
-                    type: 'int112',
+                    type: 'int104',
                   },
                   {
-                    internalType: 'uint32',
+                    internalType: 'uint48',
                     name: 'timestamp',
-                    type: 'uint32',
+                    type: 'uint48',
                   },
                 ],
                 internalType: 'struct VaultHub.Report',
@@ -476,9 +496,9 @@ export const VaultViewerAbi = [
                 type: 'tuple',
               },
               {
-                internalType: 'uint128',
-                name: 'locked',
-                type: 'uint128',
+                internalType: 'uint96',
+                name: 'maxLiabilityShares',
+                type: 'uint96',
               },
               {
                 internalType: 'uint96',
@@ -488,24 +508,44 @@ export const VaultViewerAbi = [
               {
                 components: [
                   {
-                    internalType: 'int112',
+                    internalType: 'int104',
                     name: 'value',
-                    type: 'int112',
+                    type: 'int104',
                   },
                   {
-                    internalType: 'int112',
+                    internalType: 'int104',
                     name: 'valueOnRefSlot',
-                    type: 'int112',
+                    type: 'int104',
                   },
                   {
-                    internalType: 'uint32',
+                    internalType: 'uint48',
                     name: 'refSlot',
-                    type: 'uint32',
+                    type: 'uint48',
                   },
                 ],
-                internalType: 'struct RefSlotCache.Int112WithRefSlotCache',
+                internalType: 'struct DoubleRefSlotCache.Int104WithCache[2]',
                 name: 'inOutDelta',
-                type: 'tuple',
+                type: 'tuple[2]',
+              },
+              {
+                internalType: 'uint128',
+                name: 'minimalReserve',
+                type: 'uint128',
+              },
+              {
+                internalType: 'uint128',
+                name: 'redemptionShares',
+                type: 'uint128',
+              },
+              {
+                internalType: 'uint128',
+                name: 'cumulativeLidoFees',
+                type: 'uint128',
+              },
+              {
+                internalType: 'uint128',
+                name: 'settledLidoFees',
+                type: 'uint128',
               },
             ],
             internalType: 'struct VaultHub.VaultRecord',

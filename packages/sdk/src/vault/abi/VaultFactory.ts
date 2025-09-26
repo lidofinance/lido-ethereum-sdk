@@ -1,9 +1,4 @@
-import { OperatorGridErrorsAbi } from './OperatorGrid.js';
-import { VaultHubErrorsAbi } from './VaultHub.js';
-
 export const VaultFactoryAbi = [
-  ...VaultHubErrorsAbi,
-  ...OperatorGridErrorsAbi,
   {
     inputs: [
       {
@@ -263,7 +258,26 @@ export const VaultFactoryAbi = [
         type: 'address',
       },
     ],
-    stateMutability: 'payable',
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'vault',
+        type: 'address',
+      },
+    ],
+    name: 'deployedVaults',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
 ] as const;

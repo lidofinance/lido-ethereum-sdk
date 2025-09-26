@@ -70,21 +70,18 @@ export class LidoSDKVaultFactory extends BusModule {
     this.bus.core.useWeb3Provider();
     const { callback, account, txArgs, ...rest } = await this.parseProps(props);
     const contract = await this.bus.contracts.getContractVaultFactory();
-    const methodName = !props.withoutConnectingToVaultHub
-      ? 'createVaultWithDashboard'
-      : 'createVaultWithDashboardWithoutConnectingToVaultHub';
 
     return this.bus.core.performTransaction<CreateVaultResult>({
       ...rest,
       callback,
       account,
       getGasLimit: async (options) =>
-        contract.estimateGas[methodName](txArgs, {
+        contract.estimateGas.createVaultWithDashboard(txArgs, {
           ...options,
           value: VAULTS_CONNECT_DEPOSIT,
         }),
       sendTransaction: (options) =>
-        contract.write[methodName](txArgs, {
+        contract.write.createVaultWithDashboard(txArgs, {
           ...options,
           value: VAULTS_CONNECT_DEPOSIT,
         }),
