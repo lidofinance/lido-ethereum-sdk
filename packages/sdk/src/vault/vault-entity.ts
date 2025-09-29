@@ -632,7 +632,7 @@ export class LidoSDKVaultEntity extends BusModule {
     const vaultHubContract = await this.bus.contracts.getVaultHub();
 
     const latestReportData = await lazyOracleContract.read.latestReportData();
-    const vaultsDataReportCid = latestReportData[2];
+    const vaultsDataReportCid = latestReportData[3];
 
     if (!props.skipIsFresh) {
       const isReportFresh = await vaultHubContract.read.isReportFresh([
@@ -655,6 +655,7 @@ export class LidoSDKVaultEntity extends BusModule {
       BigInt(proof.data.totalValueWei),
       BigInt(proof.data.fee),
       BigInt(proof.data.liabilityShares),
+      BigInt(proof.data.maxLiabilityShares),
       BigInt(proof.data.slashingReserve),
       proof.proof,
     ] as const;

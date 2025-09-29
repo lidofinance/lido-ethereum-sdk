@@ -13,7 +13,7 @@ import { LidoSDKShares } from './shares/shares.js';
 import { version } from './version.js';
 import { LidoSDKL2 } from './l2/l2.js';
 import { LidoSDKDualGovernance } from './dual-governance/index.js';
-import { LidoSDKVaultModule } from './vault/vault-module.js';
+import { LidoSDKVaultModule } from './vault/index.js';
 
 export class LidoSDK {
   readonly core: LidoSDKCore;
