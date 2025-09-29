@@ -1,4 +1,4 @@
-import { CID } from 'multiformats';
+import { CID } from 'multiformats/cid';
 import { MemoryBlockstore } from 'blockstore-core';
 import { importer } from 'ipfs-unixfs-importer';
 import { ReportFetchArgs } from '../types.js';

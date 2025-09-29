@@ -21,6 +21,7 @@ const jestConfig: JestConfigWithTsJest = {
     ],
   },
   maxWorkers: 1,
+  setupFiles: ['<rootDir>/tests/mocks/multiformats.mock.cjs'],
   globalSetup: '<rootDir>/tests/global-setup.cjs',
   globalTeardown: '<rootDir>/tests/global-teardown.cjs',
   testTimeout: 60_000,
