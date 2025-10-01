@@ -41,6 +41,7 @@ import {
   LIDO_L2_CONTRACT_ADDRESSES,
   DUAL_GOVERNANCE_CONTRACT_ADDRESSES,
   DUAL_GOVERNANCE_CONTRACT_NAMES,
+  VAULT_VIEWER_CONTRACT_ADDRESSES,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
@@ -435,6 +436,19 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     invariant(
       address,
       `Dual Governance on ${this.chain.name}(${this.chain.id}) does not have ${contract} contract`,
+      ERROR_CODE.NOT_SUPPORTED,
+    );
+    return address;
+  }
+
+  @Logger('Utils:')
+  @Cache(30 * 60 * 1000, ['chain.id'])
+  public getVaultViewerAddress(): Address {
+    const address = VAULT_VIEWER_CONTRACT_ADDRESSES[this.chain.id as CHAINS];
+
+    invariant(
+      address,
+      `Vault Viewer on ${this.chain.name}(${this.chain.id}) does not have contract`,
       ERROR_CODE.NOT_SUPPORTED,
     );
     return address;

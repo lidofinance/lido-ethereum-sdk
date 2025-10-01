@@ -10,7 +10,8 @@ import {
   BurnProps,
   BurnSharesProps,
   FundPros,
-  type LidoSDKVaultsModuleProps,
+  GetVaultRoleMembersProps,
+  LidoSDKVaultsModuleProps,
   MintProps,
   MintSharesProps,
   PopulateProps,
@@ -705,5 +706,12 @@ export class LidoSDKVaultEntity extends BusModule {
         args: txArgs,
       }),
     };
+  }
+
+  async getRoleMembers(props: GetVaultRoleMembersProps) {
+    const address = await this.getDashboardAddress();
+    const dashboardContract =
+      await this.bus.contracts.getVaultDashboard(address);
+    return dashboardContract.read.getRoleMembers([props.role]);
   }
 }
