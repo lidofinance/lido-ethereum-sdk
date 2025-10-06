@@ -6,6 +6,7 @@ import { LidoSDKstETH, LidoSDKwstETH } from '../erc20/index.js';
 import { Logger } from '../common/decorators/index.js';
 import type { Address } from 'viem';
 import { LidoSDKVaultEntity } from './vault-entity.js';
+import { LidoSDKVaultLazyOracle } from './vault-lazy-oracle.js';
 
 export class Bus extends LidoSDKModule {
   private version: string | undefined;
@@ -13,6 +14,7 @@ export class Bus extends LidoSDKModule {
   private contractsInstance: LidoSDKVaultContracts | undefined;
   private vaultFactoryInstance: LidoSDKVaultFactory | undefined;
   private vaultViewerInstance: LidoSDKVaultViewer | undefined;
+  private lazyOracleInstance: LidoSDKVaultLazyOracle | undefined;
 
   // erc20 modules
   private wstethInstance: LidoSDKwstETH | undefined;
@@ -64,6 +66,15 @@ export class Bus extends LidoSDKModule {
       });
     }
     return this.stethInstance;
+  }
+
+  get lazyOracle(): LidoSDKVaultLazyOracle {
+    if (!this.lazyOracleInstance) {
+      this.lazyOracleInstance = new LidoSDKVaultLazyOracle({
+        bus: this,
+      });
+    }
+    return this.lazyOracleInstance;
   }
 
   @Logger('Utils:')

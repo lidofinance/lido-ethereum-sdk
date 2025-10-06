@@ -25,6 +25,8 @@ import { DashboardAbi } from './abi/index.js';
 import { getReportProofByVault } from './utils/report-proof.js';
 import { Cache, ErrorHandler, Logger } from '../common/decorators/index.js';
 import { validateRole } from './consts/roles.js';
+import { getVaultReport } from './utils/report.js';
+import { PROXY_CODE_PAD_LEFT, PROXY_CODE_PAD_RIGHT } from './consts/index.js';
 
 type LidoSDKVaultEntityProps = LidoSDKVaultsModuleProps & {
   dashboardAddress?: Address;
@@ -93,6 +95,15 @@ export class LidoSDKVaultEntity extends BusModule {
       throw this.bus.core.error({
         code: ERROR_CODE.READ_ERROR,
         message: 'Vault owner is not found.',
+      });
+    }
+
+    const isOwnerDashboard = await this.isDashboard(vaultConnection.owner);
+
+    if (!isOwnerDashboard) {
+      throw this.bus.core.error({
+        code: ERROR_CODE.NOT_SUPPORTED,
+        message: 'Owner of vault is not dashboard contract',
       });
     }
 
@@ -708,10 +719,34 @@ export class LidoSDKVaultEntity extends BusModule {
     };
   }
 
-  async getRoleMembers(props: GetVaultRoleMembersProps) {
+  @Logger('Views:')
+  @ErrorHandler()
+  public async getRoleMembers(props: GetVaultRoleMembersProps) {
     const address = await this.getDashboardAddress();
     const dashboardContract =
       await this.bus.contracts.getVaultDashboard(address);
     return dashboardContract.read.getRoleMembers([props.role]);
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
+  public async getVaultReport() {
+    const vaultAddress = this.getVaultAddress();
+    const { cid } = await this.bus.lazyOracle.getLastReportData();
+    return getVaultReport({ vault: vaultAddress, cid });
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  private async isDashboard(address: Address) {
+    const dashboardCode = await this.bus.core.rpcProvider.getCode({ address });
+    const vaultFactory = await this.bus.contracts.getContractVaultFactory();
+    const implementation = await vaultFactory.read.DASHBOARD_IMPL();
+    const proxyCode =
+      PROXY_CODE_PAD_LEFT +
+      implementation.slice(2).toLowerCase() +
+      PROXY_CODE_PAD_RIGHT;
+
+    return dashboardCode?.startsWith(proxyCode) || false;
   }
 }
