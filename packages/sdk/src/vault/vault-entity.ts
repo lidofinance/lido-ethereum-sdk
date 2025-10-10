@@ -589,6 +589,52 @@ export class LidoSDKVaultEntity extends BusModule {
     };
   }
 
+  // set role methods
+  @Logger('Call:')
+  @ErrorHandler()
+  public async revokeRoles(props: SetRolesProps) {
+    this._validateRoles(props.roles);
+    const parsedProps = await this.parseProps(props);
+
+    return this.bus.core.performTransaction({
+      ...parsedProps,
+      getGasLimit: (options) =>
+        parsedProps.dashboard.estimateGas.revokeRoles([props.roles], options),
+      sendTransaction: (options) =>
+        parsedProps.dashboard.write.revokeRoles([props.roles], options),
+    });
+  }
+
+  @Logger('Call:')
+  @ErrorHandler()
+  public async revokeRolesSimulateTx(props: SetRolesProps) {
+    this._validateRoles(props.roles);
+    const parsedProps = await this.parseProps(props);
+
+    return parsedProps.dashboard.simulate.revokeRoles([props.roles], {
+      account: parsedProps.account,
+    });
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async revokeRolesPopulateTx(props: SetRolesProps) {
+    this._validateRoles(props.roles);
+    const parsedProps = await this.parseProps(props);
+
+    return {
+      from: parsedProps.account.address,
+      to: parsedProps.dashboard.address,
+      data: encodeFunctionData({
+        abi: parsedProps.dashboard.abi,
+        functionName: 'revokeRoles',
+        args: [props.roles],
+      }),
+    };
+  }
+
+  // todo revoke roles
+
   // disburseNodeOperatorFee methods
   @Logger('Call:')
   @ErrorHandler()
