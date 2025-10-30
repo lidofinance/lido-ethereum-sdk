@@ -9,6 +9,7 @@ import {
 import {
   DashboardAbi,
   DashboardCreatedEventAbi,
+  OperatorGridAbi,
   StakingVaultAbi,
   VaultCreatedEventAbi,
   VaultFactoryAbi,
@@ -132,6 +133,25 @@ export class LidoSDKVaultContracts extends BusModule {
     return getContract({
       address,
       abi: LazyOracleAbi,
+      client: {
+        public: this.bus.core.rpcProvider,
+        wallet: this.bus.core.web3Provider as WalletClient,
+      },
+    });
+  }
+
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
+  public async getContractOperatorGrid(): Promise<
+    GetContractReturnType<typeof OperatorGridAbi, WalletClient>
+  > {
+    const address = await this.bus.core
+      .getContractLidoLocator()
+      .read.operatorGrid();
+
+    return getContract({
+      address,
+      abi: OperatorGridAbi,
       client: {
         public: this.bus.core.rpcProvider,
         wallet: this.bus.core.web3Provider as WalletClient,

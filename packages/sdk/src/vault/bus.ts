@@ -1,12 +1,13 @@
+import type { Address } from 'viem';
+import { Logger } from '../common/decorators/index.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 import { LidoSDKVaultContracts } from './vault-contracts.js';
 import { LidoSDKVaultFactory } from './vault-factory.js';
 import { LidoSDKVaultViewer } from './vault-viewer.js';
 import { LidoSDKstETH, LidoSDKwstETH } from '../erc20/index.js';
-import { Logger } from '../common/decorators/index.js';
-import type { Address } from 'viem';
 import { LidoSDKVaultEntity } from './vault-entity.js';
 import { LidoSDKVaultLazyOracle } from './vault-lazy-oracle.js';
+import { LidoSDKVaultConstants } from './vault-contants.js';
 
 export class Bus extends LidoSDKModule {
   private version: string | undefined;
@@ -15,6 +16,7 @@ export class Bus extends LidoSDKModule {
   private vaultFactoryInstance: LidoSDKVaultFactory | undefined;
   private vaultViewerInstance: LidoSDKVaultViewer | undefined;
   private lazyOracleInstance: LidoSDKVaultLazyOracle | undefined;
+  private constantsInstance: LidoSDKVaultConstants | undefined;
 
   // erc20 modules
   private wstethInstance: LidoSDKwstETH | undefined;
@@ -39,7 +41,6 @@ export class Bus extends LidoSDKModule {
     }
     return this.vaultViewerInstance;
   }
-
   get vaultFactory(): LidoSDKVaultFactory {
     if (!this.vaultFactoryInstance) {
       this.vaultFactoryInstance = new LidoSDKVaultFactory({
@@ -75,6 +76,15 @@ export class Bus extends LidoSDKModule {
       });
     }
     return this.lazyOracleInstance;
+  }
+
+  get constants(): LidoSDKVaultConstants {
+    if (!this.constantsInstance) {
+      this.constantsInstance = new LidoSDKVaultConstants({
+        bus: this,
+      });
+    }
+    return this.constantsInstance;
   }
 
   @Logger('Utils:')

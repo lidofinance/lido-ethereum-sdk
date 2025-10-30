@@ -150,7 +150,6 @@ export class LidoSDKVaultEntity extends BusModule {
   @Logger('Call:')
   @ErrorHandler()
   public async fundSimulateTx(props: FundPros) {
-    this.bus.core.useWeb3Provider();
     const { dashboard, account } = await this.parseProps(props);
     return await dashboard.simulate.fund({
       account,

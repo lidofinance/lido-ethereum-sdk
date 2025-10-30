@@ -15,10 +15,8 @@ import {
   VaultCreatedEventAbi,
 } from './abi/VaultFactory.js';
 import {
-  MAX_CONFIRM_EXPIRY,
   MAX_NODE_OPERATOR_FEE_RATE,
-  MIN_CONFIRM_EXPIRY,
-  VAULTS_CONNECT_DEPOSIT,
+  MIN_NODE_OPERATOR_FEE_RATE,
 } from './consts/common.js';
 import { ERROR_CODE, invariant } from '../common/index.js';
 import { BusModule } from './bus-module.js';
@@ -27,7 +25,10 @@ import { validateRole } from './consts/roles.js';
 
 export class LidoSDKVaultFactory extends BusModule {
   private _validateNodeOperatorFeeRate(nodeOperatorFeeRate: bigint) {
-    if (nodeOperatorFeeRate > MAX_NODE_OPERATOR_FEE_RATE) {
+    if (
+      nodeOperatorFeeRate > MAX_NODE_OPERATOR_FEE_RATE ||
+      nodeOperatorFeeRate < MIN_NODE_OPERATOR_FEE_RATE
+    ) {
       throw this.bus.core.error({
         code: ERROR_CODE.INVALID_ARGUMENT,
         message: 'Invalid node operator fee rate.',
@@ -35,7 +36,9 @@ export class LidoSDKVaultFactory extends BusModule {
     }
   }
 
-  private _validateConfirmExpiry(confirmExpiry: bigint) {
+  private async _validateConfirmExpiry(confirmExpiry: bigint) {
+    const MIN_CONFIRM_EXPIRY = await this.bus.constants.MIN_CONFIRM_EXPIRY();
+    const MAX_CONFIRM_EXPIRY = await this.bus.constants.MAX_CONFIRM_EXPIRY();
     if (
       confirmExpiry < MIN_CONFIRM_EXPIRY ||
       confirmExpiry > MAX_CONFIRM_EXPIRY
@@ -58,10 +61,10 @@ export class LidoSDKVaultFactory extends BusModule {
     }
   }
 
-  private _validateCreateVaultProps(props: CreateVaultProps) {
+  private async _validateCreateVaultProps(props: CreateVaultProps) {
     this._validateRoles(props.roleAssignments);
     this._validateNodeOperatorFeeRate(props.nodeOperatorFeeBP);
-    this._validateConfirmExpiry(props.confirmExpiry);
+    await this._validateConfirmExpiry(props.confirmExpiry);
   }
 
   @Logger('Call:')
@@ -69,7 +72,7 @@ export class LidoSDKVaultFactory extends BusModule {
   public async createVault(
     props: CreateVaultProps,
   ): Promise<TransactionResult<CreateVaultResult>> {
-    this._validateCreateVaultProps(props);
+    await this._validateCreateVaultProps(props);
 
     this.bus.core.useWeb3Provider();
     const { callback, account, txArgs, ...rest } = await this.parseProps(props);
@@ -93,6 +96,7 @@ export class LidoSDKVaultFactory extends BusModule {
         decodeResult: async (receipt) => this.createVaultParseEvents(receipt),
       });
     }
+    const CONNECT_DEPOSIT = await this.bus.constants.CONNECT_DEPOSIT();
 
     return this.bus.core.performTransaction<CreateVaultResult>({
       ...rest,
@@ -101,12 +105,12 @@ export class LidoSDKVaultFactory extends BusModule {
       getGasLimit: async (options) =>
         contract.estimateGas.createVaultWithDashboard(txArgs, {
           ...options,
-          value: VAULTS_CONNECT_DEPOSIT,
+          value: CONNECT_DEPOSIT,
         }),
       sendTransaction: (options) =>
         contract.write.createVaultWithDashboard(txArgs, {
           ...options,
-          value: VAULTS_CONNECT_DEPOSIT,
+          value: CONNECT_DEPOSIT,
         }),
       decodeResult: async (receipt) => this.createVaultParseEvents(receipt),
     });
@@ -119,7 +123,6 @@ export class LidoSDKVaultFactory extends BusModule {
   ): Promise<WriteContractParameters> {
     this._validateCreateVaultProps(props);
 
-    this.bus.core.useWeb3Provider();
     const { account, txArgs } = await this.parseProps(props);
     const contract = await this.bus.contracts.getContractVaultFactory();
     if (props.withoutConnectingToVaultHub) {
@@ -127,7 +130,7 @@ export class LidoSDKVaultFactory extends BusModule {
         txArgs,
         {
           account,
-          value: VAULTS_CONNECT_DEPOSIT,
+          value: await this.bus.constants.CONNECT_DEPOSIT(),
         },
       );
 
@@ -167,7 +170,7 @@ export class LidoSDKVaultFactory extends BusModule {
     return {
       from: account.address,
       to: contract.address,
-      value: VAULTS_CONNECT_DEPOSIT,
+      value: this.bus.constants.CONNECT_DEPOSIT(),
       data: encodeFunctionData({
         abi: contract.abi,
         functionName: 'createVaultWithDashboard',

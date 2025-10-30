@@ -104,24 +104,7 @@ export const getVaultData = (
     reservationFee: '0',
   };
 
-  for (const [_key, _index] of Object.entries(report.leafIndexToData)) {
-    let index: number;
-    let fieldName: string;
-
-    // new report format
-    // leafIndexToData: { "vaultAddress": 0, ...
-    if (typeof _index === 'number') {
-      index = _index;
-      fieldName = _key;
-    }
-    // TODO: remove soon
-    // old report format
-    // leafIndexToData: { "0": "vaultAddress", ...
-    else {
-      index = Number(_key);
-      fieldName = _index;
-    }
-
+  for (const [fieldName, index] of Object.entries(report.leafIndexToData)) {
     const valueByIndex = match.value[index];
     if (valueByIndex === undefined) {
       throw new Error(
