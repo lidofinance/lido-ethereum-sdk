@@ -48,7 +48,7 @@ export const NODE_OPERATOR_REWARDS_ADJUST_ROLE = toRoleHash(
   'vaults.NodeOperatorFee.RewardsAdjustRole',
 );
 
-export const SET_ROLES = new Set([
+export const roleHashesSet = new Set([
   RECOVER_ASSETS_ROLE,
   VAULT_MASTER_ROLE,
   VAULT_CODEHASH_SET_ROLE,
@@ -73,5 +73,5 @@ export const SET_ROLES = new Set([
 ]);
 
 export const validateRole = (role: Hash) => {
-  return SET_ROLES.has(role);
+  return roleHashesSet.has(role);
 };

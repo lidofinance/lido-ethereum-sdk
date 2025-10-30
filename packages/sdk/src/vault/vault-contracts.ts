@@ -16,7 +16,6 @@ import {
   VaultViewerAbi,
 } from './abi/index.js';
 import { Cache, Logger } from '../common/decorators/index.js';
-import { vaultsAddresses } from './consts/vaults-addresses.js';
 import { BusModule } from './bus-module.js';
 import { LazyOracleAbi } from './abi/LazyOracle.js';
 
@@ -110,7 +109,7 @@ export class LidoSDKVaultContracts extends BusModule {
   public async getContractVaultViewer(): Promise<
     GetContractReturnType<typeof VaultViewerAbi, WalletClient>
   > {
-    const address = vaultsAddresses.vaultViewer;
+    const address = this.bus.core.getVaultViewerAddress();
 
     return getContract({
       address,

@@ -1,4 +1,4 @@
-import { decodeEventLog, isAddress } from 'viem';
+import { decodeEventLog, encodeFunctionData, isAddress } from 'viem';
 import type {
   Address,
   Hash,
@@ -58,18 +58,41 @@ export class LidoSDKVaultFactory extends BusModule {
     }
   }
 
+  private _validateCreateVaultProps(props: CreateVaultProps) {
+    this._validateRoles(props.roleAssignments);
+    this._validateNodeOperatorFeeRate(props.nodeOperatorFeeBP);
+    this._validateConfirmExpiry(props.confirmExpiry);
+  }
+
   @Logger('Call:')
   @ErrorHandler()
   public async createVault(
     props: CreateVaultProps,
   ): Promise<TransactionResult<CreateVaultResult>> {
-    this._validateRoles(props.roleAssignments);
-    this._validateNodeOperatorFeeRate(props.nodeOperatorFeeBP);
-    this._validateConfirmExpiry(props.confirmExpiry);
+    this._validateCreateVaultProps(props);
 
     this.bus.core.useWeb3Provider();
     const { callback, account, txArgs, ...rest } = await this.parseProps(props);
     const contract = await this.bus.contracts.getContractVaultFactory();
+
+    if (props.withoutConnectingToVaultHub) {
+      return this.bus.core.performTransaction<CreateVaultResult>({
+        ...rest,
+        callback,
+        account,
+        getGasLimit: async (options) =>
+          contract.estimateGas.createVaultWithDashboardWithoutConnectingToVaultHub(
+            txArgs,
+            { ...options },
+          ),
+        sendTransaction: (options) =>
+          contract.write.createVaultWithDashboardWithoutConnectingToVaultHub(
+            txArgs,
+            { ...options },
+          ),
+        decodeResult: async (receipt) => this.createVaultParseEvents(receipt),
+      });
+    }
 
     return this.bus.core.performTransaction<CreateVaultResult>({
       ...rest,
@@ -94,21 +117,64 @@ export class LidoSDKVaultFactory extends BusModule {
   public async createVaultSimulateTx(
     props: CreateVaultProps,
   ): Promise<WriteContractParameters> {
+    this._validateCreateVaultProps(props);
+
     this.bus.core.useWeb3Provider();
     const { account, txArgs } = await this.parseProps(props);
     const contract = await this.bus.contracts.getContractVaultFactory();
-    const { request } = await contract.simulate.createVaultWithDashboard(
-      txArgs,
-      {
-        account,
-        value: VAULTS_CONNECT_DEPOSIT,
-      },
-    );
+    if (props.withoutConnectingToVaultHub) {
+      const { request } = await contract.simulate.createVaultWithDashboard(
+        txArgs,
+        {
+          account,
+          value: VAULTS_CONNECT_DEPOSIT,
+        },
+      );
+
+      return request;
+    }
+
+    const { request } =
+      await contract.simulate.createVaultWithDashboardWithoutConnectingToVaultHub(
+        txArgs,
+        {
+          account,
+        },
+      );
 
     return request;
   }
 
-  // Utils
+  @Logger('Call:')
+  @ErrorHandler()
+  public async createVaultPopulateTx(props: CreateVaultProps) {
+    this._validateCreateVaultProps(props);
+
+    const { account, txArgs } = await this.parseProps(props);
+    const contract = await this.bus.contracts.getContractVaultFactory();
+    if (props.withoutConnectingToVaultHub) {
+      return {
+        from: account.address,
+        to: contract.address,
+        data: encodeFunctionData({
+          abi: contract.abi,
+          functionName: 'createVaultWithDashboardWithoutConnectingToVaultHub',
+          args: txArgs,
+        }),
+      };
+    }
+
+    return {
+      from: account.address,
+      to: contract.address,
+      value: VAULTS_CONNECT_DEPOSIT,
+      data: encodeFunctionData({
+        abi: contract.abi,
+        functionName: 'createVaultWithDashboard',
+        args: txArgs,
+      }),
+    };
+  }
 
   @Logger('Utils:')
   private async createVaultParseEvents(

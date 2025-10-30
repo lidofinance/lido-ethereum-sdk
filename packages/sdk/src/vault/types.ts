@@ -147,3 +147,21 @@ export type ReportFetchArgs = {
   gateway?: string;
   bigNumberType?: BigNumberType;
 };
+
+export type GetRoleMembersProps = {
+  vaultAddress: Address;
+  roles: Hash[];
+};
+
+export type GetVaultRoleMembersProps = {
+  role: Hash;
+};
+
+export type GetVaultDataProps = {
+  vaultAddress: Address;
+};
+
+export type GetRoleMembersBatchProps = {
+  vaultAddresses: Address[];
+  roles: Hash[];
+};

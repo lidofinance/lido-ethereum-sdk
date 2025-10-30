@@ -10,8 +10,12 @@ import { Action } from 'components/action';
 import TokenInput, { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
-import type { Address } from 'viem';
-import { LidoSDKVaultEntity, Token } from '@lidofinance/lido-ethereum-sdk';
+import type { Address, Hash } from 'viem';
+import {
+  LidoSDKVaultEntity,
+  Token,
+  roleHashesSet,
+} from '@lidofinance/lido-ethereum-sdk';
 import { ActionBlock } from '../../components/action/styles';
 
 export const VaultDemo = () => {
@@ -41,6 +45,7 @@ export const VaultDemo = () => {
   const [approveEthValue, setApproveEthValue] =
     useState<ValueType>(DEFAULT_VALUE);
   const [approveTokenValue, setApproveTokenValue] = useState<Token>('steth');
+  const [role, setRole] = useState<Hash>();
 
   return (
     <Accordion summary="Vault">
@@ -65,7 +70,7 @@ export const VaultDemo = () => {
       </ActionBlock>
 
       <Action
-        title="Get Vault Entities List"
+        title="Fetch Vaults List (first 10)"
         walletAction
         action={async () => {
           const result = await vaultViewer.fetchConnectedVaultEntities({
@@ -252,6 +257,40 @@ export const VaultDemo = () => {
             account,
           })
         }
+      />
+
+      <Action
+        title="Get Role Members"
+        walletAction
+        action={async () => {
+          if (currentVault && role) {
+            return await vaultViewer.getRoleMembers({
+              vaultAddress: currentVault.getVaultAddress(),
+              roles: [role],
+            });
+          }
+        }}
+      >
+        <Select
+          fullwidth
+          label="Select role"
+          multiple
+          onChange={(r) => {
+            setRole(r as Hash);
+          }}
+        >
+          {Array.from(roleHashesSet).map((role) => (
+            <Option key={role} value={role}>
+              {role}
+            </Option>
+          ))}
+        </Select>
+      </Action>
+
+      <Action
+        title="Disburse Node Operator Fee"
+        walletAction
+        action={() => currentVault?.disburseNodeOperatorFee({ account })}
       />
     </Accordion>
   );
