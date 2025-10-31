@@ -24,7 +24,7 @@ import type { ParsedProps } from '../unsteth/types.js';
 import { DashboardAbi } from './abi/index.js';
 import { getReportProofByVault } from './utils/report-proof.js';
 import { Cache, ErrorHandler, Logger } from '../common/decorators/index.js';
-import { validateRole } from './consts/roles.js';
+
 import { getVaultReport } from './utils/report.js';
 import { PROXY_CODE_PAD_LEFT, PROXY_CODE_PAD_RIGHT } from './consts/index.js';
 
@@ -533,9 +533,10 @@ export class LidoSDKVaultEntity extends BusModule {
     };
   }
 
-  private _validateRoles(roles: Array<{ account: Address; role: Hash }>) {
+  private async _validateRoles(roles: Array<{ account: Address; role: Hash }>) {
+    const ROLES = await this.bus.constants.ROLES();
     for (const role of roles) {
-      if (!validateRole(role.role)) {
+      if (!Object.values(ROLES).includes(role.role)) {
         throw this.bus.core.error({
           code: ERROR_CODE.TRANSACTION_ERROR,
           message: `Invalid role "${role.role}" found.`,
@@ -548,7 +549,7 @@ export class LidoSDKVaultEntity extends BusModule {
   @Logger('Call:')
   @ErrorHandler()
   public async grantRoles(props: SetRolesProps) {
-    this._validateRoles(props.roles);
+    await this._validateRoles(props.roles);
     const parsedProps = await this.parseProps(props);
 
     return this.bus.core.performTransaction({
@@ -563,7 +564,7 @@ export class LidoSDKVaultEntity extends BusModule {
   @Logger('Call:')
   @ErrorHandler()
   public async grantRolesSimulateTx(props: SetRolesProps) {
-    this._validateRoles(props.roles);
+    await this._validateRoles(props.roles);
     const parsedProps = await this.parseProps(props);
 
     return parsedProps.dashboard.simulate.grantRoles([props.roles], {
@@ -574,7 +575,7 @@ export class LidoSDKVaultEntity extends BusModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async grantRolesPopulateTx(props: SetRolesProps) {
-    this._validateRoles(props.roles);
+    await this._validateRoles(props.roles);
     const parsedProps = await this.parseProps(props);
 
     return {
@@ -592,7 +593,7 @@ export class LidoSDKVaultEntity extends BusModule {
   @Logger('Call:')
   @ErrorHandler()
   public async revokeRoles(props: SetRolesProps) {
-    this._validateRoles(props.roles);
+    await this._validateRoles(props.roles);
     const parsedProps = await this.parseProps(props);
 
     return this.bus.core.performTransaction({
@@ -607,7 +608,7 @@ export class LidoSDKVaultEntity extends BusModule {
   @Logger('Call:')
   @ErrorHandler()
   public async revokeRolesSimulateTx(props: SetRolesProps) {
-    this._validateRoles(props.roles);
+    await this._validateRoles(props.roles);
     const parsedProps = await this.parseProps(props);
 
     return parsedProps.dashboard.simulate.revokeRoles([props.roles], {
@@ -618,7 +619,7 @@ export class LidoSDKVaultEntity extends BusModule {
   @Logger('Utils:')
   @ErrorHandler()
   public async revokeRolesPopulateTx(props: SetRolesProps) {
-    this._validateRoles(props.roles);
+    await this._validateRoles(props.roles);
     const parsedProps = await this.parseProps(props);
 
     return {
@@ -631,8 +632,6 @@ export class LidoSDKVaultEntity extends BusModule {
       }),
     };
   }
-
-  // todo revoke roles
 
   // disburseNodeOperatorFee methods
   @Logger('Call:')

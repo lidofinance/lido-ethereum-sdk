@@ -21,7 +21,6 @@ import {
 import { ERROR_CODE, invariant } from '../common/index.js';
 import { BusModule } from './bus-module.js';
 import { LidoSDKVaultContracts } from './vault-contracts.js';
-import { validateRole } from './consts/roles.js';
 
 export class LidoSDKVaultFactory extends BusModule {
   private _validateNodeOperatorFeeRate(nodeOperatorFeeRate: bigint) {
@@ -50,9 +49,10 @@ export class LidoSDKVaultFactory extends BusModule {
     }
   }
 
-  private _validateRoles(roles: Array<{ account: Address; role: Hash }>) {
+  private async _validateRoles(roles: Array<{ account: Address; role: Hash }>) {
+    const ROLES = await this.bus.constants.ROLES();
     for (const role of roles) {
-      if (!validateRole(role.role)) {
+      if (!Object.values(ROLES).includes(role.role)) {
         throw this.bus.core.error({
           code: ERROR_CODE.INVALID_ARGUMENT,
           message: `Invalid role "${role.role}" found.`,
@@ -62,7 +62,7 @@ export class LidoSDKVaultFactory extends BusModule {
   }
 
   private async _validateCreateVaultProps(props: CreateVaultProps) {
-    this._validateRoles(props.roleAssignments);
+    await this._validateRoles(props.roleAssignments);
     this._validateNodeOperatorFeeRate(props.nodeOperatorFeeBP);
     await this._validateConfirmExpiry(props.confirmExpiry);
   }
@@ -121,7 +121,7 @@ export class LidoSDKVaultFactory extends BusModule {
   public async createVaultSimulateTx(
     props: CreateVaultProps,
   ): Promise<WriteContractParameters> {
-    this._validateCreateVaultProps(props);
+    await this._validateCreateVaultProps(props);
 
     const { account, txArgs } = await this.parseProps(props);
     const contract = await this.bus.contracts.getContractVaultFactory();
@@ -151,7 +151,7 @@ export class LidoSDKVaultFactory extends BusModule {
   @Logger('Call:')
   @ErrorHandler()
   public async createVaultPopulateTx(props: CreateVaultProps) {
-    this._validateCreateVaultProps(props);
+    await this._validateCreateVaultProps(props);
 
     const { account, txArgs } = await this.parseProps(props);
     const contract = await this.bus.contracts.getContractVaultFactory();

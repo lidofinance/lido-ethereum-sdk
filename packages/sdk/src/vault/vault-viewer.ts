@@ -8,7 +8,6 @@ import {
   GetVaultDataProps,
 } from './types.js';
 import { BusModule } from './bus-module.js';
-import { validateRole } from './consts/roles.js';
 import { ERROR_CODE } from '../common/index.js';
 
 export class LidoSDKVaultViewer extends BusModule {
@@ -51,9 +50,11 @@ export class LidoSDKVaultViewer extends BusModule {
     };
   }
 
-  private _validateRoles(roles: Hash[]) {
+  private async _validateRoles(roles: Hash[]) {
+    const ROLES = await this.bus.constants.ROLES();
+
     for (const role of roles) {
-      if (!validateRole(role)) {
+      if (!Object.values(ROLES).includes(role)) {
         throw this.bus.core.error({
           code: ERROR_CODE.TRANSACTION_ERROR,
           message: `Invalid role "${role}" found.`,
@@ -63,14 +64,14 @@ export class LidoSDKVaultViewer extends BusModule {
   }
 
   public async getRoleMembers(props: GetRoleMembersProps) {
-    this._validateRoles(props.roles);
+    await this._validateRoles(props.roles);
     const vaultViewer = await this.bus.contracts.getContractVaultViewer();
 
     return vaultViewer.read.getRoleMembers([props.vaultAddress, props.roles]);
   }
 
   public async getRoleMembersBatch(props: GetRoleMembersBatchProps) {
-    this._validateRoles(props.roles);
+    await this._validateRoles(props.roles);
     const vaultViewer = await this.bus.contracts.getContractVaultViewer();
 
     return vaultViewer.read.getRoleMembersBatch([
