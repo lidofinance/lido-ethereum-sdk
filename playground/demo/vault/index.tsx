@@ -9,20 +9,16 @@ import { useWeb3 } from 'reef-knot/web3-react';
 import { Action } from 'components/action';
 import TokenInput, { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
 import { useLidoSDK } from 'providers/sdk';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Address, Hash } from 'viem';
-import {
-  LidoSDKVaultEntity,
-  Token,
-  roleHashesSet,
-} from '@lidofinance/lido-ethereum-sdk';
+import { LidoSDKVaultEntity, Token } from '@lidofinance/lido-ethereum-sdk';
 import { ActionBlock } from '../../components/action/styles';
 
 export const VaultDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
   const account = web3account as `0x{string}`;
   const { vaultModule } = useLidoSDK();
-  const { vaultFactory, vaultViewer } = vaultModule;
+  const { vaultFactory, vaultViewer, constants } = vaultModule;
 
   const [fundEthValue, setFundEthValue] = useState<ValueType>(DEFAULT_VALUE);
   const [vaults, setVaults] = useState<LidoSDKVaultEntity[]>([]);
@@ -46,6 +42,20 @@ export const VaultDemo = () => {
     useState<ValueType>(DEFAULT_VALUE);
   const [approveTokenValue, setApproveTokenValue] = useState<Token>('steth');
   const [role, setRole] = useState<Hash>();
+  const [vaultRoleHashes, setVaultRoleHashes] = useState<Hash[]>([]);
+
+  useEffect(() => {
+    const fetchDataAsync = async () => {
+      try {
+        const ROLES = await constants.ROLES();
+        setVaultRoleHashes(Object.values(ROLES));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    void fetchDataAsync();
+  }, [constants]);
 
   return (
     <Accordion summary="Vault">
@@ -279,7 +289,7 @@ export const VaultDemo = () => {
             setRole(r as Hash);
           }}
         >
-          {Array.from(roleHashesSet).map((role) => (
+          {Array.from(vaultRoleHashes).map((role) => (
             <Option key={role} value={role}>
               {role}
             </Option>
