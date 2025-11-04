@@ -642,9 +642,9 @@ export class LidoSDKVaultEntity extends BusModule {
     return this.bus.core.performTransaction({
       ...parsedProps,
       getGasLimit: (options) =>
-        parsedProps.dashboard.estimateGas.disburseNodeOperatorFee(options),
+        parsedProps.dashboard.estimateGas.disburseFee(options),
       sendTransaction: (options) =>
-        parsedProps.dashboard.write.disburseNodeOperatorFee(options),
+        parsedProps.dashboard.write.disburseFee(options),
     });
   }
 
@@ -655,7 +655,7 @@ export class LidoSDKVaultEntity extends BusModule {
   ) {
     const parsedProps = await this.parseProps(props);
 
-    return parsedProps.dashboard.simulate.disburseNodeOperatorFee({
+    return parsedProps.dashboard.simulate.disburseFee({
       account: parsedProps.account,
     });
   }
@@ -672,7 +672,7 @@ export class LidoSDKVaultEntity extends BusModule {
       to: parsedProps.dashboard.address,
       data: encodeFunctionData({
         abi: parsedProps.dashboard.abi,
-        functionName: 'disburseNodeOperatorFee',
+        functionName: 'disburseFee',
         args: [],
       }),
     };
@@ -740,7 +740,19 @@ export class LidoSDKVaultEntity extends BusModule {
     const txArgs = await this.getSubmitReportTxArgs(props);
     const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
 
-    return lazyOracleContract.estimateGas.updateVaultData(txArgs, {
+    return lazyOracleContract.simulate.updateVaultData(txArgs, {
+      account: parsedProps.account,
+    });
+  }
+
+  @Logger('Call:')
+  @ErrorHandler()
+  async submitReportSimulateTxAndCheckFreshReport(props: SubmitReportProps) {
+    const parsedProps = await this.parseProps(props);
+    const txArgs = await this.getSubmitReportTxArgs(props);
+    const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
+
+    return lazyOracleContract.simulate.updateVaultData(txArgs, {
       account: parsedProps.account,
     });
   }

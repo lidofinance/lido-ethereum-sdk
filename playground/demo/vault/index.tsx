@@ -268,6 +268,16 @@ export const VaultDemo = () => {
           })
         }
       />
+      <Action
+        title="Submit Report Simulate"
+        walletAction
+        action={() =>
+          currentVault?.submitReportSimulateTx({
+            account,
+            skipIsFresh: true,
+          })
+        }
+      />
 
       <Action
         title="Get Role Members"

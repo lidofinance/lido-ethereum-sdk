@@ -27,6 +27,11 @@ export const DashboardAbi = [
   },
   {
     inputs: [],
+    name: 'AbnormallyHighFee',
+    type: 'error',
+  },
+  {
+    inputs: [],
     name: 'AccessControlBadConfirmation',
     type: 'error',
   },
@@ -48,16 +53,6 @@ export const DashboardAbi = [
   },
   {
     inputs: [],
-    name: 'AdjustmentNotReported',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'AdjustmentNotSettled',
-    type: 'error',
-  },
-  {
-    inputs: [],
     name: 'AlreadyInitialized',
     type: 'error',
   },
@@ -69,6 +64,11 @@ export const DashboardAbi = [
   {
     inputs: [],
     name: 'ConnectedToVaultHub',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'CorrectionAfterReport',
     type: 'error',
   },
   {
@@ -131,33 +131,33 @@ export const DashboardAbi = [
   },
   {
     inputs: [],
-    name: 'IncreasedOverLimit',
-    type: 'error',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: 'currentAdjustment',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'currentAtPropositionAdjustment',
-        type: 'uint256',
-      },
-    ],
-    name: 'InvalidatedAdjustmentVote',
+    name: 'ForbiddenByPDGPolicy',
     type: 'error',
   },
   {
     inputs: [],
-    name: 'NonProxyCallsForbidden',
+    name: 'PDGPolicyAlreadyActive',
     type: 'error',
   },
   {
     inputs: [],
     name: 'ReportStale',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint8',
+        name: 'bits',
+        type: 'uint8',
+      },
+      {
+        internalType: 'int256',
+        name: 'value',
+        type: 'int256',
+      },
+    ],
+    name: 'SafeCastOverflowedIntDowncast',
     type: 'error',
   },
   {
@@ -173,12 +173,12 @@ export const DashboardAbi = [
   },
   {
     inputs: [],
-    name: 'SameAdjustment',
+    name: 'SameRecipient',
     type: 'error',
   },
   {
     inputs: [],
-    name: 'SameRecipient',
+    name: 'SameSettledGrowth',
     type: 'error',
   },
   {
@@ -188,7 +188,22 @@ export const DashboardAbi = [
   },
   {
     inputs: [],
+    name: 'SettledGrowthMismatch',
+    type: 'error',
+  },
+  {
+    inputs: [],
     name: 'TierChangeNotConfirmed',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'UnexpectedFeeExemptionAmount',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'UnexpectedSettledGrowth',
     type: 'error',
   },
   {
@@ -263,8 +278,15 @@ export const DashboardAbi = [
   },
   {
     anonymous: false,
-    inputs: [],
-    name: 'Initialized',
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'timestamp',
+        type: 'uint256',
+      },
+    ],
+    name: 'CorrectionTimestampUpdated',
     type: 'event',
   },
   {
@@ -283,7 +305,7 @@ export const DashboardAbi = [
         type: 'uint256',
       },
     ],
-    name: 'NodeOperatorFeeDisbursed',
+    name: 'FeeDisbursed',
     type: 'event',
   },
   {
@@ -298,17 +320,17 @@ export const DashboardAbi = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'oldNodeOperatorFeeRate',
+        name: 'oldFeeRate',
         type: 'uint256',
       },
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'newNodeOperatorFeeRate',
+        name: 'newFeeRate',
         type: 'uint256',
       },
     ],
-    name: 'NodeOperatorFeeRateSet',
+    name: 'FeeRateSet',
     type: 'event',
   },
   {
@@ -323,17 +345,23 @@ export const DashboardAbi = [
       {
         indexed: false,
         internalType: 'address',
-        name: 'oldNodeOperatorFeeRecipient',
+        name: 'oldFeeRecipient',
         type: 'address',
       },
       {
         indexed: false,
         internalType: 'address',
-        name: 'newNodeOperatorFeeRecipient',
+        name: 'newFeeRecipient',
         type: 'address',
       },
     ],
-    name: 'NodeOperatorFeeRecipientSet',
+    name: 'FeeRecipientSet',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [],
+    name: 'Initialized',
     type: 'event',
   },
   {
@@ -341,18 +369,12 @@ export const DashboardAbi = [
     inputs: [
       {
         indexed: false,
-        internalType: 'uint256',
-        name: 'newAdjustment',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'oldAdjustment',
-        type: 'uint256',
+        internalType: 'enum Dashboard.PDGPolicy',
+        name: 'pdgPolicy',
+        type: 'uint8',
       },
     ],
-    name: 'RewardsAdjustmentSet',
+    name: 'PDGPolicyEnacted',
     type: 'event',
   },
   {
@@ -417,7 +439,7 @@ export const DashboardAbi = [
       {
         indexed: true,
         internalType: 'bytes32',
-        name: 'role',
+        name: 'roleOrAddress',
         type: 'bytes32',
       },
       {
@@ -465,6 +487,25 @@ export const DashboardAbi = [
       },
     ],
     name: 'RoleRevoked',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'int128',
+        name: 'oldSettledGrowth',
+        type: 'int128',
+      },
+      {
+        indexed: false,
+        internalType: 'int128',
+        name: 'newSettledGrowth',
+        type: 'int128',
+      },
+    ],
+    name: 'SettledGrowthSet',
     type: 'event',
   },
   {
@@ -572,19 +613,6 @@ export const DashboardAbi = [
   },
   {
     inputs: [],
-    name: 'MANUAL_REWARDS_ADJUSTMENT_LIMIT',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
     name: 'MAX_CONFIRM_EXPIRY',
     outputs: [
       {
@@ -624,6 +652,19 @@ export const DashboardAbi = [
   },
   {
     inputs: [],
+    name: 'NODE_OPERATOR_FEE_EXEMPT_ROLE',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'NODE_OPERATOR_MANAGER_ROLE',
     outputs: [
       {
@@ -637,7 +678,20 @@ export const DashboardAbi = [
   },
   {
     inputs: [],
-    name: 'NODE_OPERATOR_REWARDS_ADJUST_ROLE',
+    name: 'NODE_OPERATOR_PROVE_UNKNOWN_VALIDATOR_ROLE',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE',
     outputs: [
       {
         internalType: 'bytes32',
@@ -651,19 +705,6 @@ export const DashboardAbi = [
   {
     inputs: [],
     name: 'PAUSE_BEACON_CHAIN_DEPOSITS_ROLE',
-    outputs: [
-      {
-        internalType: 'bytes32',
-        name: '',
-        type: 'bytes32',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'PDG_PROVE_VALIDATOR_ROLE',
     outputs: [
       {
         internalType: 'bytes32',
@@ -729,19 +770,6 @@ export const DashboardAbi = [
   {
     inputs: [],
     name: 'TRIGGER_VALIDATOR_WITHDRAWAL_ROLE',
-    outputs: [
-      {
-        internalType: 'bytes32',
-        name: '',
-        type: 'bytes32',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'UNGUARANTEED_BEACON_CHAIN_DEPOSIT_ROLE',
     outputs: [
       {
         internalType: 'bytes32',
@@ -826,6 +854,32 @@ export const DashboardAbi = [
       },
     ],
     name: 'abandonDashboard',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'accruedFee',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'fee',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_exemptedAmount',
+        type: 'uint256',
+      },
+    ],
+    name: 'addFeeExemption',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -965,6 +1019,11 @@ export const DashboardAbi = [
         name: '_requestedShareLimit',
         type: 'uint256',
       },
+      {
+        internalType: 'uint256',
+        name: '_currentSettledGrowth',
+        type: 'uint256',
+      },
     ],
     name: 'connectAndAcceptTier',
     outputs: [],
@@ -972,37 +1031,64 @@ export const DashboardAbi = [
     type: 'function',
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_currentSettledGrowth',
+        type: 'uint256',
+      },
+    ],
     name: 'connectToVaultHub',
     outputs: [],
     stateMutability: 'payable',
     type: 'function',
   },
   {
+    inputs: [
+      {
+        internalType: 'int256',
+        name: '_newSettledGrowth',
+        type: 'int256',
+      },
+      {
+        internalType: 'int256',
+        name: '_expectedSettledGrowth',
+        type: 'int256',
+      },
+    ],
+    name: 'correctSettledGrowth',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [],
-    name: 'disburseNodeOperatorFee',
+    name: 'disburseAbnormallyHighFee',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
     inputs: [],
-    name: 'feePeriodStartReport',
+    name: 'disburseFee',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'feeRate',
     outputs: [
       {
-        internalType: 'uint104',
-        name: 'totalValue',
-        type: 'uint104',
-      },
-      {
-        internalType: 'int104',
-        name: 'inOutDelta',
-        type: 'int104',
-      },
-      {
-        internalType: 'uint48',
-        name: 'timestamp',
-        type: 'uint48',
+        internalType: 'uint16',
+        name: '',
+        type: 'uint16',
       },
     ],
     stateMutability: 'view',
@@ -1010,12 +1096,12 @@ export const DashboardAbi = [
   },
   {
     inputs: [],
-    name: 'forcedRebalanceThresholdBP',
+    name: 'feeRecipient',
     outputs: [
       {
-        internalType: 'uint16',
+        internalType: 'address',
         name: '',
-        type: 'uint16',
+        type: 'address',
       },
     ],
     stateMutability: 'view',
@@ -1205,32 +1291,6 @@ export const DashboardAbi = [
   {
     inputs: [
       {
-        internalType: 'uint256',
-        name: '_adjustmentIncrease',
-        type: 'uint256',
-      },
-    ],
-    name: 'increaseRewardsAdjustment',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'infraFeeBP',
-    outputs: [
-      {
-        internalType: 'uint16',
-        name: '',
-        type: 'uint16',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
         internalType: 'address',
         name: '_defaultAdmin',
         type: 'address',
@@ -1276,6 +1336,19 @@ export const DashboardAbi = [
   },
   {
     inputs: [],
+    name: 'latestCorrectionTimestamp',
+    outputs: [
+      {
+        internalType: 'uint64',
+        name: '',
+        type: 'uint64',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'latestReport',
     outputs: [
       {
@@ -1312,19 +1385,6 @@ export const DashboardAbi = [
         internalType: 'uint256',
         name: '',
         type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'liquidityFeeBP',
-    outputs: [
-      {
-        internalType: 'uint16',
-        name: '',
-        type: 'uint16',
       },
     ],
     stateMutability: 'view',
@@ -1425,45 +1485,6 @@ export const DashboardAbi = [
   },
   {
     inputs: [],
-    name: 'nodeOperatorDisbursableFee',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'nodeOperatorFeeRate',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'nodeOperatorFeeRecipient',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
     name: 'obligations',
     outputs: [
       {
@@ -1482,9 +1503,35 @@ export const DashboardAbi = [
   },
   {
     inputs: [],
+    name: 'obligationsShortfallValue',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'pauseBeaconChainDeposits',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'pdgPolicy',
+    outputs: [
+      {
+        internalType: 'enum Dashboard.PDGPolicy',
+        name: '',
+        type: 'uint8',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -1559,7 +1606,13 @@ export const DashboardAbi = [
     type: 'function',
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_currentSettledGrowth',
+        type: 'uint256',
+      },
+    ],
     name: 'reconnectToVaultHub',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -1640,32 +1693,6 @@ export const DashboardAbi = [
   },
   {
     inputs: [],
-    name: 'reservationFeeBP',
-    outputs: [
-      {
-        internalType: 'uint16',
-        name: '',
-        type: 'uint16',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'reserveRatioBP',
-    outputs: [
-      {
-        internalType: 'uint16',
-        name: '',
-        type: 'uint16',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
     name: 'resumeBeaconChainDeposits',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -1715,24 +1742,6 @@ export const DashboardAbi = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'rewardsAdjustment',
-    outputs: [
-      {
-        internalType: 'uint128',
-        name: 'amount',
-        type: 'uint128',
-      },
-      {
-        internalType: 'uint64',
-        name: 'latestTimestamp',
-        type: 'uint64',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [
       {
         internalType: 'uint256',
@@ -1755,11 +1764,11 @@ export const DashboardAbi = [
     inputs: [
       {
         internalType: 'uint256',
-        name: '_newNodeOperatorFeeRate',
+        name: '_newFeeRate',
         type: 'uint256',
       },
     ],
-    name: 'setNodeOperatorFeeRate',
+    name: 'setFeeRate',
     outputs: [
       {
         internalType: 'bool',
@@ -1774,11 +1783,11 @@ export const DashboardAbi = [
     inputs: [
       {
         internalType: 'address',
-        name: '_newNodeOperatorFeeRecipient',
+        name: '_newFeeRecipient',
         type: 'address',
       },
     ],
-    name: 'setNodeOperatorFeeRecipient',
+    name: 'setFeeRecipient',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -1786,35 +1795,24 @@ export const DashboardAbi = [
   {
     inputs: [
       {
-        internalType: 'uint256',
-        name: '_proposedAdjustment',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: '_expectedAdjustment',
-        type: 'uint256',
+        internalType: 'enum Dashboard.PDGPolicy',
+        name: '_pdgPolicy',
+        type: 'uint8',
       },
     ],
-    name: 'setRewardsAdjustment',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
+    name: 'setPDGPolicy',
+    outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
   },
   {
     inputs: [],
-    name: 'shareLimit',
+    name: 'settledGrowth',
     outputs: [
       {
-        internalType: 'uint256',
+        internalType: 'int128',
         name: '',
-        type: 'uint256',
+        type: 'int128',
       },
     ],
     stateMutability: 'view',
@@ -1900,7 +1898,13 @@ export const DashboardAbi = [
       },
     ],
     name: 'transferVaultOwnership',
-    outputs: [],
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
     stateMutability: 'nonpayable',
     type: 'function',
   },
@@ -2040,7 +2044,7 @@ export const DashboardAbi = [
           },
           {
             internalType: 'bool',
-            name: 'isBeaconDepositsManuallyPaused',
+            name: 'beaconChainDepositsPauseIntent',
             type: 'bool',
           },
         ],
