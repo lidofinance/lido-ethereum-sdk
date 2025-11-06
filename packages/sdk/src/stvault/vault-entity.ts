@@ -79,7 +79,7 @@ export class LidoSDKVaultEntity extends BusModule {
       });
     }
 
-    return this.bus.contracts.getVaultDashboard(this.dashboardAddress);
+    return this.bus.contracts.getContractVaultDashboard(this.dashboardAddress);
   }
 
   public getVaultAddress(): Address {
@@ -93,7 +93,7 @@ export class LidoSDKVaultEntity extends BusModule {
       return this.dashboardAddress;
     }
 
-    const vaultHub = await this.bus.contracts.getVaultHub();
+    const vaultHub = await this.bus.contracts.getContractVaultHub();
 
     const isVaultConnected = await vaultHub.read.isVaultConnected([
       this.vaultAddress,
@@ -731,7 +731,7 @@ export class LidoSDKVaultEntity extends BusModule {
   public async getRoleMembers(props: GetVaultRoleMembersProps) {
     const address = await this.getDashboardAddress();
     const dashboardContract =
-      await this.bus.contracts.getVaultDashboard(address);
+      await this.bus.contracts.getContractVaultDashboard(address);
     return dashboardContract.read.getRoleMembers([props.role]);
   }
 

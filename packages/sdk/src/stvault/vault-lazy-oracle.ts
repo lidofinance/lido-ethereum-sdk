@@ -38,7 +38,7 @@ export class LidoSDKVaultLazyOracle extends BusModule {
     const { gateway, vaultAddress } = props;
 
     const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
-    const vaultHubContract = await this.bus.contracts.getVaultHub();
+    const vaultHubContract = await this.bus.contracts.getContractVaultHub();
 
     const latestReportData = await lazyOracleContract.read.latestReportData();
     const vaultsDataReportCid = latestReportData[3];

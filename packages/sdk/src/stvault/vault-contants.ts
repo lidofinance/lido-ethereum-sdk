@@ -8,7 +8,7 @@ export class LidoSDKVaultConstants extends BusModule {
   @ErrorHandler()
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async CONNECT_DEPOSIT() {
-    const vaultHub = await this.bus.contracts.getVaultHub();
+    const vaultHub = await this.bus.contracts.getContractVaultHub();
 
     return vaultHub.read.CONNECT_DEPOSIT();
   }
@@ -37,9 +37,8 @@ export class LidoSDKVaultConstants extends BusModule {
   public async ROLES() {
     const vaultFactory = await this.bus.contracts.getContractVaultFactory();
     const implementationAddress = await vaultFactory.read.DASHBOARD_IMPL();
-    const dashboardContract = await this.bus.contracts.getVaultDashboard(
-      implementationAddress,
-    );
+    const dashboardContract =
+      await this.bus.contracts.getContractVaultDashboard(implementationAddress);
 
     const roleValues: Hex[] = await Promise.all(
       dashboardRoles.map((key) => (dashboardContract.read as any)[key]()),

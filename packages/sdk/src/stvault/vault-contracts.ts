@@ -54,7 +54,7 @@ export class LidoSDKVaultContracts extends BusModule {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id', 'address'])
-  public async getVaultDashboard(
+  public async getContractVaultDashboard(
     address: Address,
   ): Promise<GetContractReturnType<typeof DashboardAbi, WalletClient>> {
     return getContract({
@@ -69,7 +69,7 @@ export class LidoSDKVaultContracts extends BusModule {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
-  public async getVaultHub(): Promise<
+  public async getContractVaultHub(): Promise<
     GetContractReturnType<typeof VaultHubAbi, WalletClient>
   > {
     const address = await this.bus.core
