@@ -20,4 +20,3 @@ export const supportedChains = process.env?.SUPPORTED_CHAINS?.split(',').map(
   (chainId) => parseInt(chainId, 10),
 ) ?? [17000, 560048, 11155111];
 export const walletconnectProjectId = process.env.WALLETCONNECT_PROJECT_ID;
-export const customLidoLocatorAddress = process.env.CUSTOM_LIDO_LOCATOR_ADDRESS;

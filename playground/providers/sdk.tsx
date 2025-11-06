@@ -25,7 +25,6 @@ export const LidoSDKProvider: React.FC<PropsWithChildren> = ({ children }) => {
       rpcProvider: publicClient as any,
       web3Provider: walletClient as any,
       logMode: 'debug',
-      customLidoLocatorAddress: dynamics.customLidoLocatorAddress as Address,
     });
     // inject lido_sdk for console access
     if (typeof window !== 'undefined') (window as any).lido_sdk = sdk;
