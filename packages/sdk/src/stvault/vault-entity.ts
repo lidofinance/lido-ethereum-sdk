@@ -16,13 +16,12 @@ import {
   MintSharesProps,
   PopulateProps,
   SetRolesProps,
-  SubmitReportProps,
+  VaultSubmitReportProps,
   WithdrawProps,
 } from './types.js';
 import { ERROR_CODE, NOOP } from '../common/index.js';
 import type { ParsedProps } from '../unsteth/types.js';
-import { DashboardAbi } from './abi/index.js';
-import { getReportProofByVault } from './utils/report-proof.js';
+import { DashboardAbi, StakingVaultAbi } from './abi/index.js';
 import { Cache, ErrorHandler, Logger } from '../common/decorators/index.js';
 
 import { getVaultReport } from './utils/report.js';
@@ -31,16 +30,19 @@ import { PROXY_CODE_PAD_LEFT, PROXY_CODE_PAD_RIGHT } from './consts/index.js';
 type LidoSDKVaultEntityProps = LidoSDKVaultsModuleProps & {
   dashboardAddress?: Address;
   vaultAddress: Address;
+  skipDashboardCheck?: boolean;
 };
 
 export class LidoSDKVaultEntity extends BusModule {
   private dashboardAddress?: Address;
   private readonly vaultAddress: Address;
+  private readonly skipDashboardCheck: boolean;
 
   constructor(props: LidoSDKVaultEntityProps) {
     super(props);
     this.vaultAddress = props.vaultAddress;
     this.dashboardAddress = props.dashboardAddress;
+    this.skipDashboardCheck = !!props.skipDashboardCheck;
   }
 
   @Logger('Utils:')
@@ -51,9 +53,7 @@ export class LidoSDKVaultEntity extends BusModule {
       }
     >
   > {
-    const dashboardAddress = await this.getDashboardAddress();
-    const dashboard =
-      await this.bus.contracts.getVaultDashboard(dashboardAddress);
+    const dashboard = await this.getDashboardContract();
 
     return {
       ...props,
@@ -61,6 +61,25 @@ export class LidoSDKVaultEntity extends BusModule {
       callback: props.callback ?? NOOP,
       account: await this.bus.core.useAccount(props.account),
     };
+  }
+
+  public getVaultContract(): Promise<
+    GetContractReturnType<typeof StakingVaultAbi, WalletClient>
+  > {
+    return this.bus.contracts.getContractVault(this.vaultAddress);
+  }
+
+  public getDashboardContract(): Promise<
+    GetContractReturnType<typeof DashboardAbi, WalletClient>
+  > {
+    if (!this.dashboardAddress) {
+      throw this.bus.core.error({
+        code: ERROR_CODE.READ_ERROR,
+        message: 'Dashboard address not found is not found.',
+      });
+    }
+
+    return this.bus.contracts.getVaultDashboard(this.dashboardAddress);
   }
 
   public getVaultAddress(): Address {
@@ -98,13 +117,15 @@ export class LidoSDKVaultEntity extends BusModule {
       });
     }
 
-    const isOwnerDashboard = await this.isDashboard(vaultConnection.owner);
+    if (!this.skipDashboardCheck) {
+      const isOwnerDashboard = await this.isDashboard(vaultConnection.owner);
 
-    if (!isOwnerDashboard) {
-      throw this.bus.core.error({
-        code: ERROR_CODE.NOT_SUPPORTED,
-        message: 'Owner of vault is not dashboard contract',
-      });
+      if (!isOwnerDashboard) {
+        throw this.bus.core.error({
+          code: ERROR_CODE.NOT_SUPPORTED,
+          message: 'Owner of vault is not dashboard contract',
+        });
+      }
     }
 
     this.dashboardAddress = vaultConnection.owner;
@@ -678,101 +699,31 @@ export class LidoSDKVaultEntity extends BusModule {
     };
   }
 
-  @Logger('Utils:')
-  @ErrorHandler()
-  private async getSubmitReportTxArgs(props: SubmitReportProps) {
-    const vaultAddress = this.getVaultAddress();
-    const { gateway } = props;
-
-    const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
-    const vaultHubContract = await this.bus.contracts.getVaultHub();
-
-    const latestReportData = await lazyOracleContract.read.latestReportData();
-    const vaultsDataReportCid = latestReportData[3];
-
-    if (!props.skipIsFresh) {
-      const isReportFresh = await vaultHubContract.read.isReportFresh([
-        vaultAddress,
-      ]);
-
-      if (isReportFresh) {
-        throw new Error('Report is fresh. You dont need to submit it again');
-      }
-    }
-
-    const proof = await getReportProofByVault({
-      vault: vaultAddress,
-      cid: vaultsDataReportCid,
-      gateway,
-    });
-
-    return [
-      vaultAddress,
-      BigInt(proof.data.totalValueWei),
-      BigInt(proof.data.fee),
-      BigInt(proof.data.liabilityShares),
-      BigInt(proof.data.maxLiabilityShares),
-      BigInt(proof.data.slashingReserve),
-      proof.proof,
-    ] as const;
-  }
-
   @Logger('Call:')
   @ErrorHandler()
-  async submitReport(props: SubmitReportProps) {
-    const parsedProps = await this.parseProps(props);
-    const txArgs = await this.getSubmitReportTxArgs(props);
-    const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
-
-    return this.bus.core.performTransaction({
-      ...parsedProps,
-      getGasLimit: (options) =>
-        lazyOracleContract.estimateGas.updateVaultData(txArgs, options),
-      sendTransaction: (options) =>
-        lazyOracleContract.write.updateVaultData(txArgs, options),
+  async submitLatestReport(props: VaultSubmitReportProps) {
+    return this.bus.lazyOracle.submitLatestReport({
+      ...props,
+      vaultAddress: this.vaultAddress,
     });
   }
 
   @Logger('Call:')
   @ErrorHandler()
-  async submitReportSimulateTx(props: SubmitReportProps) {
-    const parsedProps = await this.parseProps(props);
-    const txArgs = await this.getSubmitReportTxArgs(props);
-    const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
-
-    return lazyOracleContract.simulate.updateVaultData(txArgs, {
-      account: parsedProps.account,
-    });
-  }
-
-  @Logger('Call:')
-  @ErrorHandler()
-  async submitReportSimulateTxAndCheckFreshReport(props: SubmitReportProps) {
-    const parsedProps = await this.parseProps(props);
-    const txArgs = await this.getSubmitReportTxArgs(props);
-    const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
-
-    return lazyOracleContract.simulate.updateVaultData(txArgs, {
-      account: parsedProps.account,
+  async submitLatestReportSimulateTx(props: VaultSubmitReportProps) {
+    return this.bus.lazyOracle.submitLatestReportSimulateTx({
+      ...props,
+      vaultAddress: this.vaultAddress,
     });
   }
 
   @Logger('Utils:')
   @ErrorHandler()
-  async submitReportPopulateTx(props: SubmitReportProps) {
-    const parsedProps = await this.parseProps(props);
-    const txArgs = await this.getSubmitReportTxArgs(props);
-    const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();
-
-    return {
-      from: parsedProps.account.address,
-      to: lazyOracleContract.address,
-      data: encodeFunctionData({
-        abi: lazyOracleContract.abi,
-        functionName: 'updateVaultData',
-        args: txArgs,
-      }),
-    };
+  async submitLatestReportPopulateTx(props: VaultSubmitReportProps) {
+    return this.bus.lazyOracle.submitLatestReportPopulateTx({
+      ...props,
+      vaultAddress: this.vaultAddress,
+    });
   }
 
   @Logger('Views:')

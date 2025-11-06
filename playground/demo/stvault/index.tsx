@@ -14,11 +14,11 @@ import type { Address, Hash } from 'viem';
 import { LidoSDKVaultEntity, Token } from '@lidofinance/lido-ethereum-sdk';
 import { ActionBlock } from '../../components/action/styles';
 
-export const VaultDemo = () => {
+export const StVaultDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
   const account = web3account as `0x{string}`;
-  const { vaultModule } = useLidoSDK();
-  const { vaultFactory, vaultViewer, constants } = vaultModule;
+  const { stVaultModule } = useLidoSDK();
+  const { vaultFactory, vaultViewer, constants } = stVaultModule;
 
   const [fundEthValue, setFundEthValue] = useState<ValueType>(DEFAULT_VALUE);
   const [vaults, setVaults] = useState<LidoSDKVaultEntity[]>([]);
@@ -65,7 +65,7 @@ export const VaultDemo = () => {
           label="Select current Vault"
           value={currentVault?.getVaultAddress()}
           onChange={(v) =>
-            setCurrentVault(vaultModule.vaultFromAddress(v as Address))
+            setCurrentVault(stVaultModule.vaultFromAddress(v as Address))
           }
         >
           {vaults.map((vault) => (
@@ -263,7 +263,7 @@ export const VaultDemo = () => {
         title="Submit Report"
         walletAction
         action={() =>
-          currentVault?.submitReport({
+          currentVault?.submitLatestReport({
             account,
           })
         }
@@ -272,7 +272,7 @@ export const VaultDemo = () => {
         title="Submit Report Simulate"
         walletAction
         action={() =>
-          currentVault?.submitReportSimulateTx({
+          currentVault?.submitLatestReportSimulateTx({
             account,
             skipIsFresh: true,
           })

@@ -72,10 +72,14 @@ export type SetRolesProps = CommonTransactionProps & {
   roles: Array<{ account: Address; role: Hash }>;
 };
 
-export type SubmitReportProps = CommonTransactionProps & {
+export type SubmitLatestReportProps = CommonTransactionProps & {
+  vaultAddress: Address;
   gateway?: string;
   skipIsFresh?: boolean;
 };
+
+export type VaultSubmitReportProps = CommonTransactionProps &
+  Omit<SubmitLatestReportProps, 'vaultAddress'>;
 
 // report proof types
 export type BigNumberType = 'bigint' | 'string';

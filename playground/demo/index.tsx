@@ -17,14 +17,14 @@ import { DualGovernanceDemo } from './dual-governance';
 import { useChainId } from 'wagmi';
 import { L2_CHAINS } from 'providers/web3';
 import { L2 } from './l2';
-import { VaultDemo } from './vault';
+import { StVaultDemo } from './stvault';
 
 export const Demo = () => {
   const chain = useChainId();
   if (L2_CHAINS.includes(chain)) return <L2 />;
   return (
     <>
-      <VaultDemo />
+      <StVaultDemo />
       <StakeDemo />
       <WrapDemo />
       <CoreDemo />
