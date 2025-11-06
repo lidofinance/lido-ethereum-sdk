@@ -3,6 +3,7 @@ import { StandardMerkleTree } from '@openzeppelin/merkle-tree';
 
 import { fetchIPFS } from './ipfs.js';
 import {
+  ExtraDataFields,
   LeafDataFields,
   Report,
   VaultReport,
@@ -95,14 +96,7 @@ export const getVaultData = (
     slashingReserve: '',
   };
 
-  // TODO: for old reports without extraValues
-  const extraData = report.extraValues?.[vault] || {
-    inOutDelta: '0',
-    prevFee: '0',
-    infraFee: '0',
-    liquidityFee: '0',
-    reservationFee: '0',
-  };
+  const extraData = report.extraValues[vault] as ExtraDataFields;
 
   for (const [fieldName, index] of Object.entries(report.leafIndexToData)) {
     const valueByIndex = match.value[index];

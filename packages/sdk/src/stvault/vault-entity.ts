@@ -737,7 +737,7 @@ export class LidoSDKVaultEntity extends BusModule {
 
   @Logger('Views:')
   @ErrorHandler()
-  public async getVaultReport() {
+  public async getLatestReport() {
     const vaultAddress = this.getVaultAddress();
     const { cid } = await this.bus.lazyOracle.getLastReportData();
     return getVaultReport({ vault: vaultAddress, cid });

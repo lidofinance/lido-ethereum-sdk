@@ -8,7 +8,7 @@ export const IPFS_GATEWAY = 'https://ipfs.io/ipfs';
 export const fetchIPFS = async <T>(args: ReportFetchArgs): Promise<T> => {
   const { cid, gateway = IPFS_GATEWAY } = args;
 
-  const { json } = await fetchIPFSDirectAndVerify<T>(cid, gateway);
+  const { json } = await fetchIPFSVerify<T>(cid, gateway);
   return json;
 };
 
@@ -51,7 +51,7 @@ export const calculateIPFSAddCID = async (
 };
 
 // Downloading file from IPFS and checking its integrity
-export const fetchIPFSDirectAndVerify = async <T>(
+export const fetchIPFSVerify = async <T>(
   cid: string,
   gateway = IPFS_GATEWAY,
 ): Promise<{ json: T; fileContent: Uint8Array }> => {

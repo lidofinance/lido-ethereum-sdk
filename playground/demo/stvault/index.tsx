@@ -268,6 +268,7 @@ export const StVaultDemo = () => {
           })
         }
       />
+
       <Action
         title="Submit Report Simulate"
         walletAction
@@ -277,6 +278,11 @@ export const StVaultDemo = () => {
             skipIsFresh: true,
           })
         }
+      />
+
+      <Action
+        title="Get latest report"
+        action={() => currentVault?.getLatestReport()}
       />
 
       <Action
