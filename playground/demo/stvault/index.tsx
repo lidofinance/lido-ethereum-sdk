@@ -100,7 +100,7 @@ export const StVaultDemo = () => {
         action={async () => {
           const { result } = await vaultFactory.createVault({
             account,
-            confirmExpiry: BigInt(confirmExpiry),
+            confirmExpirySeconds: BigInt(confirmExpiry),
             nodeOperatorFeeBP: BigInt(nodeOperatorFee),
             defaultAdmin: account,
             nodeOperator: account,
