@@ -10,6 +10,7 @@ import {
 import { BusModule } from './bus-module.js';
 import { ERROR_CODE } from '../common/index.js';
 
+// TODO: updates after optimisation VV
 export class LidoSDKVaultViewer extends BusModule {
   public async fetchConnectedVaults(
     props: FetchVaultsProps,

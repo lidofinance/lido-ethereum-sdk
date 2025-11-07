@@ -3,8 +3,6 @@ import { createContext, useMemo, PropsWithChildren, useContext } from 'react';
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import invariant from 'tiny-invariant';
 import { usePublicClient, useWalletClient } from 'wagmi';
-import { dynamics } from 'config';
-import { Address } from 'viem';
 
 const context = createContext<LidoSDK | null>(null);
 

@@ -12,7 +12,7 @@ export type CreateVaultProps = CommonTransactionProps & {
   nodeOperator: Address;
   nodeOperatorManager: Address;
   nodeOperatorFeeBP: bigint;
-  confirmExpiry: bigint;
+  confirmExpirySeconds: bigint;
   roleAssignments: Array<{ account: Address; role: `0x${string}` }>;
   withoutConnectingToVaultHub?: boolean;
 };

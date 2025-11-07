@@ -14,19 +14,16 @@ import {
   DashboardCreatedEventAbi,
   VaultCreatedEventAbi,
 } from './abi/VaultFactory.js';
-import {
-  MAX_NODE_OPERATOR_FEE_RATE,
-  MIN_NODE_OPERATOR_FEE_RATE,
-} from './consts/common.js';
+import { MAX_NODE_OPERATOR_BP, MIN_NODE_OPERATOR_BP } from './consts/common.js';
 import { ERROR_CODE, invariant } from '../common/index.js';
 import { BusModule } from './bus-module.js';
 import { LidoSDKVaultContracts } from './vault-contracts.js';
 
 export class LidoSDKVaultFactory extends BusModule {
-  private _validateNodeOperatorFeeRate(nodeOperatorFeeRate: bigint) {
+  private _validateNodeOperatorFeeBP(nodeOperatorFeeBP: bigint) {
     if (
-      nodeOperatorFeeRate > MAX_NODE_OPERATOR_FEE_RATE ||
-      nodeOperatorFeeRate < MIN_NODE_OPERATOR_FEE_RATE
+      nodeOperatorFeeBP < MIN_NODE_OPERATOR_BP ||
+      nodeOperatorFeeBP > MAX_NODE_OPERATOR_BP
     ) {
       throw this.bus.core.error({
         code: ERROR_CODE.INVALID_ARGUMENT,
@@ -63,8 +60,8 @@ export class LidoSDKVaultFactory extends BusModule {
 
   private async _validateCreateVaultProps(props: CreateVaultProps) {
     await this._validateRoles(props.roleAssignments);
-    this._validateNodeOperatorFeeRate(props.nodeOperatorFeeBP);
-    await this._validateConfirmExpiry(props.confirmExpiry);
+    this._validateNodeOperatorFeeBP(props.nodeOperatorFeeBP);
+    await this._validateConfirmExpiry(props.confirmExpirySeconds);
   }
 
   @Logger('Call:')
@@ -232,7 +229,7 @@ export class LidoSDKVaultFactory extends BusModule {
       nodeOperator,
       nodeOperatorManager,
       nodeOperatorFeeBP,
-      confirmExpiry,
+      confirmExpirySeconds,
       roleAssignments,
     } = props;
 
@@ -243,7 +240,7 @@ export class LidoSDKVaultFactory extends BusModule {
         nodeOperator,
         nodeOperatorManager,
         nodeOperatorFeeBP,
-        confirmExpiry,
+        confirmExpirySeconds,
         roleAssignments,
       ] as const,
       account: await this.bus.core.useAccount(props.account),
