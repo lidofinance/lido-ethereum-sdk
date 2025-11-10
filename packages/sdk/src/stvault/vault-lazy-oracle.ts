@@ -34,7 +34,7 @@ export class LidoSDKVaultLazyOracle extends BusModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  private async getSubmitLatestReportTxArgs(props: SubmitLatestReportProps) {
+  public async getSubmitLatestReportTxArgs(props: SubmitLatestReportProps) {
     const { gateway, vaultAddress } = props;
 
     const lazyOracleContract = await this.bus.contracts.getContractLazyOracle();

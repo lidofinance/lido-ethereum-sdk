@@ -69,17 +69,21 @@ export class LidoSDKVaultEntity extends BusModule {
     return this.bus.contracts.getContractVault(this.vaultAddress);
   }
 
-  public getDashboardContract(): Promise<
+  @Logger('Utils:')
+  @Cache(30 * 60 * 1000, ['dashboardAddress'])
+  @ErrorHandler()
+  public async getDashboardContract(): Promise<
     GetContractReturnType<typeof DashboardAbi, WalletClient>
   > {
-    if (!this.dashboardAddress) {
+    const dashboardAddress = await this.getDashboardAddress();
+    if (!dashboardAddress) {
       throw this.bus.core.error({
         code: ERROR_CODE.READ_ERROR,
         message: 'Dashboard address not found is not found.',
       });
     }
 
-    return this.bus.contracts.getContractVaultDashboard(this.dashboardAddress);
+    return this.bus.contracts.getContractVaultDashboard(dashboardAddress);
   }
 
   public getVaultAddress(): Address {
@@ -88,6 +92,7 @@ export class LidoSDKVaultEntity extends BusModule {
 
   @Logger('Utils:')
   @Cache(30 * 60 * 1000, ['dashboardAddress'])
+  @ErrorHandler()
   public async getDashboardAddress(): Promise<Address> {
     if (this.dashboardAddress) {
       return this.dashboardAddress;

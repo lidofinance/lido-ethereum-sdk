@@ -1,4 +1,4 @@
-import type { Address } from 'viem';
+import type { Address, ContractFunctionParameters } from 'viem';
 import { Logger } from '../common/decorators/index.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 import { LidoSDKVaultContracts } from './vault-contracts.js';
@@ -8,6 +8,8 @@ import { LidoSDKstETH, LidoSDKwstETH } from '../erc20/index.js';
 import { LidoSDKVaultEntity } from './vault-entity.js';
 import { LidoSDKVaultLazyOracle } from './vault-lazy-oracle.js';
 import { LidoSDKVaultConstants } from './vault-contants.js';
+import { getEncodableContract } from '../common/utils/get-encodable-contract.js';
+import { SubmitLatestReportProps } from './types.js';
 
 export class Bus extends LidoSDKModule {
   private version: string | undefined;
@@ -93,6 +95,28 @@ export class Bus extends LidoSDKModule {
       bus: this,
       vaultAddress,
       dashboardAddress,
+    });
+  }
+
+  async readWithLatestReport<
+    TContracts extends
+      readonly unknown[] = readonly (ContractFunctionParameters & {
+      from?: Address;
+    })[],
+  >(props: { contracts: TContracts } & SubmitLatestReportProps) {
+    const args = await this.lazyOracle.getSubmitLatestReportTxArgs({
+      vaultAddress: props.vaultAddress,
+      skipIsFresh: props.skipIsFresh,
+    });
+    const lazyOracleContract = getEncodableContract(
+      await this.contracts.getContractLazyOracle(),
+    );
+
+    return this.core.rpcProvider.multicall({
+      contracts: [
+        lazyOracleContract.prepare.updateVaultData(args),
+        ...props.contracts,
+      ] as any,
     });
   }
 }
