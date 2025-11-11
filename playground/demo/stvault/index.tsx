@@ -11,7 +11,11 @@ import TokenInput, { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
 import { useLidoSDK } from 'providers/sdk';
 import { useEffect, useState } from 'react';
 import type { Address, Hash } from 'viem';
-import { LidoSDKVaultEntity, Token } from '@lidofinance/lido-ethereum-sdk';
+import {
+  LidoSDKVaultEntity,
+  Token,
+  getEncodableContract,
+} from '@lidofinance/lido-ethereum-sdk';
 import { ActionBlock } from '../../components/action/styles';
 
 export const StVaultDemo = () => {
@@ -318,6 +322,28 @@ export const StVaultDemo = () => {
         walletAction
         action={() => currentVault?.disburseNodeOperatorFee({ account })}
       />
+
+      <Action
+        title="Read with submitreport simulation"
+        walletAction
+        action={async () => {
+          if (currentVault) {
+            const dashboard = await currentVault.getDashboardContract();
+            const dashboardEncodable = getEncodableContract(dashboard);
+            const preparedMethods = [
+              dashboardEncodable.prepare.remainingMintingCapacityShares([
+                BigInt(10),
+              ]),
+              dashboardEncodable.prepare.liabilityShares(),
+            ];
+            return stVaultModule.readWithLatestReport({
+              vaultAddress: currentVault.getVaultAddress(),
+              skipIsFresh: true,
+              preparedMethods,
+            });
+          }
+        }}
+      ></Action>
     </Accordion>
   );
 };
