@@ -79,7 +79,7 @@ export class LidoSDKVaultEntity extends BusModule {
     if (!dashboardAddress) {
       throw this.bus.core.error({
         code: ERROR_CODE.READ_ERROR,
-        message: 'Dashboard address not found is not found.',
+        message: 'Dashboard address is not found.',
       });
     }
 
