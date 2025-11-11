@@ -99,11 +99,11 @@ export class Bus extends LidoSDKModule {
   }
 
   async readWithLatestReport<
-    TContracts extends
+    TMethods extends
       readonly unknown[] = readonly (ContractFunctionParameters & {
       from?: Address;
     })[],
-  >(props: { contracts: TContracts } & SubmitLatestReportProps) {
+  >(props: { preparedMethods: TMethods } & SubmitLatestReportProps) {
     const args = await this.lazyOracle.getSubmitLatestReportTxArgs({
       vaultAddress: props.vaultAddress,
       skipIsFresh: props.skipIsFresh,
@@ -115,7 +115,7 @@ export class Bus extends LidoSDKModule {
     return this.core.rpcProvider.multicall({
       contracts: [
         lazyOracleContract.prepare.updateVaultData(args),
-        ...props.contracts,
+        ...props.preparedMethods,
       ] as any,
     });
   }

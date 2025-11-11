@@ -330,7 +330,7 @@ export const StVaultDemo = () => {
           if (currentVault) {
             const dashboard = await currentVault.getDashboardContract();
             const dashboardEncodable = getEncodableContract(dashboard);
-            const contracts = [
+            const preparedMethods = [
               dashboardEncodable.prepare.remainingMintingCapacityShares([
                 BigInt(10),
               ]),
@@ -339,7 +339,7 @@ export const StVaultDemo = () => {
             return stVaultModule.readWithLatestReport({
               vaultAddress: currentVault.getVaultAddress(),
               skipIsFresh: true,
-              contracts,
+              preparedMethods,
             });
           }
         }}
