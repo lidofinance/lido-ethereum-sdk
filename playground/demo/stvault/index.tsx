@@ -87,14 +87,14 @@ export const StVaultDemo = () => {
         title="Fetch Vaults List (first 10)"
         walletAction
         action={async () => {
-          const result = await vaultViewer.fetchConnectedVaultEntities({
+          const foundVaults = await vaultViewer.fetchConnectedVaultEntities({
             account,
             page: 1,
             perPage: 10,
           });
-          setVaults(result.data);
-          setCurrentVault(result.data[0]);
-          return { result: result.data.length };
+          setVaults(foundVaults);
+          setCurrentVault(foundVaults[0]);
+          return { result: foundVaults.length };
         }}
       />
 

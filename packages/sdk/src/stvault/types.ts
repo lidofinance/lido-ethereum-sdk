@@ -58,15 +58,9 @@ export type PopulateProps = CommonTransactionProps & {
   token: Token;
 };
 
-export type FetchVaultsResult = {
-  data: Address[];
-  total: number;
-};
+export type FetchVaultsResult = Address[];
 
-export type FetchVaultsEntitiesResult = {
-  data: LidoSDKVaultEntity[];
-  total: number;
-};
+export type FetchVaultsEntitiesResult = LidoSDKVaultEntity[];
 
 export type SetRolesProps = CommonTransactionProps & {
   roles: Array<{ account: Address; role: Hash }>;

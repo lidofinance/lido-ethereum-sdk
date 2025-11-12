@@ -10,7 +10,6 @@ import {
 import { BusModule } from './bus-module.js';
 import { ERROR_CODE } from '../common/index.js';
 
-// TODO: updates after optimisation VV
 export class LidoSDKVaultViewer extends BusModule {
   public async fetchConnectedVaults(
     props: FetchVaultsProps,
@@ -20,35 +19,22 @@ export class LidoSDKVaultViewer extends BusModule {
       ? await this.bus.core.useAccount(props.account)
       : null;
 
-    const fromCursor = BigInt(props.perPage * (props.page - 1));
-    const toCursor = BigInt(props.page * props.perPage);
+    const offset = BigInt(props.perPage * (props.page - 1));
+    const limit = BigInt(props.perPage);
 
-    const [vaultAddresses, leftOver] = await (account
-      ? vaultViewer.read.vaultsByOwnerBound([
-          account.address,
-          fromCursor,
-          toCursor,
-        ])
-      : vaultViewer.read.vaultsConnectedBound([fromCursor, toCursor]));
+    const vaultAddresses = await (account
+      ? vaultViewer.read.vaultsByOwnerBatch([account.address, offset, limit])
+      : vaultViewer.read.vaultAddressesBatch([offset, limit]));
 
-    const totalVaultsCount =
-      Number(fromCursor) + vaultAddresses.length + Number(leftOver);
-
-    return {
-      data: vaultAddresses as Address[],
-      total: totalVaultsCount,
-    };
+    return vaultAddresses as Address[];
   }
 
   public async fetchConnectedVaultEntities(
     props: FetchVaultsProps,
   ): Promise<FetchVaultsEntitiesResult> {
-    const { data, total } = await this.fetchConnectedVaults(props);
+    const vaults = await this.fetchConnectedVaults(props);
 
-    return {
-      data: data.map((v) => this.bus.vaultFromAddress(v)),
-      total,
-    };
+    return vaults.map((v) => this.bus.vaultFromAddress(v));
   }
 
   private async _validateRoles(roles: Hash[]) {
@@ -68,14 +54,14 @@ export class LidoSDKVaultViewer extends BusModule {
     await this._validateRoles(props.roles);
     const vaultViewer = await this.bus.contracts.getContractVaultViewer();
 
-    return vaultViewer.read.getRoleMembers([props.vaultAddress, props.roles]);
+    return vaultViewer.read.roleMembers([props.vaultAddress, props.roles]);
   }
 
   public async getRoleMembersBatch(props: GetRoleMembersBatchProps) {
     await this._validateRoles(props.roles);
     const vaultViewer = await this.bus.contracts.getContractVaultViewer();
 
-    return vaultViewer.read.getRoleMembersBatch([
+    return vaultViewer.read.roleMembersBatch([
       props.vaultAddresses,
       props.roles,
     ]);
@@ -84,6 +70,6 @@ export class LidoSDKVaultViewer extends BusModule {
   public async getVaultData(props: GetVaultDataProps) {
     const vaultViewer = await this.bus.contracts.getContractVaultViewer();
 
-    return vaultViewer.read.getVaultData([props.vaultAddress]);
+    return vaultViewer.read.vaultData([props.vaultAddress]);
   }
 }
