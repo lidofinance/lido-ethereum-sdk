@@ -1,5 +1,6 @@
 import { Address, Hash } from 'viem';
 import {
+  FetchVaultsByOwnerProps,
   FetchVaultsEntitiesResult,
   FetchVaultsProps,
   FetchVaultsResult,
@@ -15,26 +16,65 @@ export class LidoSDKVaultViewer extends BusModule {
     props: FetchVaultsProps,
   ): Promise<FetchVaultsResult> {
     const vaultViewer = await this.bus.contracts.getContractVaultViewer();
-    const account = props.account
-      ? await this.bus.core.useAccount(props.account)
-      : null;
 
     const offset = BigInt(props.perPage * (props.page - 1));
     const limit = BigInt(props.perPage);
 
-    const vaultAddresses = await (account
-      ? vaultViewer.read.vaultsByOwnerBatch([account.address, offset, limit])
-      : vaultViewer.read.vaultAddressesBatch([offset, limit]));
+    const totalVaults = await vaultViewer.read.vaultsCount();
+    const vaultAddresses = await vaultViewer.read.vaultAddressesBatch([
+      offset,
+      limit,
+    ]);
 
-    return vaultAddresses as Address[];
+    return { data: vaultAddresses as Address[], totals: totalVaults };
+  }
+
+  public async fetchVaultsByOwner(props: FetchVaultsByOwnerProps) {
+    if (!props.address) {
+      throw this.bus.core.error({
+        code: ERROR_CODE.INVALID_ARGUMENT,
+        message: `Address is required argument`,
+      });
+    }
+
+    const vaultViewer = await this.bus.contracts.getContractVaultViewer();
+    const scanLimit = props.scanLimit ?? 100n;
+    const totalVaults = await vaultViewer.read.vaultsCount();
+    let vaults: Address[] = [];
+
+    for (let i = 0n; i < totalVaults; i += scanLimit) {
+      const vaultsBatch = await vaultViewer.read.vaultsByOwnerBatch([
+        props.address,
+        i,
+        scanLimit,
+      ]);
+      vaults = vaults.concat(vaultsBatch);
+    }
+
+    return {
+      data: vaults,
+      totals: vaults.length,
+    };
+  }
+
+  public async fetchVaultsByOwnerEntities(props: FetchVaultsByOwnerProps) {
+    const result = await this.fetchVaultsByOwner(props);
+
+    return {
+      data: result.data.map((v) => this.bus.vaultFromAddress(v)),
+      totals: result.totals,
+    };
   }
 
   public async fetchConnectedVaultEntities(
     props: FetchVaultsProps,
   ): Promise<FetchVaultsEntitiesResult> {
-    const vaults = await this.fetchConnectedVaults(props);
+    const result = await this.fetchConnectedVaults(props);
 
-    return vaults.map((v) => this.bus.vaultFromAddress(v));
+    return {
+      data: result.data.map((v) => this.bus.vaultFromAddress(v)),
+      totals: result.totals,
+    };
   }
 
   private async _validateRoles(roles: Hash[]) {
