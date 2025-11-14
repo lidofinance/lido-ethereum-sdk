@@ -10,6 +10,7 @@ import {
 } from './types.js';
 import { BusModule } from './bus-module.js';
 import { ERROR_CODE } from '../common/index.js';
+import { SCAN_LIMIT } from './consts/index.js';
 
 export class LidoSDKVaultViewer extends BusModule {
   public async fetchConnectedVaults(
@@ -38,7 +39,7 @@ export class LidoSDKVaultViewer extends BusModule {
     }
 
     const vaultViewer = await this.bus.contracts.getContractVaultViewer();
-    const scanLimit = props.scanLimit ?? 100n;
+    const scanLimit = props.scanLimit ?? SCAN_LIMIT;
     const totalVaults = await vaultViewer.read.vaultsCount();
     let vaults: Address[] = [];
 
