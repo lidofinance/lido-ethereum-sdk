@@ -1,5 +1,6 @@
 import { Address, Hash } from 'viem';
 import {
+  FetchVaultsByOwnerProps,
   FetchVaultsEntitiesResult,
   FetchVaultsProps,
   FetchVaultsResult,
@@ -9,45 +10,71 @@ import {
 } from './types.js';
 import { BusModule } from './bus-module.js';
 import { ERROR_CODE } from '../common/index.js';
+import { SCAN_LIMIT } from './consts/index.js';
 
-// TODO: updates after optimisation VV
 export class LidoSDKVaultViewer extends BusModule {
   public async fetchConnectedVaults(
     props: FetchVaultsProps,
   ): Promise<FetchVaultsResult> {
     const vaultViewer = await this.bus.contracts.getContractVaultViewer();
-    const account = props.account
-      ? await this.bus.core.useAccount(props.account)
-      : null;
 
-    const fromCursor = BigInt(props.perPage * (props.page - 1));
-    const toCursor = BigInt(props.page * props.perPage);
+    const offset = BigInt(props.perPage * (props.page - 1));
+    const limit = BigInt(props.perPage);
 
-    const [vaultAddresses, leftOver] = await (account
-      ? vaultViewer.read.vaultsByOwnerBound([
-          account.address,
-          fromCursor,
-          toCursor,
-        ])
-      : vaultViewer.read.vaultsConnectedBound([fromCursor, toCursor]));
+    const totalVaults = await vaultViewer.read.vaultsCount();
+    const vaultAddresses = await vaultViewer.read.vaultAddressesBatch([
+      offset,
+      limit,
+    ]);
 
-    const totalVaultsCount =
-      Number(fromCursor) + vaultAddresses.length + Number(leftOver);
+    return { data: vaultAddresses as Address[], totals: totalVaults };
+  }
+
+  public async fetchVaultsByOwner(props: FetchVaultsByOwnerProps) {
+    if (!props.address) {
+      throw this.bus.core.error({
+        code: ERROR_CODE.INVALID_ARGUMENT,
+        message: `Address is required argument`,
+      });
+    }
+
+    const vaultViewer = await this.bus.contracts.getContractVaultViewer();
+    const scanLimit = props.scanLimit ?? SCAN_LIMIT;
+    const totalVaults = await vaultViewer.read.vaultsCount();
+    let vaults: Address[] = [];
+
+    for (let i = 0n; i < totalVaults; i += scanLimit) {
+      const vaultsBatch = await vaultViewer.read.vaultsByOwnerBatch([
+        props.address,
+        i,
+        scanLimit,
+      ]);
+      vaults = vaults.concat(vaultsBatch);
+    }
 
     return {
-      data: vaultAddresses as Address[],
-      total: totalVaultsCount,
+      data: vaults,
+      totals: vaults.length,
+    };
+  }
+
+  public async fetchVaultsByOwnerEntities(props: FetchVaultsByOwnerProps) {
+    const result = await this.fetchVaultsByOwner(props);
+
+    return {
+      data: result.data.map((v) => this.bus.vaultFromAddress(v)),
+      totals: result.totals,
     };
   }
 
   public async fetchConnectedVaultEntities(
     props: FetchVaultsProps,
   ): Promise<FetchVaultsEntitiesResult> {
-    const { data, total } = await this.fetchConnectedVaults(props);
+    const result = await this.fetchConnectedVaults(props);
 
     return {
-      data: data.map((v) => this.bus.vaultFromAddress(v)),
-      total,
+      data: result.data.map((v) => this.bus.vaultFromAddress(v)),
+      totals: result.totals,
     };
   }
 
@@ -68,14 +95,14 @@ export class LidoSDKVaultViewer extends BusModule {
     await this._validateRoles(props.roles);
     const vaultViewer = await this.bus.contracts.getContractVaultViewer();
 
-    return vaultViewer.read.getRoleMembers([props.vaultAddress, props.roles]);
+    return vaultViewer.read.roleMembers([props.vaultAddress, props.roles]);
   }
 
   public async getRoleMembersBatch(props: GetRoleMembersBatchProps) {
     await this._validateRoles(props.roles);
     const vaultViewer = await this.bus.contracts.getContractVaultViewer();
 
-    return vaultViewer.read.getRoleMembersBatch([
+    return vaultViewer.read.roleMembersBatch([
       props.vaultAddresses,
       props.roles,
     ]);
@@ -84,6 +111,6 @@ export class LidoSDKVaultViewer extends BusModule {
   public async getVaultData(props: GetVaultDataProps) {
     const vaultViewer = await this.bus.contracts.getContractVaultViewer();
 
-    return vaultViewer.read.getVaultData([props.vaultAddress]);
+    return vaultViewer.read.vaultData([props.vaultAddress]);
   }
 }

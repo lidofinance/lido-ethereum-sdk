@@ -116,7 +116,7 @@ export enum LIDO_L2_CONTRACT_NAMES {
 export const VAULT_VIEWER_CONTRACT_ADDRESSES: {
   [key in CHAINS]?: Address;
 } = {
-  [CHAINS.Hoodi]: '0x069f5f448475c843e099198b5e9F9977bF84FDd0',
+  [CHAINS.Hoodi]: '0x510b4CE9CdA8E5C9268D242a51356fF9Dc2bd73b',
 } as const;
 
 export const LIDO_L2_CONTRACT_ADDRESSES: {

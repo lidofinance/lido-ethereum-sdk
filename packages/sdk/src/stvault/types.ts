@@ -33,6 +33,11 @@ export type FetchVaultsProps = CommonTransactionProps & {
   page: number;
 };
 
+export type FetchVaultsByOwnerProps = CommonTransactionProps & {
+  address: Address;
+  scanLimit?: bigint;
+};
+
 export type MintSharesProps = CommonTransactionProps & {
   recipient: Address;
   amountOfShares: bigint;
@@ -60,12 +65,12 @@ export type PopulateProps = CommonTransactionProps & {
 
 export type FetchVaultsResult = {
   data: Address[];
-  total: number;
+  totals: bigint;
 };
 
 export type FetchVaultsEntitiesResult = {
   data: LidoSDKVaultEntity[];
-  total: number;
+  totals: bigint;
 };
 
 export type SetRolesProps = CommonTransactionProps & {
