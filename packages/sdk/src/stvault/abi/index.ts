@@ -5,3 +5,5 @@ export * from './Dashboard.js';
 export * from './VaultViewer.js';
 export * from './PredepositGuarantee.js';
 export * from './OperatorGrid.js';
+export * from './LazyOracle.js';
+export * from './Multicall.js';

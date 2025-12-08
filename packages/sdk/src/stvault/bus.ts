@@ -8,7 +8,6 @@ import { LidoSDKstETH, LidoSDKwstETH } from '../erc20/index.js';
 import { LidoSDKVaultEntity } from './vault-entity.js';
 import { LidoSDKVaultLazyOracle } from './vault-lazy-oracle.js';
 import { LidoSDKVaultConstants } from './vault-contants.js';
-import { getEncodableContract } from '../common/utils/get-encodable-contract.js';
 import { SubmitLatestReportProps } from './types.js';
 
 export class Bus extends LidoSDKModule {
@@ -90,7 +89,7 @@ export class Bus extends LidoSDKModule {
   }
 
   @Logger('Utils:')
-  vaultFromAddress(vaultAddress: Address, dashboardAddress?: Address) {
+  public vaultFromAddress(vaultAddress: Address, dashboardAddress?: Address) {
     return new LidoSDKVaultEntity({
       bus: this,
       vaultAddress,
@@ -98,7 +97,9 @@ export class Bus extends LidoSDKModule {
     });
   }
 
-  async readWithLatestReport<
+  // todo readWithReport (any report) and then you in readWithLatestReport
+
+  public async readWithLatestReport<
     TMethods extends
       readonly unknown[] = readonly (ContractFunctionParameters & {
       from?: Address;
@@ -108,9 +109,7 @@ export class Bus extends LidoSDKModule {
       vaultAddress: props.vaultAddress,
       skipIsFresh: props.skipIsFresh,
     });
-    const lazyOracleContract = getEncodableContract(
-      await this.contracts.getContractLazyOracle(),
-    );
+    const lazyOracleContract = await this.contracts.getContractLazyOracle();
 
     return this.core.rpcProvider.multicall({
       contracts: [
