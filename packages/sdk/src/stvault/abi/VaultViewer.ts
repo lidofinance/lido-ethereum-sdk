@@ -105,25 +105,6 @@ export const VaultViewerAbi = [
   {
     inputs: [
       {
-        internalType: 'address',
-        name: 'account',
-        type: 'address',
-      },
-    ],
-    name: 'isContract',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
         internalType: 'contract IStakingVault',
         name: 'vault',
         type: 'address',

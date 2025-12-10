@@ -153,7 +153,7 @@ export const StakingVaultAbi = [
   },
   {
     inputs: [],
-    name: 'PubkeyLengthDoesNotMatchAmountLength',
+    name: 'RenouncementNotAllowed',
     type: 'error',
   },
   {
@@ -191,11 +191,6 @@ export const StakingVaultAbi = [
       },
     ],
     name: 'TransferFailed',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'VaultOssified',
     type: 'error',
   },
   {
@@ -790,7 +785,7 @@ export const StakingVaultAbi = [
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: 'view',
     type: 'function',
   },
   {

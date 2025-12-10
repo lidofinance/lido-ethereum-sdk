@@ -191,6 +191,22 @@ export const OperatorGridAbi = [
     inputs: [
       {
         internalType: 'uint256',
+        name: 'requestedSHareLimit',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'vaultShares',
+        type: 'uint256',
+      },
+    ],
+    name: 'RequestedShareLimitTooLow',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
         name: 'tierId',
         type: 'uint256',
       },
@@ -227,6 +243,22 @@ export const OperatorGridAbi = [
       },
     ],
     name: 'ReserveRatioTooHigh',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint8',
+        name: 'bits',
+        type: 'uint8',
+      },
+      {
+        internalType: 'uint256',
+        name: 'value',
+        type: 'uint256',
+      },
+    ],
+    name: 'SafeCastOverflowedUintDowncast',
     type: 'error',
   },
   {
@@ -433,7 +465,7 @@ export const OperatorGridAbi = [
       {
         indexed: true,
         internalType: 'bytes32',
-        name: 'role',
+        name: 'roleOrAddress',
         type: 'bytes32',
       },
       {
@@ -1283,6 +1315,19 @@ export const OperatorGridAbi = [
   {
     inputs: [
       {
+        internalType: 'uint256',
+        name: '_newConfirmExpiry',
+        type: 'uint256',
+      },
+    ],
+    name: 'setConfirmExpiry',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
         internalType: 'address',
         name: '_vault',
         type: 'address',
@@ -1488,7 +1533,7 @@ export const OperatorGridAbi = [
         type: 'address',
       },
     ],
-    name: 'vaultInfo',
+    name: 'vaultTierInfo',
     outputs: [
       {
         internalType: 'address',
