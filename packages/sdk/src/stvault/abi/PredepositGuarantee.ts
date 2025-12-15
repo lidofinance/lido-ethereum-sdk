@@ -18,7 +18,7 @@ export const PredepositGuaranteeAbi = [
       },
       {
         internalType: 'uint64',
-        name: '_changeSlot',
+        name: '_pivotSlot',
         type: 'uint64',
       },
     ],
@@ -48,39 +48,12 @@ export const PredepositGuaranteeAbi = [
   },
   {
     inputs: [],
+    name: 'ArrayLengthsNotMatch',
+    type: 'error',
+  },
+  {
+    inputs: [],
     name: 'CompensateFailed',
-    type: 'error',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'bytes',
-        name: 'validatorPubkey',
-        type: 'bytes',
-      },
-      {
-        internalType: 'enum PredepositGuarantee.ValidatorStage',
-        name: 'stage',
-        type: 'uint8',
-      },
-    ],
-    name: 'DepositToUnprovenValidator',
-    type: 'error',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'bytes',
-        name: 'validatorPubkey',
-        type: 'bytes',
-      },
-      {
-        internalType: 'address',
-        name: 'stakingVault',
-        type: 'address',
-      },
-    ],
-    name: 'DepositToWrongVault',
     type: 'error',
   },
   {
@@ -124,8 +97,30 @@ export const PredepositGuaranteeAbi = [
     type: 'error',
   },
   {
-    inputs: [],
-    name: 'InvalidTimestamp',
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'InvalidTopUpAmount',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes',
+        name: 'validatorPubkey',
+        type: 'bytes',
+      },
+      {
+        internalType: 'enum IPredepositGuarantee.ValidatorStage',
+        name: 'stage',
+        type: 'uint8',
+      },
+    ],
+    name: 'InvalidValidatorStage',
     type: 'error',
   },
   {
@@ -238,6 +233,22 @@ export const PredepositGuaranteeAbi = [
         name: 'validatorPubkey',
         type: 'bytes',
       },
+      {
+        internalType: 'enum IPredepositGuarantee.ValidatorStage',
+        name: 'stage',
+        type: 'uint8',
+      },
+    ],
+    name: 'ValidatorNotActivated',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes',
+        name: 'validatorPubkey',
+        type: 'bytes',
+      },
     ],
     name: 'ValidatorNotEligibleForActivation',
     type: 'error',
@@ -250,7 +261,7 @@ export const PredepositGuaranteeAbi = [
         type: 'bytes',
       },
       {
-        internalType: 'enum PredepositGuarantee.ValidatorStage',
+        internalType: 'enum IPredepositGuarantee.ValidatorStage',
         name: 'stage',
         type: 'uint8',
       },
@@ -266,12 +277,28 @@ export const PredepositGuaranteeAbi = [
         type: 'bytes',
       },
       {
-        internalType: 'enum PredepositGuarantee.ValidatorStage',
+        internalType: 'enum IPredepositGuarantee.ValidatorStage',
         name: 'stage',
         type: 'uint8',
       },
     ],
     name: 'ValidatorNotPreDeposited',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes',
+        name: 'validatorPubkey',
+        type: 'bytes',
+      },
+      {
+        internalType: 'enum IPredepositGuarantee.ValidatorStage',
+        name: 'stage',
+        type: 'uint8',
+      },
+    ],
+    name: 'ValidatorNotProven',
     type: 'error',
   },
   {
@@ -348,37 +375,6 @@ export const PredepositGuaranteeAbi = [
     inputs: [],
     name: 'ZeroPauseDuration',
     type: 'error',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'nodeOperator',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'to',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint128',
-        name: 'total',
-        type: 'uint128',
-      },
-      {
-        indexed: false,
-        internalType: 'uint128',
-        name: 'locked',
-        type: 'uint128',
-      },
-    ],
-    name: 'BalanceCompensated',
-    type: 'event',
   },
   {
     anonymous: false,
@@ -711,6 +707,37 @@ export const PredepositGuaranteeAbi = [
     inputs: [
       {
         indexed: true,
+        internalType: 'bytes',
+        name: 'validatorPubkey',
+        type: 'bytes',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'nodeOperator',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'stakingVault',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes32',
+        name: 'withdrawalCredentials',
+        type: 'bytes32',
+      },
+    ],
+    name: 'ValidatorActivated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
         internalType: 'address',
         name: 'stakingVault',
         type: 'address',
@@ -924,6 +951,19 @@ export const PredepositGuaranteeAbi = [
   },
   {
     inputs: [],
+    name: 'MAX_TOPUP_AMOUNT',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'MIN_SUPPORTED_WC_VERSION',
     outputs: [
       {
@@ -998,6 +1038,19 @@ export const PredepositGuaranteeAbi = [
       },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes',
+        name: '_pubkey',
+        type: 'bytes',
+      },
+    ],
+    name: 'activateValidator',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -1303,7 +1356,7 @@ export const PredepositGuaranteeAbi = [
         type: 'address',
       },
     ],
-    name: 'pendingPredeposits',
+    name: 'pendingActivations',
     outputs: [
       {
         internalType: 'uint256',
@@ -1451,13 +1504,7 @@ export const PredepositGuaranteeAbi = [
       },
     ],
     name: 'proveInvalidValidatorWC',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
+    outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
   },
@@ -1546,12 +1593,17 @@ export const PredepositGuaranteeAbi = [
             type: 'uint64',
           },
         ],
-        internalType: 'struct IPredepositGuarantee.ValidatorWitness',
-        name: '_witness',
-        type: 'tuple',
+        internalType: 'struct IPredepositGuarantee.ValidatorWitness[]',
+        name: '_witnesses',
+        type: 'tuple[]',
+      },
+      {
+        internalType: 'uint256[]',
+        name: '_amounts',
+        type: 'uint256[]',
       },
     ],
-    name: 'proveWCAndActivateValidator',
+    name: 'proveWCActivateAndTopUpValidators',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -1591,17 +1643,12 @@ export const PredepositGuaranteeAbi = [
             type: 'uint64',
           },
         ],
-        internalType: 'struct IPredepositGuarantee.ValidatorWitness[]',
-        name: '_witnesses',
-        type: 'tuple[]',
-      },
-      {
-        internalType: 'uint256[]',
-        name: '_amounts',
-        type: 'uint256[]',
+        internalType: 'struct IPredepositGuarantee.ValidatorWitness',
+        name: '_witness',
+        type: 'tuple',
       },
     ],
-    name: 'proveWCAndTopUpValidators',
+    name: 'proveWCAndActivate',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -1814,7 +1861,7 @@ export const PredepositGuaranteeAbi = [
       {
         components: [
           {
-            internalType: 'enum PredepositGuarantee.ValidatorStage',
+            internalType: 'enum IPredepositGuarantee.ValidatorStage',
             name: 'stage',
             type: 'uint8',
           },
@@ -1829,7 +1876,7 @@ export const PredepositGuaranteeAbi = [
             type: 'address',
           },
         ],
-        internalType: 'struct PredepositGuarantee.ValidatorStatus',
+        internalType: 'struct IPredepositGuarantee.ValidatorStatus',
         name: '',
         type: 'tuple',
       },

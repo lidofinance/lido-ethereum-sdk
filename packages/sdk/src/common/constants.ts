@@ -117,6 +117,7 @@ export const VAULT_VIEWER_CONTRACT_ADDRESSES: {
   [key in CHAINS]?: Address;
 } = {
   [CHAINS.Hoodi]: '0x510b4CE9CdA8E5C9268D242a51356fF9Dc2bd73b',
+  [CHAINS.Mainnet]: '0x9E90338495FfD691bDDC680e47D94b60cF66dDad',
 } as const;
 
 export const LIDO_L2_CONTRACT_ADDRESSES: {

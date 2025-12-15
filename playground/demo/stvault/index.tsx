@@ -1,9 +1,9 @@
 import {
   Accordion,
-  Input,
-  Select,
-  Option,
   Checkbox,
+  Input,
+  Option,
+  Select,
 } from '@lidofinance/lido-ui';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { Action } from 'components/action';
@@ -12,9 +12,13 @@ import { useLidoSDK } from 'providers/sdk';
 import { useEffect, useState } from 'react';
 import type { Address, Hash } from 'viem';
 import {
-  LidoSDKVaultEntity,
-  Token,
+  ERROR_CODE,
   getEncodableContract,
+  LidoSDKVaultEntity,
+  Role,
+  RoleName,
+  SDKError,
+  Token,
 } from '@lidofinance/lido-ethereum-sdk';
 import { ActionBlock } from '../../components/action/styles';
 
@@ -37,7 +41,7 @@ export const StVaultDemo = () => {
   const [confirmExpiry, setConfirmExpiry] = useState<number>(24 * 3600);
   const [nodeOperatorFee, setNodeOperatorFee] = useState<number>(2);
   const [withdrawAddress, setWithdrawAddress] = useState<Address>(account);
-  const [minRecipient, setMinRecipient] = useState<Address>(account);
+  const [mintRecipient, setMintRecipient] = useState<Address>(account);
   const [mintEthValue, setMintEthValue] = useState<ValueType>(DEFAULT_VALUE);
   const [mintTokenValue, setMintTokenValue] = useState<Token>('steth');
   const [burnEthValue, setBurnEthValue] = useState<ValueType>(DEFAULT_VALUE);
@@ -46,13 +50,25 @@ export const StVaultDemo = () => {
     useState<ValueType>(DEFAULT_VALUE);
   const [approveTokenValue, setApproveTokenValue] = useState<Token>('steth');
   const [role, setRole] = useState<Hash>();
-  const [vaultRoleHashes, setVaultRoleHashes] = useState<Hash[]>([]);
+  const [vaultRoles, setVaultRoles] = useState<Role[]>([]);
+  const [grantRoleHash, setGrantRoleHash] = useState<Hash>();
+  const [grantRoleAddress, setGrantRoleAddress] = useState<Address>();
+
+  const [defaultAdmin, setDefaultAdmin] = useState<Address>(account);
+  const [nodeOperator, setNodeOperator] = useState<Address>(account);
+  const [nodeOperatorManager, setNodeOperatorManager] =
+    useState<Address>(account);
 
   useEffect(() => {
     const fetchDataAsync = async () => {
       try {
         const ROLES = await constants.ROLES();
-        setVaultRoleHashes(Object.values(ROLES));
+        const roleKeys = Object.keys(ROLES);
+        const roles: { name: string; hash: Hash }[] = roleKeys.map(
+          (roleKey) => ({ name: roleKey, hash: ROLES[roleKey as RoleName] }),
+        );
+
+        setVaultRoles(roles);
       } catch (err) {
         console.error(err);
       }
@@ -104,9 +120,9 @@ export const StVaultDemo = () => {
             account,
             confirmExpirySeconds: BigInt(confirmExpiry),
             nodeOperatorFeeBP: BigInt(nodeOperatorFee),
-            defaultAdmin: account,
-            nodeOperator: account,
-            nodeOperatorManager: account,
+            defaultAdmin,
+            nodeOperator,
+            nodeOperatorManager,
             roleAssignments: [],
             withoutConnectingToVaultHub,
           });
@@ -131,6 +147,26 @@ export const StVaultDemo = () => {
           placeholder="2"
           value={confirmExpiry}
           onChange={(e) => setConfirmExpiry(+e.currentTarget.value)}
+        />
+        <Input
+          label="Default Admin"
+          placeholder="0x0000000"
+          value={defaultAdmin}
+          onChange={(e) => setDefaultAdmin(e.currentTarget.value as Address)}
+        />
+        <Input
+          label="Node Operator"
+          placeholder="0x0000000"
+          value={nodeOperator}
+          onChange={(e) => setNodeOperator(e.currentTarget.value as Address)}
+        />
+        <Input
+          label="Node Operator Manager"
+          placeholder="0x0000000"
+          value={nodeOperatorManager}
+          onChange={(e) =>
+            setNodeOperatorManager(e.currentTarget.value as Address)
+          }
         />
         <Checkbox
           onChange={() => setWithoutConnectingToVaultHub((v) => !v)}
@@ -187,7 +223,7 @@ export const StVaultDemo = () => {
         walletAction
         action={() =>
           currentVault?.mint({
-            recipient: minRecipient,
+            recipient: mintRecipient,
             amount: mintEthValue ?? BigInt(0),
             token: mintTokenValue,
           })
@@ -196,8 +232,8 @@ export const StVaultDemo = () => {
         <Input
           label="Mint recipient"
           placeholder="0x0000000"
-          value={minRecipient}
-          onChange={(e) => setMinRecipient(e.currentTarget.value as Address)}
+          value={mintRecipient}
+          onChange={(e) => setMintRecipient(e.currentTarget.value as Address)}
         />
         <Input
           label="Mint token"
@@ -262,6 +298,51 @@ export const StVaultDemo = () => {
       </Action>
 
       <Action
+        title="Grant role"
+        walletAction
+        action={() => {
+          if (!grantRoleHash || !grantRoleAddress) {
+            throw new SDKError({
+              code: ERROR_CODE.INVALID_ARGUMENT,
+              message: 'Role and address required',
+            });
+          }
+
+          return currentVault?.grantRoles({
+            roles: [
+              {
+                role: grantRoleHash,
+                account: grantRoleAddress,
+              },
+            ],
+          });
+        }}
+      >
+        <Input
+          label="Address"
+          placeholder="0x0000000"
+          value={grantRoleAddress}
+          onChange={(e) =>
+            setGrantRoleAddress(e.currentTarget.value as Address)
+          }
+        />
+        <Select
+          fullwidth
+          label="Select role"
+          multiple
+          onChange={(r) => {
+            setGrantRoleHash(r as Hash);
+          }}
+        >
+          {Array.from(vaultRoles).map((role) => (
+            <Option key={role.hash} value={role.hash}>
+              {role.name}
+            </Option>
+          ))}
+        </Select>
+      </Action>
+
+      <Action
         title="Submit Report"
         walletAction
         action={() =>
@@ -307,9 +388,9 @@ export const StVaultDemo = () => {
             setRole(r as Hash);
           }}
         >
-          {Array.from(vaultRoleHashes).map((role) => (
-            <Option key={role} value={role}>
-              {role}
+          {Array.from(vaultRoles).map((role) => (
+            <Option key={role.hash} value={role.hash}>
+              {role.name}
             </Option>
           ))}
         </Select>

@@ -16,6 +16,11 @@ export const VaultFactoryAbi = [
         name: '_dashboardImpl',
         type: 'address',
       },
+      {
+        internalType: 'address',
+        name: '_previousFactory',
+        type: 'address',
+      },
     ],
     stateMutability: 'nonpayable',
     type: 'constructor',
@@ -129,6 +134,19 @@ export const VaultFactoryAbi = [
   {
     inputs: [],
     name: 'LIDO_LOCATOR',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'PREVIOUS_FACTORY',
     outputs: [
       {
         internalType: 'address',
@@ -265,7 +283,7 @@ export const VaultFactoryAbi = [
     inputs: [
       {
         internalType: 'address',
-        name: 'vault',
+        name: '_vault',
         type: 'address',
       },
     ],

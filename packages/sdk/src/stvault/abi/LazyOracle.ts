@@ -229,6 +229,19 @@ export const LazyOracleAbi = [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'totalValueReminder',
+        type: 'uint256',
+      },
+    ],
+    name: 'QuarantineUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: 'bytes32',
         name: 'role',
@@ -437,6 +450,42 @@ export const LazyOracleAbi = [
   {
     inputs: [
       {
+        internalType: 'bytes[]',
+        name: '_pubkeys',
+        type: 'bytes[]',
+      },
+    ],
+    name: 'batchValidatorStatuses',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'enum IPredepositGuarantee.ValidatorStage',
+            name: 'stage',
+            type: 'uint8',
+          },
+          {
+            internalType: 'contract IStakingVault',
+            name: 'stakingVault',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'nodeOperator',
+            type: 'address',
+          },
+        ],
+        internalType: 'struct IPredepositGuarantee.ValidatorStatus[]',
+        name: 'batch',
+        type: 'tuple[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
         internalType: 'uint256',
         name: '_offset',
         type: 'uint256',
@@ -458,7 +507,7 @@ export const LazyOracleAbi = [
           },
           {
             internalType: 'uint256',
-            name: 'aggregateBalance',
+            name: 'aggregatedBalance',
             type: 'uint256',
           },
           {
@@ -769,6 +818,25 @@ export const LazyOracleAbi = [
         type: 'address',
       },
     ],
+    name: 'quarantineValue',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_vault',
+        type: 'address',
+      },
+    ],
     name: 'removeVaultQuarantine',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -931,6 +999,97 @@ export const LazyOracleAbi = [
         type: 'address',
       },
     ],
+    name: 'vaultInfo',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'address',
+            name: 'vault',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'aggregatedBalance',
+            type: 'uint256',
+          },
+          {
+            internalType: 'int256',
+            name: 'inOutDelta',
+            type: 'int256',
+          },
+          {
+            internalType: 'bytes32',
+            name: 'withdrawalCredentials',
+            type: 'bytes32',
+          },
+          {
+            internalType: 'uint256',
+            name: 'liabilityShares',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'maxLiabilityShares',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'mintableStETH',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint96',
+            name: 'shareLimit',
+            type: 'uint96',
+          },
+          {
+            internalType: 'uint16',
+            name: 'reserveRatioBP',
+            type: 'uint16',
+          },
+          {
+            internalType: 'uint16',
+            name: 'forcedRebalanceThresholdBP',
+            type: 'uint16',
+          },
+          {
+            internalType: 'uint16',
+            name: 'infraFeeBP',
+            type: 'uint16',
+          },
+          {
+            internalType: 'uint16',
+            name: 'liquidityFeeBP',
+            type: 'uint16',
+          },
+          {
+            internalType: 'uint16',
+            name: 'reservationFeeBP',
+            type: 'uint16',
+          },
+          {
+            internalType: 'bool',
+            name: 'pendingDisconnect',
+            type: 'bool',
+          },
+        ],
+        internalType: 'struct LazyOracle.VaultInfo',
+        name: '',
+        type: 'tuple',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_vault',
+        type: 'address',
+      },
+    ],
     name: 'vaultQuarantine',
     outputs: [
       {
@@ -953,6 +1112,11 @@ export const LazyOracleAbi = [
           {
             internalType: 'uint256',
             name: 'endTimestamp',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'totalValueRemainder',
             type: 'uint256',
           },
         ],
