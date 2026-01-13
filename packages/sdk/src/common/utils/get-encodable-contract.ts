@@ -20,7 +20,7 @@ type ContractType = {
   };
 };
 
-type EncodableContract<
+export type EncodableContract<
   TContract extends ContractType,
   TSimulate extends
     TContract['simulate'] = TContract['simulate'] extends undefined

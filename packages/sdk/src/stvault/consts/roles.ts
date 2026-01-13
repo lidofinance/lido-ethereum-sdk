@@ -1,3 +1,5 @@
+import type { Hash } from 'viem';
+
 export const dashboardRoles = [
   'DEFAULT_ADMIN_ROLE',
   'BURN_ROLE',
@@ -19,3 +21,5 @@ export const dashboardRoles = [
 ] as const;
 
 export type RoleName = (typeof dashboardRoles)[number];
+
+export type Role = { name: string; hash: Hash };
