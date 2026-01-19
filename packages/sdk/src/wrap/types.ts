@@ -1,8 +1,9 @@
-import type { FormattedTransactionRequest, JsonRpcAccount } from 'viem';
+import type { FormattedTransactionRequest, JsonRpcAccount, Address } from 'viem';
 import type { EtherValue, CommonTransactionProps } from '../core/types.js';
 
 export type WrapProps = CommonTransactionProps & {
   value: EtherValue;
+  referral?: Address;
 };
 
 export type WrapResults = {
@@ -20,6 +21,7 @@ export type WrapPropsWithoutCallback = Omit<WrapProps, 'callback'>;
 export type WrapInnerProps = Omit<CommonTransactionProps, 'account'> & {
   value: bigint;
   account: JsonRpcAccount;
+  referral?: Address;
 };
 
 export type PopulatedTx = Omit<FormattedTransactionRequest, 'type'>;

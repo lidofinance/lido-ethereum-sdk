@@ -90,6 +90,7 @@ export enum LIDO_CONTRACT_NAMES {
   withdrawalVault = 'withdrawalVault',
   oracleDaemonConfig = 'oracleDaemonConfig',
   wsteth = 'wsteth',
+  wstethReferralStaker = 'wstethReferralStaker',
 }
 
 export enum DUAL_GOVERNANCE_CONTRACT_NAMES {
