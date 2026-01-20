@@ -94,13 +94,13 @@ describe('LidoSDKWrap read methods', () => {
   });
 
   test('wrapEth populate', async () => {
-    const wstethAddress = await wrap.core.getContractAddress(
-      LIDO_CONTRACT_NAMES.wsteth,
+    const wstethReferralStakerAddress = await wrap.core.getContractAddress(
+      LIDO_CONTRACT_NAMES.wstethReferralStaker,
     );
     const tx = await wrap.wrapEthPopulateTx({ value });
-    expectAddress(tx.to, wstethAddress);
+    expectAddress(tx.to, wstethReferralStakerAddress);
     expectAddress(tx.from, address);
-    expectPopulatedTx(tx, value, false);
+    expectPopulatedTx(tx, value, true);
   });
 
   test('wrapEth estimate', async () => {
