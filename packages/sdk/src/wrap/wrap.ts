@@ -38,7 +38,7 @@ import type {
   UnwrapResults,
 } from './types.js';
 
-import { abi } from './abi/wsteth.js';
+import { abi as wstethAbi } from './abi/wsteth.js';
 import { abi as wstethReferralStakerAbi } from './abi/wsteth-referral-staker.js';
 import {
   stethPartialAbi,
@@ -63,13 +63,13 @@ export class LidoSDKWrap extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressWstETH'])
   public async getContractWstETH(): Promise<
-    GetContractReturnType<typeof abi, WalletClient>
+    GetContractReturnType<typeof wstethAbi, WalletClient>
   > {
     const address = await this.contractAddressWstETH();
 
     return getContract({
       address,
-      abi: abi,
+      abi: wstethAbi,
       client: {
         public: this.core.rpcProvider,
         wallet: this.core.web3Provider as WalletClient,
@@ -141,13 +141,11 @@ export class LidoSDKWrap extends LidoSDKModule {
       getGasLimit: (options) =>
         contract.estimateGas.stakeETH([referralAddress], {
           value,
-          account, // TODO
           ...options,
         }),
       sendTransaction: (options) =>
         contract.write.stakeETH([referralAddress], {
           value,
-          account, // TODO
           ...options,
         }),
       decodeResult: (receipt) => this.wrapParseEvents(receipt, account.address),
@@ -240,7 +238,7 @@ export class LidoSDKWrap extends LidoSDKModule {
       to: address,
       from: account.address,
       data: encodeFunctionData({
-        abi,
+        abi: wstethAbi,
         functionName: 'wrap',
         args: [value],
       }),
@@ -386,7 +384,7 @@ export class LidoSDKWrap extends LidoSDKModule {
       to,
       from: account.address,
       data: encodeFunctionData({
-        abi: abi,
+        abi: wstethAbi,
         functionName: 'unwrap',
         args: [value],
       }),
