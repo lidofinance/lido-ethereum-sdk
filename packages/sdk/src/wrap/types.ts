@@ -3,7 +3,7 @@ import type { EtherValue, CommonTransactionProps } from '../core/types.js';
 
 export type WrapProps = CommonTransactionProps & {
   value: EtherValue;
-  referral?: Address;
+  referralAddress?: Address;
 };
 
 export type WrapResults = {
@@ -21,7 +21,7 @@ export type WrapPropsWithoutCallback = Omit<WrapProps, 'callback'>;
 export type WrapInnerProps = Omit<CommonTransactionProps, 'account'> & {
   value: bigint;
   account: JsonRpcAccount;
-  referral?: Address;
+  referralAddress: Address;
 };
 
 export type PopulatedTx = Omit<FormattedTransactionRequest, 'type'>;
