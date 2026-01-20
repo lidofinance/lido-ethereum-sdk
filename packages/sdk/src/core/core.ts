@@ -391,7 +391,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       const contractAddress = WSTETH_REFERRAL_STAKER[this.chain.id as CHAINS];
       invariant(
         contractAddress,
-        `wstETH Referral Staker contracts are not supported for ${this.chain.id}`,
+        `wstETH Referral Staker is not supported on chain ${this.chain.id}`,
         ERROR_CODE.NOT_SUPPORTED,
       );
       return contractAddress;
