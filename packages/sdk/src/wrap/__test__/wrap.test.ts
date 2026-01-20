@@ -97,7 +97,7 @@ describe('LidoSDKWrap read methods', () => {
     expectAddress(tx.functionName, 'approve');
   });
 
-  test('wrapEth populate (default referral)', async () => {
+  test('wrapEth populate (with default referral)', async () => {
     const wstethReferralStakerAddress = await wrap.core.getContractAddress(
       LIDO_CONTRACT_NAMES.wstethReferralStaker,
     );
