@@ -59,6 +59,7 @@ export const WrapDemo = () => {
         action={() =>
           wrap.wrapEthPopulateTx({
             value: wrapValue ?? ZERO,
+            referralAddress: referralAddressValue,
             account,
           })
         }
@@ -69,6 +70,7 @@ export const WrapDemo = () => {
         action={() =>
           wrap.wrapEthEstimateGas({
             value: wrapValue ?? ZERO,
+            referralAddress: referralAddressValue,
             account,
           })
         }
