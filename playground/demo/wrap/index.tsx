@@ -1,4 +1,5 @@
-import { Accordion } from '@lidofinance/lido-ui';
+import { Accordion, Input } from '@lidofinance/lido-ui';
+import { Address, zeroAddress } from 'viem';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { Action, renderTokenResult } from 'components/action';
 import { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
@@ -12,6 +13,7 @@ const ZERO = BigInt(0);
 export const WrapDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
   const [wrapValue, setWrapValue] = useState<ValueType>(DEFAULT_VALUE);
+  const [referralAddressValue, setReferralAddressValue] = useState<Address | undefined>(zeroAddress);
   const [approveValue, setApproveValue] = useState<ValueType>(DEFAULT_VALUE);
   const [wrapStethValue, setWrapStethValue] =
     useState<ValueType>(DEFAULT_VALUE);
@@ -32,6 +34,7 @@ export const WrapDemo = () => {
         action={() =>
           wrap.wrapEth({
             value: wrapValue ?? ZERO,
+            referralAddress: referralAddressValue,
             account,
             callback: transactionToast,
           })
@@ -43,6 +46,12 @@ export const WrapDemo = () => {
           placeholder="0.0"
           onChange={setWrapValue}
         />
+        <Input
+          label="referral address"
+          placeholder="0x0000000"
+          value={referralAddressValue}
+          onChange={(e) => setReferralAddressValue(e.currentTarget.value as Address)}
+        />
       </Action>
       <Action
         title="Wrap ETH Populate"
@@ -50,6 +59,7 @@ export const WrapDemo = () => {
         action={() =>
           wrap.wrapEthPopulateTx({
             value: wrapValue ?? ZERO,
+            referralAddress: referralAddressValue,
             account,
           })
         }
@@ -60,6 +70,7 @@ export const WrapDemo = () => {
         action={() =>
           wrap.wrapEthEstimateGas({
             value: wrapValue ?? ZERO,
+            referralAddress: referralAddressValue,
             account,
           })
         }
