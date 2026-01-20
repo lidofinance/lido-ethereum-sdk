@@ -90,6 +90,7 @@ export enum LIDO_CONTRACT_NAMES {
   withdrawalVault = 'withdrawalVault',
   oracleDaemonConfig = 'oracleDaemonConfig',
   wsteth = 'wsteth',
+  wstethReferralStaker = 'wstethReferralStaker',
 }
 
 export enum DUAL_GOVERNANCE_CONTRACT_NAMES {
@@ -108,6 +109,12 @@ export const DUAL_GOVERNANCE_CONTRACT_ADDRESSES: {
     EPT: '0x0A5E22782C0Bd4AddF10D771f0bF0406B038282d',
   },
 };
+
+export const WSTETH_REFERRAL_STAKER: { [key in CHAINS]?: Address } = {
+  [CHAINS.Mainnet]: '0xa88f0329C2c4ce51ba3fc619BBf44efE7120Dd0d',
+  [CHAINS.Hoodi]:   '0xf886BcC68b240316103fE8A12453Ce7831c2e835',
+  [CHAINS.Sepolia]: '0x9E90338495FfD691bDDC680e47D94b60cF66dDad',
+}
 
 export enum LIDO_L2_CONTRACT_NAMES {
   wsteth = 'wsteth',

@@ -41,6 +41,7 @@ import {
   LIDO_L2_CONTRACT_ADDRESSES,
   DUAL_GOVERNANCE_CONTRACT_ADDRESSES,
   DUAL_GOVERNANCE_CONTRACT_NAMES,
+  WSTETH_REFERRAL_STAKER,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
@@ -386,6 +387,15 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     contract: LIDO_CONTRACT_NAMES,
   ): Promise<Address> {
     const lidoLocator = this.getContractLidoLocator();
+    if (contract === 'wstethReferralStaker') {
+      const contractAddress = WSTETH_REFERRAL_STAKER[this.chain.id as CHAINS];
+      invariant(
+        contractAddress,
+        `wstETH Referral Staker is not supported on chain ${this.chain.id}`,
+        ERROR_CODE.NOT_SUPPORTED,
+      );
+      return contractAddress;
+    }
     if (contract === 'wsteth') {
       const withdrawalQueue = await lidoLocator.read.withdrawalQueue();
 
