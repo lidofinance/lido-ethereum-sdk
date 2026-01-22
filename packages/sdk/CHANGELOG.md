@@ -1,3 +1,14 @@
+# 4.6.0
+
+## SDK
+
+- `wrapEth` logic is migrated from direct ETH transfers to calling `stakeETH` on the `WstETHReferralStaker` contract
+- `wrapEth` now supports an optional `referralAddress` parameter
+
+## Playground
+
+- Support for referral address in `wrapEth`
+
 # 4.5.0
 
 ## SDK
@@ -9,6 +20,8 @@
 ## Playground
 
 - DualGovernance warning status
+
+# 4.4.0
 
 ## SDK
 
