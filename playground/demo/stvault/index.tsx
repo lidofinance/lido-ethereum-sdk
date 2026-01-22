@@ -441,7 +441,7 @@ export const StVaultDemo = () => {
               blockNumber,
             });
 
-            const overview = currentVault.calculateOverviewV2({
+            const overview = currentVault.calculateOverview({
               ...vaultData,
               liabilitySharesInStethWei: vaultData.liabilityStETH,
               forceRebalanceThresholdBP: vaultData.forcedRebalanceThresholdBP,

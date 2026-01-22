@@ -892,7 +892,7 @@ export class LidoSDKVaultEntity extends BusModule {
     } = vaultRecord;
 
     const inOutDelta = inOutDeltaArray[1].value;
-    const [_, tierId, tierShareLimit] = tier;
+    const [, tierId, tierShareLimit] = tier;
     const { shareLimit: groupShareLimit } = group;
 
     const [
@@ -971,7 +971,7 @@ export class LidoSDKVaultEntity extends BusModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  public calculateOverviewV2(args: OverviewArgs) {
+  public calculateOverview(args: OverviewArgs) {
     const BASIS_POINTS = 10_000n;
     const {
       totalValue,
