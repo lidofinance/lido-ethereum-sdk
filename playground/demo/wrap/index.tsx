@@ -1,5 +1,4 @@
 import { Accordion, Input } from '@lidofinance/lido-ui';
-import { Address, zeroAddress } from 'viem';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { Action, renderTokenResult } from 'components/action';
 import { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
@@ -13,7 +12,7 @@ const ZERO = BigInt(0);
 export const WrapDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
   const [wrapValue, setWrapValue] = useState<ValueType>(DEFAULT_VALUE);
-  const [referralAddressValue, setReferralAddressValue] = useState<Address | undefined>(zeroAddress);
+  const [referralAddressState, setReferralAddress] = useState<string>('');
   const [approveValue, setApproveValue] = useState<ValueType>(DEFAULT_VALUE);
   const [wrapStethValue, setWrapStethValue] =
     useState<ValueType>(DEFAULT_VALUE);
@@ -25,6 +24,9 @@ export const WrapDemo = () => {
   const { wrap } = useLidoSDK();
 
   const account = web3account as `0x{string}`;
+  const referralAddress = referralAddressState
+    ? (referralAddressState as `0x{string}`)
+    : undefined;
 
   return (
     <Accordion summary="Wrap">
@@ -34,7 +36,7 @@ export const WrapDemo = () => {
         action={() =>
           wrap.wrapEth({
             value: wrapValue ?? ZERO,
-            referralAddress: referralAddressValue,
+            referralAddress: referralAddress,
             account,
             callback: transactionToast,
           })
@@ -49,8 +51,8 @@ export const WrapDemo = () => {
         <Input
           label="referral address"
           placeholder="0x0000000"
-          value={referralAddressValue}
-          onChange={(e) => setReferralAddressValue(e.currentTarget.value as Address)}
+          value={referralAddressState}
+          onChange={(e) => setReferralAddress(e.currentTarget.value)}
         />
       </Action>
       <Action
@@ -59,7 +61,7 @@ export const WrapDemo = () => {
         action={() =>
           wrap.wrapEthPopulateTx({
             value: wrapValue ?? ZERO,
-            referralAddress: referralAddressValue,
+            referralAddress: referralAddress,
             account,
           })
         }
@@ -70,7 +72,7 @@ export const WrapDemo = () => {
         action={() =>
           wrap.wrapEthEstimateGas({
             value: wrapValue ?? ZERO,
-            referralAddress: referralAddressValue,
+            referralAddress: referralAddress,
             account,
           })
         }
