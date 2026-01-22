@@ -7,7 +7,7 @@
 
 ## Playground
 
-- Support for referral address in `wrapEth`
+- Support for referral address in `wrapEth` demo block
 
 # 4.5.0
 
