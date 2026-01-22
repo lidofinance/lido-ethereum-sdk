@@ -1,4 +1,4 @@
-export const stETHPartialAbi = [
+export const StEthPartialAbi = [
   {
     constant: true,
     inputs: [

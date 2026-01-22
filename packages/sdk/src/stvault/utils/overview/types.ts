@@ -1,15 +1,5 @@
-import {
-  Address,
-  GetContractReturnType,
-  Hex,
-  ReadContractReturnType,
-  WalletClient,
-} from 'viem';
+import { Address, Hex, ReadContractReturnType } from 'viem';
 import { VaultHubAbi } from '../../abi/index.js';
-import { LidoSDKVaultContracts } from '../../vault-contracts.js';
-import { lidoPartialAbi } from '../../../core/abi/lidoPartialAbi.js';
-import { stETHPartialAbi } from '../../abi/StethPartial.js';
-// import type { Confirmation } from '../../utils/get-confirmations';
 
 export type VaultConnection = ReadContractReturnType<
   typeof VaultHubAbi,
@@ -41,100 +31,73 @@ export type HubReportData = {
   timestamp: bigint;
 };
 
-export type VaultBaseInfo = {
-  blockNumber: bigint;
-  address: Address;
-  vault: Awaited<ReturnType<LidoSDKVaultContracts['getContractVault']>>;
-  hub: Awaited<ReturnType<LidoSDKVaultContracts['getContractVaultHub']>>;
-  dashboard: Awaited<
-    ReturnType<LidoSDKVaultContracts['getContractVaultDashboard']>
-  >;
-  operatorGrid: Awaited<
-    ReturnType<LidoSDKVaultContracts['getContractOperatorGrid']>
-  >;
-  lazyOracle: Awaited<
-    ReturnType<LidoSDKVaultContracts['getContractLazyOracle']>
-  >;
-
-  lidoV3Contract: GetContractReturnType<typeof lidoPartialAbi, WalletClient>;
-  stethContract: GetContractReturnType<typeof stETHPartialAbi, WalletClient>;
-  nodeOperator: Address;
-  vaultOwner: Address;
-  withdrawalCredentials: Hex;
-  isReportFresh: boolean;
-  isReportMissing: boolean;
-  hubReport: HubReportData;
-  report: VaultReportType | null;
-  isVaultDisconnected: boolean; // disconnected by user
-  isVaultConnected: boolean;
-  isPendingDisconnect: boolean;
-  isPendingConnect: boolean;
-  isReportAvailable: boolean;
-} & VaultConnection;
-
-export type Tier = {
-  id: bigint;
-  tierName: string;
-  shareLimit: bigint;
-  shareLimitStETH: bigint;
-  liabilityShares: bigint;
-  liabilityStETH: bigint;
-  operator: Address;
-  reserveRatioBP: number;
-  forcedRebalanceThresholdBP: number;
-  infraFeeBP: number;
-  liquidityFeeBP: number;
-  reservationFeeBP: number;
+export type GetVaultOverviewDataProps = {
+  blockNumber?: bigint;
+  report?: VaultReportType | null;
 };
 
-export type TierVault = {
-  tierId: bigint;
+export type OverviewArgs = {
   totalValue: bigint;
-  shareLimit: bigint;
-  stETHLimit: bigint;
-  liabilityStETH: bigint;
-  mintableStETH: bigint;
-  totalMintingCapacityStETH: bigint;
-  totalMintingCapacityShares: bigint;
   reserveRatioBP: number;
-  forcedRebalanceThresholdBP: number;
-  infraFeeBP: number;
-  liquidityFeeBP: number;
-  reservationFeeBP: number;
-  isPendingConnect: boolean;
+  liabilitySharesInStethWei: bigint;
+  forceRebalanceThresholdBP: number;
+  withdrawableEther: bigint;
+  balance: bigint;
+  locked: bigint;
+  nodeOperatorDisbursableFee: bigint;
+  totalMintingCapacityStethWei: bigint;
+  unsettledLidoFees: bigint;
+  minimalReserve: bigint;
+  reportLiabilitySharesStETH: bigint;
 };
 
-export type VaultTierInfoArgs = {
-  vault: VaultBaseInfo;
+type VaultRecordWithoutDelta = Omit<VaultRecord, 'inOutDelta'>;
+
+export type VaultQuarantineState = {
+  isActive: boolean;
+  pendingTotalValueIncrease: bigint;
+  startTimestamp: bigint;
+  endTimestamp: bigint;
+  totalValueRemainder: bigint;
 };
 
-export type VaultTierInfo = {
-  lidoTVLSharesLimit: bigint;
-  isVaultConnected: boolean;
-  address: Address;
-  owner: Address;
-  nodeOperator: Address;
-  vault: TierVault;
-  tier: Tier;
-  proposals: {
-    confirmExpiry: bigint;
-    // lastProposal: Confirmation | undefined;
-    proposedVaultLimitStETH: bigint;
-    proposedVaultLimit: bigint;
-  };
-};
-
-export type NodeOperatorTierInfoArgs = {
-  vault: VaultBaseInfo;
-};
-
-export type NodeOperatorTiersInfo = {
-  group: {
+export type VaultOverviewData = VaultConnection &
+  VaultRecordWithoutDelta & {
+    address: Address;
     nodeOperator: Address;
-    shareLimit: bigint;
-    stEthLimit: bigint;
+    owner: Address;
+    totalValue: bigint;
     liabilityShares: bigint;
     liabilityStETH: bigint;
+    mintableStETH: bigint;
+    mintableShares: bigint;
+    stETHLimit: bigint;
+    totalMintingCapacityShares: bigint;
+    totalMintingCapacityStETH: bigint;
+    inOutDelta: bigint;
+    redemptionShares: bigint;
+    redemptionStETH: bigint;
+    lockedEth: bigint;
+    nodeOperatorUnclaimedFee: bigint;
+    withdrawableEther: bigint;
+    balance: bigint;
+    feeRate: number;
+    withdrawalCredentials: Address;
+    tierId: bigint;
+    tierShareLimit: bigint;
+    tierStETHLimit: bigint;
+    vaultQuarantineState: VaultQuarantineState;
+    reportLiabilitySharesStETH: bigint;
+    obligationsShortfallValue: bigint;
+    stETHToBurn: bigint;
+    feesToSettle: bigint;
+    rebalanceShares: bigint;
+    rebalanceStETH: bigint;
+    lidoTVLSharesLimit: bigint;
+    groupShareLimit: bigint;
+    stagedBalanceWei: bigint;
+    isPendingDisconnect: boolean;
+    isVaultDisconnected: boolean;
+    isVaultConnected: boolean;
+    beaconChainDepositsPaused: boolean;
   };
-  tiers: Tier[];
-};

@@ -25,7 +25,7 @@ import { ActionBlock } from '../../components/action/styles';
 export const StVaultDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
   const account = web3account as `0x{string}`;
-  const { stVaultModule } = useLidoSDK();
+  const { stVaultModule, core } = useLidoSDK();
   const { vaultFactory, vaultViewer, constants } = stVaultModule;
 
   const [fundEthValue, setFundEthValue] = useState<ValueType>(DEFAULT_VALUE);
@@ -403,11 +403,12 @@ export const StVaultDemo = () => {
       />
 
       <Action
-        title="Read with submitreport simulation"
+        title="Read with latest report submit simulation"
         walletAction
         action={async () => {
           if (currentVault) {
             const dashboard = await currentVault.getDashboardContract();
+            const blockNumber = await core.toBlockNumber({ block: 'latest' });
             const dashboardEncodable = getEncodableContract(dashboard);
             const preparedMethods = [
               dashboardEncodable.prepare.remainingMintingCapacityShares([
@@ -419,7 +420,42 @@ export const StVaultDemo = () => {
               vaultAddress: currentVault.getVaultAddress(),
               skipIsFresh: true,
               preparedMethods,
+              blockNumber,
             });
+          }
+        }}
+      >
+        <small>
+          Read <code>remainingMintingCapacityShares</code> and{' '}
+          <code>liabilityShares</code>
+        </small>
+      </Action>
+
+      <Action
+        title="Calculate Overview"
+        walletAction
+        action={async () => {
+          if (currentVault) {
+            const blockNumber = await core.toBlockNumber({ block: 'latest' });
+            const vaultData = await currentVault.getVaultOverviewData({
+              blockNumber,
+            });
+
+            const overview = currentVault.calculateOverviewV2({
+              ...vaultData,
+              liabilitySharesInStethWei: vaultData.liabilityStETH,
+              forceRebalanceThresholdBP: vaultData.forcedRebalanceThresholdBP,
+              locked: vaultData.lockedEth,
+              nodeOperatorDisbursableFee: vaultData.nodeOperatorUnclaimedFee,
+              totalMintingCapacityStethWei: vaultData.totalMintingCapacityStETH,
+              unsettledLidoFees:
+                vaultData.cumulativeLidoFees - vaultData.settledLidoFees,
+            });
+
+            return {
+              vaultData,
+              overview,
+            };
           }
         }}
       ></Action>
