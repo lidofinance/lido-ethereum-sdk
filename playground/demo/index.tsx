@@ -13,7 +13,7 @@ import { EventsDemo } from './events';
 import { StatisticsDemo } from './statistics';
 import { RewardsDemo } from './rewards';
 import { ShareDemo } from './shares'
-import { DualGovernanceDemo } from './dual-governance';;
+import { DualGovernanceDemo } from './dual-governance';
 import { useChainId } from 'wagmi';
 import { L2_CHAINS } from 'providers/web3';
 import { L2 } from './l2';

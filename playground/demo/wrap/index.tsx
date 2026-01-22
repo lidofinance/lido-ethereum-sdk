@@ -1,4 +1,4 @@
-import { Accordion } from '@lidofinance/lido-ui';
+import { Accordion, Input } from '@lidofinance/lido-ui';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { Action, renderTokenResult } from 'components/action';
 import { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
@@ -12,6 +12,7 @@ const ZERO = BigInt(0);
 export const WrapDemo = () => {
   const { account: web3account = '0x0' } = useWeb3();
   const [wrapValue, setWrapValue] = useState<ValueType>(DEFAULT_VALUE);
+  const [referralAddressState, setReferralAddress] = useState<string>('');
   const [approveValue, setApproveValue] = useState<ValueType>(DEFAULT_VALUE);
   const [wrapStethValue, setWrapStethValue] =
     useState<ValueType>(DEFAULT_VALUE);
@@ -23,6 +24,9 @@ export const WrapDemo = () => {
   const { wrap } = useLidoSDK();
 
   const account = web3account as `0x{string}`;
+  const referralAddress = referralAddressState
+    ? (referralAddressState as `0x{string}`)
+    : undefined;
 
   return (
     <Accordion summary="Wrap">
@@ -32,6 +36,7 @@ export const WrapDemo = () => {
         action={() =>
           wrap.wrapEth({
             value: wrapValue ?? ZERO,
+            referralAddress: referralAddress,
             account,
             callback: transactionToast,
           })
@@ -43,6 +48,12 @@ export const WrapDemo = () => {
           placeholder="0.0"
           onChange={setWrapValue}
         />
+        <Input
+          label="referral address"
+          placeholder="0x0000000"
+          value={referralAddressState}
+          onChange={(e) => setReferralAddress(e.currentTarget.value)}
+        />
       </Action>
       <Action
         title="Wrap ETH Populate"
@@ -50,6 +61,7 @@ export const WrapDemo = () => {
         action={() =>
           wrap.wrapEthPopulateTx({
             value: wrapValue ?? ZERO,
+            referralAddress: referralAddress,
             account,
           })
         }
@@ -60,6 +72,7 @@ export const WrapDemo = () => {
         action={() =>
           wrap.wrapEthEstimateGas({
             value: wrapValue ?? ZERO,
+            referralAddress: referralAddress,
             account,
           })
         }
