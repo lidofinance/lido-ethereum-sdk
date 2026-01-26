@@ -10,6 +10,7 @@ import {
   BurnProps,
   BurnSharesProps,
   FundPros,
+  GetLatestVaultReportProps,
   GetVaultRoleMembersProps,
   LidoSDKVaultsModuleProps,
   MintProps,
@@ -770,10 +771,12 @@ export class LidoSDKVaultEntity extends BusModule {
 
   @Logger('Views:')
   @ErrorHandler()
-  public async getLatestReport() {
+  public async getLatestReport(props?: GetLatestVaultReportProps) {
     const vaultAddress = this.getVaultAddress();
-    const lazyOracle = await this.bus.contracts.getContractLazyOracle();
-    const hub = await this.bus.contracts.getContractVaultHub();
+    const [lazyOracle, hub] = await Promise.all([
+      this.bus.contracts.getContractLazyOracle(),
+      this.bus.contracts.getContractVaultHub(),
+    ]);
 
     const [latestVaultReport, latestHubReport] = await Promise.all([
       hub.read.latestReport([vaultAddress]),
@@ -787,7 +790,11 @@ export class LidoSDKVaultEntity extends BusModule {
       latestHubReportTimestamp > latestVaultReport.timestamp;
 
     const report = latestHubReportCID
-      ? await getVaultReport({ cid: latestHubReportCID, vault: vaultAddress })
+      ? await getVaultReport({
+          cid: latestHubReportCID,
+          vault: vaultAddress,
+          ...props,
+        })
       : null;
 
     return { report, isReportAvailable };
@@ -804,13 +811,21 @@ export class LidoSDKVaultEntity extends BusModule {
       (await this.bus.core.toBlockNumber({ block: 'latest' }));
     const report = props.report ?? (await this.getLatestReport()).report?.data;
 
-    const dashboard = await this.getDashboardContract();
-    const vaultContract = await this.getVaultContract();
-    const hub = await this.bus.contracts.getContractVaultHub();
-    const operatorGrid = await this.bus.contracts.getContractOperatorGrid();
-    const lazyOracle = await this.bus.contracts.getContractLazyOracle();
-    const lidoV3Contract = await this.bus.contracts.getLidoV3Contract();
-    const stethContract = await this.bus.contracts.getStETHPartial();
+    const [
+      dashboard,
+      vaultContract,
+      hub,
+      operatorGrid,
+      lazyOracle,
+      lidoContract,
+    ] = await Promise.all([
+      this.getDashboardContract(),
+      this.getVaultContract(),
+      this.bus.contracts.getContractVaultHub(),
+      this.bus.contracts.getContractOperatorGrid(),
+      this.bus.contracts.getContractLazyOracle(),
+      this.bus.core.getLidoContract(),
+    ]);
 
     const nodeOperator = await vaultContract.read.nodeOperator();
     const withdrawalCredentials =
@@ -907,16 +922,16 @@ export class LidoSDKVaultEntity extends BusModule {
       reportLiabilitySharesStETH,
       lidoTVLSharesLimit,
     ] = await Promise.all([
-      stethContract.read.getPooledEthBySharesRoundUp([liabilityShares]),
-      stethContract.read.getPooledEthByShares([mintableShares]),
-      stethContract.read.getPooledEthByShares([vaultConnection.shareLimit]),
-      stethContract.read.getPooledEthByShares([totalMintingCapacityShares]),
-      stethContract.read.getPooledEthByShares([tierShareLimit]),
-      stethContract.read.getPooledEthBySharesRoundUp([sharesToBurn]),
-      stethContract.read.getPooledEthBySharesRoundUp([rebalanceShares]),
-      stethContract.read.getPooledEthBySharesRoundUp([redemptionShares]),
-      stethContract.read.getPooledEthBySharesRoundUp([reportLiabilityShares]),
-      lidoV3Contract.read.getMaxMintableExternalShares(),
+      lidoContract.read.getPooledEthBySharesRoundUp([liabilityShares]),
+      lidoContract.read.getPooledEthByShares([mintableShares]),
+      lidoContract.read.getPooledEthByShares([vaultConnection.shareLimit]),
+      lidoContract.read.getPooledEthByShares([totalMintingCapacityShares]),
+      lidoContract.read.getPooledEthByShares([tierShareLimit]),
+      lidoContract.read.getPooledEthBySharesRoundUp([sharesToBurn]),
+      lidoContract.read.getPooledEthBySharesRoundUp([rebalanceShares]),
+      lidoContract.read.getPooledEthBySharesRoundUp([redemptionShares]),
+      lidoContract.read.getPooledEthBySharesRoundUp([reportLiabilityShares]),
+      lidoContract.read.getMaxMintableExternalShares(),
     ]);
 
     const supposedDashboardAddress =

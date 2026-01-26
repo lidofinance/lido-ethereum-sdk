@@ -1,9 +1,9 @@
 import { fetchIPFS, IPFS_GATEWAY } from './ipfs.js';
-import { VaultReport, VaultReportArgs, Report } from '../types.js';
+import { VaultReport, VaultReportProps, Report } from '../types.js';
 import { getVaultData } from './report-proof.js';
 
 export const getVaultReport = async (
-  args: VaultReportArgs,
+  args: VaultReportProps,
 ): Promise<VaultReport> => {
   const { vault, cid, gateway = IPFS_GATEWAY, bigNumberType = 'string' } = args;
 

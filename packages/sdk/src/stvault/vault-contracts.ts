@@ -17,12 +17,10 @@ import {
   VaultHubAbi,
   VaultViewerAbi,
   LazyOracleAbi,
-  StEthPartialAbi,
 } from './abi/index.js';
 import { Cache, Logger } from '../common/decorators/index.js';
 import { BusModule } from './bus-module.js';
 import { EncodableContract, getEncodableContract } from '../common/index.js';
-import { lidoPartialAbi } from '../core/abi/lidoPartialAbi.js';
 
 export class LidoSDKVaultContracts extends BusModule {
   // Precomputed event signatures
@@ -158,48 +156,6 @@ export class LidoSDKVaultContracts extends BusModule {
       getContract({
         address,
         abi: LazyOracleAbi,
-        client: {
-          public: this.bus.core.rpcProvider,
-          wallet: this.bus.core.web3Provider as WalletClient,
-        },
-      }),
-    );
-  }
-
-  @Logger('Contracts:')
-  @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
-  public async getLidoV3Contract(): Promise<
-    EncodableContract<
-      GetContractReturnType<typeof lidoPartialAbi, WalletClient>
-    >
-  > {
-    const address = await this.bus.core.getContractLidoLocator().read.lido();
-
-    return getEncodableContract(
-      getContract({
-        address,
-        abi: lidoPartialAbi,
-        client: {
-          public: this.bus.core.rpcProvider,
-          wallet: this.bus.core.web3Provider as WalletClient,
-        },
-      }),
-    );
-  }
-
-  @Logger('Contracts:')
-  @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
-  public async getStETHPartial(): Promise<
-    EncodableContract<
-      GetContractReturnType<typeof StEthPartialAbi, WalletClient>
-    >
-  > {
-    const address = await this.bus.core.getContractLidoLocator().read.lido();
-
-    return getEncodableContract(
-      getContract({
-        address,
-        abi: StEthPartialAbi,
         client: {
           public: this.bus.core.rpcProvider,
           wallet: this.bus.core.web3Provider as WalletClient,

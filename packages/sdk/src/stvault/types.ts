@@ -144,14 +144,18 @@ export type VaultReport = {
   cid: string;
 };
 
-export type VaultReportArgs = {
+export type GetLatestVaultReportProps = {
+  gateway?: string;
+};
+
+export type VaultReportProps = {
   vault: Address;
   cid: string;
   gateway?: string;
   bigNumberType?: BigNumberType;
 };
 
-export type ReportFetchArgs = {
+export type ReportFetchProps = {
   cid: string;
   gateway?: string;
   bigNumberType?: BigNumberType;

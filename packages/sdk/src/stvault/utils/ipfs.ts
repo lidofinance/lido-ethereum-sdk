@@ -1,11 +1,11 @@
 import { CID } from 'multiformats/cid';
 import { MemoryBlockstore } from 'blockstore-core';
 import { importer } from 'ipfs-unixfs-importer';
-import { ReportFetchArgs } from '../types.js';
+import { ReportFetchProps } from '../types.js';
 
 export const IPFS_GATEWAY = 'https://ipfs.io/ipfs';
 
-export const fetchIPFS = async <T>(args: ReportFetchArgs): Promise<T> => {
+export const fetchIPFS = async <T>(args: ReportFetchProps): Promise<T> => {
   const { cid, gateway = IPFS_GATEWAY } = args;
 
   const { json } = await fetchIPFSVerify<T>(cid, gateway);
@@ -14,7 +14,7 @@ export const fetchIPFS = async <T>(args: ReportFetchArgs): Promise<T> => {
 
 // Fetching buffer content by CID through IPFS gateway
 export const fetchIPFSBuffer = async (
-  args: ReportFetchArgs,
+  args: ReportFetchProps,
 ): Promise<Uint8Array> => {
   const { cid, gateway = IPFS_GATEWAY } = args;
   const ipfsUrl = `${gateway}/${cid}`;
