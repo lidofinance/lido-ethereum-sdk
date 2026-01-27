@@ -53,7 +53,7 @@
     "fastify": "^4.28.1",
     "fastify-plugin": "^4.5.1",
     "reflect-metadata": "^0.2.2",
-    "viem": "^2.31.0"
+    "viem": "^2.45.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.10",
