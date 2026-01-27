@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "@lidofinance/lido-ethereum-sdk": "workspace:*",
-    "viem": "^2.31.0"
+    "viem": "^2.45.0"
   }
 }

@@ -24,6 +24,8 @@ const jestConfig: JestConfigWithTsJest = {
   globalSetup: '<rootDir>/tests/global-setup.cjs',
   globalTeardown: '<rootDir>/tests/global-teardown.cjs',
   testTimeout: 60_000,
+  testPathIgnorePatterns: ['.*-snapshot\\.ts$'],
+  coveragePathIgnorePatterns: ['node_modules/', '.*snapshot.*\\.ts$'],
 };
 
 export default jestConfig;
