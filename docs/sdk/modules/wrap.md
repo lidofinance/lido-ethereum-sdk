@@ -12,6 +12,7 @@ Arguments:
 
 - `value`: _string_ | _bigint_ - amount of ETH to wrap to wstETH (staking ETH and then wrapping stETH to wstETH in a single tx)
 - `callback`: _StageCallback_ - callback function that will be on each _stage_ of the transaction
+- `referralAddress`: _string_ - referral address (optional)
 
 ```ts
 import {
@@ -56,6 +57,7 @@ try {
   const wrapTx = await lidoSDK.staking.wrapETH({
     value,
     callback,
+    referralAddress,
     account,
   });
 
