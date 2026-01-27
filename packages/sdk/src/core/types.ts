@@ -25,12 +25,12 @@ type LidoSDKCorePropsRpcProps =
     }
   | {
       rpcUrls?: undefined;
-      rpcProvider: PublicClient;
+      rpcProvider: PublicClient & { [key: string]: any }; // Accept any PublicClient-compatible type
     };
 
 export type LidoSDKCoreProps = {
   chainId: (typeof SUPPORTED_CHAINS)[number];
-  web3Provider?: WalletClient;
+  web3Provider?: WalletClient & { [key: string]: any }; // Accept any WalletClient-compatible type
   logMode?: LOG_MODE;
   customLidoLocatorAddress?: Address;
 } & LidoSDKCorePropsRpcProps;

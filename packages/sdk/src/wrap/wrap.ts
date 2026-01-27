@@ -11,6 +11,7 @@ import {
   getAbiItem,
   toEventHash,
   isAddressEqual,
+  zeroAddress,
 } from 'viem';
 
 import {
@@ -37,7 +38,8 @@ import type {
   UnwrapResults,
 } from './types.js';
 
-import { abi } from './abi/wsteth.js';
+import { abi as wstethAbi } from './abi/wsteth.js';
+import { abi as wstethReferralStakerAbi } from './abi/wsteth-referral-staker.js';
 import {
   stethPartialAbi,
   PartialTransferEventAbi,
@@ -61,13 +63,13 @@ export class LidoSDKWrap extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressWstETH'])
   public async getContractWstETH(): Promise<
-    GetContractReturnType<typeof abi, WalletClient>
+    GetContractReturnType<typeof wstethAbi, WalletClient>
   > {
     const address = await this.contractAddressWstETH();
 
     return getContract({
       address,
-      abi: abi,
+      abi: wstethAbi,
       client: {
         public: this.core.rpcProvider,
         wallet: this.core.web3Provider as WalletClient,
@@ -94,6 +96,31 @@ export class LidoSDKWrap extends LidoSDKModule {
     });
   }
 
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  public async contractAddressWstETHReferralStaker(): Promise<Address> {
+    return await this.core.getContractAddress(
+      LIDO_CONTRACT_NAMES.wstethReferralStaker,
+    );
+  }
+
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressWstETHReferralStaker'])
+  public async getContractWstETHReferralStaker(): Promise<
+    GetContractReturnType<typeof wstethReferralStakerAbi, WalletClient>
+    > {
+    const address = await this.contractAddressWstETHReferralStaker();
+
+    return getContract({
+      address,
+      abi: wstethReferralStakerAbi,
+      client: {
+        public: this.core.rpcProvider,
+        wallet: this.core.web3Provider as WalletClient,
+      },
+    });
+  }
+
   // Calls
 
   @Logger('Call:')
@@ -101,9 +128,9 @@ export class LidoSDKWrap extends LidoSDKModule {
   public async wrapEth(
     props: WrapProps,
   ): Promise<TransactionResult<WrapResults>> {
-    const { account, callback, value, ...rest } = await this.parseProps(props);
-    const web3Provider = this.core.useWeb3Provider();
-    const contract = await this.getContractWstETH();
+    this.core.useWeb3Provider();
+    const { account, callback, value, referralAddress, ...rest } = await this.parseProps(props);
+    const contract = await this.getContractWstETHReferralStaker();
 
     await this.validateStakeLimit(value);
 
@@ -112,33 +139,17 @@ export class LidoSDKWrap extends LidoSDKModule {
       account,
       callback,
       getGasLimit: (options) =>
-        this.core.rpcProvider.estimateGas({
-          to: contract.address,
+        contract.estimateGas.stakeETH([referralAddress], {
           value,
           ...options,
         }),
       sendTransaction: (options) =>
-        web3Provider.sendTransaction({
+        contract.write.stakeETH([referralAddress], {
           value,
-          to: contract.address,
           ...options,
         }),
       decodeResult: (receipt) => this.wrapParseEvents(receipt, account.address),
     });
-  }
-
-  @Logger('Utils:')
-  public async wrapEthPopulateTx(
-    props: WrapPropsWithoutCallback,
-  ): Promise<PopulatedTransaction> {
-    const { value, account } = await this.parseProps(props);
-    const address = await this.contractAddressWstETH();
-
-    return {
-      to: address,
-      from: account.address,
-      value,
-    };
   }
 
   @Logger('Utils:')
@@ -147,14 +158,12 @@ export class LidoSDKWrap extends LidoSDKModule {
     props: WrapPropsWithoutCallback,
     options?: TransactionOptions,
   ): Promise<bigint> {
-    const { value, account } = await this.parseProps(props);
+    const { value, account, referralAddress } = await this.parseProps(props);
+    const contract = await this.getContractWstETHReferralStaker();
 
-    const address = await this.contractAddressWstETH();
-
-    const originalGasLimit = await this.core.rpcProvider.estimateGas({
-      account,
-      to: address,
+    const originalGasLimit = await contract.estimateGas.stakeETH([referralAddress], {
       value,
+      account,
       ...options,
     });
 
@@ -165,6 +174,25 @@ export class LidoSDKWrap extends LidoSDKModule {
         )) /
       BigInt(GAS_TRANSACTION_RATIO_PRECISION)
     );
+  }
+
+  @Logger('Utils:')
+  public async wrapEthPopulateTx(
+    props: WrapPropsWithoutCallback,
+  ): Promise<PopulatedTransaction> {
+    const { value, account, referralAddress } = await this.parseProps(props);
+    const to = await this.contractAddressWstETHReferralStaker();
+
+    return {
+      to,
+      from: account.address,
+      value,
+      data: encodeFunctionData({
+        abi: wstethReferralStakerAbi,
+        functionName: 'stakeETH',
+        args: [referralAddress],
+      }),
+    };
   }
 
   /// Wrap stETH
@@ -210,7 +238,7 @@ export class LidoSDKWrap extends LidoSDKModule {
       to: address,
       from: account.address,
       data: encodeFunctionData({
-        abi,
+        abi: wstethAbi,
         functionName: 'wrap',
         args: [value],
       }),
@@ -356,7 +384,7 @@ export class LidoSDKWrap extends LidoSDKModule {
       to,
       from: account.address,
       data: encodeFunctionData({
-        abi: abi,
+        abi: wstethAbi,
         functionName: 'unwrap',
         args: [value],
       }),
@@ -429,6 +457,7 @@ export class LidoSDKWrap extends LidoSDKModule {
       ...props,
       account: await this.core.useAccount(props.account),
       value: parseValue(props.value),
+      referralAddress: props.referralAddress ?? zeroAddress,
       callback: props.callback ?? NOOP,
     };
   }
