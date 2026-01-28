@@ -1,4 +1,8 @@
-import type { Address, ContractFunctionParameters } from 'viem';
+import type {
+  Address,
+  ContractFunctionParameters,
+  MulticallReturnType,
+} from 'viem';
 import { Logger } from '../common/decorators/index.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 import { LidoSDKVaultContracts } from './vault-contracts.js';
@@ -8,7 +12,6 @@ import { LidoSDKstETH, LidoSDKwstETH } from '../erc20/index.js';
 import { LidoSDKVaultEntity } from './vault-entity.js';
 import { LidoSDKVaultLazyOracle } from './vault-lazy-oracle.js';
 import { LidoSDKVaultConstants } from './vault-contants.js';
-import { getEncodableContract } from '../common/utils/get-encodable-contract.js';
 import { SubmitLatestReportProps } from './types.js';
 
 export class Bus extends LidoSDKModule {
@@ -90,7 +93,7 @@ export class Bus extends LidoSDKModule {
   }
 
   @Logger('Utils:')
-  vaultFromAddress(vaultAddress: Address, dashboardAddress?: Address) {
+  public vaultFromAddress(vaultAddress: Address, dashboardAddress?: Address) {
     return new LidoSDKVaultEntity({
       bus: this,
       vaultAddress,
@@ -98,25 +101,33 @@ export class Bus extends LidoSDKModule {
     });
   }
 
-  async readWithLatestReport<
-    TMethods extends
-      readonly unknown[] = readonly (ContractFunctionParameters & {
+  public async readWithLatestReport<
+    TMethods extends readonly (ContractFunctionParameters & {
       from?: Address;
     })[],
-  >(props: { preparedMethods: TMethods } & SubmitLatestReportProps) {
+  >(
+    props: {
+      preparedMethods: TMethods;
+      blockNumber: bigint;
+    } & SubmitLatestReportProps,
+  ) {
     const args = await this.lazyOracle.getSubmitLatestReportTxArgs({
       vaultAddress: props.vaultAddress,
       skipIsFresh: props.skipIsFresh,
     });
-    const lazyOracleContract = getEncodableContract(
-      await this.contracts.getContractLazyOracle(),
-    );
 
-    return this.core.rpcProvider.multicall({
-      contracts: [
-        lazyOracleContract.prepare.updateVaultData(args),
-        ...props.preparedMethods,
-      ] as any,
+    const lazyOracleContract = await this.contracts.getContractLazyOracle();
+
+    const updateCall = lazyOracleContract.prepare.updateVaultData(args);
+
+    const allResults = await this.core.rpcProvider.multicall({
+      contracts: [updateCall, ...props.preparedMethods] as any,
+      allowFailure: false,
+      blockNumber: props.blockNumber,
     });
+
+    const [, ...results] = allResults;
+
+    return results as MulticallReturnType<TMethods, false>;
   }
 }

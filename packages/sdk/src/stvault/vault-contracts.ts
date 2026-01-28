@@ -10,15 +10,16 @@ import {
   DashboardAbi,
   DashboardCreatedEventAbi,
   OperatorGridAbi,
+  PredepositGuaranteeAbi,
   StakingVaultAbi,
   VaultCreatedEventAbi,
   VaultFactoryAbi,
   VaultHubAbi,
   VaultViewerAbi,
+  LazyOracleAbi,
 } from './abi/index.js';
 import { Cache, Logger } from '../common/decorators/index.js';
 import { BusModule } from './bus-module.js';
-import { LazyOracleAbi } from './abi/LazyOracle.js';
 import { EncodableContract, getEncodableContract } from '../common/index.js';
 
 export class LidoSDKVaultContracts extends BusModule {
@@ -64,9 +65,7 @@ export class LidoSDKVaultContracts extends BusModule {
   public async getContractVaultDashboard(
     address: Address,
   ): Promise<
-    EncodableContract<
-      GetContractReturnType<typeof DashboardAbi, WalletClient>
-    >
+    EncodableContract<GetContractReturnType<typeof DashboardAbi, WalletClient>>
   > {
     return getEncodableContract(
       getContract({
@@ -83,9 +82,7 @@ export class LidoSDKVaultContracts extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractVaultHub(): Promise<
-    EncodableContract<
-      GetContractReturnType<typeof VaultHubAbi, WalletClient>
-    >
+    EncodableContract<GetContractReturnType<typeof VaultHubAbi, WalletClient>>
   > {
     const address = await this.bus.core
       .getContractLidoLocator()
@@ -149,9 +146,7 @@ export class LidoSDKVaultContracts extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractLazyOracle(): Promise<
-    EncodableContract<
-      GetContractReturnType<typeof LazyOracleAbi, WalletClient>
-    >
+    EncodableContract<GetContractReturnType<typeof LazyOracleAbi, WalletClient>>
   > {
     const address = await this.bus.core
       .getContractLidoLocator()
@@ -161,6 +156,29 @@ export class LidoSDKVaultContracts extends BusModule {
       getContract({
         address,
         abi: LazyOracleAbi,
+        client: {
+          public: this.bus.core.rpcProvider,
+          wallet: this.bus.core.web3Provider as WalletClient,
+        },
+      }),
+    );
+  }
+
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
+  public async getContractPredepositGuarantee(): Promise<
+    EncodableContract<
+      GetContractReturnType<typeof PredepositGuaranteeAbi, WalletClient>
+    >
+  > {
+    const address = await this.bus.core
+      .getContractLidoLocator()
+      .read.predepositGuarantee();
+
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: PredepositGuaranteeAbi,
         client: {
           public: this.bus.core.rpcProvider,
           wallet: this.bus.core.web3Provider as WalletClient,

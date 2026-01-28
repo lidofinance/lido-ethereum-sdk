@@ -5,3 +5,4 @@ export * from './vault-viewer.js';
 export * from './vault-module.js';
 export * from './vault-entity.js';
 export * from './vault-contracts.js';
+export * from './abi/index.js';

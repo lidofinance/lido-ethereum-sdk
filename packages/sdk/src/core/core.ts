@@ -1,19 +1,19 @@
 import {
   type Address,
-  type WalletClient,
-  type PublicClient,
   type Chain,
-  type GetContractReturnType,
-  type CustomTransportConfig,
-  type GetBlockReturnType,
   createPublicClient,
   createWalletClient,
-  fallback,
-  http,
   custom,
+  type CustomTransportConfig,
+  fallback,
+  type GetBlockReturnType,
   getContract,
-  maxUint256,
+  type GetContractReturnType,
+  http,
   JsonRpcAccount,
+  maxUint256,
+  type PublicClient,
+  type WalletClient,
 } from 'viem';
 import {
   ERROR_CODE,
@@ -23,47 +23,49 @@ import {
 } from '../common/utils/sdk-error.js';
 import { splitSignature } from '@ethersproject/bytes';
 
-import { type SDKErrorProps, SDKError } from '../common/utils/index.js';
-import { Logger, Initialize, Cache } from '../common/decorators/index.js';
+import { SDKError, type SDKErrorProps } from '../common/utils/index.js';
+import { Cache, Initialize, Logger } from '../common/decorators/index.js';
 import {
-  SUPPORTED_CHAINS,
-  LIDO_LOCATOR_BY_CHAIN,
-  type CHAINS,
-  LIDO_CONTRACT_NAMES,
-  CONTRACTS_BY_TOKENS,
-  LIDO_TOKENS,
-  PERMIT_MESSAGE_TYPES,
-  VIEM_CHAINS,
-  SUBRGRAPH_ID_BY_CHAIN,
   APPROX_SECONDS_PER_BLOCK,
-  NOOP,
-  LIDO_L2_CONTRACT_NAMES,
-  LIDO_L2_CONTRACT_ADDRESSES,
+  type CHAINS,
+  CONTRACTS_BY_TOKENS,
   DUAL_GOVERNANCE_CONTRACT_ADDRESSES,
   DUAL_GOVERNANCE_CONTRACT_NAMES,
+  LIDO_CONTRACT_NAMES,
+  LIDO_L2_CONTRACT_ADDRESSES,
+  LIDO_L2_CONTRACT_NAMES,
+  LIDO_LOCATOR_BY_CHAIN,
+  LIDO_TOKENS,
+  NOOP,
+  PERMIT_MESSAGE_TYPES,
+  SUBRGRAPH_ID_BY_CHAIN,
+  SUPPORTED_CHAINS,
   VAULT_VIEWER_CONTRACT_ADDRESSES,
+  VIEM_CHAINS,
   WSTETH_REFERRAL_STAKER,
 } from '../common/constants.js';
 
 import { LidoLocatorAbi } from './abi/lidoLocator.js';
 import { wqWstethAddressAbi } from './abi/wq.js';
 import type {
+  AccountValue,
+  BackArgumentType,
+  BlockArgumentType,
+  GetFeeDataResult,
   LidoSDKCoreProps,
-  PermitSignature,
-  SignPermitProps,
   LOG_MODE,
   PerformTransactionOptions,
+  PermitSignature,
+  SignPermitProps,
   TransactionOptions,
   TransactionResult,
-  GetFeeDataResult,
-  BlockArgumentType,
-  BackArgumentType,
-  AccountValue,
 } from './types.js';
 import { TransactionCallbackStage } from './types.js';
 import { permitAbi } from './abi/permit.js';
 import { LidoSDKCacheable } from '../common/class-primitives/cacheable.js';
 import { readContract } from 'viem/actions';
+import { EncodableContract, getEncodableContract } from '../common/index.js';
+import { LidoAbi } from './abi/lido.js';
 
 export default class LidoSDKCore extends LidoSDKCacheable {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
@@ -206,6 +208,21 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       abi: LidoLocatorAbi,
       client: this.rpcProvider,
     });
+  }
+
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['chain.id', 'contractAddressLidoLocator'])
+  public async getLidoContract(): Promise<
+    EncodableContract<GetContractReturnType<typeof LidoAbi, WalletClient>>
+  > {
+    const address = await this.getContractAddress(LIDO_CONTRACT_NAMES.lido);
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: LidoAbi,
+        client: this.rpcProvider,
+      }),
+    );
   }
 
   // PERMIT

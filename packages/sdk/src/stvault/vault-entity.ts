@@ -10,6 +10,7 @@ import {
   BurnProps,
   BurnSharesProps,
   FundPros,
+  GetLatestVaultReportProps,
   GetVaultRoleMembersProps,
   LidoSDKVaultsModuleProps,
   MintProps,
@@ -19,13 +20,25 @@ import {
   VaultSubmitReportProps,
   WithdrawProps,
 } from './types.js';
-import { ERROR_CODE, NOOP } from '../common/index.js';
+import { EncodableContract, ERROR_CODE, NOOP } from '../common/index.js';
 import type { ParsedProps } from '../unsteth/types.js';
-import { DashboardAbi, StakingVaultAbi } from './abi/index.js';
+import {
+  DashboardAbi,
+  Multicall3AbiUtils,
+  StakingVaultAbi,
+} from './abi/index.js';
 import { Cache, ErrorHandler, Logger } from '../common/decorators/index.js';
 
 import { getVaultReport } from './utils/report.js';
 import { PROXY_CODE_PAD_LEFT, PROXY_CODE_PAD_RIGHT } from './consts/index.js';
+import {
+  OverviewArgs,
+  GetVaultOverviewDataProps,
+  VaultOverviewData,
+} from './utils/overview/types.js';
+import { calculateHealth } from './utils/overview/calculate-health.js';
+import { bigIntMax, bigIntMin } from '../common/utils/bigint-math.js';
+import { ceilDiv } from './utils/overview/consts.js';
 
 type LidoSDKVaultEntityProps = LidoSDKVaultsModuleProps & {
   dashboardAddress?: Address;
@@ -64,7 +77,9 @@ export class LidoSDKVaultEntity extends BusModule {
   }
 
   public getVaultContract(): Promise<
-    GetContractReturnType<typeof StakingVaultAbi, WalletClient>
+    EncodableContract<
+      GetContractReturnType<typeof StakingVaultAbi, WalletClient>
+    >
   > {
     return this.bus.contracts.getContractVault(this.vaultAddress);
   }
@@ -73,7 +88,7 @@ export class LidoSDKVaultEntity extends BusModule {
   @Cache(30 * 60 * 1000, ['dashboardAddress'])
   @ErrorHandler()
   public async getDashboardContract(): Promise<
-    GetContractReturnType<typeof DashboardAbi, WalletClient>
+    EncodableContract<GetContractReturnType<typeof DashboardAbi, WalletClient>>
   > {
     const dashboardAddress = await this.getDashboardAddress();
     if (!dashboardAddress) {
@@ -740,14 +755,6 @@ export class LidoSDKVaultEntity extends BusModule {
     return dashboardContract.read.getRoleMembers([props.role]);
   }
 
-  @Logger('Views:')
-  @ErrorHandler()
-  public async getLatestReport() {
-    const vaultAddress = this.getVaultAddress();
-    const { cid } = await this.bus.lazyOracle.getLastReportData();
-    return getVaultReport({ vault: vaultAddress, cid });
-  }
-
   @Logger('Utils:')
   @ErrorHandler()
   private async isDashboard(address: Address) {
@@ -760,5 +767,292 @@ export class LidoSDKVaultEntity extends BusModule {
       PROXY_CODE_PAD_RIGHT;
 
     return dashboardCode?.startsWith(proxyCode) || false;
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
+  public async getLatestReport(props?: GetLatestVaultReportProps) {
+    const vaultAddress = this.getVaultAddress();
+    const [lazyOracle, hub] = await Promise.all([
+      this.bus.contracts.getContractLazyOracle(),
+      this.bus.contracts.getContractVaultHub(),
+    ]);
+
+    const [latestVaultReport, latestHubReport] = await Promise.all([
+      hub.read.latestReport([vaultAddress]),
+      lazyOracle.read.latestReportData(),
+    ]);
+
+    const latestHubReportTimestamp = latestHubReport[0];
+    const latestHubReportCID = latestHubReport[3];
+
+    const isReportAvailable =
+      latestHubReportTimestamp > latestVaultReport.timestamp;
+
+    const report = latestHubReportCID
+      ? await getVaultReport({
+          cid: latestHubReportCID,
+          vault: vaultAddress,
+          ...props,
+        })
+      : null;
+
+    return { report, isReportAvailable };
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
+  public async getVaultOverviewData(
+    props: GetVaultOverviewDataProps,
+  ): Promise<VaultOverviewData> {
+    const vaultAddress = this.getVaultAddress();
+    const blockNumber =
+      props.blockNumber ??
+      (await this.bus.core.toBlockNumber({ block: 'latest' }));
+    const report = props.report ?? (await this.getLatestReport()).report?.data;
+
+    const [
+      dashboard,
+      vaultContract,
+      hub,
+      operatorGrid,
+      lazyOracle,
+      lidoContract,
+    ] = await Promise.all([
+      this.getDashboardContract(),
+      this.getVaultContract(),
+      this.bus.contracts.getContractVaultHub(),
+      this.bus.contracts.getContractOperatorGrid(),
+      this.bus.contracts.getContractLazyOracle(),
+      this.bus.core.getLidoContract(),
+    ]);
+
+    const nodeOperator = await vaultContract.read.nodeOperator();
+    const withdrawalCredentials =
+      await vaultContract.read.withdrawalCredentials();
+    const vaultConnection = await hub.read.vaultConnection([vaultAddress]);
+
+    const reportLiabilityShares =
+      typeof report?.liabilityShares === 'string'
+        ? BigInt(report?.liabilityShares)
+        : report?.liabilityShares ?? 0n;
+
+    const [
+      balance,
+      totalValue,
+      nodeOperatorUnclaimedFee,
+      withdrawableEther,
+      feeRate,
+      totalMintingCapacityShares,
+      mintableShares,
+      tier,
+      group,
+      vaultQuarantineState,
+      obligationsShortfallValue,
+      [sharesToBurn, feesToSettle],
+      rebalanceShares,
+      vaultRecord,
+      lockedEth,
+      stagedBalanceWei,
+      beaconChainDepositsPaused,
+    ] = await this.bus.readWithLatestReport({
+      vaultAddress,
+      blockNumber,
+      preparedMethods: [
+        {
+          abi: Multicall3AbiUtils,
+          address: this.bus.core.rpcProvider.chain?.contracts?.multicall3
+            ?.address as Address,
+          functionName: 'getEthBalance',
+          args: [vaultAddress],
+        },
+        dashboard.prepare.totalValue(),
+        dashboard.prepare.accruedFee(),
+        dashboard.prepare.withdrawableValue(),
+        dashboard.prepare.feeRate(),
+        dashboard.prepare.totalMintingCapacityShares(),
+        dashboard.prepare.remainingMintingCapacityShares([0n]),
+        operatorGrid.prepare.vaultTierInfo([vaultAddress]),
+        operatorGrid.prepare.group([nodeOperator]),
+        lazyOracle.prepare.vaultQuarantine([vaultAddress]),
+        dashboard.prepare.obligationsShortfallValue(),
+        dashboard.prepare.obligations(),
+        hub.prepare.healthShortfallShares([vaultAddress]),
+        hub.prepare.vaultRecord([vaultAddress]),
+        hub.prepare.locked([vaultAddress]),
+        vaultContract.prepare.stagedBalance(),
+        vaultContract.prepare.beaconChainDepositsPaused(),
+      ] as const,
+    });
+
+    // split call because of TS2589: Type instantiation is excessively deep and possibly infinite
+    const [isVaultConnected, isPendingDisconnect, vaultOwner] =
+      await this.bus.readWithLatestReport({
+        vaultAddress,
+        blockNumber,
+        preparedMethods: [
+          hub.prepare.isVaultConnected([vaultAddress]),
+          hub.prepare.isPendingDisconnect([vaultAddress]),
+          vaultContract.prepare.owner(),
+        ] as const,
+      });
+
+    const {
+      liabilityShares,
+      inOutDelta: inOutDeltaArray,
+      settledLidoFees,
+      cumulativeLidoFees,
+      redemptionShares,
+      ...restVaultRecord
+    } = vaultRecord;
+
+    const inOutDelta = inOutDeltaArray[1].value;
+    const [, tierId, tierShareLimit] = tier;
+    const { shareLimit: groupShareLimit } = group;
+
+    const [
+      liabilityStETH,
+      mintableStETH,
+      stETHLimit,
+      totalMintingCapacityStETH,
+      tierStETHLimit,
+      stETHToBurn,
+      rebalanceStETH,
+      redemptionStETH,
+      reportLiabilitySharesStETH,
+      lidoTVLSharesLimit,
+    ] = await Promise.all([
+      lidoContract.read.getPooledEthBySharesRoundUp([liabilityShares]),
+      lidoContract.read.getPooledEthByShares([mintableShares]),
+      lidoContract.read.getPooledEthByShares([vaultConnection.shareLimit]),
+      lidoContract.read.getPooledEthByShares([totalMintingCapacityShares]),
+      lidoContract.read.getPooledEthByShares([tierShareLimit]),
+      lidoContract.read.getPooledEthBySharesRoundUp([sharesToBurn]),
+      lidoContract.read.getPooledEthBySharesRoundUp([rebalanceShares]),
+      lidoContract.read.getPooledEthBySharesRoundUp([redemptionShares]),
+      lidoContract.read.getPooledEthBySharesRoundUp([reportLiabilityShares]),
+      lidoContract.read.getMaxMintableExternalShares(),
+    ]);
+
+    const supposedDashboardAddress =
+      vaultConnection.owner !== zeroAddress
+        ? vaultConnection.owner
+        : vaultOwner;
+    const isDashboard = await this.isDashboard(supposedDashboardAddress);
+
+    return {
+      address: vaultAddress,
+      nodeOperator,
+      totalValue,
+      liabilityStETH,
+      mintableStETH,
+      mintableShares,
+      stETHLimit,
+      totalMintingCapacityShares,
+      totalMintingCapacityStETH,
+      inOutDelta,
+      nodeOperatorUnclaimedFee,
+      withdrawableEther,
+      balance,
+      reportLiabilitySharesStETH,
+      feeRate,
+      liabilityShares,
+      withdrawalCredentials,
+      settledLidoFees,
+      cumulativeLidoFees,
+      vaultQuarantineState,
+      lockedEth,
+      tierId,
+      tierShareLimit,
+      tierStETHLimit,
+      lidoTVLSharesLimit,
+      groupShareLimit,
+      stagedBalanceWei,
+      obligationsShortfallValue,
+      stETHToBurn,
+      feesToSettle,
+      rebalanceShares,
+      rebalanceStETH,
+      redemptionShares,
+      redemptionStETH,
+      beaconChainDepositsPaused,
+      isVaultConnected,
+      isPendingDisconnect,
+      isVaultDisconnected: !isDashboard,
+      ...vaultConnection,
+      ...restVaultRecord,
+    };
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  public calculateOverview(args: OverviewArgs) {
+    const BASIS_POINTS = 10_000n;
+    const {
+      totalValue,
+      reserveRatioBP,
+      liabilitySharesInStethWei,
+      forceRebalanceThresholdBP,
+      withdrawableEther,
+      balance,
+      locked,
+      nodeOperatorDisbursableFee,
+      totalMintingCapacityStethWei,
+      unsettledLidoFees,
+      minimalReserve,
+      reportLiabilitySharesStETH,
+    } = args;
+
+    const { healthRatio, isHealthy } = calculateHealth({
+      totalValue,
+      liabilitySharesInStethWei,
+      forceRebalanceThresholdBP,
+    });
+    const availableToWithdrawal = withdrawableEther;
+    const idleCapital = balance;
+    const totalLocked = locked + nodeOperatorDisbursableFee + unsettledLidoFees;
+    const RR = BigInt(reserveRatioBP);
+    const oneMinusRR = BASIS_POINTS - RR;
+    const collateral = bigIntMax(
+      minimalReserve,
+      ceilDiv(liabilitySharesInStethWei * BASIS_POINTS, oneMinusRR),
+    );
+    const recentlyRepaid = bigIntMax(
+      0n,
+      reportLiabilitySharesStETH - liabilitySharesInStethWei,
+    );
+
+    const reservedByFormula =
+      oneMinusRR === 0n
+        ? 0n
+        : ceilDiv(liabilitySharesInStethWei * BASIS_POINTS, oneMinusRR) -
+          liabilitySharesInStethWei;
+    const reserved = bigIntMin(
+      totalValue - liabilitySharesInStethWei,
+      reservedByFormula,
+    );
+
+    // Prevent division by 0
+    const utilizationRatio =
+      totalMintingCapacityStethWei === 0n
+        ? 0
+        : Number(
+            ((liabilitySharesInStethWei * BASIS_POINTS) /
+              totalMintingCapacityStethWei) *
+              100n,
+          ) / Number(BASIS_POINTS);
+
+    return {
+      healthRatio,
+      isHealthy,
+      availableToWithdrawal,
+      idleCapital,
+      totalLocked,
+      collateral,
+      recentlyRepaid,
+      utilizationRatio,
+      reserved,
+      totalMintingCapacityStethWei,
+    };
   }
 }

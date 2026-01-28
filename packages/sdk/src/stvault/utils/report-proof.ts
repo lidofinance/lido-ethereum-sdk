@@ -7,11 +7,11 @@ import {
   LeafDataFields,
   Report,
   VaultReport,
-  VaultReportArgs,
+  VaultReportProps,
 } from '../types.js';
 import { snakeToCamel } from '../../common/utils/snake-to-camel.js';
 
-export const getReportProofByVault = async (args: VaultReportArgs) => {
+export const getReportProofByVault = async (args: VaultReportProps) => {
   const { vault } = args;
 
   const IPFSReportData = await fetchIPFS<Report>(args);
@@ -41,7 +41,7 @@ export const getReportProofByVault = async (args: VaultReportArgs) => {
   };
 };
 
-type GetReportProofByVaultsArgs = Omit<VaultReportArgs, 'vault'> & {
+type GetReportProofByVaultsArgs = Omit<VaultReportProps, 'vault'> & {
   vaults: Address[];
 };
 
@@ -57,7 +57,9 @@ export const getReportProofByVaults = async (
   return proofs;
 };
 
-export const getReportProofs = async (args: Omit<VaultReportArgs, 'vault'>) => {
+export const getReportProofs = async (
+  args: Omit<VaultReportProps, 'vault'>,
+) => {
   const report = await fetchIPFS<Report>(args);
   const vaultReports = report.values.map(
     (value) => getVaultData(report, value.value[0], args.cid).data,
