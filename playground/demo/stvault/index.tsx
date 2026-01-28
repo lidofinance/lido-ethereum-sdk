@@ -203,18 +203,17 @@ export const StVaultDemo = () => {
           })
         }
       >
-        <Input
-          label="Withdraw address"
-          placeholder="0x0000000"
-          value={withdrawAddress}
-          onChange={(e) => setWithdrawAddress(e.currentTarget.value as Address)}
-        />
-
         <TokenInput
           label="Withdraw amount"
           value={withdrawEthValue}
           placeholder="0.0"
           onChange={setWithdrawEthValue}
+        />
+        <Input
+          label="Withdraw address"
+          placeholder="0x0000000"
+          value={withdrawAddress}
+          onChange={(e) => setWithdrawAddress(e.currentTarget.value as Address)}
         />
       </Action>
 
@@ -229,23 +228,30 @@ export const StVaultDemo = () => {
           })
         }
       >
-        <Input
-          label="Mint recipient"
-          placeholder="0x0000000"
-          value={mintRecipient}
-          onChange={(e) => setMintRecipient(e.currentTarget.value as Address)}
-        />
-        <Input
-          label="Mint token"
-          value={mintTokenValue}
-          placeholder="steth"
-          onChange={(e) => setMintTokenValue(e.currentTarget.value as Token)}
-        />
         <TokenInput
           label="Mint amount"
           value={mintEthValue}
           placeholder="0.0"
           onChange={setMintEthValue}
+        />
+        <Select
+          fullwidth
+          label="Mint token"
+          value={mintTokenValue}
+          onChange={(v) => setMintTokenValue(v as Token)}
+        >
+          <Option key={'steth'} value={'steth'}>
+            {'steth'}
+          </Option>
+          <Option key={'wsteth'} value={'wsteth'}>
+            {'wsteth'}
+          </Option>
+        </Select>
+        <Input
+          label="Mint recipient"
+          placeholder="0x0000000"
+          value={mintRecipient}
+          onChange={(e) => setMintRecipient(e.currentTarget.value as Address)}
         />
       </Action>
 
@@ -255,7 +261,7 @@ export const StVaultDemo = () => {
         action={() =>
           currentVault?.approve({
             amount: approveEthValue ?? BigInt(0),
-            token: 'steth',
+            token: approveTokenValue,
           })
         }
       >
@@ -265,12 +271,19 @@ export const StVaultDemo = () => {
           placeholder="0.0"
           onChange={setApproveEthValue}
         />
-        <Input
+        <Select
+          fullwidth
           label="Approve token"
           value={approveTokenValue}
-          placeholder="steth"
-          onChange={(e) => setApproveTokenValue(e.currentTarget.value as Token)}
-        />
+          onChange={(v) => setApproveTokenValue(v as Token)}
+        >
+          <Option key={'steth'} value={'steth'}>
+            {'steth'}
+          </Option>
+          <Option key={'wsteth'} value={'wsteth'}>
+            {'wsteth'}
+          </Option>
+        </Select>
       </Action>
 
       <Action
@@ -279,7 +292,7 @@ export const StVaultDemo = () => {
         action={() =>
           currentVault?.burn({
             amount: burnEthValue ?? BigInt(0),
-            token: 'steth',
+            token: burnTokenValue,
           })
         }
       >
@@ -289,12 +302,19 @@ export const StVaultDemo = () => {
           placeholder="0.0"
           onChange={setBurnEthValue}
         />
-        <Input
+        <Select
+          fullwidth
           label="Burn token"
           value={burnTokenValue}
-          placeholder="steth"
-          onChange={(e) => setBurnTokenValue(e.currentTarget.value as Token)}
-        />
+          onChange={(v) => setBurnTokenValue(v as Token)}
+        >
+          <Option key={'steth'} value={'steth'}>
+            {'steth'}
+          </Option>
+          <Option key={'wsteth'} value={'wsteth'}>
+            {'wsteth'}
+          </Option>
+        </Select>
       </Action>
 
       <Action
@@ -410,12 +430,20 @@ export const StVaultDemo = () => {
             const dashboard = await currentVault.getDashboardContract();
             const blockNumber = await core.toBlockNumber({ block: 'latest' });
             const dashboardEncodable = getEncodableContract(dashboard);
+            const operatorGridEncodable =
+              await stVaultModule.contracts.getContractOperatorGrid();
+
             const preparedMethods = [
               dashboardEncodable.prepare.remainingMintingCapacityShares([
                 BigInt(10),
               ]),
               dashboardEncodable.prepare.liabilityShares(),
+              dashboard.prepare.totalMintingCapacityShares(),
+              operatorGridEncodable.prepare.vaultTierInfo([
+                currentVault.getVaultAddress(),
+              ]),
             ];
+
             return stVaultModule.readWithLatestReport({
               vaultAddress: currentVault.getVaultAddress(),
               skipIsFresh: true,
@@ -426,8 +454,13 @@ export const StVaultDemo = () => {
         }}
       >
         <small>
-          Read <code>remainingMintingCapacityShares</code> and{' '}
-          <code>liabilityShares</code>
+          Current example read with simulation:
+          <ul>
+            <li>remainingMintingCapacityShares</li>
+            <li>liabilityShares</li>
+            <li>totalMintingCapacityShares</li>
+            <li>vaultTierInfo</li>
+          </ul>
         </small>
       </Action>
 
