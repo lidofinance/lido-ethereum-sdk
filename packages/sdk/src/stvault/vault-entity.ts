@@ -818,6 +818,7 @@ export class LidoSDKVaultEntity extends BusModule {
       operatorGrid,
       lazyOracle,
       lidoContract,
+      // eslint-disable-next-line @typescript-eslint/await-thenable
     ] = await Promise.all([
       this.getDashboardContract(),
       this.getVaultContract(),
@@ -855,6 +856,7 @@ export class LidoSDKVaultEntity extends BusModule {
       lockedEth,
       stagedBalanceWei,
       beaconChainDepositsPaused,
+      // eslint-disable-next-line @typescript-eslint/await-thenable
     ] = await this.bus.readWithLatestReport({
       vaultAddress,
       blockNumber,
@@ -887,6 +889,7 @@ export class LidoSDKVaultEntity extends BusModule {
 
     // split call because of TS2589: Type instantiation is excessively deep and possibly infinite
     const [isVaultConnected, isPendingDisconnect, vaultOwner] =
+      // eslint-disable-next-line @typescript-eslint/await-thenable
       await this.bus.readWithLatestReport({
         vaultAddress,
         blockNumber,
@@ -921,6 +924,7 @@ export class LidoSDKVaultEntity extends BusModule {
       redemptionStETH,
       reportLiabilitySharesStETH,
       lidoTVLSharesLimit,
+      // eslint-disable-next-line @typescript-eslint/await-thenable
     ] = await Promise.all([
       lidoContract.read.getPooledEthBySharesRoundUp([liabilityShares]),
       lidoContract.read.getPooledEthByShares([mintableShares]),
