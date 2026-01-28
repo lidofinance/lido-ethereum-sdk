@@ -7,12 +7,13 @@ import {
 } from 'viem';
 
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
-import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
+import { LIDO_CONTRACT_NAMES, NOOP, UINT128_MAX } from '../common/constants.js';
 import { TransactionResult } from '../core/index.js';
 
 import { SharesTotalSupplyResult, SharesTransferProps } from './types.js';
 import { stethSharesAbi } from './abi/steth-shares-abi.js';
 import { parseValue } from '../common/utils/parse-value.js';
+
 import type {
   AccountValue,
   EtherValue,
@@ -21,6 +22,8 @@ import type {
 } from '../core/types.js';
 import { calcShareRate } from '../rewards/utils.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import { bigIntCeilDiv } from '../common/utils/bigint-math.js';
+import { ERROR_CODE } from '../common/index.js';
 
 export class LidoSDKShares extends LidoSDKModule {
   static readonly PRECISION = 10n ** 27n;
@@ -166,6 +169,115 @@ export class LidoSDKShares extends LidoSDKModule {
     const amount = parseValue(sharesAmount);
     const contract = await this.getContractStETHshares();
     return contract.read.getPooledEthByShares([amount]);
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
+  public async convertBatchSharesToSteth(
+    sharesAmounts: EtherValue[],
+    shareRateValues?: SharesTotalSupplyResult,
+  ): Promise<bigint[]> {
+    if (sharesAmounts.length === 0) {
+      return [];
+    }
+
+    const parsedShares = sharesAmounts.map((value) => parseValue(value));
+
+    const resolvedShareRateValues =
+      shareRateValues ?? (await this.getTotalSupply());
+
+    return Promise.all(
+      parsedShares.map((amount) =>
+        this.getPooledEthBySharesRoundUp(amount, resolvedShareRateValues),
+      ),
+    );
+  }
+
+  /**
+   * Off-chain replica of StETH.getSharesByPooledEth from contracts/0.4.24/StETH.sol.
+   */
+  @Logger('Views:')
+  @ErrorHandler()
+  public async getSharesByPooledEth(
+    stethAmount: bigint,
+    shareRateValues?: SharesTotalSupplyResult,
+  ): Promise<bigint> {
+    if (stethAmount >= UINT128_MAX) {
+      throw this.core.error({
+        code: ERROR_CODE.INVALID_ARGUMENT,
+        message: `ETH_TOO_LARGE`,
+      });
+    }
+
+    const { totalEther, totalShares } =
+      shareRateValues ?? (await this.getTotalSupply());
+
+    if (totalEther === 0n) {
+      throw this.core.error({
+        code: ERROR_CODE.INVALID_ARGUMENT,
+        message: `ZERO_TOTAL_POOLED_ETHER`,
+      });
+    }
+
+    return (stethAmount * totalShares) / totalEther;
+  }
+
+  /**
+   * Off-chain replica of StETH.getPooledEthByShares from contracts/0.4.24/StETH.sol.
+   */
+  @Logger('Views:')
+  @ErrorHandler()
+  public async getPooledEthByShares(
+    sharesAmount: bigint,
+    shareRateValues?: SharesTotalSupplyResult,
+  ): Promise<bigint> {
+    if (sharesAmount >= UINT128_MAX) {
+      throw this.core.error({
+        code: ERROR_CODE.INVALID_ARGUMENT,
+        message: `SHARES_TOO_LARGE`,
+      });
+    }
+
+    const { totalEther, totalShares } =
+      shareRateValues ?? (await this.getTotalSupply());
+
+    if (totalShares === 0n) {
+      throw this.core.error({
+        code: ERROR_CODE.INVALID_ARGUMENT,
+        message: `ZERO_TOTAL_SHARES`,
+      });
+    }
+
+    return (sharesAmount * totalEther) / totalShares;
+  }
+
+  /**
+   * Off-chain replica of StETH.getPooledEthBySharesRoundUp from contracts/0.4.24/StETH.sol.
+   */
+  @Logger('Views:')
+  @ErrorHandler()
+  public async getPooledEthBySharesRoundUp(
+    sharesAmount: bigint,
+    shareRateValues?: SharesTotalSupplyResult,
+  ): Promise<bigint> {
+    if (sharesAmount >= UINT128_MAX) {
+      throw this.core.error({
+        code: ERROR_CODE.INVALID_ARGUMENT,
+        message: `SHARES_TOO_LARGE`,
+      });
+    }
+
+    const { totalEther, totalShares } =
+      shareRateValues ?? (await this.getTotalSupply());
+
+    if (totalShares === 0n) {
+      throw this.core.error({
+        code: ERROR_CODE.INVALID_ARGUMENT,
+        message: `ZERO_TOTAL_SHARES`,
+      });
+    }
+
+    return bigIntCeilDiv(sharesAmount * totalEther, totalShares);
   }
 
   // total supply

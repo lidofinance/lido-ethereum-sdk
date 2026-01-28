@@ -81,6 +81,21 @@ describe('LidoSDKShares', () => {
     expect(stethValue).toEqual(altStethValue);
   });
 
+  test('converts batch shares to steth', async () => {
+    expect.hasAssertions();
+    throw new Error('Needs implementation');
+  });
+
+  test('gets pooled eth by shares using share rate data', async () => {
+    expect.hasAssertions();
+    throw new Error('Needs implementation');
+  });
+
+  test('gets shares by pooled eth using share rate data', async () => {
+    expect.hasAssertions();
+    throw new Error('Needs implementation');
+  });
+
   test('populate transfer', async () => {
     const tx = await shares.populateTransfer({ to: altAddress, amount: 100n });
     expectPopulatedTx(tx, undefined, true);
