@@ -28,7 +28,11 @@ import type {
 } from '../core/types.js';
 import { calcShareRate } from '../rewards/utils.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
-import { bigIntCeilDiv } from '../common/utils/bigint-math.js';
+import {
+  bigIntAbs,
+  bigIntCeilDiv,
+  bigIntSign,
+} from '../common/utils/bigint-math.js';
 import { ERROR_CODE } from '../common/index.js';
 
 const isSharesAmountWithRoundUp = (
@@ -170,7 +174,11 @@ export class LidoSDKShares extends LidoSDKModule {
   public async convertToShares(stethAmount: EtherValue): Promise<bigint> {
     const amount = parseValue(stethAmount);
     const contract = await this.getContractStETHshares();
-    return contract.read.getSharesByPooledEth([amount]);
+
+    const amountAbs = bigIntAbs(amount);
+    const sign = bigIntSign(amount);
+    const result = await contract.read.getSharesByPooledEth([amountAbs]);
+    return sign === -1n ? -result : result;
   }
 
   // convert
@@ -179,7 +187,11 @@ export class LidoSDKShares extends LidoSDKModule {
   public async convertToSteth(sharesAmount: EtherValue): Promise<bigint> {
     const amount = parseValue(sharesAmount);
     const contract = await this.getContractStETHshares();
-    return contract.read.getPooledEthByShares([amount]);
+
+    const amountAbs = bigIntAbs(amount);
+    const sign = bigIntSign(amount);
+    const result = await contract.read.getPooledEthByShares([amountAbs]);
+    return sign === -1n ? -result : result;
   }
 
   @Logger('Views:')
