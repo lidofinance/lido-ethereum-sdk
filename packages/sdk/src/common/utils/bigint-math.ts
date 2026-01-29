@@ -6,9 +6,8 @@ export const bigIntMin = (...args: bigint[]) =>
 export const bigIntAbs = (value: bigint): bigint =>
   value < 0n ? -value : value;
 
-export const bigIntSign = (value: bigint): 1n | -1n | 0n => {
-  if (value === 0n) return 0n;
-  return value > 0n ? 1n : -1n;
+export const bigIntSign = (value: bigint): 1n | -1n => {
+  return value >= 0n ? 1n : -1n;
 };
 
 export const bigIntCeilDiv = (

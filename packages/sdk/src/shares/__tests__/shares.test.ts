@@ -21,6 +21,7 @@ import {
   expectPopulatedTx,
   expectPopulatedTxToRun,
 } from '../../../tests/utils/expect/expect-populated-tx.js';
+import { parseEther } from 'viem';
 
 describe('LidoSDKShares', () => {
   const shares = useShares();
@@ -101,8 +102,10 @@ describe('LidoSDKShares', () => {
     const { blockNumber, contract, shareRateValues } =
       await fetchShareRateSnapshot();
 
+    const tinyValues = [0n, 1n, 2n, 3n, 4n, 5n, 10n, 100n];
     const batch: BatchSharesToStethValue[] = [
-      1000n,
+      ...tinyValues,
+      '1',
       { amount: 2000n, roundUp: true },
       { amount: 3000n, roundUp: false },
     ];
@@ -113,7 +116,12 @@ describe('LidoSDKShares', () => {
     );
 
     const expected = await Promise.all([
-      contract.read.getPooledEthByShares([1000n], { blockNumber }),
+      ...tinyValues.map((value) =>
+        contract.read.getPooledEthByShares([value], { blockNumber }),
+      ),
+      contract.read.getPooledEthByShares([parseEther('1')], {
+        blockNumber,
+      }),
       contract.read.getPooledEthBySharesRoundUp([2000n], { blockNumber }),
       contract.read.getPooledEthByShares([3000n], { blockNumber }),
     ]);

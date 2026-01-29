@@ -178,7 +178,7 @@ export class LidoSDKShares extends LidoSDKModule {
     const amountAbs = bigIntAbs(amount);
     const sign = bigIntSign(amount);
     const result = await contract.read.getSharesByPooledEth([amountAbs]);
-    return sign === -1n ? -result : result;
+    return sign * result;
   }
 
   // convert
@@ -191,7 +191,7 @@ export class LidoSDKShares extends LidoSDKModule {
     const amountAbs = bigIntAbs(amount);
     const sign = bigIntSign(amount);
     const result = await contract.read.getPooledEthByShares([amountAbs]);
-    return sign === -1n ? -result : result;
+    return sign * result;
   }
 
   @Logger('Views:')

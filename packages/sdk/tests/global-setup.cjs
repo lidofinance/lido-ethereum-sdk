@@ -3,7 +3,6 @@ const dotenv = require('dotenv');
 const ganache = require('ganache');
 
 const setupGanacheProvider = async (chainId, rpcUrl) => {
-  console.log('rpcUrl', rpcUrl);
   const ganacheProvider = ganache.provider({
     fork: { url: rpcUrl },
     logging: { quiet: true },
