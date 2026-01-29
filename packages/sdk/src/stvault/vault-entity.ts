@@ -37,8 +37,11 @@ import {
   VaultOverviewData,
 } from './utils/overview/types.js';
 import { calculateHealth } from './utils/overview/calculate-health.js';
-import { bigIntMax, bigIntMin } from '../common/utils/bigint-math.js';
-import { ceilDiv } from './utils/overview/consts.js';
+import {
+  bigIntCeilDiv,
+  bigIntMax,
+  bigIntMin,
+} from '../common/utils/bigint-math.js';
 
 type LidoSDKVaultEntityProps = LidoSDKVaultsModuleProps & {
   dashboardAddress?: Address;
@@ -1019,7 +1022,7 @@ export class LidoSDKVaultEntity extends BusModule {
     const oneMinusRR = BASIS_POINTS - RR;
     const collateral = bigIntMax(
       minimalReserve,
-      ceilDiv(liabilitySharesInStethWei * BASIS_POINTS, oneMinusRR),
+      bigIntCeilDiv(liabilitySharesInStethWei * BASIS_POINTS, oneMinusRR),
     );
     const recentlyRepaid = bigIntMax(
       0n,
@@ -1029,7 +1032,7 @@ export class LidoSDKVaultEntity extends BusModule {
     const reservedByFormula =
       oneMinusRR === 0n
         ? 0n
-        : ceilDiv(liabilitySharesInStethWei * BASIS_POINTS, oneMinusRR) -
+        : bigIntCeilDiv(liabilitySharesInStethWei * BASIS_POINTS, oneMinusRR) -
           liabilitySharesInStethWei;
     const reserved = bigIntMin(
       totalValue - liabilitySharesInStethWei,
