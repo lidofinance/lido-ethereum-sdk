@@ -12,3 +12,4 @@ export * from './unsteth/index.js';
 export * from './withdraw/index.js';
 export * from './wrap/index.js';
 export * from './dual-governance/index.js';
+export * from './stvault/index.js';

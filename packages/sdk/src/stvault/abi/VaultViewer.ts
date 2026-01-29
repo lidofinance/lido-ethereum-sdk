@@ -1,0 +1,758 @@
+export const VaultViewerAbi = [
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_lidoLocator',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'constructor',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'argName',
+        type: 'string',
+      },
+    ],
+    name: 'ZeroArgument',
+    type: 'error',
+  },
+  {
+    inputs: [],
+    name: 'DEFAULT_ADMIN_ROLE',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'LAZY_ORACLE',
+    outputs: [
+      {
+        internalType: 'contract LazyOracle',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'LIDO_LOCATOR',
+    outputs: [
+      {
+        internalType: 'contract ILidoLocator',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'VAULT_HUB',
+    outputs: [
+      {
+        internalType: 'contract VaultHub',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'contract IStakingVault',
+        name: 'vault',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_member',
+        type: 'address',
+      },
+      {
+        internalType: 'bytes32',
+        name: '_role',
+        type: 'bytes32',
+      },
+    ],
+    name: 'hasRole',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'contract IStakingVault',
+        name: 'vault',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '_owner',
+        type: 'address',
+      },
+    ],
+    name: 'isVaultOwner',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'vaultAddress',
+        type: 'address',
+      },
+      {
+        internalType: 'bytes32[]',
+        name: 'roles',
+        type: 'bytes32[]',
+      },
+    ],
+    name: 'roleMembers',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'address',
+            name: 'vault',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'owner',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'nodeOperator',
+            type: 'address',
+          },
+          {
+            internalType: 'address[][]',
+            name: 'members',
+            type: 'address[][]',
+          },
+        ],
+        internalType: 'struct VaultViewer.VaultMembers',
+        name: 'roleMembers',
+        type: 'tuple',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address[]',
+        name: 'vaultAddresses',
+        type: 'address[]',
+      },
+      {
+        internalType: 'bytes32[]',
+        name: 'roles',
+        type: 'bytes32[]',
+      },
+    ],
+    name: 'roleMembersBatch',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'address',
+            name: 'vault',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'owner',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'nodeOperator',
+            type: 'address',
+          },
+          {
+            internalType: 'address[][]',
+            name: 'members',
+            type: 'address[][]',
+          },
+        ],
+        internalType: 'struct VaultViewer.VaultMembers[]',
+        name: 'result',
+        type: 'tuple[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_offset',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: '_limit',
+        type: 'uint256',
+      },
+    ],
+    name: 'vaultAddressesBatch',
+    outputs: [
+      {
+        internalType: 'contract IStakingVault[]',
+        name: 'vaults',
+        type: 'address[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'vault',
+        type: 'address',
+      },
+    ],
+    name: 'vaultData',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'address',
+            name: 'vaultAddress',
+            type: 'address',
+          },
+          {
+            components: [
+              {
+                internalType: 'address',
+                name: 'owner',
+                type: 'address',
+              },
+              {
+                internalType: 'uint96',
+                name: 'shareLimit',
+                type: 'uint96',
+              },
+              {
+                internalType: 'uint96',
+                name: 'vaultIndex',
+                type: 'uint96',
+              },
+              {
+                internalType: 'uint48',
+                name: 'disconnectInitiatedTs',
+                type: 'uint48',
+              },
+              {
+                internalType: 'uint16',
+                name: 'reserveRatioBP',
+                type: 'uint16',
+              },
+              {
+                internalType: 'uint16',
+                name: 'forcedRebalanceThresholdBP',
+                type: 'uint16',
+              },
+              {
+                internalType: 'uint16',
+                name: 'infraFeeBP',
+                type: 'uint16',
+              },
+              {
+                internalType: 'uint16',
+                name: 'liquidityFeeBP',
+                type: 'uint16',
+              },
+              {
+                internalType: 'uint16',
+                name: 'reservationFeeBP',
+                type: 'uint16',
+              },
+              {
+                internalType: 'bool',
+                name: 'beaconChainDepositsPauseIntent',
+                type: 'bool',
+              },
+            ],
+            internalType: 'struct VaultHub.VaultConnection',
+            name: 'connection',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                components: [
+                  {
+                    internalType: 'uint104',
+                    name: 'totalValue',
+                    type: 'uint104',
+                  },
+                  {
+                    internalType: 'int104',
+                    name: 'inOutDelta',
+                    type: 'int104',
+                  },
+                  {
+                    internalType: 'uint48',
+                    name: 'timestamp',
+                    type: 'uint48',
+                  },
+                ],
+                internalType: 'struct VaultHub.Report',
+                name: 'report',
+                type: 'tuple',
+              },
+              {
+                internalType: 'uint96',
+                name: 'maxLiabilityShares',
+                type: 'uint96',
+              },
+              {
+                internalType: 'uint96',
+                name: 'liabilityShares',
+                type: 'uint96',
+              },
+              {
+                components: [
+                  {
+                    internalType: 'int104',
+                    name: 'value',
+                    type: 'int104',
+                  },
+                  {
+                    internalType: 'int104',
+                    name: 'valueOnRefSlot',
+                    type: 'int104',
+                  },
+                  {
+                    internalType: 'uint48',
+                    name: 'refSlot',
+                    type: 'uint48',
+                  },
+                ],
+                internalType: 'struct DoubleRefSlotCache.Int104WithCache[2]',
+                name: 'inOutDelta',
+                type: 'tuple[2]',
+              },
+              {
+                internalType: 'uint128',
+                name: 'minimalReserve',
+                type: 'uint128',
+              },
+              {
+                internalType: 'uint128',
+                name: 'redemptionShares',
+                type: 'uint128',
+              },
+              {
+                internalType: 'uint128',
+                name: 'cumulativeLidoFees',
+                type: 'uint128',
+              },
+              {
+                internalType: 'uint128',
+                name: 'settledLidoFees',
+                type: 'uint128',
+              },
+            ],
+            internalType: 'struct VaultHub.VaultRecord',
+            name: 'record',
+            type: 'tuple',
+          },
+          {
+            internalType: 'uint256',
+            name: 'totalValue',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'liabilityStETH',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'nodeOperatorFeeRate',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bool',
+            name: 'isReportFresh',
+            type: 'bool',
+          },
+          {
+            components: [
+              {
+                internalType: 'bool',
+                name: 'isActive',
+                type: 'bool',
+              },
+              {
+                internalType: 'uint256',
+                name: 'pendingTotalValueIncrease',
+                type: 'uint256',
+              },
+              {
+                internalType: 'uint256',
+                name: 'startTimestamp',
+                type: 'uint256',
+              },
+              {
+                internalType: 'uint256',
+                name: 'endTimestamp',
+                type: 'uint256',
+              },
+              {
+                internalType: 'uint256',
+                name: 'totalValueRemainder',
+                type: 'uint256',
+              },
+            ],
+            internalType: 'struct LazyOracle.QuarantineInfo',
+            name: 'quarantineInfo',
+            type: 'tuple',
+          },
+        ],
+        internalType: 'struct VaultViewer.VaultData',
+        name: 'data',
+        type: 'tuple',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_owner',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: '_offset',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: '_limit',
+        type: 'uint256',
+      },
+    ],
+    name: 'vaultsByOwnerBatch',
+    outputs: [
+      {
+        internalType: 'contract IStakingVault[]',
+        name: 'vaults',
+        type: 'address[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: '_role',
+        type: 'bytes32',
+      },
+      {
+        internalType: 'address',
+        name: '_member',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: '_offset',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: '_limit',
+        type: 'uint256',
+      },
+    ],
+    name: 'vaultsByRoleBatch',
+    outputs: [
+      {
+        internalType: 'contract IStakingVault[]',
+        name: 'vaults',
+        type: 'address[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'vaultsCount',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_offset',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: '_limit',
+        type: 'uint256',
+      },
+    ],
+    name: 'vaultsDataBatch',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'address',
+            name: 'vaultAddress',
+            type: 'address',
+          },
+          {
+            components: [
+              {
+                internalType: 'address',
+                name: 'owner',
+                type: 'address',
+              },
+              {
+                internalType: 'uint96',
+                name: 'shareLimit',
+                type: 'uint96',
+              },
+              {
+                internalType: 'uint96',
+                name: 'vaultIndex',
+                type: 'uint96',
+              },
+              {
+                internalType: 'uint48',
+                name: 'disconnectInitiatedTs',
+                type: 'uint48',
+              },
+              {
+                internalType: 'uint16',
+                name: 'reserveRatioBP',
+                type: 'uint16',
+              },
+              {
+                internalType: 'uint16',
+                name: 'forcedRebalanceThresholdBP',
+                type: 'uint16',
+              },
+              {
+                internalType: 'uint16',
+                name: 'infraFeeBP',
+                type: 'uint16',
+              },
+              {
+                internalType: 'uint16',
+                name: 'liquidityFeeBP',
+                type: 'uint16',
+              },
+              {
+                internalType: 'uint16',
+                name: 'reservationFeeBP',
+                type: 'uint16',
+              },
+              {
+                internalType: 'bool',
+                name: 'beaconChainDepositsPauseIntent',
+                type: 'bool',
+              },
+            ],
+            internalType: 'struct VaultHub.VaultConnection',
+            name: 'connection',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                components: [
+                  {
+                    internalType: 'uint104',
+                    name: 'totalValue',
+                    type: 'uint104',
+                  },
+                  {
+                    internalType: 'int104',
+                    name: 'inOutDelta',
+                    type: 'int104',
+                  },
+                  {
+                    internalType: 'uint48',
+                    name: 'timestamp',
+                    type: 'uint48',
+                  },
+                ],
+                internalType: 'struct VaultHub.Report',
+                name: 'report',
+                type: 'tuple',
+              },
+              {
+                internalType: 'uint96',
+                name: 'maxLiabilityShares',
+                type: 'uint96',
+              },
+              {
+                internalType: 'uint96',
+                name: 'liabilityShares',
+                type: 'uint96',
+              },
+              {
+                components: [
+                  {
+                    internalType: 'int104',
+                    name: 'value',
+                    type: 'int104',
+                  },
+                  {
+                    internalType: 'int104',
+                    name: 'valueOnRefSlot',
+                    type: 'int104',
+                  },
+                  {
+                    internalType: 'uint48',
+                    name: 'refSlot',
+                    type: 'uint48',
+                  },
+                ],
+                internalType: 'struct DoubleRefSlotCache.Int104WithCache[2]',
+                name: 'inOutDelta',
+                type: 'tuple[2]',
+              },
+              {
+                internalType: 'uint128',
+                name: 'minimalReserve',
+                type: 'uint128',
+              },
+              {
+                internalType: 'uint128',
+                name: 'redemptionShares',
+                type: 'uint128',
+              },
+              {
+                internalType: 'uint128',
+                name: 'cumulativeLidoFees',
+                type: 'uint128',
+              },
+              {
+                internalType: 'uint128',
+                name: 'settledLidoFees',
+                type: 'uint128',
+              },
+            ],
+            internalType: 'struct VaultHub.VaultRecord',
+            name: 'record',
+            type: 'tuple',
+          },
+          {
+            internalType: 'uint256',
+            name: 'totalValue',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'liabilityStETH',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'nodeOperatorFeeRate',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bool',
+            name: 'isReportFresh',
+            type: 'bool',
+          },
+          {
+            components: [
+              {
+                internalType: 'bool',
+                name: 'isActive',
+                type: 'bool',
+              },
+              {
+                internalType: 'uint256',
+                name: 'pendingTotalValueIncrease',
+                type: 'uint256',
+              },
+              {
+                internalType: 'uint256',
+                name: 'startTimestamp',
+                type: 'uint256',
+              },
+              {
+                internalType: 'uint256',
+                name: 'endTimestamp',
+                type: 'uint256',
+              },
+              {
+                internalType: 'uint256',
+                name: 'totalValueRemainder',
+                type: 'uint256',
+              },
+            ],
+            internalType: 'struct LazyOracle.QuarantineInfo',
+            name: 'quarantineInfo',
+            type: 'tuple',
+          },
+        ],
+        internalType: 'struct VaultViewer.VaultData[]',
+        name: 'vaultsData',
+        type: 'tuple[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const;

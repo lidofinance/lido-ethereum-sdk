@@ -1,8 +1,6 @@
 import styled from 'styled-components';
 
 export const TokenInputStyle = styled.div`
-  margin: ${({ theme }) => theme.spaceMap.xl}px 0;
-
   &:first-child {
     margin-top: 0;
   }

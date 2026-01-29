@@ -16,6 +16,7 @@ export const LidoSDKProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const publicClient = usePublicClient();
   const chainId = publicClient?.chain.id;
   const { data: walletClient } = useWalletClient();
+
   const value = useMemo(() => {
     const sdk = new LidoSDK({
       chainId: chainId as any,

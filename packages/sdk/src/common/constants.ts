@@ -78,7 +78,6 @@ export enum LIDO_CONTRACT_NAMES {
   accountingOracle = 'accountingOracle',
   depositSecurityModule = 'depositSecurityModule',
   elRewardsVault = 'elRewardsVault',
-  legacyOracle = 'legacyOracle',
   lido = 'lido',
   oracleReportSanityChecker = 'oracleReportSanityChecker',
   postTokenRebaseReceiver = 'postTokenRebaseReceiver',
@@ -112,14 +111,21 @@ export const DUAL_GOVERNANCE_CONTRACT_ADDRESSES: {
 
 export const WSTETH_REFERRAL_STAKER: { [key in CHAINS]?: Address } = {
   [CHAINS.Mainnet]: '0xa88f0329C2c4ce51ba3fc619BBf44efE7120Dd0d',
-  [CHAINS.Hoodi]:   '0xf886BcC68b240316103fE8A12453Ce7831c2e835',
+  [CHAINS.Hoodi]: '0xf886BcC68b240316103fE8A12453Ce7831c2e835',
   [CHAINS.Sepolia]: '0x9E90338495FfD691bDDC680e47D94b60cF66dDad',
-}
+};
 
 export enum LIDO_L2_CONTRACT_NAMES {
   wsteth = 'wsteth',
   steth = 'steth',
 }
+
+export const VAULT_VIEWER_CONTRACT_ADDRESSES: {
+  [key in CHAINS]?: Address;
+} = {
+  [CHAINS.Hoodi]: '0xEAfD3F8DC0ABA14B81344ea0B869DdF9F7e18221',
+  [CHAINS.Mainnet]: '0x57dAb476c3E37a2410076C9568d796e429fd8418',
+} as const;
 
 export const LIDO_L2_CONTRACT_ADDRESSES: {
   [key in CHAINS]?: { [key2 in LIDO_L2_CONTRACT_NAMES]?: Address };
