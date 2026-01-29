@@ -4,13 +4,19 @@ import {
   type WalletClient,
   getContract,
   encodeFunctionData,
+  maxUint128,
 } from 'viem';
 
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
-import { LIDO_CONTRACT_NAMES, NOOP, UINT128_MAX } from '../common/constants.js';
+import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
 import { TransactionResult } from '../core/index.js';
 
-import { SharesTotalSupplyResult, SharesTransferProps } from './types.js';
+import {
+  BatchSharesToStethValue,
+  SharesAmountWithRoundUp,
+  SharesTotalSupplyResult,
+  SharesTransferProps,
+} from './types.js';
 import { stethSharesAbi } from './abi/steth-shares-abi.js';
 import { parseValue } from '../common/utils/parse-value.js';
 
@@ -24,6 +30,11 @@ import { calcShareRate } from '../rewards/utils.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 import { bigIntCeilDiv } from '../common/utils/bigint-math.js';
 import { ERROR_CODE } from '../common/index.js';
+
+const isSharesAmountWithRoundUp = (
+  value: BatchSharesToStethValue,
+): value is SharesAmountWithRoundUp =>
+  typeof value === 'object' && value !== null && 'amount' in value;
 
 export class LidoSDKShares extends LidoSDKModule {
   static readonly PRECISION = 10n ** 27n;
@@ -174,21 +185,56 @@ export class LidoSDKShares extends LidoSDKModule {
   @Logger('Views:')
   @ErrorHandler()
   public async convertBatchSharesToSteth(
-    sharesAmounts: EtherValue[],
+    sharesAmounts: BatchSharesToStethValue[],
     shareRateValues?: SharesTotalSupplyResult,
   ): Promise<bigint[]> {
     if (sharesAmounts.length === 0) {
       return [];
     }
 
-    const parsedShares = sharesAmounts.map((value) => parseValue(value));
+    const parsedShares = sharesAmounts.map((entry) => {
+      if (isSharesAmountWithRoundUp(entry)) {
+        return {
+          amount: parseValue(entry.amount),
+          roundUp: Boolean(entry.roundUp),
+        };
+      }
+
+      return {
+        amount: parseValue(entry),
+        roundUp: false,
+      };
+    });
 
     const resolvedShareRateValues =
       shareRateValues ?? (await this.getTotalSupply());
 
     return Promise.all(
-      parsedShares.map((amount) =>
-        this.getPooledEthBySharesRoundUp(amount, resolvedShareRateValues),
+      parsedShares.map(({ amount, roundUp }) =>
+        roundUp
+          ? this.getPooledEthBySharesRoundUp(amount, resolvedShareRateValues)
+          : this.getPooledEthByShares(amount, resolvedShareRateValues),
+      ),
+    );
+  }
+
+  @Logger('Views:')
+  @ErrorHandler()
+  public async convertBatchStethToShares(
+    stethAmounts: EtherValue[],
+    shareRateValues?: SharesTotalSupplyResult,
+  ): Promise<bigint[]> {
+    if (stethAmounts.length === 0) {
+      return [];
+    }
+
+    const parsedAmounts = stethAmounts.map((value) => parseValue(value));
+    const resolvedShareRateValues =
+      shareRateValues ?? (await this.getTotalSupply());
+
+    return Promise.all(
+      parsedAmounts.map((amount) =>
+        this.getSharesByPooledEth(amount, resolvedShareRateValues),
       ),
     );
   }
@@ -202,7 +248,7 @@ export class LidoSDKShares extends LidoSDKModule {
     stethAmount: bigint,
     shareRateValues?: SharesTotalSupplyResult,
   ): Promise<bigint> {
-    if (stethAmount >= UINT128_MAX) {
+    if (stethAmount >= maxUint128) {
       throw this.core.error({
         code: ERROR_CODE.INVALID_ARGUMENT,
         message: `ETH_TOO_LARGE`,
@@ -231,7 +277,7 @@ export class LidoSDKShares extends LidoSDKModule {
     sharesAmount: bigint,
     shareRateValues?: SharesTotalSupplyResult,
   ): Promise<bigint> {
-    if (sharesAmount >= UINT128_MAX) {
+    if (sharesAmount >= maxUint128) {
       throw this.core.error({
         code: ERROR_CODE.INVALID_ARGUMENT,
         message: `SHARES_TOO_LARGE`,
@@ -260,7 +306,7 @@ export class LidoSDKShares extends LidoSDKModule {
     sharesAmount: bigint,
     shareRateValues?: SharesTotalSupplyResult,
   ): Promise<bigint> {
-    if (sharesAmount >= UINT128_MAX) {
+    if (sharesAmount >= maxUint128) {
       throw this.core.error({
         code: ERROR_CODE.INVALID_ARGUMENT,
         message: `SHARES_TOO_LARGE`,

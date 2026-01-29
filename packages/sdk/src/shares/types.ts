@@ -11,3 +11,10 @@ export type SharesTotalSupplyResult = {
   totalShares: bigint;
   totalEther: bigint;
 };
+
+export type SharesAmountWithRoundUp = {
+  amount: EtherValue;
+  roundUp?: boolean;
+};
+
+export type BatchSharesToStethValue = EtherValue | SharesAmountWithRoundUp;

@@ -206,8 +206,3 @@ export const WQ_API_URLS: { [key in CHAINS]?: string } = {
   [CHAINS.Holesky]: 'https://wq-api-holesky.testnet.fi',
   [CHAINS.Hoodi]: 'https://wq-api-hoodi.testnet.fi',
 };
-
-/**
- * The Solidity implementation uses `~uint128(0)` which equals 2^128 - 1.
- */
-export const UINT128_MAX = (1n << 128n) - 1n;
