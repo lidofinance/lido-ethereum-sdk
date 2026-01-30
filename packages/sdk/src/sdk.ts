@@ -13,6 +13,7 @@ import { LidoSDKShares } from './shares/shares.js';
 import { version } from './version.js';
 import { LidoSDKL2 } from './l2/l2.js';
 import { LidoSDKDualGovernance } from './dual-governance/index.js';
+import { LidoSDKVaultModule } from './stvault/index.js';
 
 export class LidoSDK {
   readonly core: LidoSDKCore;
@@ -28,6 +29,7 @@ export class LidoSDK {
   readonly rewards: LidoSDKRewards;
   readonly l2: LidoSDKL2;
   readonly dualGovernance: LidoSDKDualGovernance;
+  readonly stVaultModule: LidoSDKVaultModule;
 
   constructor(props: LidoSDKCoreProps) {
     // Core functionality
@@ -54,5 +56,7 @@ export class LidoSDK {
     this.l2 = new LidoSDKL2({ ...props, core });
     // Dual governance
     this.dualGovernance = new LidoSDKDualGovernance({ ...props, core });
+    // Vault functionality
+    this.stVaultModule = new LidoSDKVaultModule({ ...props, core });
   }
 }

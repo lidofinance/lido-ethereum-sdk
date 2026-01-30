@@ -1,5 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 import { LidoSDKShares } from '../shares.js';
+import type { BatchSharesToStethValue } from '../types.js';
 import { expectSDKModule } from '../../../tests/utils/expect/expect-sdk-module.js';
 import { useShares } from '../../../tests/utils/fixtures/use-shares.js';
 import {
@@ -20,6 +21,7 @@ import {
   expectPopulatedTx,
   expectPopulatedTxToRun,
 } from '../../../tests/utils/expect/expect-populated-tx.js';
+import { parseEther } from 'viem';
 
 describe('LidoSDKShares', () => {
   const shares = useShares();
@@ -27,6 +29,21 @@ describe('LidoSDKShares', () => {
   const wrap = useWrap();
   const { address } = useAccount();
   const { address: altAddress } = useAltAccount();
+
+  const fetchShareRateSnapshot = async () => {
+    const blockNumber = await shares.core.rpcProvider.getBlockNumber();
+    const contract = await shares.getContractStETHshares();
+    const [totalShares, totalEther] = await Promise.all([
+      contract.read.getTotalShares({ blockNumber }),
+      contract.read.getTotalPooledEther({ blockNumber }),
+    ]);
+
+    return {
+      blockNumber,
+      contract,
+      shareRateValues: { totalEther, totalShares },
+    };
+  };
 
   test('is correct module', () => {
     expectSDKModule(LidoSDKShares);
@@ -79,6 +96,87 @@ describe('LidoSDKShares', () => {
     const stethValue = await shares.convertToSteth(value);
     const altStethValue = await wrap.convertWstethToSteth(value);
     expect(stethValue).toEqual(altStethValue);
+  });
+
+  test('converts batch shares to steth', async () => {
+    const { blockNumber, contract, shareRateValues } =
+      await fetchShareRateSnapshot();
+
+    const tinyValues = [0n, 1n, 2n, 3n, 4n, 5n, 10n, 100n];
+    const batch: BatchSharesToStethValue[] = [
+      ...tinyValues,
+      '1',
+      { amount: 2000n, roundUp: true },
+      { amount: 3000n, roundUp: false },
+    ];
+
+    const converted = await shares.convertBatchSharesToSteth(
+      batch,
+      shareRateValues,
+    );
+
+    const expected = await Promise.all([
+      ...tinyValues.map((value) =>
+        contract.read.getPooledEthByShares([value], { blockNumber }),
+      ),
+      contract.read.getPooledEthByShares([parseEther('1')], {
+        blockNumber,
+      }),
+      contract.read.getPooledEthBySharesRoundUp([2000n], { blockNumber }),
+      contract.read.getPooledEthByShares([3000n], { blockNumber }),
+    ]);
+
+    expect(converted).toEqual(expected);
+  });
+
+  test('gets pooled eth by shares using share rate data', async () => {
+    const { blockNumber, contract, shareRateValues } =
+      await fetchShareRateSnapshot();
+    const value = 12345n;
+
+    const fromReplica = await shares.getPooledEthByShares(
+      value,
+      shareRateValues,
+    );
+    const expected = await contract.read.getPooledEthByShares([value], {
+      blockNumber,
+    });
+
+    expect(fromReplica).toEqual(expected);
+  });
+
+  test('gets shares by pooled eth using share rate data', async () => {
+    const { blockNumber, contract, shareRateValues } =
+      await fetchShareRateSnapshot();
+    const value = 67890n;
+
+    const fromReplica = await shares.getSharesByPooledEth(
+      value,
+      shareRateValues,
+    );
+    const expected = await contract.read.getSharesByPooledEth([value], {
+      blockNumber,
+    });
+
+    expect(fromReplica).toEqual(expected);
+  });
+
+  test('converts batch steth to shares', async () => {
+    const { blockNumber, contract, shareRateValues } =
+      await fetchShareRateSnapshot();
+    const values = [4000n, 5000n, 6000n];
+
+    const converted = await shares.convertBatchStethToShares(
+      values,
+      shareRateValues,
+    );
+    const expected = await Promise.all(
+      values.map((value) =>
+        contract.read.getSharesByPooledEth([value], { blockNumber }),
+      ),
+    );
+
+    expect(converted).toEqual(expected);
   });
 
   test('populate transfer', async () => {
