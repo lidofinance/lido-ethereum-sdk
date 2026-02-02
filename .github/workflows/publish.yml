@@ -38,7 +38,7 @@ jobs:
         run: yarn build:packages
 
       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
-        run: yarn npm audit
+        run: yarn npm audit --environment production
 
       - name: Authenticate in npm
         run: |
