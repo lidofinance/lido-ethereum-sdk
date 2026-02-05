@@ -141,7 +141,7 @@ export class LidoSDKVaultEntity extends BusModule {
       this.vaultAddress,
     ]);
 
-    const supposedDashboardAddress = isAddressEqual(
+    const supposedDashboardAddress = !isAddressEqual(
       vaultConnection.owner,
       zeroAddress,
     )
