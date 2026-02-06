@@ -116,30 +116,16 @@ export class LidoSDKVaultEntity extends BusModule {
       return this.dashboardAddress;
     }
 
-    const vaultOwner = await (await this.getVaultContract()).read.owner();
-
-    this.dashboardAddress = vaultOwner;
-
-    if (this.skipDashboardCheck) {
-      return this.dashboardAddress;
-    }
-
     const vaultHub = await this.bus.contracts.getContractVaultHub();
 
     const isVaultConnected = await vaultHub.read.isVaultConnected([
       this.vaultAddress,
     ]);
 
-    if (!isVaultConnected) {
-      throw this.bus.core.error({
-        code: ERROR_CODE.READ_ERROR,
-        message: 'Vault connection is not found.',
-      });
-    }
-
     const vaultConnection = await vaultHub.read.vaultConnection([
       this.vaultAddress,
     ]);
+    const vaultOwner = await (await this.getVaultContract()).read.owner();
 
     const supposedDashboardAddress = !isAddressEqual(
       vaultConnection.owner,
@@ -150,7 +136,7 @@ export class LidoSDKVaultEntity extends BusModule {
 
     const isOwnerDashboard = await this.isDashboard(supposedDashboardAddress);
 
-    if (!isOwnerDashboard) {
+    if (!isOwnerDashboard && isVaultConnected && !this.skipDashboardCheck) {
       throw this.bus.core.error({
         code: ERROR_CODE.NOT_SUPPORTED,
         message: 'Owner of vault is not dashboard contract',
