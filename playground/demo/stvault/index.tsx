@@ -408,6 +408,7 @@ export const StVaultDemo = () => {
             setRole(r as Hash);
           }}
         >
+          {/* eslint-disable-next-line sonarjs/no-identical-functions */}
           {Array.from(vaultRoles).map((role) => (
             <Option key={role.hash} value={role.hash}>
               {role.name}
@@ -489,6 +490,25 @@ export const StVaultDemo = () => {
               vaultData,
               overview,
             };
+          }
+        }}
+      ></Action>
+
+      <Action
+        title="Calculate Health"
+        walletAction
+        action={async () => {
+          if (currentVault) {
+            const blockNumber = await core.toBlockNumber({ block: 'latest' });
+            const vaultData = await currentVault.getVaultOverviewData({
+              blockNumber,
+            });
+
+            return currentVault.calculateHealth({
+              totalValue: vaultData.totalValue,
+              liabilitySharesInStethWei: vaultData.liabilityStETH,
+              forceRebalanceThresholdBP: vaultData.forcedRebalanceThresholdBP,
+            });
           }
         }}
       ></Action>

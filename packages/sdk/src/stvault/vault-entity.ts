@@ -36,7 +36,10 @@ import {
   GetVaultOverviewDataProps,
   VaultOverviewData,
 } from './utils/overview/types.js';
-import { calculateHealth } from './utils/overview/calculate-health.js';
+import {
+  calculateHealth,
+  CalculateHealthArgs,
+} from './utils/overview/calculate-health.js';
 import {
   bigIntCeilDiv,
   bigIntMax,
@@ -122,36 +125,28 @@ export class LidoSDKVaultEntity extends BusModule {
       this.vaultAddress,
     ]);
 
-    if (!isVaultConnected) {
-      throw this.bus.core.error({
-        code: ERROR_CODE.READ_ERROR,
-        message: 'Vault connection is not found.',
-      });
-    }
-
     const vaultConnection = await vaultHub.read.vaultConnection([
       this.vaultAddress,
     ]);
+    const vaultOwner = await (await this.getVaultContract()).read.owner();
 
-    if (isAddressEqual(vaultConnection.owner, zeroAddress)) {
+    const supposedDashboardAddress = !isAddressEqual(
+      vaultConnection.owner,
+      zeroAddress,
+    )
+      ? vaultConnection.owner
+      : vaultOwner;
+
+    const isOwnerDashboard = await this.isDashboard(supposedDashboardAddress);
+
+    if (!isOwnerDashboard && isVaultConnected && !this.skipDashboardCheck) {
       throw this.bus.core.error({
-        code: ERROR_CODE.READ_ERROR,
-        message: 'Vault owner is not found.',
+        code: ERROR_CODE.NOT_SUPPORTED,
+        message: 'Owner of vault is not dashboard contract',
       });
     }
 
-    if (!this.skipDashboardCheck) {
-      const isOwnerDashboard = await this.isDashboard(vaultConnection.owner);
-
-      if (!isOwnerDashboard) {
-        throw this.bus.core.error({
-          code: ERROR_CODE.NOT_SUPPORTED,
-          message: 'Owner of vault is not dashboard contract',
-        });
-      }
-    }
-
-    this.dashboardAddress = vaultConnection.owner;
+    this.dashboardAddress = supposedDashboardAddress;
 
     return this.dashboardAddress;
   }
@@ -1061,5 +1056,19 @@ export class LidoSDKVaultEntity extends BusModule {
       reserved,
       totalMintingCapacityStethWei,
     };
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  calculateHealth(props: CalculateHealthArgs) {
+    const { totalValue, liabilitySharesInStethWei, forceRebalanceThresholdBP } =
+      props;
+    const { healthRatio, isHealthy } = calculateHealth({
+      totalValue,
+      liabilitySharesInStethWei,
+      forceRebalanceThresholdBP,
+    });
+
+    return { healthRatio, isHealthy };
   }
 }
