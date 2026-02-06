@@ -36,7 +36,10 @@ import {
   GetVaultOverviewDataProps,
   VaultOverviewData,
 } from './utils/overview/types.js';
-import { calculateHealth } from './utils/overview/calculate-health.js';
+import {
+  calculateHealth,
+  CalculateHealthArgs,
+} from './utils/overview/calculate-health.js';
 import {
   bigIntCeilDiv,
   bigIntMax,
@@ -1053,5 +1056,19 @@ export class LidoSDKVaultEntity extends BusModule {
       reserved,
       totalMintingCapacityStethWei,
     };
+  }
+
+  @Logger('Utils:')
+  @ErrorHandler()
+  calculateHealth(props: CalculateHealthArgs) {
+    const { totalValue, liabilitySharesInStethWei, forceRebalanceThresholdBP } =
+      props;
+    const { healthRatio, isHealthy } = calculateHealth({
+      totalValue,
+      liabilitySharesInStethWei,
+      forceRebalanceThresholdBP,
+    });
+
+    return { healthRatio, isHealthy };
   }
 }

@@ -492,6 +492,25 @@ export const StVaultDemo = () => {
           }
         }}
       ></Action>
+
+      <Action
+        title="Calculate Health"
+        walletAction
+        action={async () => {
+          if (currentVault) {
+            const blockNumber = await core.toBlockNumber({ block: 'latest' });
+            const vaultData = await currentVault.getVaultOverviewData({
+              blockNumber,
+            });
+
+            return currentVault.calculateHealth({
+              totalValue: vaultData.totalValue,
+              liabilitySharesInStethWei: vaultData.liabilityStETH,
+              forceRebalanceThresholdBP: vaultData.forcedRebalanceThresholdBP,
+            });
+          }
+        }}
+      ></Action>
     </Accordion>
   );
 };
