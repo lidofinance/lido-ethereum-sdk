@@ -408,6 +408,7 @@ export const StVaultDemo = () => {
             setRole(r as Hash);
           }}
         >
+          {/* eslint-disable-next-line sonarjs/no-identical-functions */}
           {Array.from(vaultRoles).map((role) => (
             <Option key={role.hash} value={role.hash}>
               {role.name}
