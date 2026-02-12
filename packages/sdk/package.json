@@ -81,6 +81,11 @@
       "default": "./dist/cjs/dual-governance/index.js",
       "types": "./dist/types/dual-governance/index.d.ts"
     },
+    "./stvault": {
+      "import": "./dist/esm/stvault/index.js",
+      "default": "./dist/cjs/stvault/index.js",
+      "types": "./dist/types/stvault/index.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -120,6 +125,9 @@
       ],
       "dual-governance": [
         "./dist/types/dual-governance/index.d.ts"
+      ],
+      "stvault": [
+        "./dist/types/stvault/index.d.ts"
       ]
     }
   },
@@ -160,11 +168,15 @@
   },
   "dependencies": {
     "@ethersproject/bytes": "^5.7.0",
+    "@openzeppelin/merkle-tree": "^1.0.8",
+    "blockstore-core": "^5.0.4",
     "graphql": "^16.8.1",
-    "graphql-request": "^6.1.0"
+    "graphql-request": "^6.1.0",
+    "ipfs-unixfs-importer": "^15.4.0",
+    "multiformats": "^13.4.0"
   },
   "peerDependencies": {
-    "viem": "^2.31.0"
+    "viem": "^2.45.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
