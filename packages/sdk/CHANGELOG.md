@@ -1,3 +1,23 @@
+# 4.7.0
+
+## SDK
+
+### Added
+
+- `StVault` module
+- `viem` version up to `^2.45.0`
+- `shares` module new methods:
+  `convertBatchSharesToSteth`, `convertBatchStethToShares`,
+  `getSharesByPooledEth`, `getPooledEthByShares`, `getPooledEthBySharesRoundUp`
+- Updated ABIs:
+  `stvault` ABIs (`StakingVault`, `VaultHub`, `VaultFactory`, `Dashboard`,
+  `VaultViewer`, `PredepositGuarantee`, `OperatorGrid`, `LazyOracle`, `Multicall`),
+  plus updates in `core` (`lido`, `lidoLocator`) and `shares` (`steth-shares`)
+
+## Playground
+
+- `StVault` module added
+
 # 4.6.0
 
 ## SDK
