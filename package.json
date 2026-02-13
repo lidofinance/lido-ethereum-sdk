@@ -28,7 +28,7 @@
     "@qiwi/multi-semantic-release": "7.1.1",
     "@typescript-eslint/eslint-plugin": "^5",
     "@typescript-eslint/parser": "^5.46.0",
-    "eslint": "^8.46.0",
+    "eslint": "^9.26.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-node": "^0.3.6",
     "eslint-import-resolver-typescript": "^3",
