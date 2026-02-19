@@ -1,4 +1,6 @@
-export const LidoLocatorAbi = [
+import type { Abi } from 'viem';
+
+const abi = [
   {
     inputs: [
       {
@@ -254,4 +256,8 @@ export const LidoLocatorAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type LidoLocatorAbiType = typeof abi;
+
+export const LidoLocatorAbi: LidoLocatorAbiType = abi;

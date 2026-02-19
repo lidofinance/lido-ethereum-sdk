@@ -1,4 +1,6 @@
-export const StethAbi = [
+import type { Abi } from 'viem';
+
+const abi = [
   {
     constant: true,
     inputs: [],
@@ -694,7 +696,10 @@ export const StethAbi = [
     name: 'ContractVersionSet',
     type: 'event',
   },
-] as const;
+] as const satisfies Abi;
+
+export type StethAbiType = typeof abi;
+export const StethAbi: StethAbiType = abi;
 
 // smaller ABI for less overhead when parsing submit events
 export const StethEventsPartialAbi = [
@@ -718,4 +723,4 @@ export const StethEventsPartialAbi = [
     name: 'Transfer',
     type: 'event',
   },
-] as const;
+] as const satisfies Abi;

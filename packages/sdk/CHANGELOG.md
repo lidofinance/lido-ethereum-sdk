@@ -1,3 +1,16 @@
+# 4.8.0
+
+## SDK
+
+### Added
+
+- All contract instances now support `.encode` and `.prepare` methods for encoding calls and preparing transactions without sending them
+- All ABIs are now exported with their types and are optimized for better Typescript performance
+
+### Fixed
+
+- `@ethersproject/bytes` removed as dependency and all related logic is migrated to `viem` utils
+
 # 4.7.0
 
 ## SDK

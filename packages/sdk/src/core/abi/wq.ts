@@ -1,4 +1,6 @@
-export const wqWstethAddressAbi = [
+import type { Abi } from 'viem';
+
+const abi = [
   {
     inputs: [],
     name: 'WSTETH',
@@ -6,4 +8,8 @@ export const wqWstethAddressAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type wqWstethAddressAbiType = typeof abi;
+
+export const wqWstethAddressAbi: wqWstethAddressAbiType = abi;

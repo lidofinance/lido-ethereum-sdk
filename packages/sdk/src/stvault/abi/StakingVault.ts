@@ -1,4 +1,5 @@
-export const StakingVaultAbi = [
+import type { Abi } from 'viem';
+const abi = [
   {
     inputs: [
       {
@@ -944,4 +945,7 @@ export const StakingVaultAbi = [
     stateMutability: 'payable',
     type: 'receive',
   },
-] as const;
+] as const satisfies Abi;
+
+export type StakingVaultAbiType = typeof abi;
+export const StakingVaultAbi: StakingVaultAbiType = abi;

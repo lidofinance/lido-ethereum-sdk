@@ -1,4 +1,6 @@
-export const OperatorGridAbi = [
+import type { Abi } from 'viem';
+
+const abi = [
   {
     inputs: [
       {
@@ -1579,4 +1581,7 @@ export const OperatorGridAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type OperatorGridAbiType = typeof abi;
+export const OperatorGridAbi: OperatorGridAbiType = abi;

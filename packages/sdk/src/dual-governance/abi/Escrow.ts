@@ -1,4 +1,5 @@
-export const escrowAbi = [
+import type { Abi } from 'viem';
+const abi = [
   {
     inputs: [],
     name: 'ST_ETH',
@@ -42,4 +43,8 @@ export const escrowAbi = [
     type: 'function',
   },
   { stateMutability: 'payable', type: 'receive' },
-] as const;
+] as const satisfies Abi;
+
+export type escrowAbiType = typeof abi;
+
+export const escrowAbi: escrowAbiType = abi;

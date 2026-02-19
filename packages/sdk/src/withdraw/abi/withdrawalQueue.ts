@@ -1,4 +1,6 @@
-export const WithdrawalQueueAbi = [
+import type { Abi } from 'viem';
+
+export const abi = [
   { inputs: [], name: 'AdminZeroAddress', type: 'error' },
   { inputs: [], name: 'ApprovalToOwner', type: 'error' },
   { inputs: [], name: 'ApproveToCaller', type: 'error' },
@@ -1119,7 +1121,10 @@ export const WithdrawalQueueAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type WithdrawalQueueAbiType = typeof abi;
+export const WithdrawalQueueAbi: WithdrawalQueueAbiType = abi;
 
 export const PartialWithdrawalQueueEventsAbi = [
   {
@@ -1190,4 +1195,4 @@ export const PartialWithdrawalQueueEventsAbi = [
     name: 'WithdrawalClaimed',
     type: 'event',
   },
-] as const;
+] as const satisfies Abi;

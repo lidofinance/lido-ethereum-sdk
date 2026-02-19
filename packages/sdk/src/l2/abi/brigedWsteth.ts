@@ -1,4 +1,5 @@
-export const bridgedWstethAbi = [
+import type { Abi } from 'viem';
+const abi = [
   { inputs: [], name: 'ErrorAccountIsZeroAddress', type: 'error' },
   { inputs: [], name: 'ErrorDeadlineExpired', type: 'error' },
   { inputs: [], name: 'ErrorInvalidSignature', type: 'error' },
@@ -262,4 +263,7 @@ export const bridgedWstethAbi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type bridgedWstethAbiType = typeof abi;
+export const bridgedWstethAbi: bridgedWstethAbiType = abi;

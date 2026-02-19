@@ -28,17 +28,25 @@ import {
 } from '../common/constants.js';
 import { Cache, Logger, ErrorHandler } from '../common/decorators/index.js';
 
-import { rebasableL2StethAbi } from './abi/rebasableL2Steth.js';
-import { parseValue } from '../common/utils/parse-value.js';
 import {
+  rebasableL2StethAbi,
+  rebasableL2StethAbiType,
+} from './abi/rebasableL2Steth.js';
+import {
+  invariant,
+  ERROR_CODE,
+  type EncodableContract,
+  getEncodableContract,
+} from '../common/index.js';
+import { parseValue } from '../common/utils/parse-value.js';
+import type {
   UnwrapResults,
   WrapInnerProps,
   WrapProps,
   WrapPropsWithoutTxOptions,
   WrapResults,
 } from './types.js';
-import { PopulatedTransaction, TransactionResult } from '../core/types.js';
-import { invariant, ERROR_CODE } from '../common/index.js';
+import type { PopulatedTransaction, TransactionResult } from '../core/types.js';
 
 export class LidoSDKL2 extends LidoSDKModule {
   private static TRANSFER_SIGNATURE = toEventHash(
@@ -70,17 +78,21 @@ export class LidoSDKL2 extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContract(): Promise<
-    GetContractReturnType<typeof rebasableL2StethAbi, WalletClient>
+    EncodableContract<
+      GetContractReturnType<rebasableL2StethAbiType, WalletClient>
+    >
   > {
     const address = await this.contractAddress();
-    return getContract({
-      address,
-      abi: rebasableL2StethAbi,
-      client: {
-        public: this.core.rpcProvider,
-        wallet: this.core.web3Provider as WalletClient,
-      },
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: rebasableL2StethAbi,
+        client: {
+          public: this.core.rpcProvider,
+          wallet: this.core.web3Provider as WalletClient,
+        },
+      }),
+    );
   }
 
   // Wrap wstETH to stETH

@@ -11,7 +11,7 @@ import { LidoSDKVaultViewer } from './vault-viewer.js';
 import { LidoSDKstETH, LidoSDKwstETH } from '../erc20/index.js';
 import { LidoSDKVaultEntity } from './vault-entity.js';
 import { LidoSDKVaultLazyOracle } from './vault-lazy-oracle.js';
-import { LidoSDKVaultConstants } from './vault-contants.js';
+import { LidoSDKVaultConstants } from './vault-constants.js';
 import { SubmitLatestReportProps } from './types.js';
 
 export class Bus extends LidoSDKModule {

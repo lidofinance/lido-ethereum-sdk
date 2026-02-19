@@ -9,3 +9,5 @@ export type {
   WrapProps,
   WrapResults,
 } from './types.js';
+export type { bridgedWstethAbiType } from './abi/brigedWsteth.js';
+export type { rebasableL2StethAbiType } from './abi/rebasableL2Steth.js';

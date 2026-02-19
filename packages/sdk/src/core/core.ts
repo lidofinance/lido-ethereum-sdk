@@ -1,19 +1,20 @@
 import {
-  type Address,
-  type Chain,
   createPublicClient,
   createWalletClient,
   custom,
-  type CustomTransportConfig,
   fallback,
-  type GetBlockReturnType,
   getContract,
-  type GetContractReturnType,
   http,
   JsonRpcAccount,
   maxUint256,
+  type Address,
+  type Chain,
   type PublicClient,
   type WalletClient,
+  type GetContractReturnType,
+  type GetBlockReturnType,
+  type CustomTransportConfig,
+  parseSignature,
 } from 'viem';
 import {
   ERROR_CODE,
@@ -21,7 +22,6 @@ import {
   invariantArgument,
   withSDKError,
 } from '../common/utils/sdk-error.js';
-import { splitSignature } from '@ethersproject/bytes';
 
 import { SDKError, type SDKErrorProps } from '../common/utils/index.js';
 import { Cache, Initialize, Logger } from '../common/decorators/index.js';
@@ -45,8 +45,8 @@ import {
   WSTETH_REFERRAL_STAKER,
 } from '../common/constants.js';
 
-import { LidoLocatorAbi } from './abi/lidoLocator.js';
-import { wqWstethAddressAbi } from './abi/wq.js';
+import { LidoLocatorAbi, LidoLocatorAbiType } from './abi/lidoLocator.js';
+
 import type {
   AccountValue,
   BackArgumentType,
@@ -61,11 +61,14 @@ import type {
   TransactionResult,
 } from './types.js';
 import { TransactionCallbackStage } from './types.js';
-import { permitAbi } from './abi/permit.js';
+
 import { LidoSDKCacheable } from '../common/class-primitives/cacheable.js';
-import { readContract } from 'viem/actions';
+
 import { EncodableContract, getEncodableContract } from '../common/index.js';
-import { LidoAbi } from './abi/lido.js';
+
+import { wqWstethAddressAbi } from './abi/wq.js';
+import { permitAbi, permitAbiType } from './abi/permit.js';
+import { LidoAbi, LidoAbiType } from './abi/lido.js';
 
 export default class LidoSDKCore extends LidoSDKCacheable {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
@@ -199,28 +202,32 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['chain.id', 'contractAddressLidoLocator'])
-  public getContractLidoLocator(): GetContractReturnType<
-    typeof LidoLocatorAbi,
-    PublicClient
+  public getContractLidoLocator(): EncodableContract<
+    GetContractReturnType<LidoLocatorAbiType, PublicClient>
   > {
-    return getContract({
-      address: this.contractAddressLidoLocator(),
-      abi: LidoLocatorAbi,
-      client: this.rpcProvider,
-    });
+    return getEncodableContract(
+      getContract({
+        address: this.contractAddressLidoLocator(),
+        abi: LidoLocatorAbi,
+        client: this.rpcProvider,
+      }),
+    );
   }
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['chain.id', 'contractAddressLidoLocator'])
   public async getLidoContract(): Promise<
-    EncodableContract<GetContractReturnType<typeof LidoAbi, WalletClient>>
+    EncodableContract<GetContractReturnType<LidoAbiType, WalletClient>>
   > {
     const address = await this.getContractAddress(LIDO_CONTRACT_NAMES.lido);
     return getEncodableContract(
       getContract({
         address,
         abi: LidoAbi,
-        client: this.rpcProvider,
+        client: {
+          public: this.rpcProvider,
+          wallet: this.web3Provider as WalletClient,
+        },
       }),
     );
   }
@@ -253,12 +260,13 @@ export default class LidoSDKCore extends LidoSDKCacheable {
         deadline,
       },
     });
-    const { s, r, v } = splitSignature(signature);
+
+    const { s, r, v } = parseSignature(signature);
 
     return {
-      v,
-      r: r as `0x${string}`,
-      s: s as `0x${string}`,
+      v: Number(v),
+      r,
+      s,
       value: amount,
       deadline,
       nonce,
@@ -280,7 +288,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       address: tokenAddress,
       abi: permitAbi,
       client: this.rpcProvider,
-    });
+    }) as GetContractReturnType<permitAbiType, PublicClient>;
 
     let domain = {
       name: 'Wrapped liquid staked Ether 2.0',
@@ -417,7 +425,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     if (contract === 'wsteth') {
       const withdrawalQueue = await lidoLocator.read.withdrawalQueue();
 
-      const wstethAddress = await readContract(this.rpcProvider, {
+      const wstethAddress = await this.rpcProvider.readContract({
         abi: wqWstethAddressAbi,
         address: withdrawalQueue,
         functionName: 'WSTETH',

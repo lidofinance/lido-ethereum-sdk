@@ -33,7 +33,11 @@ import {
 } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
 
-import { StethAbi, StethEventsPartialAbi } from './abi/steth.js';
+import {
+  StethAbi,
+  type StethAbiType,
+  StethEventsPartialAbi,
+} from './abi/steth.js';
 import type {
   StakeProps,
   StakeEncodeDataProps,
@@ -42,6 +46,7 @@ import type {
   StakeResult,
 } from './types.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import { EncodableContract, getEncodableContract } from '../common/index.js';
 
 export class LidoSDKStake extends LidoSDKModule {
   // Precomputed event signatures
@@ -62,18 +67,20 @@ export class LidoSDKStake extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
   public async getContractStETH(): Promise<
-    GetContractReturnType<typeof StethAbi, WalletClient>
+    EncodableContract<GetContractReturnType<StethAbiType, WalletClient>>
   > {
     const address = await this.contractAddressStETH();
 
-    return getContract({
-      address,
-      abi: StethAbi,
-      client: {
-        public: this.core.rpcProvider,
-        wallet: this.core.web3Provider as WalletClient,
-      },
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: StethAbi,
+        client: {
+          public: this.core.rpcProvider,
+          wallet: this.core.web3Provider as WalletClient,
+        },
+      }),
+    );
   }
 
   // Calls

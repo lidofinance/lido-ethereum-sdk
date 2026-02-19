@@ -1,4 +1,14 @@
-export const LidoAbi = [
+import type { Abi } from 'viem';
+
+/*
+TS type performance breakdown:
+   - `as const` - makes it literal, must always be used for ABIs
+   - `satisfies Abi` - ensures ABI correctness and speeds up type inference ()
+   - `type LidoAbiType`  - creates a dedicated named type node to speed up type inference
+   - `LidoAbi: LidoAbiType` - assigns dedicated type to the exported value so unnamed raw type node is not leaking out
+*/
+
+const abi = [
   {
     constant: true,
     inputs: [{ name: '_sharesAmount', type: 'uint256' }],
@@ -1054,4 +1064,8 @@ export const LidoAbi = [
     name: 'ContractVersionSet',
     type: 'event',
   },
-] as const;
+] as const satisfies Abi;
+
+export type LidoAbiType = typeof abi;
+
+export const LidoAbi: LidoAbiType = abi;

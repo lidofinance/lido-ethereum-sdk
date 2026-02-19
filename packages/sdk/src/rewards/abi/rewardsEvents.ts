@@ -1,4 +1,5 @@
-export const rewardsEventsAbi = [
+import type { Abi } from 'viem';
+const abi = [
   {
     anonymous: false,
     inputs: [
@@ -57,4 +58,7 @@ export const rewardsEventsAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type rewardsEventsAbiType = typeof abi;
+export const rewardsEventsAbi: rewardsEventsAbiType = abi;

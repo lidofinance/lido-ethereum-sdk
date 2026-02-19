@@ -1,3 +1,5 @@
+import type { Abi } from 'viem';
+
 export const PartStethAbi = [
   {
     constant: false,
@@ -23,4 +25,6 @@ export const PartStethAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type PartStethAbiType = typeof PartStethAbi;

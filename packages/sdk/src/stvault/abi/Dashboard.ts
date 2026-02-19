@@ -1,4 +1,6 @@
-export const DashboardAbi = [
+import type { Abi } from 'viem';
+
+const abi = [
   {
     inputs: [
       {
@@ -2112,4 +2114,8 @@ export const DashboardAbi = [
     stateMutability: 'payable',
     type: 'receive',
   },
-] as const;
+] as const satisfies Abi;
+
+export type DashboardAbiType = typeof abi;
+
+export const DashboardAbi: DashboardAbiType = abi;
