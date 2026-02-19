@@ -1,4 +1,5 @@
-export const dgConfigProviderAbi = [
+import type { Abi } from 'viem';
+const abi = [
   {
     type: 'function',
     name: 'getDualGovernanceConfig',
@@ -74,4 +75,8 @@ export const dgConfigProviderAbi = [
     ],
     stateMutability: 'view',
   },
-] as const;
+] as const satisfies Abi;
+
+export type dgConfigProviderAbiType = typeof abi;
+
+export const dgConfigProviderAbi: dgConfigProviderAbiType = abi;

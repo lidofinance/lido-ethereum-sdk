@@ -1,4 +1,6 @@
-export const unstethAbi = [
+import type { Abi } from 'viem';
+
+export const abi = [
   { inputs: [], name: 'AdminZeroAddress', type: 'error' },
   { inputs: [], name: 'ApprovalToOwner', type: 'error' },
   { inputs: [], name: 'ApproveToCaller', type: 'error' },
@@ -978,4 +980,8 @@ export const unstethAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type UnstETHAbiType = typeof abi;
+
+export const unstethAbi: UnstETHAbiType = abi;

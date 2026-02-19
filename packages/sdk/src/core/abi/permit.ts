@@ -1,4 +1,6 @@
-export const permitAbi = [
+import type { Abi } from 'viem';
+
+const abi = [
   {
     constant: true,
     inputs: [],
@@ -22,4 +24,8 @@ export const permitAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type permitAbiType = typeof abi;
+
+export const permitAbi: permitAbiType = abi;

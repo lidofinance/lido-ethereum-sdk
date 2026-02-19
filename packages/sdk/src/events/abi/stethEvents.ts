@@ -1,4 +1,6 @@
-export const StethEventsAbi = [
+import type { Abi } from 'viem';
+
+const abi = [
   { payable: true, stateMutability: 'payable', type: 'fallback' },
   {
     anonymous: false,
@@ -188,4 +190,8 @@ export const StethEventsAbi = [
     name: 'ContractVersionSet',
     type: 'event',
   },
-] as const;
+] as const satisfies Abi;
+
+export type StethEventsAbiType = typeof abi;
+
+export const StethEventsAbi: StethEventsAbiType = abi;

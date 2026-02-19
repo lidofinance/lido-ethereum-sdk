@@ -1,11 +1,12 @@
 import {
-  Address,
   getAbiItem,
   getContract,
-  GetContractReturnType,
   toEventHash,
-  WalletClient,
+  type Address,
+  type GetContractReturnType,
+  type WalletClient,
 } from 'viem';
+
 import {
   DashboardAbi,
   DashboardCreatedEventAbi,
@@ -17,10 +18,21 @@ import {
   VaultHubAbi,
   VaultViewerAbi,
   LazyOracleAbi,
+  type StakingVaultAbiType,
+  type DashboardAbiType,
+  type VaultFactoryAbiType,
+  type VaultViewerAbiType,
+  type VaultHubAbiType,
+  type OperatorGridAbiType,
+  type LazyOracleAbiType,
+  type PredepositGuaranteeAbiType,
 } from './abi/index.js';
 import { Cache, Logger } from '../common/decorators/index.js';
 import { BusModule } from './bus-module.js';
-import { EncodableContract, getEncodableContract } from '../common/index.js';
+import {
+  type EncodableContract,
+  getEncodableContract,
+} from '../common/index.js';
 
 export class LidoSDKVaultContracts extends BusModule {
   // Precomputed event signatures
@@ -44,9 +56,7 @@ export class LidoSDKVaultContracts extends BusModule {
   public async getContractVault(
     address: Address,
   ): Promise<
-    EncodableContract<
-      GetContractReturnType<typeof StakingVaultAbi, WalletClient>
-    >
+    EncodableContract<GetContractReturnType<StakingVaultAbiType, WalletClient>>
   > {
     return getEncodableContract(
       getContract({
@@ -65,7 +75,7 @@ export class LidoSDKVaultContracts extends BusModule {
   public async getContractVaultDashboard(
     address: Address,
   ): Promise<
-    EncodableContract<GetContractReturnType<typeof DashboardAbi, WalletClient>>
+    EncodableContract<GetContractReturnType<DashboardAbiType, WalletClient>>
   > {
     return getEncodableContract(
       getContract({
@@ -82,7 +92,7 @@ export class LidoSDKVaultContracts extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractVaultHub(): Promise<
-    EncodableContract<GetContractReturnType<typeof VaultHubAbi, WalletClient>>
+    EncodableContract<GetContractReturnType<VaultHubAbiType, WalletClient>>
   > {
     const address = await this.bus.core
       .getContractLidoLocator()
@@ -103,9 +113,7 @@ export class LidoSDKVaultContracts extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractVaultFactory(): Promise<
-    EncodableContract<
-      GetContractReturnType<typeof VaultFactoryAbi, WalletClient>
-    >
+    EncodableContract<GetContractReturnType<VaultFactoryAbiType, WalletClient>>
   > {
     const address = await this.bus.core
       .getContractLidoLocator()
@@ -126,9 +134,7 @@ export class LidoSDKVaultContracts extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractVaultViewer(): Promise<
-    EncodableContract<
-      GetContractReturnType<typeof VaultViewerAbi, WalletClient>
-    >
+    EncodableContract<GetContractReturnType<VaultViewerAbiType, WalletClient>>
   > {
     const address = this.bus.core.getVaultViewerAddress();
 
@@ -146,7 +152,7 @@ export class LidoSDKVaultContracts extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractLazyOracle(): Promise<
-    EncodableContract<GetContractReturnType<typeof LazyOracleAbi, WalletClient>>
+    EncodableContract<GetContractReturnType<LazyOracleAbiType, WalletClient>>
   > {
     const address = await this.bus.core
       .getContractLidoLocator()
@@ -168,7 +174,7 @@ export class LidoSDKVaultContracts extends BusModule {
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractPredepositGuarantee(): Promise<
     EncodableContract<
-      GetContractReturnType<typeof PredepositGuaranteeAbi, WalletClient>
+      GetContractReturnType<PredepositGuaranteeAbiType, WalletClient>
     >
   > {
     const address = await this.bus.core
@@ -190,9 +196,7 @@ export class LidoSDKVaultContracts extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractOperatorGrid(): Promise<
-    EncodableContract<
-      GetContractReturnType<typeof OperatorGridAbi, WalletClient>
-    >
+    EncodableContract<GetContractReturnType<OperatorGridAbiType, WalletClient>>
   > {
     const address = await this.bus.core
       .getContractLidoLocator()

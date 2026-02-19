@@ -1,4 +1,6 @@
-export const Multicall3AbiUtils = [
+import type { Abi } from 'viem';
+
+const abi = [
   {
     inputs: [],
     name: 'getBasefee',
@@ -64,4 +66,7 @@ export const Multicall3AbiUtils = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type Multicall3AbiUtilsType = typeof abi;
+export const Multicall3AbiUtils: Multicall3AbiUtilsType = abi;

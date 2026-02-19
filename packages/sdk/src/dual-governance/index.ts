@@ -12,3 +12,7 @@ export type {
   SignallingEscrowDetails,
   DualGovernanceConfig,
 } from './types.js';
+export type { escrowAbiType } from './abi/Escrow.js';
+export type { emergencyProtectedTimelockAbiType } from './abi/EmergencyProtectedTimelock.js';
+export type { dgConfigProviderAbiType } from './abi/DGConfigProvider.js';
+export type { dualGovernanceAbiType } from './abi/DualGovernance.js';

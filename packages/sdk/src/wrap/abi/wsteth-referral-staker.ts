@@ -1,67 +1,71 @@
-export const abi = [
+import type { Abi } from 'viem';
+const abi = [
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "contract IWstETH",
-        "name": "_wstETH",
-        "type": "address"
-      }
+        internalType: 'contract IWstETH',
+        name: '_wstETH',
+        type: 'address',
+      },
     ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
+    stateMutability: 'nonpayable',
+    type: 'constructor',
   },
   {
-    "inputs": [],
-    "name": "EthTransferNotAllowed",
-    "type": "error"
+    inputs: [],
+    name: 'EthTransferNotAllowed',
+    type: 'error',
   },
   {
-    "inputs": [],
-    "name": "stETH",
-    "outputs": [
+    inputs: [],
+    name: 'stETH',
+    outputs: [
       {
-        "internalType": "contract IStETH",
-        "name": "",
-        "type": "address"
-      }
+        internalType: 'contract IStETH',
+        name: '',
+        type: 'address',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "address",
-        "name": "_referral",
-        "type": "address"
-      }
+        internalType: 'address',
+        name: '_referral',
+        type: 'address',
+      },
     ],
-    "name": "stakeETH",
-    "outputs": [
+    name: 'stakeETH',
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
-    "stateMutability": "payable",
-    "type": "function"
+    stateMutability: 'payable',
+    type: 'function',
   },
   {
-    "inputs": [],
-    "name": "wstETH",
-    "outputs": [
+    inputs: [],
+    name: 'wstETH',
+    outputs: [
       {
-        "internalType": "contract IWstETH",
-        "name": "",
-        "type": "address"
-      }
+        internalType: 'contract IWstETH',
+        name: '',
+        type: 'address',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    "stateMutability": "payable",
-    "type": "receive"
-  }
-] as const;
+    stateMutability: 'payable',
+    type: 'receive',
+  },
+] as const satisfies Abi;
+
+export type WstethReferralStakerABIType = typeof abi;
+export const WstethReferralStakerABI: WstethReferralStakerABIType = abi;

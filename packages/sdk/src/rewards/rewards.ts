@@ -9,7 +9,7 @@ import {
 import { Logger, ErrorHandler, Cache } from '../common/decorators/index.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 
-import { rewardsEventsAbi } from './abi/rewardsEvents.js';
+import { rewardsEventsAbi, rewardsEventsAbiType } from './abi/rewardsEvents.js';
 import {
   type GetRewardsFromChainOptions,
   type GetRewardsFromChainResult,
@@ -78,7 +78,7 @@ export class LidoSDKRewards extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
   private async getContractStETH(): Promise<
-    GetContractReturnType<typeof rewardsEventsAbi, PublicClient>
+    GetContractReturnType<rewardsEventsAbiType, PublicClient>
   > {
     const address = await this.contractAddressStETH();
 

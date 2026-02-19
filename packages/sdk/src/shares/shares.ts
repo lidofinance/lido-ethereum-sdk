@@ -11,13 +11,7 @@ import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
 import { TransactionResult } from '../core/index.js';
 
-import {
-  BatchSharesToStethValue,
-  SharesAmountWithRoundUp,
-  SharesTotalSupplyResult,
-  SharesTransferProps,
-} from './types.js';
-import { stethSharesAbi } from './abi/steth-shares-abi.js';
+import { stethSharesAbi, stethSharesAbiType } from './abi/steth-shares-abi.js';
 import { parseValue } from '../common/utils/parse-value.js';
 
 import type {
@@ -33,7 +27,18 @@ import {
   bigIntCeilDiv,
   bigIntSign,
 } from '../common/utils/bigint-math.js';
-import { ERROR_CODE } from '../common/index.js';
+import {
+  type EncodableContract,
+  ERROR_CODE,
+  getEncodableContract,
+} from '../common/index.js';
+
+import type {
+  BatchSharesToStethValue,
+  SharesAmountWithRoundUp,
+  SharesTotalSupplyResult,
+  SharesTransferProps,
+} from './types.js';
 
 const isSharesAmountWithRoundUp = (
   value: BatchSharesToStethValue,
@@ -54,18 +59,20 @@ export class LidoSDKShares extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
   public async getContractStETHshares(): Promise<
-    GetContractReturnType<typeof stethSharesAbi, WalletClient>
+    EncodableContract<GetContractReturnType<stethSharesAbiType, WalletClient>>
   > {
     const address = await this.contractAddressStETH();
 
-    return getContract({
-      address,
-      abi: stethSharesAbi,
-      client: {
-        public: this.core.rpcProvider,
-        wallet: this.core.web3Provider as WalletClient,
-      },
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: stethSharesAbi,
+        client: {
+          public: this.core.rpcProvider,
+          wallet: this.core.web3Provider as WalletClient,
+        },
+      }),
+    );
   }
 
   @Logger('Balances:')

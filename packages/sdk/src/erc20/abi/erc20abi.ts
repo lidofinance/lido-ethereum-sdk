@@ -1,5 +1,7 @@
+import type { Abi } from 'viem';
 import { permitAbi } from '../../core/abi/permit.js';
-export const erc20abi = [
+
+const abi = [
   ...permitAbi,
   {
     anonymous: false,
@@ -159,4 +161,8 @@ export const erc20abi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type erc20abiType = typeof abi;
+
+export const erc20abi: erc20abiType = abi;

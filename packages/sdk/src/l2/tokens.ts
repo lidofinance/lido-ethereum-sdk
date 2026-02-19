@@ -13,8 +13,11 @@ import { parseValue } from '../common/utils/parse-value.js';
 import { Cache, ErrorHandler, Logger } from '../common/decorators/index.js';
 import { AbstractLidoSDKErc20 } from '../erc20/erc20.js';
 
-import { rebasableL2StethAbi } from './abi/rebasableL2Steth.js';
-import { bridgedWstethAbi } from './abi/brigedWsteth.js';
+import {
+  rebasableL2StethAbi,
+  rebasableL2StethAbiType,
+} from './abi/rebasableL2Steth.js';
+import { bridgedWstethAbi, bridgedWstethAbiType } from './abi/brigedWsteth.js';
 
 import type {
   AccountValue,
@@ -24,6 +27,7 @@ import type {
   TransactionResult,
 } from '../core/types.js';
 import type { SharesTransferProps } from './types.js';
+import { EncodableContract, getEncodableContract } from '../common/index.js';
 
 export class LidoSDKL2Wsteth extends AbstractLidoSDKErc20 {
   @Logger('Contracts:')
@@ -35,17 +39,19 @@ export class LidoSDKL2Wsteth extends AbstractLidoSDKErc20 {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getL2Contract(): Promise<
-    GetContractReturnType<typeof bridgedWstethAbi, WalletClient>
+    EncodableContract<GetContractReturnType<bridgedWstethAbiType, WalletClient>>
   > {
     const address = await this.contractAddress();
-    return getContract({
-      address,
-      abi: bridgedWstethAbi,
-      client: {
-        public: this.core.rpcProvider,
-        wallet: this.core.web3Provider as WalletClient,
-      },
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: bridgedWstethAbi,
+        client: {
+          public: this.core.rpcProvider,
+          wallet: this.core.web3Provider as WalletClient,
+        },
+      }),
+    );
   }
 
   @Cache(30 * 60 * 1000, ['core.chain.id'])
@@ -93,17 +99,21 @@ export class LidoSDKL2Steth extends AbstractLidoSDKErc20 {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getL2Contract(): Promise<
-    GetContractReturnType<typeof rebasableL2StethAbi, WalletClient>
+    EncodableContract<
+      GetContractReturnType<rebasableL2StethAbiType, WalletClient>
+    >
   > {
     const address = await this.contractAddress();
-    return getContract({
-      address,
-      abi: rebasableL2StethAbi,
-      client: {
-        public: this.core.rpcProvider,
-        wallet: this.core.web3Provider as WalletClient,
-      },
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: rebasableL2StethAbi,
+        client: {
+          public: this.core.rpcProvider,
+          wallet: this.core.web3Provider as WalletClient,
+        },
+      }),
+    );
   }
 
   @Cache(30 * 60 * 1000, ['core.chain.id'])

@@ -1,4 +1,6 @@
-export const stethSharesAbi = [
+import type { Abi } from 'viem';
+
+const abi = [
   {
     anonymous: false,
     inputs: [
@@ -135,4 +137,8 @@ export const stethSharesAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type stethSharesAbiType = typeof abi;
+
+export const stethSharesAbi: stethSharesAbiType = abi;

@@ -2,11 +2,16 @@ import { getContract } from 'viem';
 import type { Address, GetContractReturnType, WalletClient } from 'viem';
 import { Logger, Cache } from '../common/decorators/index.js';
 import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
+import { EncodableContract, getEncodableContract } from '../common/index.js';
 
-import { WithdrawalQueueAbi } from './abi/withdrawalQueue.js';
-import { PartStethAbi } from './abi/partStETH.js';
-import { PartWstethAbi } from './abi/partWstETH.js';
 import { BusModule } from './bus-module.js';
+
+import {
+  WithdrawalQueueAbi,
+  type WithdrawalQueueAbiType,
+} from './abi/withdrawalQueue.js';
+import { PartStethAbi, type PartStethAbiType } from './abi/partStETH.js';
+import { PartWstethAbi, type PartWstethAbiType } from './abi/partWstETH.js';
 
 export class LidoSDKWithdrawContract extends BusModule {
   // Contracts
@@ -25,18 +30,22 @@ export class LidoSDKWithdrawContract extends BusModule {
     'contractAddressWithdrawalQueue',
   ])
   public async getContractWithdrawalQueue(): Promise<
-    GetContractReturnType<typeof WithdrawalQueueAbi, WalletClient>
+    EncodableContract<
+      GetContractReturnType<WithdrawalQueueAbiType, WalletClient>
+    >
   > {
     const address = await this.contractAddressWithdrawalQueue();
 
-    return getContract({
-      address,
-      abi: WithdrawalQueueAbi,
-      client: {
-        public: this.bus.core.rpcProvider,
-        wallet: this.bus.core.web3Provider as WalletClient,
-      },
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: WithdrawalQueueAbi,
+        client: {
+          public: this.bus.core.rpcProvider,
+          wallet: this.bus.core.web3Provider as WalletClient,
+        },
+      }),
+    );
   }
 
   @Logger('Contracts:')
@@ -48,18 +57,20 @@ export class LidoSDKWithdrawContract extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id', 'contractAddressStETH'])
   public async getContractStETH(): Promise<
-    GetContractReturnType<typeof PartStethAbi, WalletClient>
+    EncodableContract<GetContractReturnType<PartStethAbiType, WalletClient>>
   > {
     const address = await this.contractAddressStETH();
 
-    return getContract({
-      address,
-      abi: PartStethAbi,
-      client: {
-        public: this.bus.core.rpcProvider,
-        wallet: this.bus.core.web3Provider as WalletClient,
-      },
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: PartStethAbi,
+        client: {
+          public: this.bus.core.rpcProvider,
+          wallet: this.bus.core.web3Provider as WalletClient,
+        },
+      }),
+    );
   }
 
   @Logger('Contracts:')
@@ -71,17 +82,19 @@ export class LidoSDKWithdrawContract extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id', 'contractAddressWstETH'])
   public async getContractWstETH(): Promise<
-    GetContractReturnType<typeof PartWstethAbi, WalletClient>
+    EncodableContract<GetContractReturnType<PartWstethAbiType, WalletClient>>
   > {
     const address = await this.contractAddressWstETH();
 
-    return getContract({
-      address,
-      abi: PartWstethAbi,
-      client: {
-        public: this.bus.core.rpcProvider,
-        wallet: this.bus.core.web3Provider as WalletClient,
-      },
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: PartWstethAbi,
+        client: {
+          public: this.bus.core.rpcProvider,
+          wallet: this.bus.core.web3Provider as WalletClient,
+        },
+      }),
+    );
   }
 }

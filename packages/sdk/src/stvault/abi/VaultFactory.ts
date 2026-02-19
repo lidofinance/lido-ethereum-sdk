@@ -1,4 +1,6 @@
-export const VaultFactoryAbi = [
+import type { Abi } from 'viem';
+
+const abi = [
   {
     inputs: [
       {
@@ -298,7 +300,10 @@ export const VaultFactoryAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type VaultFactoryAbiType = typeof abi;
+export const VaultFactoryAbi: VaultFactoryAbiType = abi;
 
 export const DashboardCreatedEventAbi = [
   {
@@ -326,7 +331,7 @@ export const DashboardCreatedEventAbi = [
     name: 'DashboardCreated',
     type: 'event',
   },
-] as const;
+] as const satisfies Abi;
 
 export const VaultCreatedEventAbi = [
   {
@@ -342,4 +347,4 @@ export const VaultCreatedEventAbi = [
     name: 'VaultCreated',
     type: 'event',
   },
-] as const;
+] as const satisfies Abi;

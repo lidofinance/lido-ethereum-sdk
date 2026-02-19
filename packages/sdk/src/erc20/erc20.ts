@@ -7,7 +7,7 @@ import type {
   TransferProps,
 } from './types.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
-import { erc20abi } from './abi/erc20abi.js';
+import { erc20abi, erc20abiType } from './abi/erc20abi.js';
 import {
   type Address,
   type GetContractReturnType,
@@ -15,6 +15,7 @@ import {
   type WalletClient,
   encodeFunctionData,
   getContract,
+  parseSignature,
 } from 'viem';
 import { NOOP, PERMIT_MESSAGE_TYPES } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
@@ -26,7 +27,7 @@ import type {
   TransactionOptions,
   TransactionResult,
 } from '../core/types.js';
-import { splitSignature } from '@ethersproject/bytes';
+import { EncodableContract, getEncodableContract } from '../common/index.js';
 
 export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   // Contract
@@ -36,17 +37,19 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContract(): Promise<
-    GetContractReturnType<typeof erc20abi, WalletClient>
+    EncodableContract<GetContractReturnType<erc20abiType, WalletClient>>
   > {
     const address = await this.contractAddress();
-    return getContract({
-      address,
-      abi: erc20abi,
-      client: {
-        public: this.core.rpcProvider,
-        wallet: this.core.web3Provider as WalletClient,
-      },
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: erc20abi,
+        client: {
+          public: this.core.rpcProvider,
+          wallet: this.core.web3Provider as WalletClient,
+        },
+      }),
+    );
   }
 
   // Balance
@@ -151,10 +154,10 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
     const web3Provider = this.core.useWeb3Provider();
     const payload = await this.populatePermit(props);
     const signature = await web3Provider.signTypedData(payload);
-    const { s, r, v } = splitSignature(signature);
+    const { s, r, v } = parseSignature(signature);
 
     return {
-      v,
+      v: Number(v),
       r: r as `0x${string}`,
       s: s as `0x${string}`,
       chainId: BigInt(this.core.chain.id),
