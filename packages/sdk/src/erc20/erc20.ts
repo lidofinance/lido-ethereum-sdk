@@ -158,8 +158,8 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
 
     return {
       v: Number(v),
-      r: r as `0x${string}`,
-      s: s as `0x${string}`,
+      r,
+      s,
       chainId: BigInt(this.core.chain.id),
       ...payload.message,
     };
