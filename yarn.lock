@@ -6112,7 +6112,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@lidofinance/lido-ethereum-sdk@workspace:packages/sdk"
   dependencies:
-    "@ethersproject/bytes": ^5.7.0
     "@jest/globals": ^29.7.0
     "@openzeppelin/merkle-tree": ^1.0.8
     "@types/fs-extra": ^11.0.1
