@@ -30,6 +30,9 @@ jobs:
       - name: Build
         run: yarn build:packages
 
+      - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
+        run: yarn npm audit
+
       - name: Dry run Publish
         run: |
           yarn multi-semantic-release --dry-run --silent > /tmp/multi-semantic-release-output
