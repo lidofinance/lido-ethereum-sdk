@@ -175,13 +175,10 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       });
     }
 
-    const publicClient =
+    const publicClient: LidoSdkPublicClient =
       publicClientProp ??
       // eslint-disable-next-line deprecation/deprecation
-      (LidoSDKCore.createRpcProvider(
-        chainId,
-        rpcUrls as string[],
-      ) as ResolvedClientRegister['publicClient']);
+      LidoSDKCore.createRpcProvider(chainId, rpcUrls as string[]);
 
     if (publicClient?.chain?.id !== chainId) {
       throw this.error({
@@ -202,9 +199,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     return {
       chain,
       publicClient,
-      walletClient: walletClientProp as
-        | ResolvedClientRegister['walletClient']
-        | undefined,
+      walletClient: walletClientProp,
     };
   }
 
