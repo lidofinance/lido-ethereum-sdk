@@ -25,6 +25,9 @@ export type {
   PermitCallbackProps,
   TransactionOptions,
   CommonTransactionProps,
+  ClientRegister,
+  LidoSdkPublicClient,
+  LidoSdkWalletClient,
 } from './types.js';
 export { TransactionCallbackStage } from './types.js';
 export type { LidoAbiType } from './abi/lido.js';
