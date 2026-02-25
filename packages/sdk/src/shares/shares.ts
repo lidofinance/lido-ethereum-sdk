@@ -68,7 +68,7 @@ export class LidoSDKShares extends LidoSDKModule {
         address,
         abi: stethSharesAbi,
         client: {
-          public: this.core.rpcProvider,
+          public: this.core.publicClient,
           wallet: this.core.web3Provider as WalletClient,
         },
       }),
@@ -354,8 +354,8 @@ export class LidoSDKShares extends LidoSDKModule {
       address: sharesContract.address,
       abi: sharesContract.abi,
     };
-    if (this.core.rpcProvider.multicall) {
-      const [totalShares, totalEther] = await this.core.rpcProvider.multicall({
+    if (this.core.publicClient.multicall) {
+      const [totalShares, totalEther] = await this.core.publicClient.multicall({
         allowFailure: false,
         contracts: [
           {

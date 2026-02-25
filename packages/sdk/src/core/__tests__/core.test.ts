@@ -24,7 +24,7 @@ describe('Core Tests', () => {
     });
     expect(core).toBeDefined();
     expect(core.chainId).toBe(chainId);
-    expect(core.rpcProvider).toBeDefined();
+    expect(core.publicClient).toBeDefined();
     expect(core.web3Provider).toBeUndefined();
   });
 
@@ -122,7 +122,7 @@ describe('Core Tests', () => {
   });
 
   test('toBlockNumber', async () => {
-    const block = await rpcCore.rpcProvider.getBlock({ blockTag: 'latest' });
+    const block = await rpcCore.publicClient.getBlock({ blockTag: 'latest' });
     await expect(rpcCore.toBlockNumber({ block: block.number })).resolves.toBe(
       block.number,
     );

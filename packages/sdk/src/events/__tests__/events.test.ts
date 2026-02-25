@@ -85,7 +85,7 @@ describe('LidoSDKEvents', () => {
     for (const event of events) {
       expectRebaseEvent(event);
 
-      const block = await core.rpcProvider.getBlock({
+      const block = await core.publicClient.getBlock({
         blockNumber: event.blockNumber,
       });
 

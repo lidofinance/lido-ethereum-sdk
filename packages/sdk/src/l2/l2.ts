@@ -88,7 +88,7 @@ export class LidoSDKL2 extends LidoSDKModule {
         address,
         abi: rebasableL2StethAbi,
         client: {
-          public: this.core.rpcProvider,
+          public: this.core.publicClient,
           wallet: this.core.web3Provider as WalletClient,
         },
       }),

@@ -71,7 +71,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
         address,
         abi: emergencyProtectedTimelockAbi,
         client: {
-          public: this.core.rpcProvider,
+          public: this.core.publicClient,
           wallet: this.core.web3Provider as WalletClient,
         },
       }),
@@ -98,7 +98,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
         address,
         abi: dualGovernanceAbi,
         client: {
-          public: this.core.rpcProvider,
+          public: this.core.publicClient,
           wallet: this.core.web3Provider as WalletClient,
         },
       }),
@@ -123,7 +123,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
         address,
         abi: escrowAbi,
         client: {
-          public: this.core.rpcProvider,
+          public: this.core.publicClient,
           wallet: this.core.web3Provider as WalletClient,
         },
       }),
@@ -158,7 +158,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
         address,
         abi: dgConfigProviderAbi,
         client: {
-          public: this.core.rpcProvider,
+          public: this.core.publicClient,
           wallet: this.core.web3Provider as WalletClient,
         },
       }),

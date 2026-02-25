@@ -76,7 +76,7 @@ export class LidoSDKStake extends LidoSDKModule {
         address,
         abi: StethAbi,
         client: {
-          public: this.core.rpcProvider,
+          public: this.core.publicClient,
           wallet: this.core.web3Provider as WalletClient,
         },
       }),

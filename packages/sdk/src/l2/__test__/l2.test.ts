@@ -137,7 +137,7 @@ describe('LidoSDKL2 wrap', () => {
     expectAddress(tx.to, stethAddress);
     expectAddress(tx.from, account.address);
     expectPopulatedTx(tx, undefined);
-    await expectPopulatedTxToRun(tx, l2.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, l2.core.publicClient);
   });
 
   testSpending('wrap simulate', async () => {
@@ -188,7 +188,7 @@ describe('LidoSDKL2 wrap', () => {
     expectAddress(tx.to, stethAddress);
     expectAddress(tx.from, account.address);
     expectPopulatedTx(tx, undefined);
-    await expectPopulatedTxToRun(tx, l2.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, l2.core.publicClient);
   });
 
   testSpending('unwrap steth simulate', async () => {
@@ -314,7 +314,7 @@ describe('LidoSDKL2Steth shares', () => {
       amount: 100n,
     });
     expectPopulatedTx(tx, undefined, true);
-    await expectPopulatedTxToRun(tx, l2.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, l2.core.publicClient);
   });
 
   test('simulate transfer', async () => {

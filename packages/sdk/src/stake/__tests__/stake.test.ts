@@ -34,7 +34,7 @@ describe('LidoSDKStake read methods', () => {
   test('stakeEthPopulateTx', async () => {
     const tx = await stake.stakeEthPopulateTx({ value: 100n });
     expectPopulatedTx(tx, 100n);
-    await expectPopulatedTxToRun(tx, stake.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, stake.core.publicClient);
   });
 
   test('stakeEthEstimateGas', async () => {

@@ -84,7 +84,7 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
       address,
       abi: erc20abi,
       client: {
-        public: rpcCore.rpcProvider,
+        public: rpcCore.publicClient,
         wallet: web3Core.web3Provider,
       },
     });
@@ -137,7 +137,7 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
 
         const tx = await token.populateApprove(params);
 
-        await expectPopulatedTxToRun(tx, rpcCore.rpcProvider);
+        await expectPopulatedTxToRun(tx, rpcCore.publicClient);
         expectPopulatedTx(tx, undefined, dataEncoded);
         expect(tx.to).toBe(contractAddress);
         expect(tx.from).toBe(account);
@@ -213,7 +213,7 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
 
         const tx = await token.populateTransfer(params);
         expectPopulatedTx(tx, undefined, dataEncoded);
-        await expectPopulatedTxToRun(tx, rpcCore.rpcProvider);
+        await expectPopulatedTxToRun(tx, rpcCore.publicClient);
       });
 
       testSpending('populateTransferFrom', async () => {
@@ -240,7 +240,7 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
 
         const tx = await tokenRpc.populateTransfer(params);
         expectPopulatedTx(tx, undefined, dataEncoded);
-        await expectPopulatedTxToRun(tx, rpcCore.rpcProvider);
+        await expectPopulatedTxToRun(tx, rpcCore.publicClient);
       });
 
       test('simulateTransfer', async () => {

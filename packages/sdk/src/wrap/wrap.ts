@@ -77,7 +77,7 @@ export class LidoSDKWrap extends LidoSDKModule {
         address,
         abi: WstethABI,
         client: {
-          public: this.core.rpcProvider,
+          public: this.core.publicClient,
           wallet: this.core.web3Provider as WalletClient,
         },
       }),
@@ -97,7 +97,7 @@ export class LidoSDKWrap extends LidoSDKModule {
       address,
       abi: stethPartialAbi,
       client: {
-        public: this.core.rpcProvider,
+        public: this.core.publicClient,
         wallet: this.core.web3Provider as WalletClient,
       },
     });
@@ -128,7 +128,7 @@ export class LidoSDKWrap extends LidoSDKModule {
         address,
         abi: WstethReferralStakerABI,
         client: {
-          public: this.core.rpcProvider,
+          public: this.core.publicClient,
           wallet: this.core.web3Provider as WalletClient,
         },
       }),

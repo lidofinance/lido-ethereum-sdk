@@ -43,7 +43,7 @@ export class LidoSDKStethEvents extends LidoSDKModule {
     return getContract({
       address,
       abi: StethEventsAbi,
-      client: this.core.rpcProvider,
+      client: this.core.publicClient,
     });
   }
 
@@ -73,7 +73,7 @@ export class LidoSDKStethEvents extends LidoSDKModule {
       invariantArgument(from >= 0n, 'Days range precedes first block');
       const to = from + BLOCKS_BY_DAY;
 
-      const logs = await this.core.rpcProvider.getLogs({
+      const logs = await this.core.publicClient.getLogs({
         address: contract.address,
         event: StethEventsAbi[REBASE_EVENT_ABI_INDEX],
         fromBlock: from,
@@ -130,7 +130,7 @@ export class LidoSDKStethEvents extends LidoSDKModule {
       fromBlock,
       toBlock,
       (fromBlock, toBlock) =>
-        this.core.rpcProvider.getLogs({
+        this.core.publicClient.getLogs({
           address: contract.address,
           event: StethEventsAbi[8],
           fromBlock,
@@ -146,7 +146,7 @@ export class LidoSDKStethEvents extends LidoSDKModule {
   @Logger('Utils:')
   @ErrorHandler()
   private async getLastBlock() {
-    const lastBlock = await this.core.rpcProvider.getBlock({
+    const lastBlock = await this.core.publicClient.getBlock({
       blockTag: 'latest',
     });
 

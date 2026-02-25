@@ -55,7 +55,7 @@ export class LidoSDKUnstETH extends LidoSDKModule {
         address,
         abi: unstethAbi,
         client: {
-          public: this.core.rpcProvider,
+          public: this.core.publicClient,
           wallet: this.core.web3Provider as WalletClient,
         },
       }),
@@ -290,11 +290,11 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   @ErrorHandler()
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContractMetadata() {
-    if (this.core.rpcProvider.multicall) {
+    if (this.core.publicClient.multicall) {
       const address = await this.contractAddress();
       const common = { abi: unstethAbi, address } as const;
       const [name, version, symbol, baseURI] =
-        await this.core.rpcProvider.multicall({
+        await this.core.publicClient.multicall({
           allowFailure: false,
           contracts: [
             {

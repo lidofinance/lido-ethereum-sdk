@@ -45,7 +45,7 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
         address,
         abi: erc20abi,
         client: {
-          public: this.core.rpcProvider,
+          public: this.core.publicClient,
           wallet: this.core.web3Provider as WalletClient,
         },
       }),
@@ -275,10 +275,10 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
     decimals: number;
     domainSeparator: Hash;
   }> {
-    if (this.core.rpcProvider.multicall) {
+    if (this.core.publicClient.multicall) {
       const contract = { address: await this.contractAddress(), abi: erc20abi };
       const [decimals, name, symbol, domainSeparator] =
-        await this.core.rpcProvider.multicall({
+        await this.core.publicClient.multicall({
           allowFailure: false,
           contracts: [
             {

@@ -41,7 +41,7 @@ export class LidoSDKWithdrawContract extends BusModule {
         address,
         abi: WithdrawalQueueAbi,
         client: {
-          public: this.bus.core.rpcProvider,
+          public: this.bus.core.publicClient,
           wallet: this.bus.core.web3Provider as WalletClient,
         },
       }),
@@ -66,7 +66,7 @@ export class LidoSDKWithdrawContract extends BusModule {
         address,
         abi: PartStethAbi,
         client: {
-          public: this.bus.core.rpcProvider,
+          public: this.bus.core.publicClient,
           wallet: this.bus.core.web3Provider as WalletClient,
         },
       }),
@@ -91,7 +91,7 @@ export class LidoSDKWithdrawContract extends BusModule {
         address,
         abi: PartWstethAbi,
         client: {
-          public: this.bus.core.rpcProvider,
+          public: this.bus.core.publicClient,
           wallet: this.bus.core.web3Provider as WalletClient,
         },
       }),

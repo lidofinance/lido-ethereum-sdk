@@ -50,7 +50,7 @@ export const expectERC20 = <I extends AbstractLidoSDKErc20>({
       address,
       abi: erc20abi,
       client: {
-        public: rpcCore.rpcProvider,
+        public: rpcCore.publicClient,
         wallet: web3Core.web3Provider,
       },
     });

@@ -47,7 +47,7 @@ export class LidoSDKL2Wsteth extends AbstractLidoSDKErc20 {
         address,
         abi: bridgedWstethAbi,
         client: {
-          public: this.core.rpcProvider,
+          public: this.core.publicClient,
           wallet: this.core.web3Provider as WalletClient,
         },
       }),
@@ -109,7 +109,7 @@ export class LidoSDKL2Steth extends AbstractLidoSDKErc20 {
         address,
         abi: rebasableL2StethAbi,
         client: {
-          public: this.core.rpcProvider,
+          public: this.core.publicClient,
           wallet: this.core.web3Provider as WalletClient,
         },
       }),

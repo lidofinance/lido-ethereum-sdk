@@ -63,7 +63,7 @@ export class LidoSDKVaultContracts extends BusModule {
         address,
         abi: StakingVaultAbi,
         client: {
-          public: this.bus.core.rpcProvider,
+          public: this.bus.core.publicClient,
           wallet: this.bus.core.web3Provider as WalletClient,
         },
       }),
@@ -82,7 +82,7 @@ export class LidoSDKVaultContracts extends BusModule {
         address,
         abi: DashboardAbi,
         client: {
-          public: this.bus.core.rpcProvider,
+          public: this.bus.core.publicClient,
           wallet: this.bus.core.web3Provider as WalletClient,
         },
       }),
@@ -103,7 +103,7 @@ export class LidoSDKVaultContracts extends BusModule {
         address,
         abi: VaultHubAbi,
         client: {
-          public: this.bus.core.rpcProvider,
+          public: this.bus.core.publicClient,
           wallet: this.bus.core.web3Provider as WalletClient,
         },
       }),
@@ -124,7 +124,7 @@ export class LidoSDKVaultContracts extends BusModule {
         address,
         abi: VaultFactoryAbi,
         client: {
-          public: this.bus.core.rpcProvider,
+          public: this.bus.core.publicClient,
           wallet: this.bus.core.web3Provider as WalletClient,
         },
       }),
@@ -143,7 +143,7 @@ export class LidoSDKVaultContracts extends BusModule {
         address,
         abi: VaultViewerAbi,
         client: {
-          public: this.bus.core.rpcProvider,
+          public: this.bus.core.publicClient,
         },
       }),
     );
@@ -163,7 +163,7 @@ export class LidoSDKVaultContracts extends BusModule {
         address,
         abi: LazyOracleAbi,
         client: {
-          public: this.bus.core.rpcProvider,
+          public: this.bus.core.publicClient,
           wallet: this.bus.core.web3Provider as WalletClient,
         },
       }),
@@ -186,7 +186,7 @@ export class LidoSDKVaultContracts extends BusModule {
         address,
         abi: PredepositGuaranteeAbi,
         client: {
-          public: this.bus.core.rpcProvider,
+          public: this.bus.core.publicClient,
           wallet: this.bus.core.web3Provider as WalletClient,
         },
       }),
@@ -207,7 +207,7 @@ export class LidoSDKVaultContracts extends BusModule {
         address,
         abi: OperatorGridAbi,
         client: {
-          public: this.bus.core.rpcProvider,
+          public: this.bus.core.publicClient,
           wallet: this.bus.core.web3Provider as WalletClient,
         },
       }),

@@ -110,7 +110,7 @@ describe('Core Wallet Tests', () => {
     const contract = getContract({
       abi: permitAbi,
       address: contractAddress,
-      client: web3Core.rpcProvider,
+      client: web3Core.publicClient,
     });
 
     await contract.simulate.permit([
