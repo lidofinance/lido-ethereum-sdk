@@ -1,6 +1,10 @@
-import type { Log } from 'viem';
-import type { BackArgumentType, BlockArgumentType } from '../core/types.js';
-import type { StethEventsAbi } from './abi/stethEvents.js';
+import type { GetContractReturnType, Log } from 'viem';
+import type {
+  BackArgumentType,
+  BlockArgumentType,
+  LidoSdkPublicClient,
+} from '../core/types.js';
+import type { StethEventsAbiType } from './abi/stethEvents.js';
 
 export type RebaseEvent = Log<
   bigint,
@@ -8,8 +12,13 @@ export type RebaseEvent = Log<
   false,
   undefined,
   true,
-  typeof StethEventsAbi,
+  StethEventsAbiType,
   'TokenRebased'
+>;
+
+export type StethEventsContractType = GetContractReturnType<
+  StethEventsAbiType,
+  LidoSdkPublicClient
 >;
 
 export type GetRebaseEventsProps = {

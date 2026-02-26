@@ -1,24 +1,18 @@
-import {
-  type Address,
-  type GetContractReturnType,
-  type PublicClient,
-  getContract,
-  zeroAddress,
-  isAddressEqual,
-} from 'viem';
+import { type Address, getContract, zeroAddress, isAddressEqual } from 'viem';
 import { Logger, ErrorHandler, Cache } from '../common/decorators/index.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 
-import { rewardsEventsAbi, rewardsEventsAbiType } from './abi/rewardsEvents.js';
-import {
-  type GetRewardsFromChainOptions,
-  type GetRewardsFromChainResult,
-  type GetRewardsFromSubgraphOptions,
-  type GetRewardsFromSubgraphResult,
-  type GetRewardsOptions,
-  type Reward,
-  type RewardsChainEvents,
-  type RewardsSubgraphEvents,
+import { rewardsEventsAbi } from './abi/rewardsEvents.js';
+import type {
+  StethRewardsContractType,
+  GetRewardsFromChainOptions,
+  GetRewardsFromChainResult,
+  GetRewardsFromSubgraphOptions,
+  GetRewardsFromSubgraphResult,
+  GetRewardsOptions,
+  Reward,
+  RewardsChainEvents,
+  RewardsSubgraphEvents,
 } from './types.js';
 
 import {
@@ -77,9 +71,7 @@ export class LidoSDKRewards extends LidoSDKModule {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
-  private async getContractStETH(): Promise<
-    GetContractReturnType<rewardsEventsAbiType, PublicClient>
-  > {
+  private async getContractStETH(): Promise<StethRewardsContractType> {
     const address = await this.contractAddressStETH();
 
     return getContract({

@@ -17,13 +17,11 @@ import {
 } from 'reef-knot/core-react';
 import { createConfig, http, WagmiProvider } from 'wagmi';
 import * as wagmiChains from 'wagmi/chains';
-import { Chain } from 'wagmi/chains';
 import invariant from 'tiny-invariant';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CHAINS } from '@lidofinance/lido-ethereum-sdk';
 import { useThemeToggle } from '@lidofinance/lido-ui';
-
-type ChainsList = [Chain, ...Chain[]];
+import { ChainsList, RegisteredConfig } from './types';
 
 export const L2_CHAINS = [10, 11155420, 1946, 1301];
 
@@ -31,7 +29,7 @@ const wagmiChainsArray = Object.values(wagmiChains) as any as ChainsList;
 
 const supportedChains = wagmiChainsArray.filter((chain) =>
   dynamics.supportedChains.includes(chain.id),
-) as ChainsList;
+) as unknown as ChainsList;
 
 const defaultChain =
   wagmiChainsArray.find((chain) => chain.id === dynamics.defaultChain) ||
@@ -106,13 +104,17 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
           [curr.id]: http(activeRpc[curr.id], { batch: true }),
         }),
         {},
-      ),
+      ) as any,
     });
   }, [activeRpc]);
 
   return (
     <CustomRpcContext.Provider value={customRpcContextValue}>
-      <WagmiProvider config={config} reconnectOnMount={false}>
+      <WagmiProvider
+        // TODO: fix types
+        config={config as unknown as RegisteredConfig}
+        reconnectOnMount={false}
+      >
         <QueryClientProvider client={queryClient}>
           <ReefKnot
             rpc={activeRpc}

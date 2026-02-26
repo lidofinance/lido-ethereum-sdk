@@ -5,8 +5,9 @@ import {
   fallback,
   getContract,
   http,
-  JsonRpcAccount,
   maxUint256,
+  parseSignature,
+  type JsonRpcAccount,
   type Address,
   type Chain,
   type PublicClient,
@@ -14,15 +15,14 @@ import {
   type GetContractReturnType,
   type GetBlockReturnType,
   type CustomTransportConfig,
-  parseSignature,
 } from 'viem';
+
 import {
   ERROR_CODE,
   invariant,
   invariantArgument,
   withSDKError,
 } from '../common/utils/sdk-error.js';
-
 import { SDKError, type SDKErrorProps } from '../common/utils/index.js';
 import { Cache, Initialize, Logger } from '../common/decorators/index.js';
 import {
@@ -45,15 +45,14 @@ import {
   WSTETH_REFERRAL_STAKER,
 } from '../common/constants.js';
 
-import { LidoLocatorAbi, LidoLocatorAbiType } from './abi/lidoLocator.js';
-
 import type {
   AccountValue,
   BackArgumentType,
   BlockArgumentType,
   GetFeeDataResult,
+  LidoContractType,
+  LidoLocatorContractType,
   LidoSDKCoreProps,
-  LidoSdkKeyedClients,
   LidoSdkPublicClient,
   LidoSdkWalletClient,
   LOG_MODE,
@@ -67,11 +66,11 @@ import type {
 import { TransactionCallbackStage } from './types.js';
 
 import { LidoSDKCacheable } from '../common/class-primitives/cacheable.js';
-
-import { EncodableContract, getEncodableContract } from '../common/index.js';
+import { getEncodableContract } from '../common/index.js';
 
 import { permitAbi, permitAbiType } from './abi/permit.js';
-import { LidoAbi, LidoAbiType } from './abi/lido.js';
+import { LidoLocatorAbi } from './abi/lidoLocator.js';
+import { LidoAbi } from './abi/lido.js';
 
 export default class LidoSDKCore extends LidoSDKCacheable {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
@@ -243,9 +242,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['chain.id', 'contractAddressLidoLocator'])
-  public getContractLidoLocator(): EncodableContract<
-    GetContractReturnType<LidoLocatorAbiType, LidoSdkPublicClient>
-  > {
+  public getContractLidoLocator(): LidoLocatorContractType {
     return getEncodableContract(
       getContract({
         address: this.contractAddressLidoLocator(),
@@ -257,9 +254,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['chain.id', 'contractAddressLidoLocator'])
-  public async getLidoContract(): Promise<
-    EncodableContract<GetContractReturnType<LidoAbiType, LidoSdkKeyedClients>>
-  > {
+  public async getLidoContract(): Promise<LidoContractType> {
     const address = await this.getContractAddress(LIDO_CONTRACT_NAMES.lido);
     return getEncodableContract(
       getContract({

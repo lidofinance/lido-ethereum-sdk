@@ -6,28 +6,39 @@ export { LidoAbi } from './abi/lido.js';
 export { default as LidoSDKCore } from './core.js';
 export type {
   LidoSDKCoreProps,
+  LOG_MODE,
+  // Types for public and wallet client registration
+  ClientRegister,
+  ResolvedClientRegister,
+  LidoSdkPublicClient,
+  LidoSdkWalletClient,
+  LidoSdkKeyedClients,
+
+  // Contracts
+  LidoLocatorContractType,
+  LidoContractType,
+
+  // Transaction related types
   TransactionCallback,
   TransactionCallbackProps,
   TransactionResult,
+  PerformTransactionOptions,
+  PerformTransactionGasLimit,
+  PerformTransactionSendTransaction,
+  TransactionOptions,
+  PopulatedTransaction,
+  PermitCallback,
+  PermitCallbackProps,
+  CommonTransactionProps,
+
+  // Props
   EtherValue,
   AccountValue,
   PermitSignature,
   GetFeeDataResult,
-  PopulatedTransaction,
   BackArgumentType,
   BlockArgumentType,
-  LOG_MODE,
-  PerformTransactionOptions,
-  PerformTransactionGasLimit,
-  PerformTransactionSendTransaction,
   SignPermitProps,
-  PermitCallback,
-  PermitCallbackProps,
-  TransactionOptions,
-  CommonTransactionProps,
-  ClientRegister,
-  LidoSdkPublicClient,
-  LidoSdkWalletClient,
 } from './types.js';
 export { TransactionCallbackStage } from './types.js';
 export type { LidoAbiType } from './abi/lido.js';

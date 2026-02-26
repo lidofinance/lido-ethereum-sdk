@@ -1,14 +1,15 @@
 import { getContract } from 'viem';
-import type { Address, GetContractReturnType, PublicClient } from 'viem';
+import type { Address } from 'viem';
 
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
 
-import { StethEventsAbi, StethEventsAbiType } from './abi/stethEvents.js';
-import {
+import { StethEventsAbi } from './abi/stethEvents.js';
+import type {
   RebaseEvent,
   GetRebaseEventsProps,
   GetLastRebaseEventsProps,
+  StethEventsContractType,
 } from './types.js';
 import {
   ERROR_CODE,
@@ -35,9 +36,7 @@ export class LidoSDKStethEvents extends LidoSDKModule {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
-  private async getContractStETH(): Promise<
-    GetContractReturnType<StethEventsAbiType, PublicClient>
-  > {
+  private async getContractStETH(): Promise<StethEventsContractType> {
     const address = await this.contractAddressStETH();
 
     return getContract({

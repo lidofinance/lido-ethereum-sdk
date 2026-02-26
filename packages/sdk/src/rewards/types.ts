@@ -1,11 +1,23 @@
-import type { Address, Log } from 'viem';
-import type { rewardsEventsAbi } from './abi/rewardsEvents.js';
-import type { BackArgumentType, BlockArgumentType } from '../core/types.js';
+import type { Address, GetContractReturnType, Log } from 'viem';
+import type {
+  rewardsEventsAbi,
+  rewardsEventsAbiType,
+} from './abi/rewardsEvents.js';
+import type {
+  BackArgumentType,
+  BlockArgumentType,
+  LidoSdkPublicClient,
+} from '../core/types.js';
 import type {
   SubgraphUrl,
   TotalRewardEntity,
   TransferEventEntity,
 } from './subgraph/types.js';
+
+export type StethRewardsContractType = GetContractReturnType<
+  rewardsEventsAbiType,
+  LidoSdkPublicClient
+>;
 
 export type GetRewardsOptions = {
   address: Address;

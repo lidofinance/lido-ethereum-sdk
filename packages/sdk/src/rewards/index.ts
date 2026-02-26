@@ -8,4 +8,5 @@ export {
   type RewardsChainEvents,
   type RewardType,
   type Reward,
+  type StethRewardsContractType,
 } from './types.js';

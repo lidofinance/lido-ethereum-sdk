@@ -8,11 +8,15 @@ import type {
   BlockTag,
   Account,
   WaitForTransactionReceiptParameters,
+  GetContractReturnType,
 } from 'viem';
 
-import { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
-import { SDKError } from '../common/utils/sdk-error.js';
+import type { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
+import type { SDKError } from '../common/utils/sdk-error.js';
 import type LidoSDKCore from './core.js';
+import type { EncodableContract } from '../common/index.js';
+import type { LidoLocatorAbiType } from './abi/lidoLocator.js';
+import type { LidoAbiType } from './abi/lido.js';
 
 // Constructor Props
 
@@ -23,15 +27,15 @@ export type LOG_MODE = 'info' | 'debug' | 'none';
 export interface ClientRegister {}
 export type ResolvedClientRegister = {
   publicClient: ClientRegister extends {
-    publicClient: infer publicClient extends PublicClient;
+    publicClient: infer ResolvedPublicCLient extends object;
   }
-    ? publicClient
+    ? ResolvedPublicCLient
     : PublicClient;
 
   walletClient: ClientRegister extends {
-    walletClient: infer walletClient extends WalletClient;
+    walletClient: infer ResolvedWalletClient extends object;
   }
-    ? walletClient
+    ? ResolvedWalletClient
     : WalletClient;
 };
 
@@ -42,6 +46,8 @@ export type LidoSdkKeyedClients = {
   public: LidoSdkPublicClient;
   wallet: LidoSdkWalletClient;
 };
+
+// Core Props
 
 type LidoSDKCorePropsPublicClientProps =
   | {
@@ -86,6 +92,15 @@ export type LidoSDKCommonProps =
       core: LidoSDKCore;
     }
   | ({ core?: undefined } & LidoSDKCoreProps);
+
+// Contracts
+export type LidoLocatorContractType = EncodableContract<
+  GetContractReturnType<LidoLocatorAbiType, LidoSdkPublicClient>
+>;
+
+export type LidoContractType = EncodableContract<
+  GetContractReturnType<LidoAbiType, LidoSdkKeyedClients>
+>;
 
 // Method Props primitives
 
