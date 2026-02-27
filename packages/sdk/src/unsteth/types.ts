@@ -3,16 +3,23 @@ import type {
   Address,
   ContractFunctionReturnType,
   JsonRpcAccount,
+  GetContractReturnType,
 } from 'viem';
 import type {
   TransactionCallback,
   CommonTransactionProps,
   AccountValue,
+  LidoSdkKeyedClients,
 } from '../core/types.js';
-import type { unstethAbi } from './abi/unsteth-abi.js';
+import type { UnstETHAbiType } from './abi/unsteth-abi.js';
+import type { EncodableContract } from '../common/index.js';
+
+export type UnstethContractType = EncodableContract<
+  GetContractReturnType<UnstETHAbiType, LidoSdkKeyedClients>
+>;
 
 export type UnstethNFTstatus = ContractFunctionReturnType<
-  typeof unstethAbi,
+  UnstETHAbiType,
   'view',
   'getWithdrawalStatus'
 >[number];

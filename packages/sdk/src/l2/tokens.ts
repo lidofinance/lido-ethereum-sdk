@@ -1,23 +1,13 @@
 /* eslint-disable sonarjs/no-identical-functions */
-import {
-  getContract,
-  type GetContractReturnType,
-  type WalletClient,
-  type Address,
-  encodeFunctionData,
-  Hash,
-} from 'viem';
+import { getContract, type Address, encodeFunctionData, Hash } from 'viem';
 
 import { CHAINS, LIDO_L2_CONTRACT_NAMES, NOOP } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
 import { Cache, ErrorHandler, Logger } from '../common/decorators/index.js';
 import { AbstractLidoSDKErc20 } from '../erc20/erc20.js';
 
-import {
-  rebasableL2StethAbi,
-  rebasableL2StethAbiType,
-} from './abi/rebasableL2Steth.js';
-import { bridgedWstethAbi, bridgedWstethAbiType } from './abi/brigedWsteth.js';
+import { rebasableL2StethAbi } from './abi/rebasableL2Steth.js';
+import { bridgedWstethAbi } from './abi/brigedWsteth.js';
 
 import type {
   AccountValue,
@@ -26,8 +16,12 @@ import type {
   TransactionOptions,
   TransactionResult,
 } from '../core/types.js';
-import type { SharesTransferProps } from './types.js';
-import { EncodableContract, getEncodableContract } from '../common/index.js';
+import type {
+  BridgedWstethContractType,
+  RebasableL2StethContractType,
+  SharesTransferProps,
+} from './types.js';
+import { getEncodableContract } from '../common/index.js';
 
 export class LidoSDKL2Wsteth extends AbstractLidoSDKErc20 {
   @Logger('Contracts:')
@@ -38,18 +32,13 @@ export class LidoSDKL2Wsteth extends AbstractLidoSDKErc20 {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
-  public async getL2Contract(): Promise<
-    EncodableContract<GetContractReturnType<bridgedWstethAbiType, WalletClient>>
-  > {
+  public async getL2Contract(): Promise<BridgedWstethContractType> {
     const address = await this.contractAddress();
     return getEncodableContract(
       getContract({
         address,
         abi: bridgedWstethAbi,
-        client: {
-          public: this.core.publicClient,
-          wallet: this.core.web3Provider as WalletClient,
-        },
+        client: this.core.keyedClient,
       }),
     );
   }
@@ -98,20 +87,13 @@ export class LidoSDKL2Steth extends AbstractLidoSDKErc20 {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
-  public async getL2Contract(): Promise<
-    EncodableContract<
-      GetContractReturnType<rebasableL2StethAbiType, WalletClient>
-    >
-  > {
+  public async getL2Contract(): Promise<RebasableL2StethContractType> {
     const address = await this.contractAddress();
     return getEncodableContract(
       getContract({
         address,
         abi: rebasableL2StethAbi,
-        client: {
-          public: this.core.publicClient,
-          wallet: this.core.web3Provider as WalletClient,
-        },
+        client: this.core.keyedClient,
       }),
     );
   }
@@ -194,7 +176,7 @@ export class LidoSDKL2Steth extends AbstractLidoSDKErc20 {
     from: _from,
     ...rest
   }: SharesTransferProps): Promise<TransactionResult> {
-    this.core.useWeb3Provider();
+    this.core.useWalletClient();
     const account = await this.core.useAccount(accountProp);
     const from = _from ?? account.address;
     const amount = parseValue(_amount);

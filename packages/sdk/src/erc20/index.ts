@@ -8,6 +8,7 @@ export type {
   ApproveProps,
   TransferProps,
   SignTokenPermitProps,
+  Erc20ContractType,
 } from './types.js';
 
 export type { erc20abiType } from './abi/erc20abi.js';

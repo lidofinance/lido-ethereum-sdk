@@ -10,4 +10,5 @@ export type {
   UnstethApprovedForProps,
   UnstethIsApprovedForAllProps,
   UnstethNFTstatus,
+  UnstethContractType,
 } from './types.js';

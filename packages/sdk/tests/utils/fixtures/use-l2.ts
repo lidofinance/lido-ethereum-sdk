@@ -73,12 +73,12 @@ export const useL2Web3Core = () => {
   if (!cachedWeb3Core) {
     const walletClient = useL2WalletClient();
     const { l2ChainId } = useTestsEnvs();
-    const rpcProvider = usePublicL2RpcProvider();
+    const publicClient = usePublicL2RpcProvider();
     cachedWeb3Core = new LidoSDKCore({
       chainId: l2ChainId,
-      rpcProvider: rpcProvider,
+      publicClient,
       logMode: 'none',
-      web3Provider: walletClient,
+      walletClient,
     });
   }
   return cachedWeb3Core;

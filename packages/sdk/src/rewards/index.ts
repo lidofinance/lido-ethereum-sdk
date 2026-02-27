@@ -1,12 +1,12 @@
 export { LidoSDKRewards } from './rewards.js';
-export {
-  type GetRewardsFromChainResult,
-  type GetRewardsFromChainOptions,
-  type GetRewardsFromSubgraphOptions,
-  type GetRewardsFromSubgraphResult,
-  type RewardsSubgraphEvents,
-  type RewardsChainEvents,
-  type RewardType,
-  type Reward,
-  type StethRewardsContractType,
+export type {
+  GetRewardsFromChainResult,
+  GetRewardsFromChainOptions,
+  GetRewardsFromSubgraphOptions,
+  GetRewardsFromSubgraphResult,
+  RewardsSubgraphEvents,
+  RewardsChainEvents,
+  RewardType,
+  Reward,
+  StethRewardsContractType,
 } from './types.js';

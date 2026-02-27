@@ -1,10 +1,22 @@
-import type { Address } from 'viem';
+import type { Address, GetContractReturnType } from 'viem';
 import type {
   CommonTransactionProps,
   EtherValue,
+  LidoSdkKeyedClients,
   NoTxOptions,
 } from '../core/types.js';
-import type { FormattedTransactionRequest, JsonRpcAccount } from 'viem';
+import type { JsonRpcAccount } from 'viem';
+import type { EncodableContract } from '../common/index.js';
+import type { rebasableL2StethAbiType } from './abi/rebasableL2Steth.js';
+import type { bridgedWstethAbiType } from './abi/brigedWsteth.js';
+
+export type RebasableL2StethContractType = EncodableContract<
+  GetContractReturnType<rebasableL2StethAbiType, LidoSdkKeyedClients>
+>;
+
+export type BridgedWstethContractType = EncodableContract<
+  GetContractReturnType<bridgedWstethAbiType, LidoSdkKeyedClients>
+>;
 
 export type SharesTransferProps = CommonTransactionProps & {
   from?: Address;
@@ -32,5 +44,3 @@ export type WrapInnerProps = Omit<CommonTransactionProps, 'account'> & {
   value: bigint;
   account: JsonRpcAccount;
 };
-
-export type PopulatedTx = Omit<FormattedTransactionRequest, 'type'>;

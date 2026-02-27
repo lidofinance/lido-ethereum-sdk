@@ -1,6 +1,11 @@
-import type { Address, JsonRpcAccount } from 'viem';
-import { CommonTransactionProps } from '../core/types.js';
-import { EtherValue } from '../core/types.js';
+import type { Address, GetContractReturnType, JsonRpcAccount } from 'viem';
+import type {
+  CommonTransactionProps,
+  LidoSdkKeyedClients,
+} from '../core/types.js';
+import type { EtherValue } from '../core/types.js';
+import type { EncodableContract } from '../common/index.js';
+import type { StethAbiType } from './abi/steth.js';
 
 export type StakeProps = CommonTransactionProps & {
   value: EtherValue;
@@ -31,3 +36,7 @@ export type StakeLimitResult = {
   prevStakeLimit: bigint;
   prevStakeBlockNumber: bigint;
 };
+
+export type StethContractType = EncodableContract<
+  GetContractReturnType<StethAbiType, LidoSdkKeyedClients>
+>;

@@ -8,12 +8,12 @@ import { LidoSDKUnstETH } from './unsteth/index.js';
 import { LidoSDKEvents } from './events/index.js';
 import { LidoSDKStatistics } from './statistics/index.js';
 import { LidoSDKRewards } from './rewards/index.js';
-import { LidoSDKShares } from './shares/shares.js';
-
-import { version } from './version.js';
-import { LidoSDKL2 } from './l2/l2.js';
+import { LidoSDKShares } from './shares/index.js';
+import { LidoSDKL2 } from './l2/index.js';
 import { LidoSDKDualGovernance } from './dual-governance/index.js';
 import { LidoSDKVaultModule } from './stvault/index.js';
+
+import { version } from './version.js';
 
 export class LidoSDK {
   readonly core: LidoSDKCore;

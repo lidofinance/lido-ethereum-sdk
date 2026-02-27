@@ -28,13 +28,13 @@ import {
 } from './subgraph/index.js';
 import { getInitialData } from './subgraph/index.js';
 import { calcShareRate, requestWithBlockStep, sharesToSteth } from './utils.js';
+import { LidoSDKApr } from '../statistics/apr.js';
 import {
   ERROR_CODE,
   invariant,
   invariantArgument,
   withSDKError,
-} from '../index.js';
-import { LidoSDKApr } from '../statistics/apr.js';
+} from '../common/index.js';
 
 export class LidoSDKRewards extends LidoSDKModule {
   private static readonly PRECISION = 10n ** 27n;

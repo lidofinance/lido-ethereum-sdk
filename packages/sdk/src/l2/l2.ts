@@ -13,8 +13,6 @@ import {
   isAddressEqual,
   getAbiItem,
   toEventHash,
-  type GetContractReturnType,
-  type WalletClient,
   type Address,
   type WriteContractParameters,
   type TransactionReceipt,
@@ -28,18 +26,15 @@ import {
 } from '../common/constants.js';
 import { Cache, Logger, ErrorHandler } from '../common/decorators/index.js';
 
-import {
-  rebasableL2StethAbi,
-  rebasableL2StethAbiType,
-} from './abi/rebasableL2Steth.js';
+import { rebasableL2StethAbi } from './abi/rebasableL2Steth.js';
 import {
   invariant,
   ERROR_CODE,
-  type EncodableContract,
   getEncodableContract,
 } from '../common/index.js';
 import { parseValue } from '../common/utils/parse-value.js';
 import type {
+  RebasableL2StethContractType,
   UnwrapResults,
   WrapInnerProps,
   WrapProps,
@@ -77,20 +72,13 @@ export class LidoSDKL2 extends LidoSDKModule {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
-  public async getContract(): Promise<
-    EncodableContract<
-      GetContractReturnType<rebasableL2StethAbiType, WalletClient>
-    >
-  > {
+  public async getContract(): Promise<RebasableL2StethContractType> {
     const address = await this.contractAddress();
     return getEncodableContract(
       getContract({
         address,
         abi: rebasableL2StethAbi,
-        client: {
-          public: this.core.publicClient,
-          wallet: this.core.web3Provider as WalletClient,
-        },
+        client: this.core.keyedClient,
       }),
     );
   }
@@ -153,7 +141,7 @@ export class LidoSDKL2 extends LidoSDKModule {
   public async wrapWstethToSteth(
     props: WrapProps,
   ): Promise<TransactionResult<WrapResults>> {
-    this.core.useWeb3Provider();
+    this.core.useWalletClient();
     const { account, callback, value, ...rest } = await this.parseProps(props);
     const contract = await this.getContract();
 
@@ -261,7 +249,7 @@ export class LidoSDKL2 extends LidoSDKModule {
   public async unwrapStethToWsteth(
     props: WrapProps,
   ): Promise<TransactionResult<UnwrapResults>> {
-    this.core.useWeb3Provider();
+    this.core.useWalletClient();
     const { account, callback, value, ...rest } = await this.parseProps(props);
     const contract = await this.getContract();
 
