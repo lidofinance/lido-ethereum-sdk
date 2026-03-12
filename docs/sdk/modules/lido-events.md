@@ -74,10 +74,13 @@ Props:
 
 ```ts
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+import { http, createPublicClient, hoodi } from 'viem';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['https://rpc-url'],
-  chainId: 5,
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
 });
 
 const lastRebaseEvent = await lidoSDK.events.stethEvents.getLastRebaseEvent();

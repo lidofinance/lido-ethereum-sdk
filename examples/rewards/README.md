@@ -74,7 +74,7 @@ Simplified code example:
 const balanceInShares = await lidoSDK.shares.balance(address);
 
 // Signature for the rebase event
-rpcProvider.watchContractEvent({
+publicClient.watchContractEvent({
   address: stethContract.address,
   abi: stethContract.abi,
   eventName: 'TokenRebased',
@@ -317,7 +317,7 @@ Simplified code example:
 const balanceInShares = [balance_1, balance_2, balance_3];
 
 // Signature for the rebase event
-rpcProvider.watchContractEvent({
+publicClient.watchContractEvent({
   address: stethContract.address,
   abi: stethContract.abi,
   eventName: 'TokenRebased',

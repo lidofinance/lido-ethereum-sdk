@@ -13,13 +13,14 @@ import { expectPositiveBn } from '../../../tests/utils/expect/expect-bn.js';
 
 describe('Core Tests', () => {
   const { rpcUrl, chainId } = useTestsEnvs();
+  const { publicClient } = useRpcCore();
   const { account } = useWalletClient();
   const rpcCore = useRpcCore();
 
   test('Core can be created', () => {
     const core = new LidoSDKCore({
       chainId: chainId,
-      rpcUrls: [rpcUrl],
+      publicClient,
       logMode: 'none',
     });
     expect(core).toBeDefined();

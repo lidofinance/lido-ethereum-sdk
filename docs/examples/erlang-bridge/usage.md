@@ -17,7 +17,7 @@ sidebar_position: 3
 2. Replace RPC_URL in `sdk.js` with the actual RPC URL and set the `chain` parameter to which chain you want to connect:
 
    ```ts
-   const rpcProvider = createPublicClient({
+   const publicClient = createPublicClient({
      chain: mainnet,
      transport: http('RPC_URL'),
    });

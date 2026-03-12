@@ -48,9 +48,9 @@ let cachedPublicProvider: PublicClient | null = null;
 export const usePublicL2RpcProvider = () => {
   if (cachedPublicProvider) return cachedPublicProvider;
   const { testClient } = useTestL2RpcProvider();
-  const rpcProvider = testClient.extend(publicActions) as PublicClient;
-  cachedPublicProvider = rpcProvider;
-  return rpcProvider;
+  const publicClient = testClient.extend(publicActions) as PublicClient;
+  cachedPublicProvider = publicClient;
+  return publicClient;
 };
 
 export const useL2WalletClient = (_account?: PrivateKeyAccount) => {
@@ -89,10 +89,10 @@ let cachedRpcCore: LidoSDKCore | null = null;
 export const useL2RpcCore = () => {
   if (!cachedRpcCore) {
     const { l2ChainId } = useTestsEnvs();
-    const rpcProvider = usePublicL2RpcProvider();
+    const publicClient = usePublicL2RpcProvider();
     cachedRpcCore = new LidoSDKCore({
       chainId: l2ChainId,
-      rpcProvider: rpcProvider,
+      publicClient,
       logMode: 'none',
     });
   }

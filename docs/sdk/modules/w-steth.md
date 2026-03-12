@@ -7,10 +7,23 @@ sidebar_position: 8
 stETH and wstETH tokens functionality is presented trough modules with same ERC20 interface that exposes balances, allowances, transfers and ERC2612 permits signing.
 
 ```ts
+import {
+  createWalletClient,
+  custom,
+  hoodi,
+  http,
+  createPublicClient,
+} from 'viem';
+
 const lidoSDK = new LidoSDK({
-  chainId: 17000,
-  rpcUrls: ['<RPC_URL>'],
-  web3Provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
+  walletClient: createWalletClient({
+    chain: hoodi,
+    transport: custom(window.ethereum),
+  }),
 });
 
 // Views

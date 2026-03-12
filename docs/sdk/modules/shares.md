@@ -11,12 +11,24 @@ off-chain conversions between stETH and shares.
 ## Access
 
 ```ts
+import {
+  createWalletClient,
+  custom,
+  http,
+  createPublicClient,
+  hoodi,
+} from 'viem';
 import { LidoSDK, LidoSDKCore } from '@lidofinance/lido-ethereum-sdk';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['<RPC_URL>'],
-  chainId: 17000,
-  web3Provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
+  walletClient: createWalletClient({
+    chain: hoodi,
+    transport: custom(window.ethereum),
+  }),
 });
 
 const shares = lidoSDK.shares;
@@ -52,15 +64,25 @@ const shares = lidoSDK.shares;
 ## Example
 
 ```ts
+import { LidoSDK, LidoSDKCore } from '@lidofinance/lido-ethereum-sdk';
 import {
-  LidoSDK,
-  LidoSDKCore,
-} from '@lidofinance/lido-ethereum-sdk';
+  createWalletClient,
+  custom,
+  http,
+  createPublicClient,
+  hoodi,
+} from 'viem';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['<RPC_URL>'],
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
   chainId: 17000,
-  web3Provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
+  walletClient: createWalletClient({
+    chain: hoodi,
+    transport: custom(window.ethereum),
+  }),
 });
 
 const account = '<ACCOUNT_ADDRESS>';
@@ -80,11 +102,7 @@ const stethValue = await lidoSDK.shares.convertToSteth(1_000n);
 const shareRateValues = await lidoSDK.shares.getTotalSupply();
 
 const stethBatch = await lidoSDK.shares.convertBatchSharesToSteth(
-  [
-    100n,
-    '200',
-    { amount: 1_000_000_000_000_000_000n, roundUp: true },
-  ],
+  [100n, '200', { amount: 1_000_000_000_000_000_000n, roundUp: true }],
   shareRateValues,
 );
 

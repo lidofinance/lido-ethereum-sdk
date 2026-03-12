@@ -21,19 +21,30 @@ import invariant from 'tiny-invariant';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CHAINS } from '@lidofinance/lido-ethereum-sdk';
 import { useThemeToggle } from '@lidofinance/lido-ui';
-import { ChainsList, RegisteredConfig } from './types';
+import { ChainsList, RegisteredConfig, SupportedWagmiChain } from './types';
 
 export const L2_CHAINS = [10, 11155420, 1946, 1301];
 
-const wagmiChainsArray = Object.values(wagmiChains) as any as ChainsList;
+const wagmiChainsArray = Object.values(wagmiChains);
 
 const supportedChains = wagmiChainsArray.filter((chain) =>
   dynamics.supportedChains.includes(chain.id),
-) as unknown as ChainsList;
+) as readonly SupportedWagmiChain[];
+
+const supportedChainList = supportedChains as ChainsList;
 
 const defaultChain =
   wagmiChainsArray.find((chain) => chain.id === dynamics.defaultChain) ||
-  supportedChains[0]; // first supported chain as fallback;
+  supportedChainList[0]; // first supported chain as fallback;
+
+// invariants enforce typecasts
+
+invariant(supportedChains[0], 'At least one supported chain must be provided');
+
+invariant(
+  defaultChain === supportedChainList[0],
+  'Default chain must be first in supported chains list',
+);
 
 const queryClient = new QueryClient();
 
@@ -94,31 +105,29 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
   }, [activeRpc]);
 
   const config = useMemo(() => {
+    const transports = supportedChainList.reduce(
+      (res, curr) => ({
+        ...res,
+        [curr.id]: http(activeRpc[curr.id], { batch: true }),
+      }),
+      {} as { [chainId in CHAINS]: ReturnType<typeof http> },
+    );
+
     return createConfig({
-      chains: supportedChains,
+      chains: supportedChainList,
       ssr: true,
       multiInjectedProviderDiscovery: false,
-      transports: supportedChains.reduce(
-        (res, curr) => ({
-          ...res,
-          [curr.id]: http(activeRpc[curr.id], { batch: true }),
-        }),
-        {},
-      ) as any,
-    });
+      transports,
+    }) as RegisteredConfig;
   }, [activeRpc]);
 
   return (
     <CustomRpcContext.Provider value={customRpcContextValue}>
-      <WagmiProvider
-        // TODO: fix types
-        config={config as unknown as RegisteredConfig}
-        reconnectOnMount={false}
-      >
+      <WagmiProvider config={config} reconnectOnMount={false}>
         <QueryClientProvider client={queryClient}>
           <ReefKnot
             rpc={activeRpc}
-            chains={supportedChains}
+            chains={supportedChainList}
             walletDataList={walletsDataList}
           >
             <AutoConnect autoConnect />

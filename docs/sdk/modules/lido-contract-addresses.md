@@ -6,10 +6,13 @@ sidebar_position: 4
 
 ```ts
 import { LidoSDK, LIDO_CONTRACT_NAMES } from '@lidofinance/lido-ethereum-sdk';
+import { http, createPublicClient, hoodi } from 'viem';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['https://rpc-url'],
-  chainId: 5,
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
 });
 
 const stethAddress = await lidoSDK.core.getContractAddress(

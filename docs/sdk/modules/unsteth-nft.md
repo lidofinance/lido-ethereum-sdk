@@ -7,9 +7,14 @@ sidebar_position: 9
 This modules exposes NFT functionality of Lido Withdrawal Request NFT.
 
 ```ts
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+import { createPublicClient, hoodi, http } from 'viem';
+
 const lidoSDK = new LidoSDK({
-  chainId: 17000,
-  rpcUrls: ['<RPC_URL>'],
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
 });
 
 // Contracts

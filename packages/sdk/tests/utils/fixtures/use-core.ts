@@ -9,11 +9,11 @@ export const useRpcCore = () => {
   const { chainId } = useTestsEnvs();
 
   if (!cachedRpcCore) {
-    const rpcProvider = usePublicRpcProvider();
+    const publicClient = usePublicRpcProvider();
     cachedRpcCore = new LidoSDKCore({
       chainId: chainId,
       logMode: 'none',
-      rpcProvider: rpcProvider,
+      publicClient,
     });
   }
   return cachedRpcCore;
