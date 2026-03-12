@@ -118,6 +118,33 @@ const params = {
 // core is created under the hood
 const stake = new LidoSDKStake(params);
 
+// or core is created separately and passed to modules individually
 const core = new LidoSDKCore(params);
 const wrap = new LidoSDKWrap({ core });
+```
+
+## Typescript and Type Registration
+
+The SDK is written fully in TypeScript, each module exports helper types, specific types for ABIs and contract instances.
+
+### Type Registration
+
+To get the best experience with Lido Ethereum SDK you can register `viem` types for `PublicClient` and `WalletClient`. This will allow you to take full advantage of viem type safety mechanisms and get better DX when working with the SDK. Specifically when accessing underlying clients and contract instances.
+
+After Registration `sdk.publicClient` and `sdk.walletClient` will be typed as your custom clients with all the helper methods and types provided by viem.
+Same types will be used in contracts instances types.
+
+```ts
+// In your project
+
+type MyPublicClient = ReturnType<typeof myPublicClient>;
+type MyWalletClient = ReturnType<typeof myWalletClient>;
+
+// global registration for client types used by Lido SDK
+declare module '@lidofinance/lido-ethereum-sdk' {
+  interface ClientRegister {
+    publicClient: MyPublicClient;
+    walletClient: MyWalletClient;
+  }
+}
 ```
