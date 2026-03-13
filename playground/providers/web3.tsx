@@ -31,20 +31,28 @@ const supportedChains = wagmiChainsArray.filter((chain) =>
   dynamics.supportedChains.includes(chain.id),
 ) as readonly SupportedWagmiChain[];
 
-const supportedChainList = supportedChains as ChainsList;
+let supportedChainList = supportedChains as ChainsList;
 
 const defaultChain =
   wagmiChainsArray.find((chain) => chain.id === dynamics.defaultChain) ||
   supportedChainList[0]; // first supported chain as fallback;
 
+const defaultChainInSupportedList = supportedChainList.findIndex(
+  (chain) => chain.id === defaultChain.id,
+);
+
+// move default chain to the beginning of the list, it's important for correct wagmi behavior
+if (defaultChainInSupportedList !== 0) {
+  supportedChainList = [
+    supportedChainList[defaultChainInSupportedList],
+    ...supportedChainList.slice(0, defaultChainInSupportedList),
+    ...supportedChainList.slice(defaultChainInSupportedList + 1),
+  ];
+}
+
 // invariants enforce typecasts
 
 invariant(supportedChains[0], 'At least one supported chain must be provided');
-
-invariant(
-  defaultChain === supportedChainList[0],
-  'Default chain must be first in supported chains list',
-);
 
 const queryClient = new QueryClient();
 
