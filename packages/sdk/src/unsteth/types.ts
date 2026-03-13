@@ -9,13 +9,13 @@ import type {
   TransactionCallback,
   CommonTransactionProps,
   AccountValue,
-  LidoSdkKeyedClients,
+  LidoSdkKeyedClient,
 } from '../core/types.js';
 import type { UnstETHAbiType } from './abi/unsteth-abi.js';
 import type { EncodableContract } from '../common/index.js';
 
 export type UnstethContractType = EncodableContract<
-  GetContractReturnType<UnstETHAbiType, LidoSdkKeyedClients>
+  GetContractReturnType<UnstETHAbiType, LidoSdkKeyedClient>
 >;
 
 export type UnstethNFTstatus = ContractFunctionReturnType<

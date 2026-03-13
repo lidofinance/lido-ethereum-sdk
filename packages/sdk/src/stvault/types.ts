@@ -2,7 +2,7 @@ import type { Address, GetContractReturnType, Hash, Hex } from 'viem';
 import type { Bus } from './bus.js';
 import type {
   CommonTransactionProps,
-  LidoSdkKeyedClients,
+  LidoSdkKeyedClient,
 } from '../core/types.js';
 import type { LidoSDKVaultEntity } from './vault-entity.js';
 import type {
@@ -18,35 +18,35 @@ import type {
 import type { EncodableContract } from '../common/index.js';
 
 export type StakingVaultContractType = EncodableContract<
-  GetContractReturnType<StakingVaultAbiType, LidoSdkKeyedClients>
+  GetContractReturnType<StakingVaultAbiType, LidoSdkKeyedClient>
 >;
 
 export type DashboardContractType = EncodableContract<
-  GetContractReturnType<DashboardAbiType, LidoSdkKeyedClients>
+  GetContractReturnType<DashboardAbiType, LidoSdkKeyedClient>
 >;
 
 export type VaultHubContractType = EncodableContract<
-  GetContractReturnType<VaultHubAbiType, LidoSdkKeyedClients>
+  GetContractReturnType<VaultHubAbiType, LidoSdkKeyedClient>
 >;
 
 export type LazyOracleContractType = EncodableContract<
-  GetContractReturnType<LazyOracleAbiType, LidoSdkKeyedClients>
+  GetContractReturnType<LazyOracleAbiType, LidoSdkKeyedClient>
 >;
 
 export type VaultFactoryContractType = EncodableContract<
-  GetContractReturnType<VaultFactoryAbiType, LidoSdkKeyedClients>
+  GetContractReturnType<VaultFactoryAbiType, LidoSdkKeyedClient>
 >;
 
 export type VaultViewerContractType = EncodableContract<
-  GetContractReturnType<VaultViewerAbiType, LidoSdkKeyedClients>
+  GetContractReturnType<VaultViewerAbiType, LidoSdkKeyedClient>
 >;
 
 export type OperatorGridContractType = EncodableContract<
-  GetContractReturnType<OperatorGridAbiType, LidoSdkKeyedClients>
+  GetContractReturnType<OperatorGridAbiType, LidoSdkKeyedClient>
 >;
 
 export type PredepositGuaranteeContractType = EncodableContract<
-  GetContractReturnType<PredepositGuaranteeAbiType, LidoSdkKeyedClients>
+  GetContractReturnType<PredepositGuaranteeAbiType, LidoSdkKeyedClient>
 >;
 
 export type Token = 'steth' | 'wsteth';

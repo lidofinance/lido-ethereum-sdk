@@ -53,7 +53,7 @@ import type {
   LidoContractType,
   LidoLocatorContractType,
   LidoSDKCoreProps,
-  LidoSdkKeyedClients,
+  LidoSdkKeyedClient,
   LidoSdkPublicClient,
   LidoSdkWalletClient,
   LOG_MODE,
@@ -94,7 +94,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   }
 
   // shortcut for internal contract initialization
-  public get keyedClient(): LidoSdkKeyedClients {
+  public get keyedClient(): LidoSdkKeyedClient {
     return {
       public: this.publicClient,
       // walletClient can be undefined but for better types we add assertion here, runtime access to .write methods is protected by .useWalletClient() guard

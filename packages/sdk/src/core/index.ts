@@ -12,7 +12,7 @@ export type {
   ResolvedClientRegister,
   LidoSdkPublicClient,
   LidoSdkWalletClient,
-  LidoSdkKeyedClients,
+  LidoSdkKeyedClient as LidoSdkKeyedClients,
 
   // Contracts
   LidoLocatorContractType,

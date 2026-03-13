@@ -1,7 +1,7 @@
 import type { Address, GetContractReturnType, JsonRpcAccount } from 'viem';
 import type {
   CommonTransactionProps,
-  LidoSdkKeyedClients,
+  LidoSdkKeyedClient,
 } from '../core/types.js';
 import type { EtherValue } from '../core/types.js';
 import type { EncodableContract } from '../common/index.js';
@@ -38,5 +38,5 @@ export type StakeLimitResult = {
 };
 
 export type StethContractType = EncodableContract<
-  GetContractReturnType<StethAbiType, LidoSdkKeyedClients>
+  GetContractReturnType<StethAbiType, LidoSdkKeyedClient>
 >;

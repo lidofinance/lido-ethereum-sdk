@@ -42,7 +42,7 @@ export type ResolvedClientRegister = {
 export type LidoSdkPublicClient = ResolvedClientRegister['publicClient'];
 export type LidoSdkWalletClient = ResolvedClientRegister['walletClient'];
 
-export type LidoSdkKeyedClients = {
+export type LidoSdkKeyedClient = {
   public: LidoSdkPublicClient;
   wallet: LidoSdkWalletClient;
 };
@@ -99,7 +99,7 @@ export type LidoLocatorContractType = EncodableContract<
 >;
 
 export type LidoContractType = EncodableContract<
-  GetContractReturnType<LidoAbiType, LidoSdkKeyedClients>
+  GetContractReturnType<LidoAbiType, LidoSdkKeyedClient>
 >;
 
 // Method Props primitives
