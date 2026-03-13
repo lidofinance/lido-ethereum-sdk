@@ -56,6 +56,21 @@ const sdk = new LidoSDK({
 });
 ```
 
+or let the SDK create it for you by passing RPC URL(s):
+
+```ts
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+// viem is still required as peer dependency for inner workings of SDK
+import { hoodi } from 'viem/chains';
+
+const sdk = new LidoSDK({
+  // in this chainId must be provided explicitly
+  chainId: hoodi.id,
+  // multiple RPC URLs are supported and used in viem's fallback transport
+  rpcUrls: ['<RPC_URL>'],
+});
+```
+
 Replace `<RPC_URL>` with the address of your Ethereum provider.
 
 ## With walletClient

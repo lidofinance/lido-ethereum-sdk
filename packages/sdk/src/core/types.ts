@@ -51,7 +51,6 @@ export type LidoSdkKeyedClient = {
 
 type LidoSDKCorePropsPublicClientProps =
   | {
-      /** @deprecated Use `publicClient` instead. */
       rpcUrls: string[];
       chainId: (typeof SUPPORTED_CHAINS)[number];
       publicClient?: undefined;

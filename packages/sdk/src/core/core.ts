@@ -125,7 +125,6 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
       publicClient: publicClientProp,
       walletClient: walletClientProp,
-      // eslint-disable-next-line deprecation/deprecation
       rpcUrls,
       // eslint-disable-next-line deprecation/deprecation
       rpcProvider,
@@ -157,8 +156,14 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
     const publicClient: LidoSdkPublicClient =
       publicClientProp ??
-      // eslint-disable-next-line deprecation/deprecation
-      LidoSDKCore.createRpcProvider(chainId, rpcUrls as string[]);
+      createPublicClient({
+        batch: {
+          multicall: true,
+        },
+        chain: VIEM_CHAINS[chainId],
+        // rpcUrls are checked above
+        transport: fallback((rpcUrls as string[]).map((url) => http(url))),
+      });
 
     if (publicClient?.chain?.id !== chainId) {
       throw this.error({
