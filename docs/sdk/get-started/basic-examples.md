@@ -7,9 +7,15 @@ sidebar_position: 2
 ## Core example
 
 ```ts
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+import { http, createPublicClient, hoodi } from 'viem';
+
 const lidoSDK = new LidoSDK({
   chainId: 17000,
-  rpcUrls: ['<RPC_URL>'],
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
 });
 
 // Views
@@ -21,10 +27,18 @@ console.log(balanceETH.toString(), 'ETH balance');
 ## Stake example
 
 ```ts
+import { createWalletClient, custom, hoodi, createPublicClient } from 'viem';
+
 const lidoSDK = new LidoSDK({
   chainId: 17000,
-  rpcUrls: ['<RPC_URL>'],
-  web3provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
+  walletClient: createWalletClient({
+    chain: hoodi,
+    transport: custom(window.ethereum),
+  }),
 });
 
 // Contracts
@@ -46,10 +60,24 @@ console.log(stakeTx, 'stake tx result');
 ## Withdraw example
 
 ```ts
+import {
+  createWalletClient,
+  custom,
+  hoodi,
+  http,
+  createPublicClient,
+} from 'viem';
+
 const lidoSDK = new LidoSDK({
   chainId: 17000,
-  rpcUrls: ['<RPC_URL>'],
-  web3provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
+  walletClient: createWalletClient({
+    chain: hoodi,
+    transport: custom(window.ethereum),
+  }),
 });
 
 // Contracts
@@ -73,10 +101,24 @@ console.log(requestTx.result.requests, 'array of created requests');
 ## Wrap example
 
 ```ts
+import {
+  createWalletClient,
+  custom,
+  hoodi,
+  http,
+  createPublicClient,
+} from 'viem';
+
 const lidoSDK = new LidoSDK({
   chainId: 17000,
-  rpcUrls: ['<RPC_URL>'],
-  web3provider: LidoSDKCore.createWeb3Provider(5, window.ethereum),
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
+  walletClient: createWalletClient({
+    chain: hoodi,
+    transport: custom(window.ethereum),
+  }),
 });
 
 // Contracts

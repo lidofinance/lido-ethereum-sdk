@@ -105,7 +105,7 @@ describe('unsteth wallet tests', () => {
     expectAddress(tx.to, wqAddress);
     expectAddress(tx.from, account.address);
     expectPopulatedTx(tx, undefined);
-    await expectPopulatedTxToRun(tx, core.rpcProvider);
+    await expectPopulatedTxToRun(tx, core.publicClient);
   });
 
   testSpending('can simulate transfer token', async () => {
@@ -144,7 +144,7 @@ describe('unsteth wallet tests', () => {
     expectAddress(tx.to, wqAddress);
     expectAddress(tx.from, account.address);
     expectPopulatedTx(tx, undefined);
-    await expectPopulatedTxToRun(tx, core.rpcProvider);
+    await expectPopulatedTxToRun(tx, core.publicClient);
   });
 
   testSpending('can simulate approve single token', async () => {
@@ -238,7 +238,7 @@ describe('unsteth wallet tests', () => {
     expectAddress(tx.to, wqAddress);
     expectAddress(tx.from, account.address);
     expectPopulatedTx(tx, undefined);
-    await expectPopulatedTxToRun(tx, core.rpcProvider);
+    await expectPopulatedTxToRun(tx, core.publicClient);
   });
 
   testSpending('can simulate approve for all tokens', async () => {

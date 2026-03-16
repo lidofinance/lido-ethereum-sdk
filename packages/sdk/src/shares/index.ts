@@ -6,5 +6,6 @@ export type {
   SharesTotalSupplyResult,
   SharesAmountWithRoundUp,
   BatchSharesToStethValue,
+  StethShareContractType,
 } from './types.js';
 export type { stethSharesAbiType } from './abi/steth-shares-abi.js';

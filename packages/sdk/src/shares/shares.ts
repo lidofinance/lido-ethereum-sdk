@@ -1,7 +1,5 @@
 import {
-  type GetContractReturnType,
   type Address,
-  type WalletClient,
   getContract,
   encodeFunctionData,
   maxUint128,
@@ -11,7 +9,7 @@ import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
 import { TransactionResult } from '../core/index.js';
 
-import { stethSharesAbi, stethSharesAbiType } from './abi/steth-shares-abi.js';
+import { stethSharesAbi } from './abi/steth-shares-abi.js';
 import { parseValue } from '../common/utils/parse-value.js';
 
 import type {
@@ -27,14 +25,11 @@ import {
   bigIntCeilDiv,
   bigIntSign,
 } from '../common/utils/bigint-math.js';
-import {
-  type EncodableContract,
-  ERROR_CODE,
-  getEncodableContract,
-} from '../common/index.js';
+import { ERROR_CODE, getEncodableContract } from '../common/index.js';
 
 import type {
   BatchSharesToStethValue,
+  StethShareContractType,
   SharesAmountWithRoundUp,
   SharesTotalSupplyResult,
   SharesTransferProps,
@@ -58,19 +53,14 @@ export class LidoSDKShares extends LidoSDKModule {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
-  public async getContractStETHshares(): Promise<
-    EncodableContract<GetContractReturnType<stethSharesAbiType, WalletClient>>
-  > {
+  public async getContractStETHshares(): Promise<StethShareContractType> {
     const address = await this.contractAddressStETH();
 
     return getEncodableContract(
       getContract({
         address,
         abi: stethSharesAbi,
-        client: {
-          public: this.core.rpcProvider,
-          wallet: this.core.web3Provider as WalletClient,
-        },
+        client: this.core.keyedClient,
       }),
     );
   }
@@ -95,7 +85,7 @@ export class LidoSDKShares extends LidoSDKModule {
     from: _from,
     ...rest
   }: SharesTransferProps): Promise<TransactionResult> {
-    this.core.useWeb3Provider();
+    this.core.useWalletClient();
     const account = await this.core.useAccount(accountProp);
     const from = _from ?? account.address;
     const amount = parseValue(_amount);
@@ -354,8 +344,8 @@ export class LidoSDKShares extends LidoSDKModule {
       address: sharesContract.address,
       abi: sharesContract.abi,
     };
-    if (this.core.rpcProvider.multicall) {
-      const [totalShares, totalEther] = await this.core.rpcProvider.multicall({
+    if (this.core.publicClient.multicall) {
+      const [totalShares, totalEther] = await this.core.publicClient.multicall({
         allowFailure: false,
         contracts: [
           {

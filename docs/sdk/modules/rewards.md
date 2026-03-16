@@ -51,9 +51,14 @@ type RewardsResult = {
 This method heavily utilizes RPC fetching chain event logs. It's better suited for smaller,recent queries. Beware that this might cause rate limit issues on free RPC endpoints.
 
 ```ts
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+import { http, createPublicClient, hoodi } from 'viem';
+
 const lidoSDK = new LidoSDK({
-  chainId: 17000,
-  rpcUrls: ['<RPC_URL>'],
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
 });
 
 const rewardsQuery = await lidoSDK.rewards.getRewardsFromChain({
@@ -77,9 +82,14 @@ This method requires you to provide API URL to send subgraph requests to. It's b
 - **getSubgraphUrl** can also return object of type `{url:string,requestHeaders?: Record<string,string> }` that is passed to `graphql-request` for extra configurability
 
 ```ts
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+import { http, createPublicClient } from 'viem';
+
 const lidoSDK = new LidoSDK({
-  chainId: 1,
-  rpcUrls: ['<RPC_URL>'],
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
 });
 
 const rewardsQuery = await lidoSDK.rewards.getRewardsFromSubgraph({

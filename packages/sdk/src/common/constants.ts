@@ -188,7 +188,9 @@ export const PERMIT_MESSAGE_TYPES = {
   Permit: EIP2612_TYPE,
 } as const;
 
-export const VIEM_CHAINS: { [key in CHAINS]: Chain } = {
+export const VIEM_CHAINS: {
+  [key in CHAINS]: Chain extends { id: CHAINS } ? Chain : never;
+} = {
   [CHAINS.Mainnet]: mainnet,
   [CHAINS.Holesky]: holesky,
   [CHAINS.Hoodi]: hoodi,

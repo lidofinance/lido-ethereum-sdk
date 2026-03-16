@@ -8,38 +8,98 @@ import type {
   BlockTag,
   Account,
   WaitForTransactionReceiptParameters,
+  GetContractReturnType,
 } from 'viem';
 
-import { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
-import { SDKError } from '../common/utils/sdk-error.js';
+import type { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
+import type { SDKError } from '../common/utils/sdk-error.js';
 import type LidoSDKCore from './core.js';
+import type { EncodableContract } from '../common/index.js';
+import type { LidoLocatorAbiType } from './abi/lidoLocator.js';
+import type { LidoAbiType } from './abi/lido.js';
 
 // Constructor Props
 
 export type LOG_MODE = 'info' | 'debug' | 'none';
 
-type LidoSDKCorePropsRpcProps =
+// Declaration merging similar to wagmi's
+// Allows users to augment types and leverage viem types for Lido SDK
+export interface ClientRegister {}
+export type ResolvedClientRegister = {
+  publicClient: ClientRegister extends {
+    publicClient: infer ResolvedPublicCLient extends object;
+  }
+    ? ResolvedPublicCLient
+    : PublicClient;
+
+  walletClient: ClientRegister extends {
+    walletClient: infer ResolvedWalletClient extends object;
+  }
+    ? ResolvedWalletClient
+    : WalletClient;
+};
+
+export type LidoSdkPublicClient = ResolvedClientRegister['publicClient'];
+export type LidoSdkWalletClient = ResolvedClientRegister['walletClient'];
+
+export type LidoSdkKeyedClient = {
+  public: LidoSdkPublicClient;
+  wallet: LidoSdkWalletClient;
+};
+
+// Core Props
+
+type LidoSDKCorePropsPublicClientProps =
   | {
       rpcUrls: string[];
+      chainId: (typeof SUPPORTED_CHAINS)[number];
+      publicClient?: undefined;
       rpcProvider?: undefined;
     }
   | {
+      publicClient: LidoSdkPublicClient;
       rpcUrls?: undefined;
-      rpcProvider: PublicClient & { [key: string]: any }; // Accept any PublicClient-compatible type
+      rpcProvider?: undefined;
+    }
+  | {
+      /** @deprecated Use `publicClient` instead. */
+      rpcProvider: LidoSdkPublicClient;
+      rpcUrls?: undefined;
+      publicClient?: undefined;
+    };
+
+type LidoSDKCorePropsWalletClientProps =
+  | {
+      walletClient?: LidoSdkWalletClient;
+      web3Provider?: undefined;
+    }
+  | {
+      /** @deprecated Use `walletClient` instead. */
+      web3Provider?: LidoSdkWalletClient;
+      walletClient?: undefined;
     };
 
 export type LidoSDKCoreProps = {
-  chainId: (typeof SUPPORTED_CHAINS)[number];
-  web3Provider?: WalletClient & { [key: string]: any }; // Accept any WalletClient-compatible type
+  chainId?: (typeof SUPPORTED_CHAINS)[number];
   logMode?: LOG_MODE;
   customLidoLocatorAddress?: Address;
-} & LidoSDKCorePropsRpcProps;
+} & LidoSDKCorePropsPublicClientProps &
+  LidoSDKCorePropsWalletClientProps;
 
 export type LidoSDKCommonProps =
   | {
       core: LidoSDKCore;
     }
   | ({ core?: undefined } & LidoSDKCoreProps);
+
+// Contracts
+export type LidoLocatorContractType = EncodableContract<
+  GetContractReturnType<LidoLocatorAbiType, LidoSdkPublicClient>
+>;
+
+export type LidoContractType = EncodableContract<
+  GetContractReturnType<LidoAbiType, LidoSdkKeyedClient>
+>;
 
 // Method Props primitives
 

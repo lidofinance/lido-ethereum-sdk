@@ -1,6 +1,6 @@
 import { callConsoleMessage } from './utils.js';
 import { type HeadMessage } from './types.js';
-import { SDKError } from '../index.js';
+import { SDKError } from '../utils/sdk-error.js';
 
 export const ErrorHandler = function (headMessage: HeadMessage = 'Error:') {
   return function ErrorHandlerMethod<This, Args extends any[], Return>(

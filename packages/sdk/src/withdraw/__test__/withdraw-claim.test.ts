@@ -49,7 +49,7 @@ describe('withdraw request claim', () => {
     expectPopulatedTx(tx);
     expectAddress(tx.from, address);
     expectAddress(tx.to, wqAddress);
-    await expectPopulatedTxToRun(tx, core.rpcProvider);
+    await expectPopulatedTxToRun(tx, core.publicClient);
   });
 
   testSpending('can simulate claim', async () => {

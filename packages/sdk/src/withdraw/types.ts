@@ -1,7 +1,22 @@
-import type { Address } from 'viem';
+import type { Address, GetContractReturnType } from 'viem';
 import type { Bus } from './bus.js';
-import type { AccountValue } from '../index.js';
-import { CHAINS } from '../index.js';
+import type { CHAINS, EncodableContract } from '../common/index.js';
+import type { AccountValue, LidoSdkKeyedClient } from '../core/types.js';
+import type { WithdrawalQueueAbiType } from './abi/withdrawalQueue.js';
+import type { PartStethAbiType } from './abi/partStETH.js';
+import type { PartWstethAbiType } from './abi/partWstETH.js';
+
+export type WithdrawalQueueContractType = EncodableContract<
+  GetContractReturnType<WithdrawalQueueAbiType, LidoSdkKeyedClient>
+>;
+
+export type PartialStethContractType = EncodableContract<
+  GetContractReturnType<PartStethAbiType, LidoSdkKeyedClient>
+>;
+
+export type PartialWstethContractType = EncodableContract<
+  GetContractReturnType<PartWstethAbiType, LidoSdkKeyedClient>
+>;
 
 export type LidoSDKWithdrawModuleProps = { bus: Bus; version?: string };
 

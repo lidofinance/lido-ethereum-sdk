@@ -1,7 +1,5 @@
 import {
   type Address,
-  type GetContractReturnType,
-  type WalletClient,
   getContract,
   zeroAddress,
   encodeFunctionData,
@@ -17,12 +15,9 @@ import type {
   PopulatedTransaction,
 } from '../core/types.js';
 
-import { unstethAbi, type UnstETHAbiType } from './abi/unsteth-abi.js';
+import { unstethAbi } from './abi/unsteth-abi.js';
 
-import {
-  type EncodableContract,
-  getEncodableContract,
-} from '../common/index.js';
+import { getEncodableContract } from '../common/index.js';
 
 import type {
   UnstethNFT,
@@ -33,6 +28,7 @@ import type {
   ParsedProps,
   SafeTransferFromArguments,
   UnstethTransferProps,
+  UnstethContractType,
 } from './types.js';
 
 export class LidoSDKUnstETH extends LidoSDKModule {
@@ -46,18 +42,13 @@ export class LidoSDKUnstETH extends LidoSDKModule {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressWstETH'])
-  public async getContract(): Promise<
-    EncodableContract<GetContractReturnType<UnstETHAbiType, WalletClient>>
-  > {
+  public async getContract(): Promise<UnstethContractType> {
     const address = await this.contractAddress();
     return getEncodableContract(
       getContract({
         address,
         abi: unstethAbi,
-        client: {
-          public: this.core.rpcProvider,
-          wallet: this.core.web3Provider as WalletClient,
-        },
+        client: this.core.keyedClient,
       }),
     );
   }
@@ -290,11 +281,11 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   @ErrorHandler()
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContractMetadata() {
-    if (this.core.rpcProvider.multicall) {
+    if (this.core.publicClient.multicall) {
       const address = await this.contractAddress();
       const common = { abi: unstethAbi, address } as const;
       const [name, version, symbol, baseURI] =
-        await this.core.rpcProvider.multicall({
+        await this.core.publicClient.multicall({
           allowFailure: false,
           contracts: [
             {

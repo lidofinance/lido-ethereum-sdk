@@ -85,7 +85,7 @@ describe('LidoSDKWrap read methods', () => {
     expectAddress(tx.to, stethAddress);
     expectAddress(tx.from, address);
     expectPopulatedTx(tx);
-    await expectPopulatedTxToRun(tx, wrap.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, wrap.core.publicClient);
   });
 
   test('approve simulate', async () => {

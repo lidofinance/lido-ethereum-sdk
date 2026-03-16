@@ -43,7 +43,7 @@ let cachedPublicProvider: PublicClient | null = null;
 export const usePublicRpcProvider = () => {
   if (cachedPublicProvider) return cachedPublicProvider;
   const { testClient } = useTestRpcProvider();
-  const rpcProvider = testClient.extend(publicActions) as PublicClient;
-  cachedPublicProvider = rpcProvider;
-  return rpcProvider;
+  const publicClient = testClient.extend(publicActions) as PublicClient;
+  cachedPublicProvider = publicClient;
+  return publicClient;
 };

@@ -14,13 +14,13 @@ declare module 'fastify' {
 
 const fastifyLidoSDK: FastifyPluginAsync = async (fastify) => {
   const envs: { RPC_PROVIDER_URL: string } = fastify.getEnvs();
-  const rpcProvider = createPublicClient({
+  const publicClient = createPublicClient({
     chain: hoodi,
     transport: http(envs.RPC_PROVIDER_URL),
   });
   const lidoSDK = new LidoSDK({
     chainId: hoodi.id,
-    rpcProvider,
+    publicClient,
   });
 
   if (!fastify.lidoSDK) {

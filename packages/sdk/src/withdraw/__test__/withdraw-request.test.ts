@@ -88,7 +88,7 @@ const testWithdrawalsWithPermit = (
     expectPopulatedTx(tx);
     expectAddress(tx.from, address);
     expectAddress(tx.to, wqAddress);
-    await expectPopulatedTxToRun(tx, core.rpcProvider);
+    await expectPopulatedTxToRun(tx, core.publicClient);
   });
 
   testSpending('can simulate request', async () => {
@@ -211,7 +211,7 @@ const testWithdrawals = (token: WithdrawableTokens, ethAmount: bigint) => {
     expectPopulatedTx(tx, undefined, altTx.data);
     expectAddress(tx.from, address);
     expectAddress(tx.to, tokenAddress);
-    await expectPopulatedTxToRun(tx, core.rpcProvider);
+    await expectPopulatedTxToRun(tx, core.publicClient);
   });
 
   testSpending('can simulate approve', async () => {
@@ -266,7 +266,7 @@ const testWithdrawals = (token: WithdrawableTokens, ethAmount: bigint) => {
     expectPopulatedTx(tx);
     expectAddress(tx.from, address);
     expectAddress(tx.to, wqAddress);
-    await expectPopulatedTxToRun(tx, core.rpcProvider);
+    await expectPopulatedTxToRun(tx, core.publicClient);
   });
 
   testSpending('can simulate request', async () => {

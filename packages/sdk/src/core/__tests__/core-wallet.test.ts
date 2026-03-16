@@ -58,12 +58,12 @@ const permitAbi = [
 
 const createCore = (walletClient?: WalletClient) => {
   const { chainId } = useTestsEnvs();
-  const rpcProvider = usePublicRpcProvider();
+  const publicClient = usePublicRpcProvider();
   return new LidoSDKCore({
     chainId,
     logMode: 'none',
-    rpcProvider,
-    web3Provider: walletClient,
+    publicClient,
+    walletClient,
   });
 };
 
@@ -110,7 +110,7 @@ describe('Core Wallet Tests', () => {
     const contract = getContract({
       abi: permitAbi,
       address: contractAddress,
-      client: web3Core.rpcProvider,
+      client: web3Core.publicClient,
     });
 
     await contract.simulate.permit([
@@ -125,7 +125,7 @@ describe('Core Wallet Tests', () => {
   };
 
   test('web3provider is available', () => {
-    const provider = web3Core.useWeb3Provider();
+    const provider = web3Core.useWalletClient();
     expect(provider).toBeDefined();
   });
 
@@ -177,7 +177,7 @@ describe('Account hoisting', () => {
     expect(account).toBe(altAccount);
   });
 
-  test('useAccount requests account from web3Provider', async () => {
+  test('useAccount requests account from walletClient', async () => {
     const mockFn = jest.fn();
     const mockTransport = useMockTransport(async (args, originalRequest) => {
       mockFn(args.method);
@@ -192,13 +192,13 @@ describe('Account hoisting', () => {
       transport: mockTransport,
     });
     const core = createCore(walletClient);
-    expect(core.useWeb3Provider().account).toBeUndefined();
+    expect(core.useWalletClient().account).toBeUndefined();
 
     // first call, account hoisted
     const account = await core.useAccount();
     expect(account.address).toBe(altAccount.address);
     expect(account.type).toBe('json-rpc');
-    expect(core.web3Provider?.account).toBe(account);
+    expect(core.walletClient?.account).toBe(account);
     expect(mockFn).toHaveBeenCalledTimes(1);
     expect(mockFn.mock.calls[0]?.[0]).toBe('eth_requestAccounts');
 

@@ -47,25 +47,16 @@ Before using the SDK, you need to create an instance of the LidoSDK class:
 // Pass your own viem PublicClient
 
 import { createPublicClient, http } from 'viem';
-import { holesky } from 'viem/chains';
+import { hoodi } from 'viem/chains';
 
-const rpcProvider = createPublicClient({
-  chain: holesky,
-  transport: http(),
+const publicClient = createPublicClient({
+  chain: hoodi,
+  transport: http('<RPC_URL>'),
 });
 const sdk = new LidoSDK({
   chainId: 17000,
-  rpcProvider,
-  web3Provider: provider, // optional
-});
-```
-
-```ts
-// Or just rpc urls so it can be created under the hood
-const sdk = new LidoSDK({
-  chainId: 17000,
-  rpcUrls: ['<RPC_URL>'],
-  web3Provider: provider, // optional
+  publicClient,
+  walletClient, // optional
 });
 ```
 
@@ -78,8 +69,8 @@ Basic examples and usage instructions can be found in [here](/category/get-start
 ```ts
 const lidoSDK = new LidoSDK({
   chainId: 17000,
-  rpcUrls: ['<RPC_URL>'],
-  web3Provider: provider,
+  publicClient,
+  walletClient, // optional
 });
 
 // Views

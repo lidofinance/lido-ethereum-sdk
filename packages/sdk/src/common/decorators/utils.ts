@@ -47,7 +47,7 @@ export const callConsoleMessage = function <This>(
 };
 
 export const isCore = function (value: unknown): value is LidoSDKCore {
-  return !!value && typeof value === 'object' && 'rpcProvider' in value;
+  return !!value && typeof value === 'object' && 'publicClient' in value;
 };
 
 export const hasBus = function (

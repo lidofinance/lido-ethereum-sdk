@@ -24,7 +24,7 @@ export class LidoSDKWithdrawApprove extends BusModule {
   public async approve(
     props: WithdrawApproveProps,
   ): Promise<TransactionResult> {
-    this.bus.core.useWeb3Provider();
+    this.bus.core.useWalletClient();
     const { account, token, callback = NOOP, amount: _amount, ...rest } = props;
     const amount = parseValue(_amount);
     const addressWithdrawalsQueue =

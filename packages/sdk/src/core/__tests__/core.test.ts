@@ -13,19 +13,20 @@ import { expectPositiveBn } from '../../../tests/utils/expect/expect-bn.js';
 
 describe('Core Tests', () => {
   const { rpcUrl, chainId } = useTestsEnvs();
+  const { publicClient } = useRpcCore();
   const { account } = useWalletClient();
   const rpcCore = useRpcCore();
 
   test('Core can be created', () => {
     const core = new LidoSDKCore({
       chainId: chainId,
-      rpcUrls: [rpcUrl],
+      publicClient,
       logMode: 'none',
     });
     expect(core).toBeDefined();
     expect(core.chainId).toBe(chainId);
-    expect(core.rpcProvider).toBeDefined();
-    expect(core.web3Provider).toBeUndefined();
+    expect(core.publicClient).toBeDefined();
+    expect(core.walletClient).toBeUndefined();
   });
 
   test('Core accepts only valid arguments', async () => {
@@ -48,14 +49,14 @@ describe('Core Tests', () => {
     );
   });
 
-  test('web3 provider is immutable', () => {
-    expect(() => ((rpcCore as any).web3Provider = {})).toThrow();
+  test('wallet client is immutable', () => {
+    expect(() => ((rpcCore as any).walletClient = {})).toThrow();
   });
 
   test('web3 functions are not available', async () => {
-    expect(rpcCore.web3Provider).toBeUndefined();
+    expect(rpcCore.walletClient).toBeUndefined();
     await expectSDKError(
-      () => rpcCore.useWeb3Provider(),
+      () => rpcCore.useWalletClient(),
       ERROR_CODE.PROVIDER_ERROR,
     );
     await expectSDKError(
@@ -122,7 +123,7 @@ describe('Core Tests', () => {
   });
 
   test('toBlockNumber', async () => {
-    const block = await rpcCore.rpcProvider.getBlock({ blockTag: 'latest' });
+    const block = await rpcCore.publicClient.getBlock({ blockTag: 'latest' });
     await expect(rpcCore.toBlockNumber({ block: block.number })).resolves.toBe(
       block.number,
     );

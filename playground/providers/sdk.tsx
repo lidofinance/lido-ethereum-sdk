@@ -3,6 +3,7 @@ import { createContext, useMemo, PropsWithChildren, useContext } from 'react';
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import invariant from 'tiny-invariant';
 import { usePublicClient, useWalletClient } from 'wagmi';
+import { RegisteredPublicClient, RegisteredWalletClient } from './types';
 
 const context = createContext<LidoSDK | null>(null);
 
@@ -12,22 +13,28 @@ export const useLidoSDK = () => {
   return value;
 };
 
+// global registration for client types used by Lido SDK
+declare module '@lidofinance/lido-ethereum-sdk' {
+  interface ClientRegister {
+    publicClient: RegisteredPublicClient;
+    walletClient: NonNullable<RegisteredWalletClient>;
+  }
+}
+
 export const LidoSDKProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const publicClient = usePublicClient();
-  const chainId = publicClient?.chain.id;
   const { data: walletClient } = useWalletClient();
 
   const value = useMemo(() => {
     const sdk = new LidoSDK({
-      chainId: chainId as any,
-      rpcProvider: publicClient as any,
-      web3Provider: walletClient as any,
+      publicClient,
+      walletClient,
       logMode: 'debug',
     });
     // inject lido_sdk for console access
     if (typeof window !== 'undefined') (window as any).lido_sdk = sdk;
     return sdk;
-  }, [chainId, publicClient, walletClient]);
+  }, [publicClient, walletClient]);
 
   return <context.Provider value={value}>{children}</context.Provider>;
 };

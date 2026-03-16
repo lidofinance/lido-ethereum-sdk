@@ -26,4 +26,7 @@ export type {
   GetClaimableRequestsInfoReturnType,
   GetWithdrawalRequestsInfoReturnType,
   PropsWithAccount,
+  WithdrawalQueueContractType,
+  PartialStethContractType,
+  PartialWstethContractType,
 } from './types.js';

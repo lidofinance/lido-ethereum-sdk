@@ -31,7 +31,7 @@ describe('getLatestBlockToTimestamp', () => {
     const block = await core.getLatestBlockToTimestamp(ts);
     expect(block.number).toBeLessThanOrEqual(ts);
 
-    const blockAfter = await core.rpcProvider.getBlock({
+    const blockAfter = await core.publicClient.getBlock({
       blockNumber: block.number + 1n,
     });
     expect(blockAfter.timestamp).toBeGreaterThan(ts);

@@ -2,13 +2,13 @@ import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import { createPublicClient, http } from 'viem';
 import { mainnet } from 'viem/chains';
 
-const rpcProvider = createPublicClient({
+const publicClient = createPublicClient({
   chain: mainnet,
   transport: http('RPC_URL'),
 });
 const lidoSDK = new LidoSDK({
   chainId: mainnet.id,
-  rpcProvider,
+  publicClient,
   logMode: 'none',
 });
 

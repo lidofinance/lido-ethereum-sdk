@@ -29,11 +29,22 @@ import {
   TransactionCallbackStage,
   SDKError,
 } from '@lidofinance/lido-ethereum-sdk';
+import {
+  createWalletClient,
+  custom,
+  hoodi,
+  http,
+  createPublicClient,
+} from 'viem';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['<RPC_URL>'],
-  chainId: 17000,
-  web3Provider: LidoSDKCore.createWeb3Provider(1700, window.ethereum),
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
+  walletClient: createWalletClient({
+    transport: custom(window.ethereum),
+  }),
 });
 
 const callback: StakeStageCallback = ({ stage, payload }) => {
@@ -84,10 +95,13 @@ try {
 
 ```ts
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+import { createPublicClient, hoodi, http } from 'viem';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['<RPC_URL>'],
-  chainId: 17000,
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
 });
 
 const populateResult = await lidoSDK.stake.stakeEthPopulateTx({
@@ -104,10 +118,13 @@ console.log(populateResult, 'to, from, value, data');
 
 ```ts
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+import { createPublicClient, hoodi, http } from 'viem';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['<RPC_URL>'],
-  chainId: 17000,
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
 });
 
 const simulateResult = await lidoSDK.staking.stakeEthSimulateTx({

@@ -120,7 +120,7 @@ export class Bus extends LidoSDKModule {
 
     const updateCall = lazyOracleContract.prepare.updateVaultData(args);
 
-    const allResults = await this.core.rpcProvider.multicall({
+    const allResults = await this.core.publicClient.multicall({
       contracts: [updateCall, ...props.preparedMethods] as any,
       allowFailure: false,
       blockNumber: props.blockNumber,

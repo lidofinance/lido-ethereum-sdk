@@ -67,7 +67,7 @@ describe('LidoSDKWrap wallet methods', () => {
     expectAddress(tx.to, wstethAddress);
     expectAddress(tx.from, address);
     expectPopulatedTx(tx, undefined);
-    await expectPopulatedTxToRun(tx, wrap.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, wrap.core.publicClient);
   });
 
   testSpending('wrap steth estimate', async () => {
@@ -116,7 +116,7 @@ describe('LidoSDKWrap wallet methods', () => {
     expectAddress(tx.to, wstethAddress);
     expectAddress(tx.from, address);
     expectPopulatedTx(tx, undefined);
-    await expectPopulatedTxToRun(tx, wrap.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, wrap.core.publicClient);
   });
 
   testSpending('unwrap steth simulate', async () => {
