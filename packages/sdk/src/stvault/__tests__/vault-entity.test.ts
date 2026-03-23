@@ -10,31 +10,28 @@ import type { Bus } from '../bus.js';
 const MOCK_BUS = {} as Bus;
 const VAULT_ADDRESS = '0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' as Address;
 
-function makeEntity() {
-  return new LidoSDKVaultEntity({
+const makeEntity = () =>
+  new LidoSDKVaultEntity({
     bus: MOCK_BUS,
     vaultAddress: VAULT_ADDRESS,
   });
-}
 
 // ─── Base args factory ───────────────────────────────────────────────────────
-function makeArgs(overrides: Partial<OverviewArgs> = {}): OverviewArgs {
-  return {
-    totalValue: 10_000n * 10n ** 18n, // 10,000 ETH
-    reserveRatioBP: 1000, // 10%
-    liabilitySharesInStethWei: 1_000n * 10n ** 18n, // 1,000 stETH
-    forceRebalanceThresholdBP: 500, // 5%
-    withdrawableEther: 500n * 10n ** 18n,
-    balance: 200n * 10n ** 18n,
-    locked: 100n * 10n ** 18n,
-    nodeOperatorDisbursableFee: 10n * 10n ** 18n,
-    totalMintingCapacityStethWei: 5_000n * 10n ** 18n,
-    unsettledLidoFees: 5n * 10n ** 18n,
-    minimalReserve: 50n * 10n ** 18n,
-    reportLiabilitySharesStETH: 1_000n * 10n ** 18n,
-    ...overrides,
-  };
-}
+const makeArgs = (overrides: Partial<OverviewArgs> = {}): OverviewArgs => ({
+  totalValue: 10_000n * 10n ** 18n, // 10,000 ETH
+  reserveRatioBP: 1000, // 10%
+  liabilitySharesInStethWei: 1_000n * 10n ** 18n, // 1,000 stETH
+  forceRebalanceThresholdBP: 500, // 5%
+  withdrawableEther: 500n * 10n ** 18n,
+  balance: 200n * 10n ** 18n,
+  locked: 100n * 10n ** 18n,
+  nodeOperatorDisbursableFee: 10n * 10n ** 18n,
+  totalMintingCapacityStethWei: 5_000n * 10n ** 18n,
+  unsettledLidoFees: 5n * 10n ** 18n,
+  minimalReserve: 50n * 10n ** 18n,
+  reportLiabilitySharesStETH: 1_000n * 10n ** 18n,
+  ...overrides,
+});
 
 describe('LidoSDKVaultEntity.calculateHealth', () => {
   test('returns healthy for vault well above threshold', () => {

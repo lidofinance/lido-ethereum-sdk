@@ -37,6 +37,11 @@ jobs:
       - name: Check types
         run: yarn types
 
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
       - name: Tests
         run: yarn test
         env:

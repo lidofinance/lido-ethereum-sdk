@@ -62,8 +62,6 @@ const prepareL2Wsteth = async () => {
 
   await testClient.impersonateAccount({ address: bridge });
 
-  // TestClient<'anvil'> lacks walletActions, so use a dedicated WalletClient
-  // for the impersonated bridge account to call writeContract.
   const bridgeWalletClient = createWalletClient({
     account: bridge,
     chain: testClient.chain,
@@ -75,6 +73,7 @@ const prepareL2Wsteth = async () => {
     address: wstethAddress,
     functionName: 'bridgeMint',
     args: [account.address, 2000n],
+    chain: testClient.chain,
   });
 };
 

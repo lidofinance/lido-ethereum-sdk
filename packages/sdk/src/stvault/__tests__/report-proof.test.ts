@@ -60,12 +60,17 @@ const treeDump = realTree.dump();
 // Derive expected leaf hashes from the real tree for assertions
 const vault1Entry = treeDump.values.find(
   (v) => v.value[0]?.toLowerCase() === VAULT_ADDRESS.toLowerCase(),
-)!;
+);
+if (!vault1Entry) throw new Error('vault1Entry not found in tree');
 const vault2Entry = treeDump.values.find(
   (v) => v.value[0]?.toLowerCase() === VAULT_ADDRESS_2.toLowerCase(),
-)!;
-const EXPECTED_LEAF_1 = treeDump.tree[vault1Entry.treeIndex]!;
-const EXPECTED_LEAF_2 = treeDump.tree[vault2Entry.treeIndex]!;
+);
+if (!vault2Entry) throw new Error('vault2Entry not found in tree');
+
+const EXPECTED_LEAF_1 = treeDump.tree[vault1Entry.treeIndex];
+if (!EXPECTED_LEAF_1) throw new Error('EXPECTED_LEAF_1 not found in tree');
+const EXPECTED_LEAF_2 = treeDump.tree[vault2Entry.treeIndex];
+if (!EXPECTED_LEAF_2) throw new Error('EXPECTED_LEAF_2 not found in tree');
 
 const MOCK_REPORT: Report = {
   format: 'standard-v1',

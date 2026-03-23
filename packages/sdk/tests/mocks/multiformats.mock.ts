@@ -38,15 +38,14 @@ vi.mock('blockstore-core', () => {
   return { MemoryBlockstore: MockBlockstore };
 });
 
-vi.mock('ipfs-unixfs-importer', () => {
-  const importer = async function* (entries: any[]) {
-    for (const entry of entries) {
-      yield {
-        cid: { toString: () => `mocked-cid-${entry.path ?? ''}` },
-        path: entry.path,
-        size: entry.content?.length ?? 0,
-      };
-    }
-  };
-  return { importer };
-});
+const importer = async function* (entries: any[]) {
+  for (const entry of entries) {
+    yield {
+      cid: { toString: () => `mocked-cid-${entry.path ?? ''}` },
+      path: entry.path,
+      size: entry.content?.length ?? 0,
+    };
+  }
+};
+
+vi.mock('ipfs-unixfs-importer', () => ({ importer }));

@@ -23,7 +23,7 @@ dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
  * Requires the `anvil` binary from Foundry:
  *   https://book.getfoundry.sh/getting-started/installation
  */
-export async function setup() {
+export const setup = async () => {
   if (!process.env.TEST_RPC_URL || !process.env.TEST_CHAIN_ID) {
     // No network env configured — unit tests only, nothing to start.
     return;
@@ -43,10 +43,9 @@ export async function setup() {
     return anvil;
   };
 
-  const instances = [];
+  const instances: Array<Awaited<ReturnType<typeof startAnvil>>> = [];
 
   const anvil = await startAnvil(process.env.TEST_RPC_URL);
-  // Written to process.env so forked workers inherit it automatically.
   process.env.VITEST_ANVIL_PORT = String(anvil.port);
   instances.push(anvil);
 
@@ -56,7 +55,6 @@ export async function setup() {
     instances.push(l2Anvil);
   }
 
-  // Returned function is called by vitest after all tests finish.
   return async () => {
     await Promise.allSettled(instances.map((a) => a.stop()));
   };
