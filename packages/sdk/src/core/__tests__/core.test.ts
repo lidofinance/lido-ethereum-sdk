@@ -1,5 +1,5 @@
 /* eslint-disable jest/expect-expect */
-import { test, expect, describe } from '@jest/globals';
+import { test, expect, describe } from 'vitest';
 
 import { LidoSDKCore } from '../index.js';
 import { useTestsEnvs } from '../../../tests/utils/fixtures/use-test-envs.js';
@@ -123,10 +123,16 @@ describe('Core Tests', () => {
   });
 
   test('toBlockNumber', async () => {
-    const block = await rpcCore.publicClient.getBlock({ blockTag: 'latest' });
-    await expect(rpcCore.toBlockNumber({ block: block.number })).resolves.toBe(
-      block.number,
+    const latest = await rpcCore.publicClient.getBlock({ blockTag: 'latest' });
+    await expect(rpcCore.toBlockNumber({ block: latest.number })).resolves.toBe(
+      latest.number,
     );
+    // Use a block well behind 'latest' to avoid Anvil-mined blocks that share
+    // a timestamp with their predecessor (automining assigns timestamp = prev+1
+    // which can duplicate timestamps already present on the fork).
+    const block = await rpcCore.publicClient.getBlock({
+      blockNumber: latest.number - 200n,
+    });
     await expect(
       rpcCore.toBlockNumber({ timestamp: block.timestamp }),
     ).resolves.toBe(block.number);

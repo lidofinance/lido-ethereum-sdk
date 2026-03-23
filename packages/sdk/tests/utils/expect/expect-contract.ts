@@ -1,4 +1,4 @@
-import { expect } from '@jest/globals';
+import { expect } from 'vitest';
 import { expectAddress } from './expect-address.js';
 
 export const expectContract = (contract: any, address?: string) => {

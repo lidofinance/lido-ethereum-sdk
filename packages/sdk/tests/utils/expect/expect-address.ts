@@ -1,4 +1,4 @@
-import { expect } from '@jest/globals';
+import { expect } from 'vitest';
 import { isAddress } from 'viem';
 
 export const expectAddress = (address: any, expected?: string) => {

@@ -1,5 +1,5 @@
 import { encodeFunctionData } from 'viem';
-import { expect, describe, test } from '@jest/globals';
+import { expect, describe, test } from 'vitest';
 
 import { LidoSDKWrap } from '../wrap.js';
 import { WstethReferralStakerABI } from '../abi/wsteth-referral-staker.js';

@@ -1,5 +1,5 @@
 import { encodeFunctionData, getContract, maxUint256 } from 'viem';
-import { expect, describe, test, jest } from '@jest/globals';
+import { expect, describe, test, vi } from 'vitest';
 import { AbstractLidoSDKErc20 } from '../../../src/erc20/erc20.js';
 import {
   LIDO_CONTRACT_NAMES,
@@ -91,7 +91,7 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
   };
 
   describe('wallet methods', () => {
-    jest.setTimeout(SPENDING_TIMEOUT);
+    vi.setConfig({ testTimeout: SPENDING_TIMEOUT });
 
     /**
      * Approve
@@ -102,7 +102,7 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
         const params = {
           to: account,
           amount: 100n,
-          callback: jest.fn<TransactionCallback>(),
+          callback: vi.fn<TransactionCallback>(),
         };
 
         const tx = await token.approve(params);
@@ -183,7 +183,7 @@ export const expectERC20Wallet = <I extends AbstractLidoSDKErc20>({
           to: altAddress,
           from: address,
           amount: 100n,
-          callback: jest.fn<TransactionCallback>(),
+          callback: vi.fn<TransactionCallback>(),
         };
 
         const tx = await token.transfer(params);

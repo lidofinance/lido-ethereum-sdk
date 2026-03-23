@@ -1,4 +1,4 @@
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, test } from 'vitest';
 import { useRpcCore } from '../../../tests/utils/fixtures/use-core.js';
 import { expectPositiveBn } from '../../../tests/utils/expect/expect-bn.js';
 

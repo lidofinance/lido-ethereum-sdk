@@ -1,4 +1,4 @@
-import { describe, jest, expect } from '@jest/globals';
+import { describe, vi, expect } from 'vitest';
 import { useStake } from '../../../tests/utils/fixtures/use-stake.js';
 import {
   SPENDING_TIMEOUT,
@@ -20,7 +20,7 @@ describe('LidoSDKStake wallet methods', () => {
       const stakeValue = 100n;
       const balanceBefore = await steth.balance();
       const balanceSharesBefore = await shares.balance();
-      const mockTxCallback = jest.fn<TransactionCallback>();
+      const mockTxCallback = vi.fn<TransactionCallback>();
       const tx = await stake.stakeEth({
         value: stakeValue,
         callback: mockTxCallback,

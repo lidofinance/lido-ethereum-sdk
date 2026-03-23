@@ -1,4 +1,4 @@
-import { expect, describe, test } from '@jest/globals';
+import { expect, describe, test } from 'vitest';
 import { LidoSDKStake } from '../stake.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
 import { expectContract } from '../../../tests/utils/expect/expect-contract.js';

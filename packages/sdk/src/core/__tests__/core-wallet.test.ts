@@ -1,4 +1,4 @@
-import { test, expect, describe, jest } from '@jest/globals';
+import { test, expect, describe, vi } from 'vitest';
 
 import {
   useRpcCore,
@@ -178,7 +178,7 @@ describe('Account hoisting', () => {
   });
 
   test('useAccount requests account from walletClient', async () => {
-    const mockFn = jest.fn();
+    const mockFn = vi.fn();
     const mockTransport = useMockTransport(async (args, originalRequest) => {
       mockFn(args.method);
       if (args.method === 'eth_requestAccounts') {
@@ -217,7 +217,7 @@ describe('Perform Transaction', () => {
   const testHash = '0xaaaaaabbbbbbb';
 
   testSpending('perform transaction works with EOA', async () => {
-    const mockTransportCallback = jest.fn<MockTransportCallback>((_, next) =>
+    const mockTransportCallback = vi.fn<MockTransportCallback>((_, next) =>
       next(),
     );
     const core = createCore(
@@ -230,17 +230,17 @@ describe('Perform Transaction', () => {
     const stake = new LidoSDKStake({ core });
     const rawContract = await stake.getContractStETH();
 
-    const mockGetGasLimit = jest.fn<PerformTransactionGasLimit>((options) =>
+    const mockGetGasLimit = vi.fn<PerformTransactionGasLimit>((options) =>
       rawContract.estimateGas.submit([zeroAddress], {
         ...options,
         value,
       }),
     );
-    const mockSendTransaction = jest.fn<PerformTransactionSendTransaction>(
+    const mockSendTransaction = vi.fn<PerformTransactionSendTransaction>(
       (options) =>
         rawContract.write.submit([zeroAddress], { ...options, value }),
     );
-    const mockTxCallback = jest.fn<TransactionCallback>();
+    const mockTxCallback = vi.fn<TransactionCallback>();
 
     const txResult = await core.performTransaction({
       getGasLimit: mockGetGasLimit,
@@ -275,7 +275,7 @@ describe('Perform Transaction', () => {
   });
 
   testSpending('perform transaction works with Multisig', async () => {
-    const mockTransportCallback = jest.fn<MockTransportCallback>(
+    const mockTransportCallback = vi.fn<MockTransportCallback>(
       async (args, next) => {
         if (args.method === 'eth_sendTransaction') {
           return testHash;
@@ -294,17 +294,17 @@ describe('Perform Transaction', () => {
     const stake = new LidoSDKStake({ core });
     const rawContract = await stake.getContractStETH();
 
-    const mockGetGasLimit = jest.fn<PerformTransactionGasLimit>((options) =>
+    const mockGetGasLimit = vi.fn<PerformTransactionGasLimit>((options) =>
       rawContract.estimateGas.submit([zeroAddress], {
         ...options,
         value,
       }),
     );
-    const mockSendTransaction = jest.fn<PerformTransactionSendTransaction>(
+    const mockSendTransaction = vi.fn<PerformTransactionSendTransaction>(
       (options) =>
         rawContract.write.submit([zeroAddress], { ...options, value }),
     );
-    const mockTxCallback = jest.fn<TransactionCallback>();
+    const mockTxCallback = vi.fn<TransactionCallback>();
 
     const txResult = await core.performTransaction({
       getGasLimit: mockGetGasLimit,

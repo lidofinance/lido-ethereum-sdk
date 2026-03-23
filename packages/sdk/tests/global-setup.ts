@@ -1,0 +1,63 @@
+import net from 'node:net';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import dotenv from 'dotenv';
+
+const getFreePort = (): Promise<number> =>
+  new Promise((resolve) => {
+    const srv = net.createServer();
+    srv.listen(0, () => {
+      const port = (srv.address() as net.AddressInfo).port;
+      srv.close(() => resolve(port));
+    });
+  });
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
+
+/**
+ * Vitest globalSetup — runs in the main process before any test worker starts.
+ * Anvil processes are started here and their ports written to process.env so that
+ * forked test workers (which inherit the env) can connect via HTTP.
+ *
+ * Requires the `anvil` binary from Foundry:
+ *   https://book.getfoundry.sh/getting-started/installation
+ */
+export async function setup() {
+  if (!process.env.TEST_RPC_URL || !process.env.TEST_CHAIN_ID) {
+    // No network env configured — unit tests only, nothing to start.
+    return;
+  }
+
+  const { createAnvil } = await import('@viem/anvil');
+
+  const startAnvil = async (forkUrl: string) => {
+    // forkChainId is intentionally omitted: Anvil inherits the chain ID from
+    // the fork automatically, and passing it together with --fork-url requires
+    // --fork-block-number which we don't want to pin.
+    //
+    // Port is chosen dynamically so parallel/repeated runs don't collide.
+    const port = await getFreePort();
+    const anvil = createAnvil({ forkUrl, port });
+    await anvil.start();
+    return anvil;
+  };
+
+  const instances = [];
+
+  const anvil = await startAnvil(process.env.TEST_RPC_URL);
+  // Written to process.env so forked workers inherit it automatically.
+  process.env.VITEST_ANVIL_PORT = String(anvil.port);
+  instances.push(anvil);
+
+  if (process.env.TEST_L2_RPC_URL) {
+    const l2Anvil = await startAnvil(process.env.TEST_L2_RPC_URL);
+    process.env.VITEST_L2_ANVIL_PORT = String(l2Anvil.port);
+    instances.push(l2Anvil);
+  }
+
+  // Returned function is called by vitest after all tests finish.
+  return async () => {
+    await Promise.allSettled(instances.map((a) => a.stop()));
+  };
+}

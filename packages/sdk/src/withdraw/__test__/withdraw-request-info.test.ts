@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { expect, describe, test } from '@jest/globals';
+import { expect, describe, test } from 'vitest';
 import { useWithdraw } from '../../../tests/utils/fixtures/use-withdraw.js';
 import { useUnsteth } from '../../../tests/utils/fixtures/use-unsteth.js';
 import { useAccount } from '../../../tests/utils/fixtures/use-wallet-client.js';

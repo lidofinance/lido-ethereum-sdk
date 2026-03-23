@@ -1,5 +1,5 @@
 /* eslint-disable jest/no-conditional-expect */
-import { describe, test } from '@jest/globals';
+import { describe, test } from 'vitest';
 import { expectSDKModule } from '../../../tests/utils/expect/expect-sdk-module.js';
 import { LidoSDKRewards } from '../../index.js';
 

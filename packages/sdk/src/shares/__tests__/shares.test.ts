@@ -1,4 +1,4 @@
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, test } from 'vitest';
 import { LidoSDKShares } from '../shares.js';
 import type { BatchSharesToStethValue } from '../types.js';
 import { expectSDKModule } from '../../../tests/utils/expect/expect-sdk-module.js';

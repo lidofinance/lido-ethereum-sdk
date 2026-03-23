@@ -1,4 +1,4 @@
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, test } from 'vitest';
 import { expectSDKModule } from '../../../tests/utils/expect/expect-sdk-module.js';
 import { LidoSDKUnstETH } from '../unsteth.js';
 import { useUnsteth } from '../../../tests/utils/fixtures/use-unsteth.js';

@@ -1,5 +1,5 @@
 import { getContract } from 'viem';
-import { expect, describe, test } from '@jest/globals';
+import { expect, describe, test } from 'vitest';
 import { AbstractLidoSDKErc20 } from '../../../src/erc20/erc20.js';
 import {
   LIDO_CONTRACT_NAMES,

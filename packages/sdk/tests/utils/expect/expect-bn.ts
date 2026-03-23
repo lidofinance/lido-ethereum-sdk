@@ -1,4 +1,4 @@
-import { expect } from '@jest/globals';
+import { expect } from 'vitest';
 
 export const expectBn = (value: any) => {
   expect(typeof value === 'bigint');

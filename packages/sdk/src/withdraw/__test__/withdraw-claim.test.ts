@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { expect, describe, jest } from '@jest/globals';
+import { expect, describe, vi } from 'vitest';
 import { useUnsteth } from '../../../tests/utils/fixtures/use-unsteth.js';
 import { useAccount } from '../../../tests/utils/fixtures/use-wallet-client.js';
 import { useWithdraw } from '../../../tests/utils/fixtures/use-withdraw.js';
@@ -27,7 +27,7 @@ describe('withdraw request claim', () => {
   let request: RequestStatusWithId = {} as any;
   let claimableETH = 0n;
 
-  jest.setTimeout(SPENDING_TIMEOUT);
+  vi.setConfig({ testTimeout: SPENDING_TIMEOUT });
 
   testSpending('has at least 1 claimable requests', async () => {
     const claimable = await requestsInfo.getClaimableRequestsETHByAccount({
@@ -74,7 +74,7 @@ describe('withdraw request claim', () => {
     const balanceBefore = await core.balanceETH(address);
     const owner = await unsteth.getAccountByNFT(request.id);
     expectAddress(owner, address);
-    const mock = jest.fn<TransactionCallback>();
+    const mock = vi.fn<TransactionCallback>();
     const tx = await claim.claimRequests({
       requestsIds: [request.id],
       callback: mock,
