@@ -15,6 +15,21 @@ const getFreePort = (): Promise<number> =>
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
+const getLatestBlockNumber = async (rpcUrl: string): Promise<bigint> => {
+  const res = await fetch(rpcUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      method: 'eth_blockNumber',
+      params: [],
+      id: 1,
+    }),
+  });
+  const { result } = (await res.json()) as { result: string };
+  return BigInt(result);
+};
+
 /**
  * Vitest globalSetup — runs in the main process before any test worker starts.
  * Anvil processes are started here and their ports written to process.env so that
@@ -33,12 +48,17 @@ export const setup = async () => {
 
   const startAnvil = async (forkUrl: string) => {
     // forkChainId is intentionally omitted: Anvil inherits the chain ID from
-    // the fork automatically, and passing it together with --fork-url requires
-    // --fork-block-number which we don't want to pin.
+    // the fork automatically.
+    //
+    // forkBlockNumber is fetched dynamically so Anvil does not fall back to the
+    // 'finalized' block tag.
     //
     // Port is chosen dynamically so parallel/repeated runs don't collide.
-    const port = await getFreePort();
-    const anvil = createAnvil({ forkUrl, port });
+    const [port, forkBlockNumber] = await Promise.all([
+      getFreePort(),
+      getLatestBlockNumber(forkUrl),
+    ]);
+    const anvil = createAnvil({ forkUrl, port, forkBlockNumber });
     await anvil.start();
     return anvil;
   };
@@ -58,4 +78,4 @@ export const setup = async () => {
   return async () => {
     await Promise.allSettled(instances.map((a) => a.stop()));
   };
-}
+};
