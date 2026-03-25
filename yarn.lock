@@ -4529,7 +4529,7 @@ __metadata:
     "@fastify/swagger-ui": ^4.0.0
     "@lidofinance/lido-ethereum-sdk": "workspace:*"
     "@types/node": ^20.14.10
-    fastify: ^5.8.1
+    fastify: ^5.8.3
     fastify-plugin: ^4.5.1
     nodemon: ^3.1.4
     reflect-metadata: ^0.2.2
@@ -14086,9 +14086,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify@npm:^5.8.1":
-  version: 5.8.1
-  resolution: "fastify@npm:5.8.1"
+"fastify@npm:^5.8.3":
+  version: 5.8.4
+  resolution: "fastify@npm:5.8.4"
   dependencies:
     "@fastify/ajv-compiler": ^4.0.5
     "@fastify/error": ^4.0.0
@@ -14105,7 +14105,7 @@ __metadata:
     secure-json-parse: ^4.0.0
     semver: ^7.6.0
     toad-cache: ^3.7.0
-  checksum: b552917345197af3f8ab099e70ae76d3ecc1fd9236f0f9955f73c23c7fc15864929636a00f90080de51826cf45737631e047e6400c6b43dbf5f9f2a1ed8a8950
+  checksum: 8d80fa862dbc69620779376031d69d51481920ca2c8d7bfda94793ae2a28e3cf9f2a4c912b0f7a63fad3a3f32c48fe5338fecb0dfdc980698fdccdef06c11db0
   languageName: node
   linkType: hard
 
