@@ -1,5 +1,4 @@
 import { custom, http } from 'viem';
-import { useTestRpcProvider } from './use-test-rpc-provider.js';
 import { useTestsEnvs } from './use-test-envs.js';
 
 export type MockTransportCallback = (
@@ -22,9 +21,9 @@ export const useMockTransport = (
 ) => {
   const { useDirectRpc = false } = options;
   const { rpcUrl } = useTestsEnvs();
-  const originalRequest: (args: any) => Promise<any> = useDirectRpc
-    ? (args: any) => http(rpcUrl)({}).request(args)
-    : (args: any) => useTestRpcProvider().ganacheProvider.request(args);
+  const anvilUrl = `http://127.0.0.1:${process.env.VITEST_ANVIL_PORT}`;
+  const baseUrl = useDirectRpc ? rpcUrl : anvilUrl;
+  const originalRequest = (args: any) => http(baseUrl)({}).request(args);
   return custom({
     async request(args) {
       return callback(args, async (customArgs: any = args) =>

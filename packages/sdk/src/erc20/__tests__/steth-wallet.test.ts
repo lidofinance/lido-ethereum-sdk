@@ -1,4 +1,4 @@
-import { beforeAll, describe } from '@jest/globals';
+import { beforeAll, describe } from 'vitest';
 import { LidoSDKstETH } from '../steth.js';
 import {
   useRpcCore,

@@ -1,4 +1,4 @@
-import { expect } from '@jest/globals';
+import { expect } from 'vitest';
 import { LidoSDKModule } from '../../../src/common/class-primitives/sdk-module.js';
 import { LidoSDKCommonProps } from '../../../src/core/types.js';
 import { LidoSDKCore } from '../../../src/index.js';

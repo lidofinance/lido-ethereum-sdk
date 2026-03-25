@@ -1,5 +1,5 @@
 import { ERROR_CODE, SDKError } from '../../../src/index.js';
-import { expect } from '@jest/globals';
+import { expect } from 'vitest';
 
 export const expectSDKError = async (
   callback: () => any | Promise<any>,

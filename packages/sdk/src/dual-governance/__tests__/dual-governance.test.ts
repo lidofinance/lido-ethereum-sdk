@@ -1,5 +1,5 @@
 /* eslint-disable jest/no-conditional-expect */
-import { beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { beforeEach, describe, expect, vi, test } from 'vitest';
 import { expectSDKModule } from '../../../tests/utils/expect/expect-sdk-module.js';
 import { LidoSDKDualGovernance } from '../../index.js';
 import { useDualGovernance } from '../../../tests/utils/fixtures/use-dual-governance.js';
@@ -208,7 +208,7 @@ describe('LidoSDKDualGovernance - calculateCurrentVetoSignallingThresholdProgres
   };
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
     dualGovernance = new LidoSDKDualGovernance({
       core: { chain: { id: 560048, name: 'Hoodi' } } as any,
     });
@@ -219,19 +219,19 @@ describe('LidoSDKDualGovernance - calculateCurrentVetoSignallingThresholdProgres
     escrow: bigint,
     supply: bigint,
   ) => {
-    jest
-      .spyOn(dualGovernance, 'getDualGovernanceConfig')
-      .mockResolvedValue(config);
+    vi.spyOn(dualGovernance, 'getDualGovernanceConfig').mockResolvedValue(
+      config,
+    );
 
     if (escrow === null) {
-      jest.spyOn(dualGovernance, 'getTotalStEthInEscrow').mockResolvedValue(0n);
+      vi.spyOn(dualGovernance, 'getTotalStEthInEscrow').mockResolvedValue(0n);
     } else {
-      jest
-        .spyOn(dualGovernance, 'getTotalStEthInEscrow')
-        .mockResolvedValue(escrow);
+      vi.spyOn(dualGovernance, 'getTotalStEthInEscrow').mockResolvedValue(
+        escrow,
+      );
     }
 
-    jest.spyOn(dualGovernance, 'getTotalStETHSupply').mockResolvedValue(supply);
+    vi.spyOn(dualGovernance, 'getTotalStETHSupply').mockResolvedValue(supply);
   };
 
   test('calculates progress correctly for normal case', async () => {
@@ -323,16 +323,16 @@ describe('LidoSDKDualGovernance - getDualGovernanceState', () => {
   let dualGovernance: LidoSDKDualGovernance;
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
     dualGovernance = new LidoSDKDualGovernance({
       core: { chain: { id: 560048, name: 'Hoodi' } },
     } as any);
   });
 
   const mockGetContractDualGovernance = (returnValue: DualGovernanceState) => {
-    jest.spyOn(dualGovernance, 'getContractDualGovernance').mockResolvedValue({
+    vi.spyOn(dualGovernance, 'getContractDualGovernance').mockResolvedValue({
       read: {
-        getStateDetails: jest
+        getStateDetails: vi
           .fn()
           .mockImplementation(() => Promise.resolve(returnValue)),
       } as any,
@@ -363,7 +363,7 @@ describe('LidoSDKDualGovernance - getGovernanceWarningStatus', () => {
   let dualGovernance: LidoSDKDualGovernance;
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
     dualGovernance = new LidoSDKDualGovernance({
       core: { chain: { id: 560048, name: 'Hoodi' } },
     } as any);
@@ -373,12 +373,13 @@ describe('LidoSDKDualGovernance - getGovernanceWarningStatus', () => {
     governanceState: GovernanceState,
     vetoSignalingProgress: { currentSupportPercent: number },
   ) => {
-    jest
-      .spyOn(dualGovernance, 'getDualGovernanceState')
-      .mockResolvedValue(governanceState);
-    jest
-      .spyOn(dualGovernance, 'calculateCurrentVetoSignallingThresholdProgress')
-      .mockResolvedValue(vetoSignalingProgress);
+    vi.spyOn(dualGovernance, 'getDualGovernanceState').mockResolvedValue(
+      governanceState,
+    );
+    vi.spyOn(
+      dualGovernance,
+      'calculateCurrentVetoSignallingThresholdProgress',
+    ).mockResolvedValue(vetoSignalingProgress);
   };
 
   test('returns "Blocked" state when in VetoSignalling', async () => {

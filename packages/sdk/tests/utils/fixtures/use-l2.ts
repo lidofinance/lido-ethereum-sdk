@@ -1,12 +1,12 @@
-import type { EthereumProvider } from 'ganache';
 import {
+  http,
   createTestClient,
   createWalletClient,
   custom,
-  PrivateKeyAccount,
+  type PrivateKeyAccount,
+  type PublicClient,
+  type TestClient,
   publicActions,
-  PublicClient,
-  TestClient,
 } from 'viem';
 import { useTestsEnvs } from './use-test-envs.js';
 import { CHAINS, LidoSDKCore, VIEM_CHAINS } from '../../../src/index.js';
@@ -14,32 +14,22 @@ import { useAccount } from './use-wallet-client.js';
 import { LidoSDKL2 } from '../../../src/l2/l2.js';
 
 let cached: {
-  testClient: TestClient<'ganache'>;
-  ganacheProvider: EthereumProvider;
+  testClient: TestClient<'anvil'>;
 } | null = null;
 
 export const useTestL2RpcProvider = () => {
   if (cached) return cached;
   const { l2ChainId } = useTestsEnvs();
 
-  const ganacheProvider = (globalThis as any)
-    .__l2_ganache_provider__ as EthereumProvider;
-
+  const port = Number(process.env.VITEST_L2_ANVIL_PORT);
   const testClient = createTestClient({
-    mode: 'ganache',
-    transport: custom({
-      async request(args) {
-        if (args.method === 'eth_estimateGas') {
-          delete args.params[0].gas;
-        }
-        return ganacheProvider.request(args);
-      },
-    }),
+    mode: 'anvil',
+    transport: http(`http://127.0.0.1:${port}`),
     name: 'testClient',
     chain: VIEM_CHAINS[l2ChainId as CHAINS],
   });
 
-  cached = { ganacheProvider, testClient };
+  cached = { testClient };
   return cached;
 };
 
