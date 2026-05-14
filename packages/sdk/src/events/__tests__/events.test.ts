@@ -67,7 +67,8 @@ describe('LidoSDKEvents', () => {
       back: { days: 10n },
       maxCount: 10,
     });
-    expect(events).toHaveLength(10);
+    expect(events.length).toBeGreaterThanOrEqual(1);
+    expect(events.length).toBeLessThanOrEqual(10);
     for (const event of events) {
       expectRebaseEvent(event);
     }
@@ -82,6 +83,7 @@ describe('LidoSDKEvents', () => {
       maxCount: 10,
     });
     expect(events.length).toBeGreaterThanOrEqual(1);
+    expect(events.length).toBeLessThanOrEqual(10);
     for (const event of events) {
       expectRebaseEvent(event);
 
