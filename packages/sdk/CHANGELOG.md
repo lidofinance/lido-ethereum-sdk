@@ -13,6 +13,7 @@
 ### Fixed
 
 - `@ethersproject/bytes` removed as dependency and all related logic is migrated to `viem` utils
+- `logMode` default value is now `'none'` in `new LidoSDKCore(props)`
 
 # 4.7.0
 

@@ -112,7 +112,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     this.publicClient = publicClient;
     this.#walletClient = walletClient;
 
-    this.logMode = props.logMode ?? 'info';
+    this.logMode = props.logMode ?? 'none';
     // for devnets
     this.customLidoLocatorAddress = props.customLidoLocatorAddress;
   }
