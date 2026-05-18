@@ -10,8 +10,6 @@ import {
 
 import type {
   Address,
-  GetContractReturnType,
-  WalletClient,
   Hash,
   WriteContractParameters,
   TransactionReceipt,
@@ -40,8 +38,10 @@ import type {
   StakeInnerProps,
   StakeLimitResult,
   StakeResult,
+  StethContractType,
 } from './types.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import { getEncodableContract } from '../common/index.js';
 
 export class LidoSDKStake extends LidoSDKModule {
   // Precomputed event signatures
@@ -61,19 +61,16 @@ export class LidoSDKStake extends LidoSDKModule {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressStETH'])
-  public async getContractStETH(): Promise<
-    GetContractReturnType<typeof StethAbi, WalletClient>
-  > {
+  public async getContractStETH(): Promise<StethContractType> {
     const address = await this.contractAddressStETH();
 
-    return getContract({
-      address,
-      abi: StethAbi,
-      client: {
-        public: this.core.rpcProvider,
-        wallet: this.core.web3Provider as WalletClient,
-      },
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: StethAbi,
+        client: this.core.keyedClient,
+      }),
+    );
   }
 
   // Calls
@@ -83,7 +80,7 @@ export class LidoSDKStake extends LidoSDKModule {
   public async stakeEth(
     props: StakeProps,
   ): Promise<TransactionResult<StakeResult>> {
-    this.core.useWeb3Provider();
+    this.core.useWalletClient();
     const { callback, account, referralAddress, value, ...rest } =
       await this.parseProps(props);
 

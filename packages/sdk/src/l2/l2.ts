@@ -13,8 +13,6 @@ import {
   isAddressEqual,
   getAbiItem,
   toEventHash,
-  type GetContractReturnType,
-  type WalletClient,
   type Address,
   type WriteContractParameters,
   type TransactionReceipt,
@@ -29,16 +27,21 @@ import {
 import { Cache, Logger, ErrorHandler } from '../common/decorators/index.js';
 
 import { rebasableL2StethAbi } from './abi/rebasableL2Steth.js';
-import { parseValue } from '../common/utils/parse-value.js';
 import {
+  invariant,
+  ERROR_CODE,
+  getEncodableContract,
+} from '../common/index.js';
+import { parseValue } from '../common/utils/parse-value.js';
+import type {
+  RebasableL2StethContractType,
   UnwrapResults,
   WrapInnerProps,
   WrapProps,
   WrapPropsWithoutTxOptions,
   WrapResults,
 } from './types.js';
-import { PopulatedTransaction, TransactionResult } from '../core/types.js';
-import { invariant, ERROR_CODE } from '../common/index.js';
+import type { PopulatedTransaction, TransactionResult } from '../core/types.js';
 
 export class LidoSDKL2 extends LidoSDKModule {
   private static TRANSFER_SIGNATURE = toEventHash(
@@ -69,18 +72,15 @@ export class LidoSDKL2 extends LidoSDKModule {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
-  public async getContract(): Promise<
-    GetContractReturnType<typeof rebasableL2StethAbi, WalletClient>
-  > {
+  public async getContract(): Promise<RebasableL2StethContractType> {
     const address = await this.contractAddress();
-    return getContract({
-      address,
-      abi: rebasableL2StethAbi,
-      client: {
-        public: this.core.rpcProvider,
-        wallet: this.core.web3Provider as WalletClient,
-      },
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: rebasableL2StethAbi,
+        client: this.core.keyedClient,
+      }),
+    );
   }
 
   // Wrap wstETH to stETH
@@ -141,7 +141,7 @@ export class LidoSDKL2 extends LidoSDKModule {
   public async wrapWstethToSteth(
     props: WrapProps,
   ): Promise<TransactionResult<WrapResults>> {
-    this.core.useWeb3Provider();
+    this.core.useWalletClient();
     const { account, callback, value, ...rest } = await this.parseProps(props);
     const contract = await this.getContract();
 
@@ -249,7 +249,7 @@ export class LidoSDKL2 extends LidoSDKModule {
   public async unwrapStethToWsteth(
     props: WrapProps,
   ): Promise<TransactionResult<UnwrapResults>> {
-    this.core.useWeb3Provider();
+    this.core.useWalletClient();
     const { account, callback, value, ...rest } = await this.parseProps(props);
     const contract = await this.getContract();
 

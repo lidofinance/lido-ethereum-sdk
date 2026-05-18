@@ -1,4 +1,4 @@
-import { test, expect, describe, jest } from '@jest/globals';
+import { test, expect, describe, vi } from 'vitest';
 
 import {
   useRpcCore,
@@ -58,12 +58,12 @@ const permitAbi = [
 
 const createCore = (walletClient?: WalletClient) => {
   const { chainId } = useTestsEnvs();
-  const rpcProvider = usePublicRpcProvider();
+  const publicClient = usePublicRpcProvider();
   return new LidoSDKCore({
     chainId,
     logMode: 'none',
-    rpcProvider,
-    web3Provider: walletClient,
+    publicClient,
+    walletClient,
   });
 };
 
@@ -110,7 +110,7 @@ describe('Core Wallet Tests', () => {
     const contract = getContract({
       abi: permitAbi,
       address: contractAddress,
-      client: web3Core.rpcProvider,
+      client: web3Core.publicClient,
     });
 
     await contract.simulate.permit([
@@ -125,7 +125,7 @@ describe('Core Wallet Tests', () => {
   };
 
   test('web3provider is available', () => {
-    const provider = web3Core.useWeb3Provider();
+    const provider = web3Core.useWalletClient();
     expect(provider).toBeDefined();
   });
 
@@ -177,8 +177,8 @@ describe('Account hoisting', () => {
     expect(account).toBe(altAccount);
   });
 
-  test('useAccount requests account from web3Provider', async () => {
-    const mockFn = jest.fn();
+  test('useAccount requests account from walletClient', async () => {
+    const mockFn = vi.fn();
     const mockTransport = useMockTransport(async (args, originalRequest) => {
       mockFn(args.method);
       if (args.method === 'eth_requestAccounts') {
@@ -192,13 +192,13 @@ describe('Account hoisting', () => {
       transport: mockTransport,
     });
     const core = createCore(walletClient);
-    expect(core.useWeb3Provider().account).toBeUndefined();
+    expect(core.useWalletClient().account).toBeUndefined();
 
     // first call, account hoisted
     const account = await core.useAccount();
     expect(account.address).toBe(altAccount.address);
     expect(account.type).toBe('json-rpc');
-    expect(core.web3Provider?.account).toBe(account);
+    expect(core.walletClient?.account).toBe(account);
     expect(mockFn).toHaveBeenCalledTimes(1);
     expect(mockFn.mock.calls[0]?.[0]).toBe('eth_requestAccounts');
 
@@ -217,7 +217,7 @@ describe('Perform Transaction', () => {
   const testHash = '0xaaaaaabbbbbbb';
 
   testSpending('perform transaction works with EOA', async () => {
-    const mockTransportCallback = jest.fn<MockTransportCallback>((_, next) =>
+    const mockTransportCallback = vi.fn<MockTransportCallback>((_, next) =>
       next(),
     );
     const core = createCore(
@@ -230,17 +230,17 @@ describe('Perform Transaction', () => {
     const stake = new LidoSDKStake({ core });
     const rawContract = await stake.getContractStETH();
 
-    const mockGetGasLimit = jest.fn<PerformTransactionGasLimit>((options) =>
+    const mockGetGasLimit = vi.fn<PerformTransactionGasLimit>((options) =>
       rawContract.estimateGas.submit([zeroAddress], {
         ...options,
         value,
       }),
     );
-    const mockSendTransaction = jest.fn<PerformTransactionSendTransaction>(
+    const mockSendTransaction = vi.fn<PerformTransactionSendTransaction>(
       (options) =>
         rawContract.write.submit([zeroAddress], { ...options, value }),
     );
-    const mockTxCallback = jest.fn<TransactionCallback>();
+    const mockTxCallback = vi.fn<TransactionCallback>();
 
     const txResult = await core.performTransaction({
       getGasLimit: mockGetGasLimit,
@@ -275,7 +275,7 @@ describe('Perform Transaction', () => {
   });
 
   testSpending('perform transaction works with Multisig', async () => {
-    const mockTransportCallback = jest.fn<MockTransportCallback>(
+    const mockTransportCallback = vi.fn<MockTransportCallback>(
       async (args, next) => {
         if (args.method === 'eth_sendTransaction') {
           return testHash;
@@ -294,17 +294,17 @@ describe('Perform Transaction', () => {
     const stake = new LidoSDKStake({ core });
     const rawContract = await stake.getContractStETH();
 
-    const mockGetGasLimit = jest.fn<PerformTransactionGasLimit>((options) =>
+    const mockGetGasLimit = vi.fn<PerformTransactionGasLimit>((options) =>
       rawContract.estimateGas.submit([zeroAddress], {
         ...options,
         value,
       }),
     );
-    const mockSendTransaction = jest.fn<PerformTransactionSendTransaction>(
+    const mockSendTransaction = vi.fn<PerformTransactionSendTransaction>(
       (options) =>
         rawContract.write.submit([zeroAddress], { ...options, value }),
     );
-    const mockTxCallback = jest.fn<TransactionCallback>();
+    const mockTxCallback = vi.fn<TransactionCallback>();
 
     const txResult = await core.performTransaction({
       getGasLimit: mockGetGasLimit,

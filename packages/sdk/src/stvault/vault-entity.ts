@@ -756,7 +756,7 @@ export class LidoSDKVaultEntity extends BusModule {
   @Logger('Utils:')
   @ErrorHandler()
   private async isDashboard(address: Address) {
-    const dashboardCode = await this.bus.core.rpcProvider.getCode({ address });
+    const dashboardCode = await this.bus.core.publicClient.getCode({ address });
     const vaultFactory = await this.bus.contracts.getContractVaultFactory();
     const implementation = await vaultFactory.read.DASHBOARD_IMPL();
     const proxyCode =
@@ -861,7 +861,7 @@ export class LidoSDKVaultEntity extends BusModule {
       preparedMethods: [
         {
           abi: Multicall3AbiUtils,
-          address: this.bus.core.rpcProvider.chain?.contracts?.multicall3
+          address: this.bus.core.publicClient.chain?.contracts?.multicall3
             ?.address as Address,
           functionName: 'getEthBalance',
           args: [vaultAddress],

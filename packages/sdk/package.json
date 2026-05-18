@@ -161,13 +161,13 @@
     "build:cjs": "tsc --project tsconfig.build.json --module commonjs --moduleResolution node10 --outDir ./dist/cjs --removeComments --verbatimModuleSyntax false && echo > ./dist/cjs/package.json '{\"type\":\"commonjs\"}'",
     "build:esm": "tsc --project tsconfig.build.json --module nodenext --outDir ./dist/esm && echo > ./dist/esm/package.json '{\"type\":\"module\",\"sideEffects\":false}'",
     "build:types": "tsc --project tsconfig.build.json --module nodenext --declarationDir ./dist/types --emitDeclarationOnly --declaration --declarationMap",
-    "test": "jest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prepublishOnly": "node scripts/updateVersion.cjs",
     "lint": "eslint . --ext .ts --max-warnings 0",
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@ethersproject/bytes": "^5.7.0",
     "@openzeppelin/merkle-tree": "^1.0.8",
     "blockstore-core": "^5.0.4",
     "graphql": "^16.8.1",
@@ -179,14 +179,12 @@
     "viem": "^2.45.0"
   },
   "devDependencies": {
-    "@jest/globals": "^29.7.0",
     "@types/fs-extra": "^11.0.1",
+    "@viem/anvil": "^0.0.10",
     "dotenv": "^16.3.1",
     "fs-extra": "^11.1.1",
-    "ganache": "^7.9.2",
-    "jest": "^29.7.0",
     "rimraf": "^5.0.1",
-    "ts-jest": "^29.1.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^2.1.0"
   }
 }

@@ -1,5 +1,23 @@
+import {
+  type Address,
+  getContract,
+  zeroAddress,
+  encodeFunctionData,
+} from 'viem';
+
 import { CommonTransactionProps, TransactionResult } from '../core/index.js';
 import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
+import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
+import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import type {
+  AccountValue,
+  NoTxOptions,
+  PopulatedTransaction,
+} from '../core/types.js';
+
+import { unstethAbi } from './abi/unsteth-abi.js';
+
+import { getEncodableContract } from '../common/index.js';
 
 import type {
   UnstethNFT,
@@ -10,23 +28,8 @@ import type {
   ParsedProps,
   SafeTransferFromArguments,
   UnstethTransferProps,
+  UnstethContractType,
 } from './types.js';
-import type {
-  AccountValue,
-  NoTxOptions,
-  PopulatedTransaction,
-} from '../core/types.js';
-import {
-  type Address,
-  type GetContractReturnType,
-  type WalletClient,
-  getContract,
-  zeroAddress,
-  encodeFunctionData,
-} from 'viem';
-import { unstethAbi } from './abi/unsteth-abi.js';
-import { LIDO_CONTRACT_NAMES, NOOP } from '../common/constants.js';
-import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
 
 export class LidoSDKUnstETH extends LidoSDKModule {
   // Contract
@@ -39,18 +42,15 @@ export class LidoSDKUnstETH extends LidoSDKModule {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id', 'contractAddressWstETH'])
-  public async getContract(): Promise<
-    GetContractReturnType<typeof unstethAbi, WalletClient>
-  > {
+  public async getContract(): Promise<UnstethContractType> {
     const address = await this.contractAddress();
-    return getContract({
-      address,
-      abi: unstethAbi,
-      client: {
-        public: this.core.rpcProvider,
-        wallet: this.core.web3Provider as WalletClient,
-      },
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: unstethAbi,
+        client: this.core.keyedClient,
+      }),
+    );
   }
 
   // Balance
@@ -281,11 +281,11 @@ export class LidoSDKUnstETH extends LidoSDKModule {
   @ErrorHandler()
   @Cache(30 * 60 * 1000, ['core.chain.id'])
   public async getContractMetadata() {
-    if (this.core.rpcProvider.multicall) {
+    if (this.core.publicClient.multicall) {
       const address = await this.contractAddress();
       const common = { abi: unstethAbi, address } as const;
       const [name, version, symbol, baseURI] =
-        await this.core.rpcProvider.multicall({
+        await this.core.publicClient.multicall({
           allowFailure: false,
           contracts: [
             {

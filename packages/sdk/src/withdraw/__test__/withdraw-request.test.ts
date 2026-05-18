@@ -1,4 +1,4 @@
-import { expect, describe, jest, beforeAll, test } from '@jest/globals';
+import { expect, describe, vi, beforeAll, test } from 'vitest';
 import { useWithdraw } from '../../../tests/utils/fixtures/use-withdraw.js';
 import {
   expectAlmostEqualBn,
@@ -48,7 +48,7 @@ const testWithdrawalsWithPermit = (
   let wqAddress: Address;
   let permit: PermitSignature;
 
-  jest.setTimeout(SPENDING_TIMEOUT);
+  vi.setConfig({ testTimeout: SPENDING_TIMEOUT });
 
   beforeAll(async () => {
     const balanceBefore = await tokenContract.balance(address);
@@ -88,7 +88,7 @@ const testWithdrawalsWithPermit = (
     expectPopulatedTx(tx);
     expectAddress(tx.from, address);
     expectAddress(tx.to, wqAddress);
-    await expectPopulatedTxToRun(tx, core.rpcProvider);
+    await expectPopulatedTxToRun(tx, core.publicClient);
   });
 
   testSpending('can simulate request', async () => {
@@ -112,7 +112,7 @@ const testWithdrawalsWithPermit = (
   testSpending('can request withdrawals with permit', async () => {
     const balanceBefore = await tokenContract.balance(address);
     const nftsBefore = await unsteth.getNFTsByAccount(address);
-    const mock = jest.fn<TransactionCallback>();
+    const mock = vi.fn<TransactionCallback>();
     const tx = await request.requestWithdrawalWithPermit({
       permit,
       token,
@@ -149,7 +149,7 @@ const testWithdrawals = (token: WithdrawableTokens, ethAmount: bigint) => {
   let requestsAmounts: bigint[] = [];
   let wqAddress: Address;
 
-  jest.setTimeout(SPENDING_TIMEOUT);
+  vi.setConfig({ testTimeout: SPENDING_TIMEOUT });
 
   beforeAll(async () => {
     wqAddress = await contract.contractAddressWithdrawalQueue();
@@ -211,7 +211,7 @@ const testWithdrawals = (token: WithdrawableTokens, ethAmount: bigint) => {
     expectPopulatedTx(tx, undefined, altTx.data);
     expectAddress(tx.from, address);
     expectAddress(tx.to, tokenAddress);
-    await expectPopulatedTxToRun(tx, core.rpcProvider);
+    await expectPopulatedTxToRun(tx, core.publicClient);
   });
 
   testSpending('can simulate approve', async () => {
@@ -223,12 +223,12 @@ const testWithdrawals = (token: WithdrawableTokens, ethAmount: bigint) => {
     expectAddress(tx.request.address, tokenAddress);
   });
 
-  testSpending.failing('cannot withdraw without approve', async () => {
+  testSpending.fails('cannot withdraw without approve', async () => {
     await request.requestWithdrawal({ token, amount });
   });
 
   testSpending('can approve', async () => {
-    const mock = jest.fn<TransactionCallback>();
+    const mock = vi.fn<TransactionCallback>();
     const tx = await approval.approve({
       token,
       amount,
@@ -266,7 +266,7 @@ const testWithdrawals = (token: WithdrawableTokens, ethAmount: bigint) => {
     expectPopulatedTx(tx);
     expectAddress(tx.from, address);
     expectAddress(tx.to, wqAddress);
-    await expectPopulatedTxToRun(tx, core.rpcProvider);
+    await expectPopulatedTxToRun(tx, core.publicClient);
   });
 
   testSpending('can simulate request', async () => {
@@ -288,7 +288,7 @@ const testWithdrawals = (token: WithdrawableTokens, ethAmount: bigint) => {
   testSpending('can request withdrawals', async () => {
     const balanceBefore = await tokenContract.balance(address);
     const nftsBefore = await unsteth.getNFTsByAccount(address);
-    const mock = jest.fn<TransactionCallback>();
+    const mock = vi.fn<TransactionCallback>();
     const tx = await request.requestWithdrawal({
       token,
       amount,

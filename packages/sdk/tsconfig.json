@@ -1,11 +1,11 @@
 {
   // This configuration is used for local development and type checking.
   "extends": "../../tsconfig.base.json",
-  "outDir": "dist",
-  "baseUrl": "./src/",
-  "include": ["src", "tests", "jest.config.ts"],
+  "include": ["src", "tests", "vitest.config.ts"],
   "exclude": ["node_modules", "dist", "__test__"],
   "compilerOptions": {
+    "outDir": "dist",
+    "baseUrl": "./src/",
     "resolveJsonModule": true
   }
 }

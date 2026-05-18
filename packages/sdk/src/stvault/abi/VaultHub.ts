@@ -1,4 +1,5 @@
-export const VaultHubAbi = [
+import type { Abi } from 'viem';
+const abi = [
   {
     inputs: [
       {
@@ -2616,4 +2617,7 @@ export const VaultHubAbi = [
     stateMutability: 'payable',
     type: 'receive',
   },
-] as const;
+] as const satisfies Abi;
+
+export type VaultHubAbiType = typeof abi;
+export const VaultHubAbi: VaultHubAbiType = abi;

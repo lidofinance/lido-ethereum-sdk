@@ -1,28 +1,28 @@
 import {
-  type Address,
-  type Chain,
   createPublicClient,
   createWalletClient,
   custom,
-  type CustomTransportConfig,
   fallback,
-  type GetBlockReturnType,
   getContract,
-  type GetContractReturnType,
   http,
-  JsonRpcAccount,
   maxUint256,
+  parseSignature,
+  type JsonRpcAccount,
+  type Address,
+  type Chain,
   type PublicClient,
   type WalletClient,
+  type GetContractReturnType,
+  type GetBlockReturnType,
+  type CustomTransportConfig,
 } from 'viem';
+
 import {
   ERROR_CODE,
   invariant,
   invariantArgument,
   withSDKError,
 } from '../common/utils/sdk-error.js';
-import { splitSignature } from '@ethersproject/bytes';
-
 import { SDKError, type SDKErrorProps } from '../common/utils/index.js';
 import { Cache, Initialize, Logger } from '../common/decorators/index.js';
 import {
@@ -45,129 +45,158 @@ import {
   WSTETH_REFERRAL_STAKER,
 } from '../common/constants.js';
 
-import { LidoLocatorAbi } from './abi/lidoLocator.js';
-import { wqWstethAddressAbi } from './abi/wq.js';
 import type {
   AccountValue,
   BackArgumentType,
   BlockArgumentType,
   GetFeeDataResult,
+  LidoContractType,
+  LidoLocatorContractType,
   LidoSDKCoreProps,
+  LidoSdkKeyedClient,
+  LidoSdkPublicClient,
+  LidoSdkWalletClient,
   LOG_MODE,
   PerformTransactionOptions,
   PermitSignature,
+  ResolvedClientRegister,
   SignPermitProps,
   TransactionOptions,
   TransactionResult,
 } from './types.js';
 import { TransactionCallbackStage } from './types.js';
-import { permitAbi } from './abi/permit.js';
+
 import { LidoSDKCacheable } from '../common/class-primitives/cacheable.js';
-import { readContract } from 'viem/actions';
-import { EncodableContract, getEncodableContract } from '../common/index.js';
+import { getEncodableContract } from '../common/index.js';
+
+import { permitAbi, permitAbiType } from './abi/permit.js';
+import { LidoLocatorAbi } from './abi/lidoLocator.js';
 import { LidoAbi } from './abi/lido.js';
 
 export default class LidoSDKCore extends LidoSDKCacheable {
   public static readonly INFINITY_DEADLINE_VALUE = maxUint256;
   private static readonly SECONDS_PER_DAY = 86400n;
 
-  #web3Provider: WalletClient | undefined;
+  #walletClient: ResolvedClientRegister['walletClient'] | undefined;
 
   readonly chainId: CHAINS;
-  readonly rpcUrls: string[] | undefined;
   readonly chain: Chain;
-  readonly rpcProvider: PublicClient;
+  readonly publicClient: ResolvedClientRegister['publicClient'];
+
   readonly logMode: LOG_MODE;
-  // for devnnets actual
+  // for devnets
   readonly customLidoLocatorAddress: Address | undefined;
 
-  public get web3Provider(): WalletClient | undefined {
-    return this.#web3Provider;
+  public get walletClient():
+    | ResolvedClientRegister['walletClient']
+    | undefined {
+    return this.#walletClient;
+  }
+
+  // shortcut for internal contract initialization
+  public get keyedClient(): LidoSdkKeyedClient {
+    return {
+      public: this.publicClient,
+      // walletClient can be undefined but for better types we add assertion here, runtime access to .write methods is protected by .useWalletClient() guard
+      wallet: this.#walletClient as LidoSdkWalletClient,
+    };
   }
 
   constructor(props: LidoSDKCoreProps, version?: string) {
     super();
-    this.chainId = props.chainId;
-    this.rpcUrls = props.rpcUrls;
-    this.logMode = props.logMode ?? 'info';
-    // for devnnets actual
+
+    this.logMode = props.logMode ?? 'none';
     this.customLidoLocatorAddress = props.customLidoLocatorAddress;
 
-    const { chain, rpcProvider, web3Provider } = this.init(props, version);
+    const { chain, publicClient, walletClient } = this.init(props, version);
 
     this.chain = chain;
-    this.rpcProvider = rpcProvider;
-    this.#web3Provider = web3Provider;
-  }
-
-  // Static Provider Creation
-
-  public static createRpcProvider(
-    chainId: CHAINS,
-    rpcUrls: string[],
-  ): PublicClient {
-    const rpcs = rpcUrls.map((url) => http(url));
-
-    return createPublicClient({
-      batch: {
-        multicall: true,
-      },
-      chain: VIEM_CHAINS[chainId],
-      transport: fallback(rpcs),
-    });
-  }
-
-  public static createWeb3Provider(
-    chainId: CHAINS,
-    transport: { request(...args: any): Promise<any> },
-    transportConfig?: CustomTransportConfig,
-  ): WalletClient {
-    return createWalletClient({
-      chain: VIEM_CHAINS[chainId],
-      transport: custom(transport, transportConfig),
-    });
+    this.chainId = chain.id as CHAINS;
+    this.publicClient = publicClient;
+    this.#walletClient = walletClient;
   }
 
   @Initialize('Init:')
   @Logger('LOG:')
-  private init(props: LidoSDKCoreProps, _version?: string) {
-    const { chainId, rpcUrls, web3Provider, rpcProvider } = props;
-    if (!SUPPORTED_CHAINS.includes(chainId)) {
+  private init(
+    {
+      chainId: chainIdProp,
+
+      publicClient: publicClientProp,
+      walletClient: walletClientProp,
+      rpcUrls,
+      // eslint-disable-next-line deprecation/deprecation
+      rpcProvider,
+      // eslint-disable-next-line deprecation/deprecation
+      web3Provider,
+    }: LidoSDKCoreProps,
+    _version?: string,
+  ) {
+    publicClientProp = publicClientProp ?? rpcProvider;
+    walletClientProp = walletClientProp ?? web3Provider;
+
+    const chainId =
+      chainIdProp ??
+      (publicClientProp ? (publicClientProp.chain?.id as CHAINS) : undefined);
+
+    if (chainId === undefined || !SUPPORTED_CHAINS.includes(chainId)) {
       throw this.error({
         message: `Unsupported chain: ${chainId}`,
         code: ERROR_CODE.INVALID_ARGUMENT,
       });
     }
 
-    if (!rpcProvider && rpcUrls.length === 0) {
+    if (!publicClientProp && (!rpcUrls || rpcUrls.length === 0)) {
       throw this.error({
-        message: `Either rpcProvider or rpcUrls are required`,
+        message: `Either publicClient or rpcUrls are required`,
+        code: ERROR_CODE.INVALID_ARGUMENT,
+      });
+    }
+
+    const publicClient: LidoSdkPublicClient =
+      publicClientProp ??
+      createPublicClient({
+        batch: {
+          multicall: true,
+        },
+        chain: VIEM_CHAINS[chainId],
+        // rpcUrls are checked above
+        transport: fallback((rpcUrls as string[]).map((url) => http(url))),
+      });
+
+    if (publicClient?.chain?.id !== chainId) {
+      throw this.error({
+        message: `publicClient chain id ${publicClient?.chain?.id} does not match provided chain id ${chainId}`,
+        code: ERROR_CODE.INVALID_ARGUMENT,
+      });
+    }
+
+    if (walletClientProp?.chain && walletClientProp.chain.id !== chainId) {
+      throw this.error({
+        message: `walletClient chain id ${walletClientProp.chain.id} does not match provided chain id ${chainId}`,
         code: ERROR_CODE.INVALID_ARGUMENT,
       });
     }
 
     const chain = VIEM_CHAINS[chainId];
-    const currentRpcProvider =
-      rpcProvider ?? LidoSDKCore.createRpcProvider(chainId, rpcUrls);
-    const currentWeb3Provider = web3Provider;
 
     return {
       chain,
-      rpcProvider: currentRpcProvider,
-      web3Provider: currentWeb3Provider,
+      publicClient,
+      walletClient: walletClientProp,
     };
   }
 
   // Web 3 provider
 
   @Logger('Provider:')
-  public useWeb3Provider(): WalletClient {
+  public useWalletClient(): ResolvedClientRegister['walletClient'] {
     invariant(
-      this.#web3Provider,
+      this.#walletClient,
       'Web3 Provider is not defined',
       ERROR_CODE.PROVIDER_ERROR,
     );
-    return this.#web3Provider;
+    return this.#walletClient;
   }
 
   // Balances
@@ -175,7 +204,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   @Logger('Balances:')
   public async balanceETH(address?: AccountValue): Promise<bigint> {
     const parsedAccount = await this.useAccount(address);
-    return this.rpcProvider.getBalance({ address: parsedAccount.address });
+    return this.publicClient.getBalance({ address: parsedAccount.address });
   }
 
   // Contracts
@@ -183,7 +212,6 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['chain.id'])
   public contractAddressLidoLocator(): Address {
-    // for devnnets actual
     if (this.customLidoLocatorAddress) {
       return this.customLidoLocatorAddress;
     }
@@ -199,28 +227,25 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['chain.id', 'contractAddressLidoLocator'])
-  public getContractLidoLocator(): GetContractReturnType<
-    typeof LidoLocatorAbi,
-    PublicClient
-  > {
-    return getContract({
-      address: this.contractAddressLidoLocator(),
-      abi: LidoLocatorAbi,
-      client: this.rpcProvider,
-    });
+  public getContractLidoLocator(): LidoLocatorContractType {
+    return getEncodableContract(
+      getContract({
+        address: this.contractAddressLidoLocator(),
+        abi: LidoLocatorAbi,
+        client: this.publicClient,
+      }),
+    );
   }
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['chain.id', 'contractAddressLidoLocator'])
-  public async getLidoContract(): Promise<
-    EncodableContract<GetContractReturnType<typeof LidoAbi, WalletClient>>
-  > {
+  public async getLidoContract(): Promise<LidoContractType> {
     const address = await this.getContractAddress(LIDO_CONTRACT_NAMES.lido);
     return getEncodableContract(
       getContract({
         address,
         abi: LidoAbi,
-        client: this.rpcProvider,
+        client: this.keyedClient,
       }),
     );
   }
@@ -235,7 +260,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       spender,
       deadline = LidoSDKCore.INFINITY_DEADLINE_VALUE,
     } = props;
-    const web3Provider = this.useWeb3Provider();
+    const web3Provider = this.useWalletClient();
     const account = await this.useAccount(accountProp);
     const { contract, domain } = await this.getPermitContractData(token);
     const nonce = await contract.read.nonces([account.address]);
@@ -253,12 +278,13 @@ export default class LidoSDKCore extends LidoSDKCacheable {
         deadline,
       },
     });
-    const { s, r, v } = splitSignature(signature);
+
+    const { s, r, v } = parseSignature(signature);
 
     return {
-      v,
-      r: r as `0x${string}`,
-      s: s as `0x${string}`,
+      v: Number(v),
+      r,
+      s,
       value: amount,
       deadline,
       nonce,
@@ -279,8 +305,8 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     const contract = getContract({
       address: tokenAddress,
       abi: permitAbi,
-      client: this.rpcProvider,
-    });
+      client: this.publicClient,
+    }) as GetContractReturnType<permitAbiType, LidoSdkPublicClient>;
 
     let domain = {
       name: 'Wrapped liquid staked Ether 2.0',
@@ -308,7 +334,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   public async getFeeData(): Promise<GetFeeDataResult> {
     // we look back 5 blocks at fees of botton 25% txs
     // if you want to increase maxPriorityFee output increase percentile
-    const feeHistory = await this.rpcProvider.getFeeHistory({
+    const feeHistory = await this.publicClient.getFeeHistory({
       blockCount: 5,
       blockTag: 'pending',
       rewardPercentiles: [25],
@@ -337,23 +363,6 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     };
   }
 
-  @Logger('Deprecation:')
-  public async getWeb3Address(accountValue?: AccountValue): Promise<Address> {
-    if (typeof accountValue === 'string') return accountValue;
-    if (accountValue) return accountValue.address;
-    const web3Provider = this.useWeb3Provider();
-
-    if (web3Provider.account) return web3Provider.account.address;
-
-    const [account] = await web3Provider.requestAddresses();
-    invariant(
-      account,
-      'web3provider must have at least 1 account',
-      ERROR_CODE.PROVIDER_ERROR,
-    );
-    return account;
-  }
-
   @Logger('Utils:')
   public async useAccount(
     accountValue?: AccountValue,
@@ -363,22 +372,22 @@ export default class LidoSDKCore extends LidoSDKCacheable {
         return { address: accountValue, type: 'json-rpc' };
       else return accountValue as JsonRpcAccount;
     }
-    if (this.web3Provider) {
-      if (!this.web3Provider.account) {
+    if (this.walletClient) {
+      if (!this.walletClient.account) {
         const [account] = await withSDKError(
-          this.web3Provider.requestAddresses(),
+          this.walletClient.requestAddresses(),
           ERROR_CODE.READ_ERROR,
         );
         invariant(
           account,
-          'web3provider must have at least 1 account',
+          'walletClient must have at least 1 account',
           ERROR_CODE.PROVIDER_ERROR,
         );
-        this.web3Provider.account = { address: account, type: 'json-rpc' };
+        this.walletClient.account = { address: account, type: 'json-rpc' };
       }
-      return this.web3Provider.account as unknown as JsonRpcAccount;
+      return this.walletClient.account as unknown as JsonRpcAccount;
     }
-    invariantArgument(false, 'No account or web3Provider is available');
+    invariantArgument(false, 'No account or walletClient is available');
   }
 
   @Logger('Utils:')
@@ -386,7 +395,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   public async isContract(address: Address): Promise<boolean> {
     // eth_getCode returns hex string of bytecode at address
     // for contract it's potentially very long hex (can't be safely&quickly parsed)
-    const bytecode = await this.rpcProvider.getCode({ address: address });
+    const bytecode = await this.publicClient.getCode({ address: address });
 
     const isEOA = bytecode === '0x'; // regular accounts (EOA) have no bytecode
     const isDelegatedEOA = bytecode?.startsWith('0xef0100'); // EIP-7702 delegation designator code prefix
@@ -413,19 +422,9 @@ export default class LidoSDKCore extends LidoSDKCacheable {
         ERROR_CODE.NOT_SUPPORTED,
       );
       return contractAddress;
-    }
-    if (contract === 'wsteth') {
-      const withdrawalQueue = await lidoLocator.read.withdrawalQueue();
-
-      const wstethAddress = await readContract(this.rpcProvider, {
-        abi: wqWstethAddressAbi,
-        address: withdrawalQueue,
-        functionName: 'WSTETH',
-      });
-
-      return wstethAddress;
     } else {
-      return lidoLocator.read[contract]();
+      const contractName = contract === 'wsteth' ? 'wstETH' : contract;
+      return await lidoLocator.read[contractName]();
     }
   }
 
@@ -493,14 +492,14 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     timestamp: bigint,
   ): Promise<GetBlockReturnType<Chain, false, 'latest'>> {
     const now = BigInt(Math.floor(Date.now() / 1000));
-    let latestBlock = await this.rpcProvider.getBlock({ blockTag: 'latest' });
+    let latestBlock = await this.publicClient.getBlock({ blockTag: 'latest' });
     if (latestBlock.timestamp < timestamp) {
       return latestBlock;
     }
     let mid = latestBlock.number - (now - timestamp) / APPROX_SECONDS_PER_BLOCK;
     invariantArgument(mid > 0n, 'No blocks at this timestamp');
 
-    let block = await this.rpcProvider.getBlock({ blockNumber: mid });
+    let block = await this.publicClient.getBlock({ blockNumber: mid });
     // feeling lucky?
     if (block.timestamp === timestamp) return block;
 
@@ -510,7 +509,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
 
     while (left <= right) {
       mid = (left + right) / 2n;
-      block = await this.rpcProvider.getBlock({ blockNumber: mid });
+      block = await this.publicClient.getBlock({ blockNumber: mid });
       if (block.timestamp === timestamp) {
         return block;
       } else if (block.timestamp < timestamp) {
@@ -531,7 +530,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     }
     const { block } = arg;
     if (typeof block === 'bigint') return block;
-    const { number } = await this.rpcProvider.getBlock({
+    const { number } = await this.publicClient.getBlock({
       blockTag: block,
     });
     invariantArgument(number !== null, 'block must not be pending');
@@ -548,7 +547,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       invariantArgument(end >= 0n, 'Too many blocks back');
       return end;
     } else {
-      const { timestamp: startTimestamp } = await this.rpcProvider.getBlock({
+      const { timestamp: startTimestamp } = await this.publicClient.getBlock({
         blockNumber: start,
       });
       const diff = arg.days
@@ -565,7 +564,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     props: PerformTransactionOptions<TDecodedResult>,
   ): Promise<TransactionResult<TDecodedResult>> {
     // this guards against not having web3Provider
-    this.useWeb3Provider();
+    this.useWalletClient();
     const {
       callback = NOOP,
       getGasLimit,
@@ -642,7 +641,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     });
 
     const receipt = await withSDKError(
-      this.rpcProvider.waitForTransactionReceipt({
+      this.publicClient.waitForTransactionReceipt({
         hash,
         timeout: 120_000,
         ...waitForTransactionReceiptParameters,
@@ -655,7 +654,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       payload: receipt,
     });
 
-    const confirmations = await this.rpcProvider.getTransactionConfirmations({
+    const confirmations = await this.publicClient.getTransactionConfirmations({
       hash: receipt.transactionHash,
     });
 
@@ -673,4 +672,76 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       confirmations,
     };
   }
+
+  //
+  // ------------------------- Deprecation & backward compatibility -------------------------
+  //
+
+  @Logger('Deprecation:')
+  /** @deprecated Use `.useWalletClient` instead. */
+  public useWeb3Provider(): ResolvedClientRegister['walletClient'] {
+    return this.useWalletClient();
+  }
+
+  /** @deprecated Use `.walletClient` instead. */
+  public get web3Provider():
+    | ResolvedClientRegister['walletClient']
+    | undefined {
+    return this.#walletClient;
+  }
+
+  /** @deprecated Use `.walletClient` instead. */
+  public get rpcProvider(): ResolvedClientRegister['publicClient'] {
+    return this.publicClient;
+  }
+
+  /** @deprecated Use `viem.createPublicClient` instead. */
+  public static createRpcProvider(
+    chainId: CHAINS,
+    rpcUrls: string[],
+  ): PublicClient {
+    const rpcs = rpcUrls.map((url) => http(url));
+
+    return createPublicClient({
+      batch: {
+        multicall: true,
+      },
+      chain: VIEM_CHAINS[chainId],
+      transport: fallback(rpcs),
+    });
+  }
+
+  /** @deprecated Use `viem.createWalletClient` instead. */
+  public static createWeb3Provider(
+    chainId: CHAINS,
+    transport: { request(...args: any): Promise<any> },
+    transportConfig?: CustomTransportConfig,
+  ): WalletClient {
+    return createWalletClient({
+      chain: VIEM_CHAINS[chainId],
+      transport: custom(transport, transportConfig),
+    });
+  }
+
+  @Logger('Deprecation:')
+  /** @deprecated */
+  public async getWeb3Address(accountValue?: AccountValue): Promise<Address> {
+    if (typeof accountValue === 'string') return accountValue;
+    if (accountValue) return accountValue.address;
+    const web3Provider = this.useWalletClient();
+
+    if (web3Provider.account) return web3Provider.account.address;
+
+    const [account] = await web3Provider.requestAddresses();
+    invariant(
+      account,
+      'web3provider must have at least 1 account',
+      ERROR_CODE.PROVIDER_ERROR,
+    );
+    return account;
+  }
+
+  //
+  // -----------------------------------------------------------------------------------------------------------------------------
+  //
 }

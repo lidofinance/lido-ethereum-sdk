@@ -1,4 +1,4 @@
-import { expect } from '@jest/globals';
+import { expect } from 'vitest';
 
 export const expectHash = (hash: any) => {
   expect(typeof hash).toBe('string');

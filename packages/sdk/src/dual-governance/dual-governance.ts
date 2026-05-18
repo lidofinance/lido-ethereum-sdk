@@ -1,14 +1,9 @@
-import {
-  Address,
-  formatUnits,
-  getContract,
-  type GetContractReturnType,
-  type PublicClient,
-} from 'viem';
+import { formatUnits, getContract, type Address } from 'viem';
 
 import {
   DUAL_GOVERNANCE_CONTRACT_NAMES,
   ERROR_CODE,
+  getEncodableContract,
   invariant,
 } from '../common/index.js';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
@@ -17,16 +12,21 @@ import { Cache, Logger } from '../common/decorators/index.js';
 import { dualGovernanceAbi } from './abi/DualGovernance.js';
 import { escrowAbi } from './abi/Escrow.js';
 import { emergencyProtectedTimelockAbi } from './abi/EmergencyProtectedTimelock.js';
-import { stETH } from './abi/StETH.js';
 import { dgConfigProviderAbi } from './abi/DGConfigProvider.js';
+
 import {
+  DGConfigProviderContractType,
   DualGovernanceConfig,
+  DualGovernanceContractType,
   DualGovernanceState,
+  EmergencyProtectedTimelockContractType,
+  EscrowContractType,
   GetGovernanceWarningStatusProps,
   GetGovernanceWarningStatusReturnType,
   GovernanceState,
   SignallingEscrowDetails,
 } from './types.js';
+import { LidoContractType } from '../core/index.js';
 
 export class LidoSDKDualGovernance extends LidoSDKModule {
   // Contracts Addresses
@@ -41,9 +41,7 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
   // Contracts
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
-  public async getContractEmergencyProtectedTimelock(): Promise<
-    GetContractReturnType<typeof emergencyProtectedTimelockAbi, PublicClient>
-  > {
+  public async getContractEmergencyProtectedTimelock(): Promise<EmergencyProtectedTimelockContractType> {
     const address = this.getContractEmergencyProtectedTimelockAddress();
 
     invariant(
@@ -52,18 +50,18 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
       ERROR_CODE.NOT_SUPPORTED,
     );
 
-    return getContract({
-      address,
-      abi: emergencyProtectedTimelockAbi,
-      client: this.core.rpcProvider,
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: emergencyProtectedTimelockAbi,
+        client: this.core.keyedClient,
+      }),
+    );
   }
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
-  public async getContractDualGovernance(): Promise<
-    GetContractReturnType<typeof dualGovernanceAbi, PublicClient>
-  > {
+  public async getContractDualGovernance(): Promise<DualGovernanceContractType> {
     const address = await this.getGovernanceAddress();
 
     invariant(
@@ -72,18 +70,18 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
       ERROR_CODE.READ_ERROR,
     );
 
-    return getContract({
-      address,
-      abi: dualGovernanceAbi,
-      client: this.core.rpcProvider,
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: dualGovernanceAbi,
+        client: this.core.keyedClient,
+      }),
+    );
   }
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
-  public async getContractVetoSignallingEscrow(): Promise<
-    GetContractReturnType<typeof escrowAbi, PublicClient>
-  > {
+  public async getContractVetoSignallingEscrow(): Promise<EscrowContractType> {
     const address = await this.getVetoSignallingEscrowAddress();
 
     invariant(
@@ -92,38 +90,24 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
       ERROR_CODE.READ_ERROR,
     );
 
-    return getContract({
-      address,
-      abi: escrowAbi,
-      client: this.core.rpcProvider,
-    });
-  }
-
-  @Logger('Contracts:')
-  @Cache(30 * 60 * 1000, ['core.chain.id'])
-  public async getContractStETH(): Promise<
-    GetContractReturnType<typeof stETH, PublicClient>
-  > {
-    const address = await this.getStETHAddress();
-
-    invariant(
-      address,
-      `Couldn't fetch stETH address on chain ${this.core.chain.name}`,
-      ERROR_CODE.READ_ERROR,
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: escrowAbi,
+        client: this.core.keyedClient,
+      }),
     );
-
-    return getContract({
-      address,
-      abi: stETH,
-      client: this.core.rpcProvider,
-    });
   }
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
-  public async getContractDualGovernanceConfigProvider(): Promise<
-    GetContractReturnType<typeof dgConfigProviderAbi, PublicClient>
-  > {
+  public async getContractStETH(): Promise<LidoContractType> {
+    return this.core.getLidoContract();
+  }
+
+  @Logger('Contracts:')
+  @Cache(30 * 60 * 1000, ['core.chain.id'])
+  public async getContractDualGovernanceConfigProvider(): Promise<DGConfigProviderContractType> {
     const address = await this.getDualGovernanceConfigProviderAddress();
 
     invariant(
@@ -132,11 +116,13 @@ export class LidoSDKDualGovernance extends LidoSDKModule {
       ERROR_CODE.READ_ERROR,
     );
 
-    return getContract({
-      address,
-      abi: dgConfigProviderAbi,
-      client: this.core.rpcProvider,
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: dgConfigProviderAbi,
+        client: this.core.keyedClient,
+      }),
+    );
   }
 
   // Views

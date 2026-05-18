@@ -1,25 +1,24 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { LidoSDK, RebaseEvent } from '@lidofinance/lido-ethereum-sdk';
 import { createPublicClient, http, Address } from 'viem';
-import { holesky } from 'viem/chains';
+import { hoodi } from 'viem/chains';
 
 const mockAddress_1 = '0x';
 const mockAddress_2 = '0x';
 const mockAddress_3 = '0x';
 
-const rpcProvider = createPublicClient({
-  chain: holesky,
+const publicClient = createPublicClient({
+  chain: hoodi,
   transport: http(),
 });
 const lidoSDK = new LidoSDK({
-  chainId: holesky.id,
-  rpcProvider,
+  publicClient,
 });
 
 const subscribeRebaseEvent = async (callback: (logs: any) => void) => {
   const stethContract = await lidoSDK.stake.getContractStETH();
 
-  const unwatch = rpcProvider.watchContractEvent({
+  const unwatch = publicClient.watchContractEvent({
     address: stethContract.address,
     abi: stethContract.abi,
     eventName: 'TokenRebased',

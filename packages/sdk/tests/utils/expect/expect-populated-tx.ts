@@ -1,4 +1,4 @@
-import { expect } from '@jest/globals';
+import { expect } from 'vitest';
 import { expectAddress } from './expect-address.js';
 import { expectHash } from './expect-hash.js';
 import { PublicClient } from 'viem';

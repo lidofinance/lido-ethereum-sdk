@@ -28,11 +28,23 @@ import {
   TransactionCallbackStage,
   SDKError,
 } from '@lidofinance/lido-ethereum-sdk';
+import {
+  createWalletClient,
+  custom,
+  hoodi,
+  http,
+  createPublicClient,
+} from 'viem';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['<RPC_URL>'],
-  chainId: 17000,
-  web3Provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
+  walletClient: createWalletClient({
+    chain: hoodi,
+    transport: custom(window.ethereum),
+  }),
 });
 
 const callback: TransactionCallback = ({ stage, payload }) => {
@@ -110,11 +122,23 @@ import {
   TransactionCallbackStage,
   SDKError,
 } from '@lidofinance/lido-ethereum-sdk';
+import {
+  createWalletClient,
+  custom,
+  hoodi,
+  http,
+  createPublicClient,
+} from 'viem';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['<RPC_URL>'],
-  chainId: 17000,
-  web3Provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
+  walletClient: createWalletClient({
+    chain: hoodi,
+    transport: custom(window.ethereum),
+  }),
 });
 
 const callback: TransactionCallback = ({ stage, payload }) => {
@@ -183,10 +207,23 @@ import {
   SDKError,
 } from '@lidofinance/lido-ethereum-sdk';
 
+import {
+  createWalletClient,
+  custom,
+  hoodi,
+  http,
+  createPublicClient,
+} from 'viem';
+
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['<RPC_URL>'],
-  chainId: 17000,
-  web3Provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
+  walletClient: createWalletClient({
+    chain: hoodi,
+    transport: custom(window.ethereum),
+  }),
 });
 
 const callback: TransactionCallback = ({ stage, payload }) => {
@@ -252,10 +289,23 @@ import {
   SDKError,
 } from '@lidofinance/lido-ethereum-sdk';
 
+import {
+  createWalletClient,
+  custom,
+  hoodi,
+  http,
+  createPublicClient,
+} from 'viem';
+
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['<RPC_URL>'],
-  chainId: 17000,
-  web3Provider: LidoSDKCore.createWeb3Provider(17000, window.ethereum),
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
+  walletClient: createWalletClient({
+    chain: hoodi,
+    transport: custom(window.ethereum),
+  }),
 });
 
 const callback: ApproveStageCallback = ({ stage, payload }) => {

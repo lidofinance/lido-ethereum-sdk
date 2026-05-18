@@ -1,4 +1,4 @@
-import { describe, expect, test } from '@jest/globals';
+import { describe, expect, test } from 'vitest';
 import { LidoSDKShares } from '../shares.js';
 import type { BatchSharesToStethValue } from '../types.js';
 import { expectSDKModule } from '../../../tests/utils/expect/expect-sdk-module.js';
@@ -31,7 +31,7 @@ describe('LidoSDKShares', () => {
   const { address: altAddress } = useAltAccount();
 
   const fetchShareRateSnapshot = async () => {
-    const blockNumber = await shares.core.rpcProvider.getBlockNumber();
+    const blockNumber = await shares.core.publicClient.getBlockNumber();
     const contract = await shares.getContractStETHshares();
     const [totalShares, totalEther] = await Promise.all([
       contract.read.getTotalShares({ blockNumber }),
@@ -182,7 +182,7 @@ describe('LidoSDKShares', () => {
   test('populate transfer', async () => {
     const tx = await shares.populateTransfer({ to: altAddress, amount: 100n });
     expectPopulatedTx(tx, undefined, true);
-    await expectPopulatedTxToRun(tx, shares.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, shares.core.publicClient);
   });
 
   test('simulate transfer', async () => {

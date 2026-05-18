@@ -9,11 +9,11 @@ export const useRpcCore = () => {
   const { chainId } = useTestsEnvs();
 
   if (!cachedRpcCore) {
-    const rpcProvider = usePublicRpcProvider();
+    const publicClient = usePublicRpcProvider();
     cachedRpcCore = new LidoSDKCore({
       chainId: chainId,
       logMode: 'none',
-      rpcProvider: rpcProvider,
+      publicClient,
     });
   }
   return cachedRpcCore;
@@ -40,12 +40,12 @@ export const useWeb3Core = () => {
   if (!cachedWeb3Core) {
     const walletClient = useWalletClient();
     const { chainId } = useTestsEnvs();
-    const rpcProvider = usePublicRpcProvider();
+    const publicClient = usePublicRpcProvider();
     cachedWeb3Core = new LidoSDKCore({
       chainId: chainId,
-      rpcProvider: rpcProvider,
+      publicClient,
       logMode: 'none',
-      web3Provider: walletClient,
+      walletClient,
     });
   }
   return cachedWeb3Core;

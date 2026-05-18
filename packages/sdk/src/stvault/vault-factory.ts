@@ -71,7 +71,7 @@ export class LidoSDKVaultFactory extends BusModule {
   ): Promise<TransactionResult<CreateVaultResult>> {
     await this._validateCreateVaultProps(props);
 
-    this.bus.core.useWeb3Provider();
+    this.bus.core.useWalletClient();
     const { callback, account, txArgs, ...rest } = await this.parseProps(props);
     const contract = await this.bus.contracts.getContractVaultFactory();
 

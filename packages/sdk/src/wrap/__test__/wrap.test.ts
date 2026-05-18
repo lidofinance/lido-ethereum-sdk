@@ -1,8 +1,8 @@
 import { encodeFunctionData } from 'viem';
-import { expect, describe, test } from '@jest/globals';
+import { expect, describe, test } from 'vitest';
 
 import { LidoSDKWrap } from '../wrap.js';
-import { abi as wstethReferralStakerAbi } from '../abi/wsteth-referral-staker.js';
+import { WstethReferralStakerABI } from '../abi/wsteth-referral-staker.js';
 
 import { LIDO_CONTRACT_NAMES, LidoSDKstETH } from '../../index.js';
 
@@ -85,7 +85,7 @@ describe('LidoSDKWrap read methods', () => {
     expectAddress(tx.to, stethAddress);
     expectAddress(tx.from, address);
     expectPopulatedTx(tx);
-    await expectPopulatedTxToRun(tx, wrap.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, wrap.core.publicClient);
   });
 
   test('approve simulate', async () => {
@@ -111,14 +111,15 @@ describe('LidoSDKWrap read methods', () => {
     const wstethReferralStakerAddress = await wrap.core.getContractAddress(
       LIDO_CONTRACT_NAMES.wstethReferralStaker,
     );
-    const referralAddress = '0x1111111111111111111111111111111111111111' as const;
+    const referralAddress =
+      '0x1111111111111111111111111111111111111111' as const;
     const tx = await wrap.wrapEthPopulateTx({ value, referralAddress });
     expectAddress(tx.to, wstethReferralStakerAddress);
     expectAddress(tx.from, address);
     expectPopulatedTx(tx, value, true);
     expect(tx.data).toEqual(
       encodeFunctionData({
-        abi: wstethReferralStakerAbi,
+        abi: WstethReferralStakerABI,
         functionName: 'stakeETH',
         args: [referralAddress],
       }),

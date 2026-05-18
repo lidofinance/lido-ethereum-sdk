@@ -1,5 +1,7 @@
 export { WithdrawalQueueAbi } from './abi/withdrawalQueue.js';
 export { LidoSDKWithdraw } from './withdraw.js';
+
+export type { WithdrawalQueueAbiType } from './abi/withdrawalQueue.js';
 export type {
   ClaimRequestsProps,
   ClaimResult,
@@ -24,4 +26,7 @@ export type {
   GetClaimableRequestsInfoReturnType,
   GetWithdrawalRequestsInfoReturnType,
   PropsWithAccount,
+  WithdrawalQueueContractType,
+  PartialStethContractType,
+  PartialWstethContractType,
 } from './types.js';

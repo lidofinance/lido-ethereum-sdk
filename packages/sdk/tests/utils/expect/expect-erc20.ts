@@ -1,5 +1,5 @@
 import { getContract } from 'viem';
-import { expect, describe, test } from '@jest/globals';
+import { expect, describe, test } from 'vitest';
 import { AbstractLidoSDKErc20 } from '../../../src/erc20/erc20.js';
 import {
   LIDO_CONTRACT_NAMES,
@@ -50,8 +50,8 @@ export const expectERC20 = <I extends AbstractLidoSDKErc20>({
       address,
       abi: erc20abi,
       client: {
-        public: rpcCore.rpcProvider,
-        wallet: web3Core.web3Provider,
+        public: rpcCore.publicClient,
+        wallet: web3Core.walletClient,
       },
     });
   };

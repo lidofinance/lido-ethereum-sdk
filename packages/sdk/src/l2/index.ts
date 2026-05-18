@@ -8,4 +8,8 @@ export type {
   UnwrapResults,
   WrapProps,
   WrapResults,
+  RebasableL2StethContractType,
+  BridgedWstethContractType,
 } from './types.js';
+export type { bridgedWstethAbiType } from './abi/brigedWsteth.js';
+export type { rebasableL2StethAbiType } from './abi/rebasableL2Steth.js';

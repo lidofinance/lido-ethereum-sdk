@@ -1,4 +1,5 @@
-export const rebasableL2StethAbi = [
+import type { Abi } from 'viem';
+const abi = [
   {
     inputs: [
       { internalType: 'string', name: 'name_', type: 'string' },
@@ -387,4 +388,7 @@ export const rebasableL2StethAbi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type rebasableL2StethAbiType = typeof abi;
+export const rebasableL2StethAbi: rebasableL2StethAbiType = abi;

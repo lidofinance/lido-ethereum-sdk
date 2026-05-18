@@ -29,10 +29,13 @@ sidebar_position: 11
 
 ```ts
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+import { http, createPublicClient } from 'viem';
 
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['<RPC_URL>'],
-  chainId: 17000,
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
 });
 
 const lastApr = await lidoSDK.statistics.apr.getLastApr();

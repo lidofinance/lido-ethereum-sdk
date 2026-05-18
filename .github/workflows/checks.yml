@@ -1,4 +1,9 @@
 name: Check all
+
+permissions:
+  contents: read
+  packages: read
+
 on:
   pull_request:
 jobs:
@@ -7,10 +12,10 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: 'yarn'
@@ -36,6 +41,9 @@ jobs:
           DEFAULT_CHAIN: ${{ vars.DEFAULT_CHAIN }}
       - name: Check types
         run: yarn types
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@c7450ba673e133f5ee30098b3b54f444d3a2ca2d
 
       - name: Tests
         run: yarn test

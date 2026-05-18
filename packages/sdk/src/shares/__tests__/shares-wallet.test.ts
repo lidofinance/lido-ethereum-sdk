@@ -1,4 +1,4 @@
-import { describe, expect, jest } from '@jest/globals';
+import { describe, expect, vi } from 'vitest';
 import { useSteth } from '../../../tests/utils/fixtures/use-steth.js';
 import {
   SPENDING_TIMEOUT,
@@ -26,7 +26,7 @@ describe('LidoSDKStake wallet methods', () => {
       const amountSteth = await shares.convertToShares(amount);
       const balanceStethBefore = await steth.balance(address);
       const balanceSharesBefore = await shares.balance(address);
-      const mockTxCallback = jest.fn<TransactionCallback>();
+      const mockTxCallback = vi.fn<TransactionCallback>();
       const tx = await shares.transfer({
         amount,
         to: alt.address,

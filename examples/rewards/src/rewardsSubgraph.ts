@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
 import { createPublicClient, http } from 'viem';
-import { holesky } from 'viem/chains';
+import { hoodi } from 'viem/chains';
 
 const mockAddress = '0x';
-const rpcProvider = createPublicClient({
-  chain: holesky,
+const publicClient = createPublicClient({
+  chain: hoodi,
   transport: http(),
 });
 const lidoSDK = new LidoSDK({
-  chainId: holesky.id,
-  rpcProvider,
+  publicClient,
 });
 
 const getRewardsSubgraph = async () => {

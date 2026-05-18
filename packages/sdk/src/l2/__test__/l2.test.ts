@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, jest, test } from '@jest/globals';
+import { beforeAll, describe, expect, vi, test } from 'vitest';
 import { expectSDKModule } from '../../../tests/utils/expect/expect-sdk-module.js';
 import {
   useL2,
@@ -14,7 +14,7 @@ import {
   useAccount,
   useAltAccount,
 } from '../../../tests/utils/fixtures/use-wallet-client.js';
-import { getContract } from 'viem';
+import { getContract, createWalletClient, custom, parseEther } from 'viem';
 import { bridgedWstethAbi } from '../abi/brigedWsteth.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
 import { expectContract } from '../../../tests/utils/expect/expect-contract.js';
@@ -48,28 +48,31 @@ const prepareL2Wsteth = async () => {
 
   const bridge = await wstethImpersonated.read.bridge();
 
+  // Use generous ETH balances so eth_estimateGas passes even with mainnet-level
+  // maxFeePerGas filled in by prepareTransactionRequest (0.0001 ETH is not enough).
   await testClient.setBalance({
     address: account.address,
-    value: 100000000000000n,
+    value: parseEther('10'),
   });
 
   await testClient.setBalance({
     address: bridge,
-    value: 100000000000000n,
+    value: parseEther('1'),
   });
 
-  await testClient.request({
-    method: 'evm_addAccount' as any,
-    params: [bridge, 'pass'],
-  });
+  await testClient.impersonateAccount({ address: bridge });
 
-  await testClient.request({
-    method: 'personal_unlockAccount' as any,
-    params: [bridge, 'pass'],
-  });
-
-  await wstethImpersonated.write.bridgeMint([account.address, 2000n], {
+  const bridgeWalletClient = createWalletClient({
     account: bridge,
+    chain: testClient.chain,
+    transport: custom({ request: testClient.request }),
+  });
+
+  await bridgeWalletClient.writeContract({
+    abi: bridgedWstethAbi,
+    address: wstethAddress,
+    functionName: 'bridgeMint',
+    args: [account.address, 2000n],
     chain: testClient.chain,
   });
 };
@@ -123,7 +126,7 @@ describe('LidoSDKL2 wrap', () => {
   beforeAll(prepareL2Wsteth);
 
   testSpending('set allowance', async () => {
-    const mock = jest.fn<TransactionCallback>();
+    const mock = vi.fn<TransactionCallback>();
     const tx = await l2.approveWstethForWrap({ value, callback: mock });
     expectTxCallback(mock, tx);
     await expect(l2.getWstethForWrapAllowance(account)).resolves.toEqual(value);
@@ -137,7 +140,7 @@ describe('LidoSDKL2 wrap', () => {
     expectAddress(tx.to, stethAddress);
     expectAddress(tx.from, account.address);
     expectPopulatedTx(tx, undefined);
-    await expectPopulatedTxToRun(tx, l2.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, l2.core.publicClient);
   });
 
   testSpending('wrap simulate', async () => {
@@ -157,7 +160,7 @@ describe('LidoSDKL2 wrap', () => {
     const stethValue = await l2.steth.convertToSteth(value);
     const stethBalanceBefore = await l2.steth.balance(account.address);
     const wstethBalanceBefore = await l2.wsteth.balance(account.address);
-    const mock = jest.fn<TransactionCallback>();
+    const mock = vi.fn<TransactionCallback>();
     const tx = await l2.wrapWstethToSteth({ value, callback: mock });
     expectTxCallback(mock, tx);
     const stethBalanceAfter = await l2.steth.balance(account.address);
@@ -188,7 +191,7 @@ describe('LidoSDKL2 wrap', () => {
     expectAddress(tx.to, stethAddress);
     expectAddress(tx.from, account.address);
     expectPopulatedTx(tx, undefined);
-    await expectPopulatedTxToRun(tx, l2.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, l2.core.publicClient);
   });
 
   testSpending('unwrap steth simulate', async () => {
@@ -208,7 +211,7 @@ describe('LidoSDKL2 wrap', () => {
     const stethValue = await l2.steth.convertToSteth(value);
     const stethBalanceBefore = await l2.steth.balance(account.address);
     const wstethBalanceBefore = await l2.wsteth.balance(account.address);
-    const mock = jest.fn<TransactionCallback>();
+    const mock = vi.fn<TransactionCallback>();
     const tx = await l2.unwrapStethToWsteth({
       value: stethValue,
       callback: mock,
@@ -314,7 +317,7 @@ describe('LidoSDKL2Steth shares', () => {
       amount: 100n,
     });
     expectPopulatedTx(tx, undefined, true);
-    await expectPopulatedTxToRun(tx, l2.core.rpcProvider);
+    await expectPopulatedTxToRun(tx, l2.core.publicClient);
   });
 
   test('simulate transfer', async () => {
@@ -336,7 +339,7 @@ describe('LidoSDKL2Steth shares', () => {
       const amountSteth = await l2.steth.convertToSteth(amount);
       const balanceStethBefore = await l2.steth.balance(account.address);
       const balanceSharesBefore = await l2.steth.balanceShares(account.address);
-      const mockTxCallback = jest.fn<TransactionCallback>();
+      const mockTxCallback = vi.fn<TransactionCallback>();
 
       const tx = await l2.steth.transferShares({
         amount,

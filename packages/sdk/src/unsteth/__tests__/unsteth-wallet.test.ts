@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, jest } from '@jest/globals';
+import { beforeAll, describe, expect, vi } from 'vitest';
 import { useUnsteth } from '../../../tests/utils/fixtures/use-unsteth.js';
 import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
 import { expectPositiveBn } from '../../../tests/utils/expect/expect-bn.js';
@@ -35,7 +35,7 @@ describe('unsteth wallet tests', () => {
   let nftIds: bigint[] = [];
   let nftId = 0n;
 
-  jest.setTimeout(SPENDING_TIMEOUT);
+  vi.setConfig({ testTimeout: SPENDING_TIMEOUT });
 
   beforeAll(async () => {
     await unsteth.setAllTokensApproval({
@@ -105,7 +105,7 @@ describe('unsteth wallet tests', () => {
     expectAddress(tx.to, wqAddress);
     expectAddress(tx.from, account.address);
     expectPopulatedTx(tx, undefined);
-    await expectPopulatedTxToRun(tx, core.rpcProvider);
+    await expectPopulatedTxToRun(tx, core.publicClient);
   });
 
   testSpending('can simulate transfer token', async () => {
@@ -121,7 +121,7 @@ describe('unsteth wallet tests', () => {
   });
 
   testSpending('can transfer token', async () => {
-    const mock = jest.fn<TransactionCallback>();
+    const mock = vi.fn<TransactionCallback>();
     const tx = await unsteth.transfer({
       id: nftId,
       to: altAccount.address,
@@ -144,7 +144,7 @@ describe('unsteth wallet tests', () => {
     expectAddress(tx.to, wqAddress);
     expectAddress(tx.from, account.address);
     expectPopulatedTx(tx, undefined);
-    await expectPopulatedTxToRun(tx, core.rpcProvider);
+    await expectPopulatedTxToRun(tx, core.publicClient);
   });
 
   testSpending('can simulate approve single token', async () => {
@@ -168,7 +168,7 @@ describe('unsteth wallet tests', () => {
   });
 
   testSpending('can approve single token', async () => {
-    const mock = jest.fn<TransactionCallback>();
+    const mock = vi.fn<TransactionCallback>();
     const tx = await unsteth.setSingleTokenApproval({
       id: nftId,
       to: altAccount.address,
@@ -195,7 +195,7 @@ describe('unsteth wallet tests', () => {
   });
 
   testSpending('can revoke approve single token', async () => {
-    const mock = jest.fn<TransactionCallback>();
+    const mock = vi.fn<TransactionCallback>();
     const tx = await unsteth.setSingleTokenApproval({
       id: nftId,
       callback: mock,
@@ -238,7 +238,7 @@ describe('unsteth wallet tests', () => {
     expectAddress(tx.to, wqAddress);
     expectAddress(tx.from, account.address);
     expectPopulatedTx(tx, undefined);
-    await expectPopulatedTxToRun(tx, core.rpcProvider);
+    await expectPopulatedTxToRun(tx, core.publicClient);
   });
 
   testSpending('can simulate approve for all tokens', async () => {
@@ -254,7 +254,7 @@ describe('unsteth wallet tests', () => {
   });
 
   testSpending('can approve for all tokens', async () => {
-    const mock = jest.fn<TransactionCallback>();
+    const mock = vi.fn<TransactionCallback>();
     const tx = await unsteth.setAllTokensApproval({
       to: altAccount.address,
       allow: true,
@@ -282,7 +282,7 @@ describe('unsteth wallet tests', () => {
   });
 
   testSpending('can revoke approve for all tokens', async () => {
-    const mock = jest.fn<TransactionCallback>();
+    const mock = vi.fn<TransactionCallback>();
     const tx = await unsteth.setAllTokensApproval({
       to: altAccount.address,
       allow: false,

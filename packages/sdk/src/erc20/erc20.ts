@@ -1,7 +1,8 @@
-import { EtherValue, LidoSDKCore } from '../core/index.js';
+import { type EtherValue, LidoSDKCore } from '../core/index.js';
 import type {
   AllowanceProps,
   ApproveProps,
+  Erc20ContractType,
   ParsedTransactionProps,
   SignTokenPermitProps,
   TransferProps,
@@ -10,11 +11,10 @@ import { Logger, Cache, ErrorHandler } from '../common/decorators/index.js';
 import { erc20abi } from './abi/erc20abi.js';
 import {
   type Address,
-  type GetContractReturnType,
   type Hash,
-  type WalletClient,
   encodeFunctionData,
   getContract,
+  parseSignature,
 } from 'viem';
 import { NOOP, PERMIT_MESSAGE_TYPES } from '../common/constants.js';
 import { parseValue } from '../common/utils/parse-value.js';
@@ -26,7 +26,7 @@ import type {
   TransactionOptions,
   TransactionResult,
 } from '../core/types.js';
-import { splitSignature } from '@ethersproject/bytes';
+import { getEncodableContract } from '../common/index.js';
 
 export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   // Contract
@@ -35,18 +35,15 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
 
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['core.chain.id'])
-  public async getContract(): Promise<
-    GetContractReturnType<typeof erc20abi, WalletClient>
-  > {
+  public async getContract(): Promise<Erc20ContractType> {
     const address = await this.contractAddress();
-    return getContract({
-      address,
-      abi: erc20abi,
-      client: {
-        public: this.core.rpcProvider,
-        wallet: this.core.web3Provider as WalletClient,
-      },
-    });
+    return getEncodableContract(
+      getContract({
+        address,
+        abi: erc20abi,
+        client: this.core.keyedClient,
+      }),
+    );
   }
 
   // Balance
@@ -64,7 +61,7 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   @Logger('Call:')
   @ErrorHandler()
   public async transfer(props: TransferProps): Promise<TransactionResult> {
-    this.core.useWeb3Provider();
+    this.core.useWalletClient();
     const parsedProps = await this.parseProps(props);
     const { account, amount, to, from = account.address } = parsedProps;
     const isTransferFrom = from !== account.address;
@@ -148,15 +145,15 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   public async signPermit(
     props: SignTokenPermitProps,
   ): Promise<PermitSignature> {
-    const web3Provider = this.core.useWeb3Provider();
+    const walletClient = this.core.useWalletClient();
     const payload = await this.populatePermit(props);
-    const signature = await web3Provider.signTypedData(payload);
-    const { s, r, v } = splitSignature(signature);
+    const signature = await walletClient.signTypedData(payload);
+    const { s, r, v } = parseSignature(signature);
 
     return {
-      v,
-      r: r as `0x${string}`,
-      s: s as `0x${string}`,
+      v: Number(v),
+      r,
+      s,
       chainId: BigInt(this.core.chain.id),
       ...payload.message,
     };
@@ -199,7 +196,7 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
   @Logger('Call:')
   @ErrorHandler()
   public async approve(props: ApproveProps): Promise<TransactionResult> {
-    this.core.useWeb3Provider();
+    this.core.useWalletClient();
     const parsedProps = await this.parseProps(props);
     const contract = await this.getContract();
     const txArguments = [parsedProps.to, parsedProps.amount] as const;
@@ -272,10 +269,10 @@ export abstract class AbstractLidoSDKErc20 extends LidoSDKModule {
     decimals: number;
     domainSeparator: Hash;
   }> {
-    if (this.core.rpcProvider.multicall) {
+    if (this.core.publicClient.multicall) {
       const contract = { address: await this.contractAddress(), abi: erc20abi };
       const [decimals, name, symbol, domainSeparator] =
-        await this.core.rpcProvider.multicall({
+        await this.core.publicClient.multicall({
           allowFailure: false,
           contracts: [
             {

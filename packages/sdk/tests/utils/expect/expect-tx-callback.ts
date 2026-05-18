@@ -1,4 +1,4 @@
-import { expect, jest } from '@jest/globals';
+import { expect, vi } from 'vitest';
 import {
   TransactionCallback,
   TransactionCallbackStage,
@@ -6,9 +6,9 @@ import {
 import { expectPositiveBn } from './expect-bn.js';
 import { expectHash } from './expect-hash.js';
 
-const mockTxCallback = jest.fn<TransactionCallback>();
+const mockTxCallback = vi.fn<TransactionCallback>();
 
-export const useMockCallback = () => jest.fn<TransactionCallback>();
+export const useMockCallback = () => vi.fn<TransactionCallback>();
 
 type ExpectTxCallbackOptions = {
   hasPermit?: boolean;

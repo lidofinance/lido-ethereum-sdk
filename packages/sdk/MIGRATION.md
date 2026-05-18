@@ -1,3 +1,19 @@
+#
+
+# Migrating from V4.7.0 -> V4.8.0 & V5 (coming soon)
+
+Naming and typings are now consistent with `viem`
+
+## Deprecations (will be removed in V5)
+
+- in `new LidoSDKCore()` constructor arguments `rpcProvider`, `rpcUrls`, `web3Provider` -> use `publicClient` and `walletClient`
+- `LidoSDKCore.rpcProvider` -> use `LidoSDKCore.publicClient`
+- `LidoSDKCore.web3Provider` -> use `LidoSDKCore.walletClient`
+- `LidoSDKCore.useWeb3Provider` -> use `LidoSDKCore.useWalletClient`
+- `LidoSDKCore.createRpcProvider` -> use `viem` `createPublicClient`
+- `LidoSDKCore.createWeb3Provider` -> use `viem` `createWalletClient`
+- `LidoSDKCore.getWeb3Address`
+
 # Migrating from V3 -> V4
 
 - `viem` is now a peer dependency and you will need to install it separately.

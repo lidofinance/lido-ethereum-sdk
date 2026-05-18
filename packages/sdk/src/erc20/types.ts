@@ -1,12 +1,19 @@
-import type { Address, JsonRpcAccount } from 'viem';
+import type { Address, GetContractReturnType, JsonRpcAccount } from 'viem';
 import { type EtherValue } from '../core/index.js';
-import {
+import type {
   AccountValue,
   CommonTransactionProps,
   SignPermitProps,
+  LidoSdkKeyedClient,
 } from '../core/types.js';
+import type { EncodableContract } from '../common/index.js';
+import type { erc20abiType } from './abi/erc20abi.js';
 
 export type InnerTransactionProps = Required<CommonTransactionProps>;
+
+export type Erc20ContractType = EncodableContract<
+  GetContractReturnType<erc20abiType, LidoSdkKeyedClient>
+>;
 
 export type ParsedTransactionProps<TProps extends CommonTransactionProps> =
   Omit<TProps, 'callback' | 'account'> & {

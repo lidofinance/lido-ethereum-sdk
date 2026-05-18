@@ -1,3 +1,5 @@
+import type { Abi } from 'viem';
+
 export const stethPartialAbi = [
   {
     constant: true,
@@ -80,7 +82,9 @@ export const stethPartialAbi = [
     name: 'Submitted',
     type: 'event',
   },
-] as const;
+] as const satisfies Abi;
+
+export type StETHPartialAbiType = typeof stethPartialAbi;
 
 export const PartialTransferEventAbi = [
   {
@@ -93,4 +97,6 @@ export const PartialTransferEventAbi = [
     name: 'Transfer',
     type: 'event',
   },
-] as const;
+] as const satisfies Abi;
+
+export type PartialTransferEventAbiType = typeof PartialTransferEventAbi;

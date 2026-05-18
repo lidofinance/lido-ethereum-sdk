@@ -17,25 +17,42 @@ import {
 } from 'reef-knot/core-react';
 import { createConfig, http, WagmiProvider } from 'wagmi';
 import * as wagmiChains from 'wagmi/chains';
-import { Chain } from 'wagmi/chains';
 import invariant from 'tiny-invariant';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CHAINS } from '@lidofinance/lido-ethereum-sdk';
 import { useThemeToggle } from '@lidofinance/lido-ui';
-
-type ChainsList = [Chain, ...Chain[]];
+import { ChainsList, RegisteredConfig, SupportedWagmiChain } from './types';
 
 export const L2_CHAINS = [10, 11155420, 1946, 1301];
 
-const wagmiChainsArray = Object.values(wagmiChains) as any as ChainsList;
+const wagmiChainsArray = Object.values(wagmiChains);
 
 const supportedChains = wagmiChainsArray.filter((chain) =>
   dynamics.supportedChains.includes(chain.id),
-) as ChainsList;
+) as readonly SupportedWagmiChain[];
+
+let supportedChainList = supportedChains as ChainsList;
 
 const defaultChain =
   wagmiChainsArray.find((chain) => chain.id === dynamics.defaultChain) ||
-  supportedChains[0]; // first supported chain as fallback;
+  supportedChainList[0]; // first supported chain as fallback;
+
+const defaultChainInSupportedList = supportedChainList.findIndex(
+  (chain) => chain.id === defaultChain.id,
+);
+
+// move default chain to the beginning of the list, it's important for correct wagmi behavior
+if (defaultChainInSupportedList !== 0) {
+  supportedChainList = [
+    supportedChainList[defaultChainInSupportedList],
+    ...supportedChainList.slice(0, defaultChainInSupportedList),
+    ...supportedChainList.slice(defaultChainInSupportedList + 1),
+  ];
+}
+
+// invariants enforce typecasts
+
+invariant(supportedChains[0], 'At least one supported chain must be provided');
 
 const queryClient = new QueryClient();
 
@@ -96,18 +113,20 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
   }, [activeRpc]);
 
   const config = useMemo(() => {
+    const transports = supportedChainList.reduce(
+      (res, curr) => ({
+        ...res,
+        [curr.id]: http(activeRpc[curr.id], { batch: true }),
+      }),
+      {} as { [chainId in CHAINS]: ReturnType<typeof http> },
+    );
+
     return createConfig({
-      chains: supportedChains,
+      chains: supportedChainList,
       ssr: true,
       multiInjectedProviderDiscovery: false,
-      transports: supportedChains.reduce(
-        (res, curr) => ({
-          ...res,
-          [curr.id]: http(activeRpc[curr.id], { batch: true }),
-        }),
-        {},
-      ),
-    });
+      transports,
+    }) as RegisteredConfig;
   }, [activeRpc]);
 
   return (
@@ -116,7 +135,7 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
         <QueryClientProvider client={queryClient}>
           <ReefKnot
             rpc={activeRpc}
-            chains={supportedChains}
+            chains={supportedChainList}
             walletDataList={walletsDataList}
           >
             <AutoConnect autoConnect />

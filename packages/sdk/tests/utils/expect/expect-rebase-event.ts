@@ -1,4 +1,4 @@
-import { expect } from '@jest/globals';
+import { expect } from 'vitest';
 import { expectPositiveBn } from './expect-bn.js';
 import { expectAddress } from './expect-address.js';
 

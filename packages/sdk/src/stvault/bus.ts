@@ -11,7 +11,7 @@ import { LidoSDKVaultViewer } from './vault-viewer.js';
 import { LidoSDKstETH, LidoSDKwstETH } from '../erc20/index.js';
 import { LidoSDKVaultEntity } from './vault-entity.js';
 import { LidoSDKVaultLazyOracle } from './vault-lazy-oracle.js';
-import { LidoSDKVaultConstants } from './vault-contants.js';
+import { LidoSDKVaultConstants } from './vault-constants.js';
 import { SubmitLatestReportProps } from './types.js';
 
 export class Bus extends LidoSDKModule {
@@ -120,7 +120,7 @@ export class Bus extends LidoSDKModule {
 
     const updateCall = lazyOracleContract.prepare.updateVaultData(args);
 
-    const allResults = await this.core.rpcProvider.multicall({
+    const allResults = await this.core.publicClient.multicall({
       contracts: [updateCall, ...props.preparedMethods] as any,
       allowFailure: false,
       blockNumber: props.blockNumber,

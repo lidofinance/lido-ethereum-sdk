@@ -12,10 +12,23 @@ execute dashboard/vault actions.
 ```ts
 import { LidoSDK, LidoSDKCore } from '@lidofinance/lido-ethereum-sdk';
 
+import {
+  createWalletClient,
+  custom,
+  hoodi,
+  http,
+  createPublicClient,
+} from 'viem';
+
 const lidoSDK = new LidoSDK({
-  rpcUrls: ['<RPC_URL>'],
-  chainId: 1,
-  web3Provider: LidoSDKCore.createWeb3Provider(1, window.ethereum),
+  publicClient: createPublicClient({
+    chain: hoodi,
+    transport: http('<RPC_URL>'),
+  }),
+  walletClient: createWalletClient({
+    chain: hoodi,
+    transport: custom(window.ethereum),
+  }),
 });
 
 const stVault = lidoSDK.stVaultModule;
@@ -36,9 +49,11 @@ const stVault = lidoSDK.stVaultModule;
 ## Create vault
 
 Main method:
+
 - `stVault.vaultFactory.createVault(props)`
 
 Helpers:
+
 - `stVault.vaultFactory.createVaultSimulateTx(props)`
 - `stVault.vaultFactory.createVaultPopulateTx(props)`
 
@@ -85,12 +100,14 @@ const vault = stVault.vaultFromAddress('<VAULT_ADDRESS>');
 ```
 
 Address/contracts:
+
 - `vault.getVaultAddress()`
 - `vault.getDashboardAddress()`
 - `vault.getVaultContract()`
 - `vault.getDashboardContract()`
 
 Value operations:
+
 - `vault.fund({ value, account? })`
 - `vault.withdraw({ address, amount, account? })`
 - `vault.mint({ recipient, amount, token: 'steth' | 'wsteth', account? })`
@@ -98,15 +115,18 @@ Value operations:
 - `vault.approve({ amount, token: 'steth' | 'wsteth', account? })`
 
 Shares-specific:
+
 - `vault.mintShares({ recipient, amountOfShares, account? })`
 - `vault.burnShares({ amountOfShares, account? })`
 
 Role management:
+
 - `vault.grantRoles({ roles, account? })`
 - `vault.revokeRoles({ roles, account? })`
 - `vault.getRoleMembers({ role })`
 
 Node operator fee:
+
 - `vault.disburseNodeOperatorFee({ account? })`
 
 Most transactional methods above also provide `SimulateTx` and `PopulateTx`
@@ -115,12 +135,14 @@ variants (for example `fundSimulateTx`, `fundPopulateTx`). `approve` is call-onl
 ## Reports and overview
 
 Report methods:
+
 - `vault.getLatestReport({ gateway? })`
 - `vault.submitLatestReport({ account?, gateway?, skipIsFresh? })`
 - `vault.submitLatestReportSimulateTx(...)`
 - `vault.submitLatestReportPopulateTx(...)`
 
 Overview/health:
+
 - `vault.getVaultOverviewData({ blockNumber?, report? })`
 - `vault.calculateOverview(overviewArgs)`
 - `vault.calculateHealth({ totalValue, liabilitySharesInStethWei, forceRebalanceThresholdBP })`
@@ -160,4 +182,5 @@ You can use preconfigured contract instances:
 - `stVault.contracts.getContractOperatorGrid()`
 
 `stvault` ABIs are exported and available under:
+
 - `@lidofinance/lido-ethereum-sdk/stvault`

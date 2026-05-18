@@ -1,3 +1,20 @@
+# 4.8.0
+
+## SDK
+
+### Added
+
+- All contract instances now support `.encode` and `.prepare` methods for encoding calls and preparing transactions without sending them
+- All ABIs are now exported with their types and are optimized for better Typescript performance
+- SDK now aligned with `viem` naming conventions - `publicClient` and `walletClient` are used instead of `rpcProvider` and `signerProvider` to better reflect their purpose and avoid confusion
+- Older methods are marked for deprecation but are still supported for backward compatibility
+- Types for `PublicClient` and `WalletClient` can now be registered with user types.
+
+### Fixed
+
+- `@ethersproject/bytes` removed as dependency and all related logic is migrated to `viem` utils
+- `logMode` default value is now `'none'` in `new LidoSDKCore(props)`
+
 # 4.7.0
 
 ## SDK

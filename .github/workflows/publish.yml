@@ -20,13 +20,13 @@ jobs:
     environment: production
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: 'yarn'
@@ -38,7 +38,7 @@ jobs:
         run: yarn build:packages
 
       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
-        run: yarn npm audit --environment production
+        run: yarn npm audit
 
       - name: Authenticate in npm
         run: |

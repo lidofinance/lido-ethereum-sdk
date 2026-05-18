@@ -1,4 +1,6 @@
-export const LazyOracleAbi = [
+import type { Abi } from 'viem';
+
+const abi = [
   {
     inputs: [
       {
@@ -1141,4 +1143,7 @@ export const LazyOracleAbi = [
     stateMutability: 'view',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type LazyOracleAbiType = typeof abi;
+export const LazyOracleAbi: LazyOracleAbiType = abi;

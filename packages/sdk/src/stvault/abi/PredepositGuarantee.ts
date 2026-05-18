@@ -1,4 +1,6 @@
-export const PredepositGuaranteeAbi = [
+import type { Abi } from 'viem';
+
+const abi = [
   {
     inputs: [
       {
@@ -1998,4 +2000,7 @@ export const PredepositGuaranteeAbi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
-] as const;
+] as const satisfies Abi;
+
+export type PredepositGuaranteeAbiType = typeof abi;
+export const PredepositGuaranteeAbi: PredepositGuaranteeAbiType = abi;

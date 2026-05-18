@@ -1,3 +1,5 @@
+import type { Abi } from 'viem';
+
 export const abi = [
   {
     inputs: [
@@ -57,4 +59,7 @@ export const abi = [
     type: 'function',
   },
   { stateMutability: 'payable', type: 'receive' },
-] as const;
+] as const satisfies Abi;
+
+export type WstethABIType = typeof abi;
+export const WstethABI: WstethABIType = abi;
