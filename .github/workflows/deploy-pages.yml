@@ -35,7 +35,7 @@ jobs:
           cache: 'yarn'
       - name: Setup Pages
         id: config_pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Restore cache
         uses: actions/cache@v5
         with:
@@ -70,7 +70,7 @@ jobs:
       - name: Move artifacts
         run: mkdir -p ./apps && mkdir -p ./apps/playground && mv ./playground/out/* ./apps/playground && mv ./docs/build/* ./apps
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./apps
 
@@ -84,4 +84,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
