@@ -7,8 +7,11 @@ on:
         description: 'NPM token'
         required: true
 
+# dry-runs needs same permissions as publish, because multi-semantic-release checks all accesses
 permissions:
-  contents: read
+  contents: write # to be able to publish a GitHub release
+  issues: write # to be able to comment on released issues
+  id-token: write # to enable use of OIDC for npm provenance
 
 jobs:
   publish-dry-run:
