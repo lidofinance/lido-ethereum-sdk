@@ -7,6 +7,7 @@ import {
 } from '../core/types.js';
 import { BusModule } from './bus-module.js';
 import {
+  BlockNumberProps,
   BurnProps,
   BurnSharesProps,
   FundPros,
@@ -93,10 +94,12 @@ export class LidoSDKVaultEntity extends BusModule {
   @Logger('Utils:')
   @Cache(30 * 60 * 1000, ['dashboardAddress'])
   @ErrorHandler()
-  public async getDashboardContract(): Promise<
+  public async getDashboardContract(
+    props?: BlockNumberProps,
+  ): Promise<
     EncodableContract<GetContractReturnType<typeof DashboardAbi, WalletClient>>
   > {
-    const dashboardAddress = await this.getDashboardAddress();
+    const dashboardAddress = await this.getDashboardAddress(props);
     if (!dashboardAddress) {
       throw this.bus.core.error({
         code: ERROR_CODE.READ_ERROR,
@@ -111,35 +114,77 @@ export class LidoSDKVaultEntity extends BusModule {
     return this.vaultAddress;
   }
 
+  /**
+   * The address expected to be the Dashboard: the owner recorded by the
+   * VaultHub when the vault is connected, otherwise the StakingVault's own
+   * owner.
+   */
+  private getSupposedDashboardAddress(
+    vaultConnectionOwner: Address,
+    vaultOwner: Address,
+  ): Address {
+    return !isAddressEqual(vaultConnectionOwner, zeroAddress)
+      ? vaultConnectionOwner
+      : vaultOwner;
+  }
+
+  /**
+   * Resolves the Dashboard address of the vault.
+   *
+   * Note: the resolved address is memoized on the instance, so `blockNumber`
+   * only affects the first resolution for a given entity. Construct a new
+   * entity to resolve against a different block.
+   */
   @Logger('Utils:')
   @Cache(30 * 60 * 1000, ['dashboardAddress'])
   @ErrorHandler()
-  public async getDashboardAddress(): Promise<Address> {
+  public async getDashboardAddress(props?: BlockNumberProps): Promise<Address> {
     if (this.dashboardAddress) {
       return this.dashboardAddress;
     }
 
+    const blockNumber = props?.blockNumber;
+    const callOptions = { blockNumber };
+
     const vaultHub = await this.bus.contracts.getContractVaultHub();
+    const vault = await this.getVaultContract();
 
-    const isVaultConnected = await vaultHub.read.isVaultConnected([
-      this.vaultAddress,
+    const [isVaultConnected, vaultConnection, vaultOwner] = await Promise.all([
+      vaultHub.read.isVaultConnected([this.vaultAddress], callOptions),
+      vaultHub.read.vaultConnection([this.vaultAddress], callOptions),
+      vault.read.owner(callOptions),
     ]);
 
-    const vaultConnection = await vaultHub.read.vaultConnection([
-      this.vaultAddress,
-    ]);
-    const vaultOwner = await (await this.getVaultContract()).read.owner();
-
-    const supposedDashboardAddress = !isAddressEqual(
+    const supposedDashboardAddress = this.getSupposedDashboardAddress(
       vaultConnection.owner,
-      zeroAddress,
-    )
-      ? vaultConnection.owner
-      : vaultOwner;
+      vaultOwner,
+    );
 
-    const isOwnerDashboard = await this.isDashboard(supposedDashboardAddress);
+    if (await this.isDashboard(supposedDashboardAddress, { blockNumber })) {
+      this.dashboardAddress = supposedDashboardAddress;
 
-    if (!isOwnerDashboard && isVaultConnected && !this.skipDashboardCheck) {
+      return this.dashboardAddress;
+    }
+
+    // The dashboard address is missing when `applyReport` is called after a
+    // voluntary disconnection: the VaultHub holds the vault's ownership and
+    // hands it back to the Dashboard with a 2-step transfer, so until
+    // `acceptOwnership` the Dashboard is only the pending owner.
+    if (!isVaultConnected && isAddressEqual(vaultOwner, vaultHub.address)) {
+      // the read is made only for this case, connected vaults never pay for it
+      const pendingOwner = await vault.read.pendingOwner(callOptions);
+
+      if (
+        !isAddressEqual(pendingOwner, zeroAddress) &&
+        (await this.isDashboard(pendingOwner, { blockNumber }))
+      ) {
+        this.dashboardAddress = pendingOwner;
+
+        return this.dashboardAddress;
+      }
+    }
+
+    if (isVaultConnected && !this.skipDashboardCheck) {
       throw this.bus.core.error({
         code: ERROR_CODE.NOT_SUPPORTED,
         message: 'Owner of vault is not dashboard contract',
@@ -753,16 +798,42 @@ export class LidoSDKVaultEntity extends BusModule {
     return dashboardContract.read.getRoleMembers([props.role]);
   }
 
+  /**
+   * Clone-proxy runtime code of the canonical Dashboard implementation.
+   * `DASHBOARD_IMPL` is immutable on a given factory, so it is safe to cache
+   * and to read at the latest block even when the caller pins `blockNumber`.
+   */
   @Logger('Utils:')
+  @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   @ErrorHandler()
-  private async isDashboard(address: Address) {
-    const dashboardCode = await this.bus.core.publicClient.getCode({ address });
+  private async getDashboardProxyCode(): Promise<string> {
     const vaultFactory = await this.bus.contracts.getContractVaultFactory();
     const implementation = await vaultFactory.read.DASHBOARD_IMPL();
-    const proxyCode =
+
+    return (
       PROXY_CODE_PAD_LEFT +
       implementation.slice(2).toLowerCase() +
-      PROXY_CODE_PAD_RIGHT;
+      PROXY_CODE_PAD_RIGHT
+    );
+  }
+
+  /**
+   * Whether `address` is a Dashboard, detected by comparing its deployed
+   * bytecode against the canonical Dashboard clone-proxy code.
+   */
+  @Logger('Utils:')
+  @ErrorHandler()
+  public async isDashboard(
+    address: Address,
+    props?: BlockNumberProps,
+  ): Promise<boolean> {
+    const [dashboardCode, proxyCode] = await Promise.all([
+      this.bus.core.publicClient.getCode({
+        address,
+        blockNumber: props?.blockNumber,
+      }),
+      this.getDashboardProxyCode(),
+    ]);
 
     return dashboardCode?.startsWith(proxyCode) || false;
   }
@@ -818,7 +889,7 @@ export class LidoSDKVaultEntity extends BusModule {
       lidoContract,
       // eslint-disable-next-line @typescript-eslint/await-thenable
     ] = await Promise.all([
-      this.getDashboardContract(),
+      this.getDashboardContract({ blockNumber }),
       this.getVaultContract(),
       this.bus.contracts.getContractVaultHub(),
       this.bus.contracts.getContractOperatorGrid(),
@@ -936,11 +1007,13 @@ export class LidoSDKVaultEntity extends BusModule {
       lidoContract.read.getMaxMintableExternalShares(),
     ]);
 
-    const supposedDashboardAddress =
-      vaultConnection.owner !== zeroAddress
-        ? vaultConnection.owner
-        : vaultOwner;
-    const isDashboard = await this.isDashboard(supposedDashboardAddress);
+    const supposedDashboardAddress = this.getSupposedDashboardAddress(
+      vaultConnection.owner,
+      vaultOwner,
+    );
+    const isDashboard = await this.isDashboard(supposedDashboardAddress, {
+      blockNumber,
+    });
 
     return {
       address: vaultAddress,
