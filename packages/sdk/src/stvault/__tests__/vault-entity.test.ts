@@ -3,7 +3,11 @@ import { isAddressEqual, zeroAddress, type Address } from 'viem';
 import { LidoSDKVaultEntity } from '../vault-entity.js';
 import type { OverviewArgs } from '../utils/overview/types.js';
 import type { Bus } from '../bus.js';
-import { PROXY_CODE_PAD_LEFT, PROXY_CODE_PAD_RIGHT } from '../consts/index.js';
+import {
+  PROXY_CODE_PAD_LEFT,
+  PROXY_CODE_PAD_RIGHT,
+  VAULT_ERROR_REASON,
+} from '../consts/index.js';
 import { ERROR_CODE, SDKError } from '../../common/utils/sdk-error.js';
 
 // ─── Minimal mock bus ────────────────────────────────────────────────────────
@@ -208,6 +212,8 @@ const DASHBOARD_PROXY_CODE =
   DASHBOARD_IMPL.slice(2).toLowerCase() +
   PROXY_CODE_PAD_RIGHT;
 
+const OTHER_VAULT = '0x9999999999999999999999999999999999999999' as Address;
+
 type StubOptions = {
   isVaultConnected: boolean;
   vaultOwner: Address;
@@ -215,11 +221,17 @@ type StubOptions = {
   pendingOwner?: Address;
   /** addresses whose deployed bytecode is the Dashboard clone proxy */
   dashboards?: Address[];
+  /**
+   * Dashboard address (lowercased) -> the vault its `stakingVault()` returns.
+   * Anything not listed points back at VAULT_ADDRESS, i.e. correct linkage.
+   */
+  stakingVaultOf?: Record<string, Address>;
   skipDashboardCheck?: boolean;
 };
 
 const makeDashboardEntity = (opts: StubOptions) => {
   const dashboards = opts.dashboards ?? [];
+  const stakingVaultOf = opts.stakingVaultOf ?? {};
 
   const getCode = vi.fn(
     async ({
@@ -253,8 +265,20 @@ const makeDashboardEntity = (opts: StubOptions) => {
     },
   );
   const dashboardImpl = vi.fn(async () => DASHBOARD_IMPL);
+
+  // the real contract's read.stakingVault() takes no address, so the spy is
+  // called with the bound dashboard address to make assertions readable
+  const stakingVault = vi.fn(
+    async (address: Address, _options?: { blockNumber?: bigint }) => {
+      return stakingVaultOf[address.toLowerCase()] ?? VAULT_ADDRESS;
+    },
+  );
   const getContractVaultDashboard = vi.fn(async (address: Address) => ({
     address,
+    read: {
+      stakingVault: (options?: { blockNumber?: bigint }) =>
+        stakingVault(address, options),
+    },
   }));
 
   const bus = {
@@ -293,6 +317,7 @@ const makeDashboardEntity = (opts: StubOptions) => {
       isVaultConnected,
       vaultConnection,
       dashboardImpl,
+      stakingVault,
       getContractVaultDashboard,
     },
   };
@@ -382,6 +407,7 @@ describe('LidoSDKVaultEntity.getDashboardAddress', () => {
 
     await expect(entity.getDashboardAddress()).rejects.toMatchObject({
       code: ERROR_CODE.NOT_SUPPORTED,
+      reason: VAULT_ERROR_REASON.OWNER_NOT_DASHBOARD,
     });
   });
 
@@ -464,5 +490,191 @@ describe('LidoSDKVaultEntity.isDashboard', () => {
     // one getCode per call, but the factory's DASHBOARD_IMPL is read once
     expect(mocks.getCode).toHaveBeenCalledTimes(2);
     expect(mocks.dashboardImpl).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('LidoSDKVaultEntity.isDashboardBelongsToVault', () => {
+  test('true when the Dashboard points back at this vault', async () => {
+    const { entity } = makeDashboardEntity({
+      isVaultConnected: true,
+      vaultOwner: DASHBOARD_ADDRESS,
+      dashboards: [DASHBOARD_ADDRESS],
+    });
+
+    await expect(
+      entity.isDashboardBelongsToVault(DASHBOARD_ADDRESS),
+    ).resolves.toBe(true);
+  });
+
+  test('false when the Dashboard points at another vault', async () => {
+    const { entity } = makeDashboardEntity({
+      isVaultConnected: true,
+      vaultOwner: DASHBOARD_ADDRESS,
+      dashboards: [DASHBOARD_ADDRESS],
+      stakingVaultOf: { [DASHBOARD_ADDRESS.toLowerCase()]: OTHER_VAULT },
+    });
+
+    await expect(
+      entity.isDashboardBelongsToVault(DASHBOARD_ADDRESS),
+    ).resolves.toBe(false);
+  });
+
+  test('forwards blockNumber to the stakingVault read', async () => {
+    const blockNumber = 21_000_000n;
+    const { entity, mocks } = makeDashboardEntity({
+      isVaultConnected: true,
+      vaultOwner: DASHBOARD_ADDRESS,
+      dashboards: [DASHBOARD_ADDRESS],
+    });
+
+    await entity.isDashboardBelongsToVault(DASHBOARD_ADDRESS, { blockNumber });
+
+    expect(mocks.stakingVault).toHaveBeenCalledWith(DASHBOARD_ADDRESS, {
+      blockNumber,
+    });
+  });
+});
+
+/** Resolves the SDKError a failing resolution rejects with. */
+const captureError = async (
+  entity: LidoSDKVaultEntity,
+): Promise<SDKError> => {
+  const result = await entity.getDashboardAddress().then(
+    () => null,
+    (error: unknown) => error,
+  );
+  expect(result).toBeInstanceOf(SDKError);
+
+  return result as SDKError;
+};
+
+describe('LidoSDKVaultEntity.getDashboardAddress linkage enforcement', () => {
+  test('strict: throws when the owner Dashboard belongs to another vault', async () => {
+    const { entity } = makeDashboardEntity({
+      isVaultConnected: true,
+      vaultOwner: DASHBOARD_ADDRESS,
+      dashboards: [DASHBOARD_ADDRESS],
+      stakingVaultOf: { [DASHBOARD_ADDRESS.toLowerCase()]: OTHER_VAULT },
+      skipDashboardCheck: false,
+    });
+
+    await expect(entity.getDashboardAddress()).rejects.toMatchObject({
+      code: ERROR_CODE.NOT_SUPPORTED,
+      reason: VAULT_ERROR_REASON.DASHBOARD_NOT_BELONG_TO_VAULT,
+    });
+  });
+
+  test('strict: throws when the pending-owner Dashboard belongs to another vault', async () => {
+    const { entity } = makeDashboardEntity({
+      isVaultConnected: false,
+      vaultOwner: HUB_ADDRESS,
+      pendingOwner: PENDING_DASHBOARD,
+      dashboards: [PENDING_DASHBOARD],
+      stakingVaultOf: { [PENDING_DASHBOARD.toLowerCase()]: OTHER_VAULT },
+      skipDashboardCheck: false,
+    });
+
+    await expect(entity.getDashboardAddress()).rejects.toMatchObject({
+      code: ERROR_CODE.NOT_SUPPORTED,
+      reason: VAULT_ERROR_REASON.DASHBOARD_NOT_BELONG_TO_VAULT,
+    });
+  });
+
+  test('the two failure conditions are distinguishable by reason', async () => {
+    // both throws share code NOT_SUPPORTED, so `reason` is the only thing a
+    // consumer can switch on to pick the right message/UI
+    const ownerNotDashboard = makeDashboardEntity({
+      isVaultConnected: true,
+      vaultOwner: EOA_ADDRESS,
+      dashboards: [],
+      skipDashboardCheck: false,
+    });
+    const notBelongToVault = makeDashboardEntity({
+      isVaultConnected: true,
+      vaultOwner: DASHBOARD_ADDRESS,
+      dashboards: [DASHBOARD_ADDRESS],
+      stakingVaultOf: { [DASHBOARD_ADDRESS.toLowerCase()]: OTHER_VAULT },
+      skipDashboardCheck: false,
+    });
+
+    const first = await captureError(ownerNotDashboard.entity);
+    const second = await captureError(notBelongToVault.entity);
+
+    expect(first.code).toBe(second.code);
+    expect(first.reason).toBe(VAULT_ERROR_REASON.OWNER_NOT_DASHBOARD);
+    expect(second.reason).toBe(
+      VAULT_ERROR_REASON.DASHBOARD_NOT_BELONG_TO_VAULT,
+    );
+  });
+
+  test('strict: resolves normally when the linkage matches', async () => {
+    const { entity, mocks } = makeDashboardEntity({
+      isVaultConnected: true,
+      vaultOwner: DASHBOARD_ADDRESS,
+      dashboards: [DASHBOARD_ADDRESS],
+      skipDashboardCheck: false,
+    });
+
+    await expect(entity.getDashboardAddress()).resolves.toBe(DASHBOARD_ADDRESS);
+    expect(mocks.stakingVault).toHaveBeenCalledWith(
+      DASHBOARD_ADDRESS,
+      expect.anything(),
+    );
+  });
+
+  test('strict: forwards blockNumber into the linkage read', async () => {
+    const blockNumber = 21_000_000n;
+    const { entity, mocks } = makeDashboardEntity({
+      isVaultConnected: true,
+      vaultOwner: DASHBOARD_ADDRESS,
+      dashboards: [DASHBOARD_ADDRESS],
+      skipDashboardCheck: false,
+    });
+
+    await entity.getDashboardAddress({ blockNumber });
+
+    expect(mocks.stakingVault).toHaveBeenCalledWith(DASHBOARD_ADDRESS, {
+      blockNumber,
+    });
+  });
+
+  test('skipDashboardCheck: resolves a mismatched Dashboard without reading stakingVault', async () => {
+    // the widget's mode — it runs the check itself so it can throw its own error
+    const { entity, mocks } = makeDashboardEntity({
+      isVaultConnected: true,
+      vaultOwner: DASHBOARD_ADDRESS,
+      dashboards: [DASHBOARD_ADDRESS],
+      stakingVaultOf: { [DASHBOARD_ADDRESS.toLowerCase()]: OTHER_VAULT },
+      skipDashboardCheck: true,
+    });
+
+    await expect(entity.getDashboardAddress()).resolves.toBe(DASHBOARD_ADDRESS);
+    expect(mocks.stakingVault).not.toHaveBeenCalled();
+  });
+
+  test('strict: the non-Dashboard fallback never reads stakingVault', async () => {
+    const { entity, mocks } = makeDashboardEntity({
+      isVaultConnected: false,
+      vaultOwner: EOA_ADDRESS,
+      dashboards: [],
+      skipDashboardCheck: false,
+    });
+
+    await expect(entity.getDashboardAddress()).resolves.toBe(EOA_ADDRESS);
+    expect(mocks.stakingVault).not.toHaveBeenCalled();
+  });
+
+  test('an explicitly supplied dashboardAddress is not linkage-checked', async () => {
+    const bus = {
+      core: { logMode: 'none', chain: { id: 1 } },
+      contracts: {},
+    } as unknown as Bus;
+    const entity = new LidoSDKVaultEntity({
+      bus,
+      vaultAddress: VAULT_ADDRESS,
+      dashboardAddress: DASHBOARD_ADDRESS,
+    });
+
+    await expect(entity.getDashboardAddress()).resolves.toBe(DASHBOARD_ADDRESS);
   });
 });
