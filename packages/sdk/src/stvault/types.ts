@@ -194,6 +194,14 @@ export type GetLatestVaultReportProps = {
   gateway?: string;
 };
 
+/**
+ * Pins the reads of a view method to a specific block. When omitted the reads
+ * are made at the latest block.
+ */
+export type BlockNumberProps = {
+  blockNumber?: bigint;
+};
+
 export type VaultReportProps = {
   vault: Address;
   cid: string;

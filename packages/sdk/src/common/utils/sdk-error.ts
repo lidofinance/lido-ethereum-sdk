@@ -8,10 +8,13 @@ export enum ERROR_CODE {
   UNKNOWN_ERROR = 'UNKNOWN_ERROR',
 }
 
+export type SDKErrorReason = string;
+
 export type SDKErrorProps = {
   code?: ERROR_CODE;
   error?: unknown;
   message?: string;
+  reason?: SDKErrorReason;
 };
 
 export class SDKError extends Error {
@@ -35,8 +38,9 @@ export class SDKError extends Error {
 
   public code: ERROR_CODE;
   public errorMessage: string | undefined;
+  public reason: SDKErrorReason | undefined;
 
-  constructor({ code, error = {}, message }: SDKErrorProps) {
+  constructor({ code, error = {}, message, reason }: SDKErrorProps) {
     super(message);
     if (error instanceof Error) {
       this.cause = error.cause;
@@ -44,6 +48,7 @@ export class SDKError extends Error {
     }
     this.code = code ?? ERROR_CODE.UNKNOWN_ERROR;
     this.errorMessage = message;
+    this.reason = reason;
   }
 }
 // invariant that throws SDK ERROR

@@ -73,8 +73,16 @@ export const Cache = function (timeMs = 0, cacheArgs?: string[]) {
       );
       const result = originalMethod.call(this, ...args);
       if (result instanceof Promise) {
-        void result.then((resolvedResult) =>
-          cache.set(cacheKey, { data: resolvedResult, timestamp: Date.now() }),
+        // only successful results are cached; the rejection handler is required
+        // so this observer promise does not surface as an unhandled rejection
+        // (the rejection itself is still delivered to the caller via `result`)
+        void result.then(
+          (resolvedResult) =>
+            cache.set(cacheKey, {
+              data: resolvedResult,
+              timestamp: Date.now(),
+            }),
+          () => undefined,
         );
       } else cache.set(cacheKey, { data: result, timestamp: Date.now() });
 

@@ -1,3 +1,26 @@
+# 4.9.0
+
+## SDK
+
+### Added
+
+- Move vault Dashboard resolution and verification into the SDK.
+    - getDashboardAddress(props?) now resolves pending-owner Dashboards after voluntary disconnect and batches owner/connection reads.
+    - isDashboard(address, props?) is now public and block-aware.
+    - Added isDashboardBelongsToVault(dashboardAddress, props?).
+    - Dashboard-vault linkage is enforced during resolution, gated by skipDashboardCheck.
+- Added SDKError.reason with stVault reasons:
+    - OWNER_NOT_DASHBOARD
+    - DASHBOARD_NOT_BELONG_TO_VAULT
+- Exported BlockNumberProps.
+- getVaultOverviewData now performs Dashboard reads at its own blockNumber.
+- Restructured error-code docs into code and reason sections.
+
+### Fixed
+
+- Fixed unhandled rejection in @Cache-decorated methods.
+
+
 # 4.8.0
 
 ## SDK
