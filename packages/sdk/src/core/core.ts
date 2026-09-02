@@ -16,6 +16,7 @@ import {
   type GetContractReturnType,
   type GetBlockReturnType,
   type CustomTransportConfig,
+  isAddress,
 } from 'viem';
 
 import {
@@ -184,14 +185,33 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       });
     }
 
-    if (
-      contractAddressManifest &&
-      Object.getOwnPropertyNames(contractAddressManifest).length === 0
-    ) {
-      throw this.error({
-        message: `Contract address manifest is empty`,
-        code: ERROR_CODE.INVALID_ARGUMENT,
-      });
+    if (contractAddressManifest) {
+      const entries = Object.entries(contractAddressManifest).map(([k, v]) => [
+        k as LIDO_CONTRACT_NAMES,
+        v.toLocaleLowerCase('en-US') as Address,
+      ]);
+      if (entries.length === 0)
+        throw this.error({
+          message: `Contract address manifest is empty`,
+          code: ERROR_CODE.INVALID_ARGUMENT,
+        });
+
+      if (
+        entries.some(
+          ([contract, address]) =>
+            !address ||
+            !isAddress(address, { strict: false }) ||
+            LIDO_CONTRACT_NAMES[contract as LIDO_CONTRACT_NAMES] === undefined,
+        )
+      ) {
+        throw this.error({
+          message: `Malformed contactAddressManifest, must be a mapping of LIDO_CONTRACT_NAMES to valid addresses`,
+          code: ERROR_CODE.INVALID_ARGUMENT,
+        });
+      }
+
+      // rebuild clean object
+      contractAddressManifest = Object.fromEntries(entries);
     }
 
     const chain = VIEM_CHAINS[chainId];
