@@ -10,7 +10,7 @@ import {
   BlockNumberProps,
   BurnProps,
   BurnSharesProps,
-  FundPros,
+  FundProps,
   GetLatestVaultReportProps,
   GetVaultRoleMembersProps,
   LidoSDKVaultsModuleProps,
@@ -211,7 +211,7 @@ export class LidoSDKVaultEntity extends BusModule {
   // fund methods
   @Logger('Call:')
   @ErrorHandler()
-  public async fund(props: FundPros): Promise<TransactionResult> {
+  public async fund(props: FundProps): Promise<TransactionResult> {
     const parsedProps = await this.parseProps(props);
 
     return this.bus.core.performTransaction({
@@ -228,7 +228,7 @@ export class LidoSDKVaultEntity extends BusModule {
 
   @Logger('Utils:')
   @ErrorHandler()
-  public async fundPopulateTx(props: FundPros): Promise<PopulatedTransaction> {
+  public async fundPopulateTx(props: FundProps): Promise<PopulatedTransaction> {
     const parsedProps = await this.parseProps(props);
 
     return {
@@ -245,7 +245,7 @@ export class LidoSDKVaultEntity extends BusModule {
 
   @Logger('Call:')
   @ErrorHandler()
-  public async fundSimulateTx(props: FundPros) {
+  public async fundSimulateTx(props: FundProps) {
     const { dashboard, account } = await this.parseProps(props);
     return await dashboard.simulate.fund({
       account,
@@ -889,7 +889,9 @@ export class LidoSDKVaultEntity extends BusModule {
       return;
     }
 
-    if (await this.isDashboardBelongsToVault(dashboardAddress, { blockNumber })) {
+    if (
+      await this.isDashboardBelongsToVault(dashboardAddress, { blockNumber })
+    ) {
       return;
     }
 

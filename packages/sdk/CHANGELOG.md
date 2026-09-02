@@ -20,6 +20,7 @@
 ### Fixed
 
 - Fixed unhandled rejection in @Cache-decorated methods.
+- Fixed typo `FundPros` -> `FundProps` in stVault types.
 
 # 4.8.0
 
