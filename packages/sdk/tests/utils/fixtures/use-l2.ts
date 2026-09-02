@@ -9,6 +9,7 @@ import {
   publicActions,
 } from 'viem';
 import { useTestsEnvs } from './use-test-envs.js';
+import { useL2AnvilUrl } from './use-anvil-url.js';
 import { CHAINS, LidoSDKCore, VIEM_CHAINS } from '../../../src/index.js';
 import { useAccount } from './use-wallet-client.js';
 import { LidoSDKL2 } from '../../../src/l2/l2.js';
@@ -21,10 +22,9 @@ export const useTestL2RpcProvider = () => {
   if (cached) return cached;
   const { l2ChainId } = useTestsEnvs();
 
-  const port = Number(process.env.VITEST_L2_ANVIL_PORT);
   const testClient = createTestClient({
     mode: 'anvil',
-    transport: http(`http://127.0.0.1:${port}`),
+    transport: http(useL2AnvilUrl()),
     name: 'testClient',
     chain: VIEM_CHAINS[l2ChainId as CHAINS],
   });
