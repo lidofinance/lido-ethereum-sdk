@@ -76,6 +76,24 @@ const APR_SPEC: Array<[AprRebaseEvent, number]> = [
 ];
 
 const APR_SPEC_BLOCK: Record<string, { block: bigint; apr: number }[]> = {
+  '1': [
+    {
+      block: 25846524n,
+      apr: 2.1935,
+    },
+    {
+      block: 25853706n,
+      apr: 2.2201,
+    },
+    {
+      block: 25860884n,
+      apr: 2.2088,
+    },
+    {
+      block: 25868055n,
+      apr: 2.2053,
+    },
+  ],
   '560048': [
     {
       block: 542808n,
@@ -139,7 +157,9 @@ describe('LidoSDKStats', () => {
     expect(APR_SPEC_BLOCK[chainId]).toBeDefined();
   });
 
-  test.each(APR_SPEC_BLOCK[chainId]!)(
+  // fallback keeps collection from crashing on chains without a spec — the
+  // 'has apr by block spec' test above reports the gap instead
+  test.each(APR_SPEC_BLOCK[chainId] ?? [])(
     'calculateAprFromRebaseEvent for $block block',
     async ({ apr, block }) => {
       const events = await stethEvents.getRebaseEvents({

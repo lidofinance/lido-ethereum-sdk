@@ -29,8 +29,8 @@ For breaking changes between versions see [MIGRATION.md](MIGRATION.md)
 
 ## Requirements
 
-- Node.js 20.x or higher (for development and testing)
-- Note: Node.js 22+ has compatibility issues with Ganache used in tests
+- Node.js 20.x or higher (for development); running the test suite requires Node.js 22+ (used by prool)
+- [Foundry](https://book.getfoundry.sh/getting-started/installation) `anvil` binary (for running fork tests)
 
 ## Installation
 

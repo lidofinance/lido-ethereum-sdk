@@ -7,6 +7,7 @@ import {
   http,
   maxUint256,
   parseSignature,
+  isAddressEqual,
   type JsonRpcAccount,
   type Address,
   type Chain,
@@ -15,6 +16,7 @@ import {
   type GetContractReturnType,
   type GetBlockReturnType,
   type CustomTransportConfig,
+  isAddress,
 } from 'viem';
 
 import {
@@ -49,6 +51,7 @@ import type {
   AccountValue,
   BackArgumentType,
   BlockArgumentType,
+  ContractAddressManifest,
   GetFeeDataResult,
   LidoContractType,
   LidoLocatorContractType,
@@ -82,6 +85,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   readonly chainId: CHAINS;
   readonly chain: Chain;
   readonly publicClient: ResolvedClientRegister['publicClient'];
+  readonly contractAddressManifest: ContractAddressManifest | undefined;
 
   readonly logMode: LOG_MODE;
   // for devnets
@@ -108,12 +112,14 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     this.logMode = props.logMode ?? 'none';
     this.customLidoLocatorAddress = props.customLidoLocatorAddress;
 
-    const { chain, publicClient, walletClient } = this.init(props, version);
+    const { chain, publicClient, walletClient, contractAddressManifest } =
+      this.init(props, version);
 
     this.chain = chain;
     this.chainId = chain.id as CHAINS;
     this.publicClient = publicClient;
     this.#walletClient = walletClient;
+    this.contractAddressManifest = contractAddressManifest;
   }
 
   @Initialize('Init:')
@@ -129,6 +135,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       rpcProvider,
       // eslint-disable-next-line deprecation/deprecation
       web3Provider,
+      contractAddressManifest,
     }: LidoSDKCoreProps,
     _version?: string,
   ) {
@@ -178,12 +185,42 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       });
     }
 
+    if (contractAddressManifest) {
+      const entries = Object.entries(contractAddressManifest).map(([k, v]) => [
+        k as LIDO_CONTRACT_NAMES,
+        v.toLocaleLowerCase('en-US') as Address,
+      ]);
+      if (entries.length === 0)
+        throw this.error({
+          message: `Contract address manifest is empty`,
+          code: ERROR_CODE.INVALID_ARGUMENT,
+        });
+
+      if (
+        entries.some(
+          ([contract, address]) =>
+            !address ||
+            !isAddress(address, { strict: false }) ||
+            LIDO_CONTRACT_NAMES[contract as LIDO_CONTRACT_NAMES] === undefined,
+        )
+      ) {
+        throw this.error({
+          message: `Malformed contactAddressManifest, must be a mapping of LIDO_CONTRACT_NAMES to valid addresses`,
+          code: ERROR_CODE.INVALID_ARGUMENT,
+        });
+      }
+
+      // rebuild clean object
+      contractAddressManifest = Object.fromEntries(entries);
+    }
+
     const chain = VIEM_CHAINS[chainId];
 
     return {
       chain,
       publicClient,
       walletClient: walletClientProp,
+      contractAddressManifest,
     };
   }
 
@@ -414,6 +451,8 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     contract: LIDO_CONTRACT_NAMES,
   ): Promise<Address> {
     const lidoLocator = this.getContractLidoLocator();
+    const addressToVerify = this.contractAddressManifest?.[contract];
+    let addressFromLocator;
     if (contract === 'wstethReferralStaker') {
       const contractAddress = WSTETH_REFERRAL_STAKER[this.chain.id as CHAINS];
       invariant(
@@ -421,11 +460,21 @@ export default class LidoSDKCore extends LidoSDKCacheable {
         `wstETH Referral Staker is not supported on chain ${this.chain.id}`,
         ERROR_CODE.NOT_SUPPORTED,
       );
-      return contractAddress;
+      addressFromLocator = contractAddress;
     } else {
       const contractName = contract === 'wsteth' ? 'wstETH' : contract;
-      return await lidoLocator.read[contractName]();
+      addressFromLocator = await lidoLocator.read[contractName]();
     }
+    if (
+      addressToVerify &&
+      !isAddressEqual(addressToVerify, addressFromLocator)
+    ) {
+      throw this.error({
+        code: ERROR_CODE.PROVIDER_ERROR,
+        message: `Contract address for ${contract} is not correct. Expected: ${addressToVerify}, got: ${addressFromLocator}`,
+      });
+    }
+    return addressFromLocator;
   }
 
   @Logger('Utils:')
