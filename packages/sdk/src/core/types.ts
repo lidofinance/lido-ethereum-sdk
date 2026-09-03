@@ -11,7 +11,11 @@ import type {
   GetContractReturnType,
 } from 'viem';
 
-import type { LIDO_TOKENS, SUPPORTED_CHAINS } from '../common/constants.js';
+import type {
+  LIDO_CONTRACT_NAMES,
+  LIDO_TOKENS,
+  SUPPORTED_CHAINS,
+} from '../common/constants.js';
 import type { SDKError } from '../common/utils/sdk-error.js';
 import type LidoSDKCore from './core.js';
 import type { EncodableContract } from '../common/index.js';
@@ -79,10 +83,15 @@ type LidoSDKCorePropsWalletClientProps =
       walletClient?: undefined;
     };
 
+export type ContractAddressManifest = {
+  [key in LIDO_CONTRACT_NAMES]?: Address;
+};
+
 export type LidoSDKCoreProps = {
   chainId?: (typeof SUPPORTED_CHAINS)[number];
   logMode?: LOG_MODE;
   customLidoLocatorAddress?: Address;
+  contractAddressManifest?: ContractAddressManifest;
 } & LidoSDKCorePropsPublicClientProps &
   LidoSDKCorePropsWalletClientProps;
 

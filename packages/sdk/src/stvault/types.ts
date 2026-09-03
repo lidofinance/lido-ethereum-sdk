@@ -65,9 +65,12 @@ export type CreateVaultProps = CommonTransactionProps & {
 
 export type CreateVaultResult = LidoSDKVaultEntity;
 
-export type FundPros = CommonTransactionProps & {
+export type FundProps = CommonTransactionProps & {
   value: bigint;
 };
+
+/** @deprecated Use `FundProps` instead. */
+export type FundPros = FundProps;
 
 export type WithdrawProps = CommonTransactionProps & {
   address: Address;
