@@ -1,5 +1,6 @@
 import { custom, http } from 'viem';
 import { useTestsEnvs } from './use-test-envs.js';
+import { useAnvilUrl } from './use-anvil-url.js';
 
 export type MockTransportCallback = (
   args: any,
@@ -21,8 +22,7 @@ export const useMockTransport = (
 ) => {
   const { useDirectRpc = false } = options;
   const { rpcUrl } = useTestsEnvs();
-  const anvilUrl = `http://127.0.0.1:${process.env.VITEST_ANVIL_PORT}`;
-  const baseUrl = useDirectRpc ? rpcUrl : anvilUrl;
+  const baseUrl = useDirectRpc ? rpcUrl : useAnvilUrl();
   const originalRequest = (args: any) => http(baseUrl)({}).request(args);
   return custom({
     async request(args) {

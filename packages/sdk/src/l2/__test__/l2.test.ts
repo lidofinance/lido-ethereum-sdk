@@ -37,6 +37,7 @@ import { TransactionCallback } from '../../core/types.js';
 const prepareL2Wsteth = async () => {
   const l2 = useL2();
   const account = useAccount();
+  const altAccount = useAltAccount();
   const { testClient } = useTestL2RpcProvider();
   const wstethAddress = await l2.wsteth.contractAddress();
 
@@ -75,6 +76,16 @@ const prepareL2Wsteth = async () => {
     args: [account.address, 2000n],
     chain: testClient.chain,
   });
+
+  // Fund the alt account and pre-approve it for transferFrom estimates and
+  // simulations, which otherwise depend on the spending `approve` tests having
+  // run (they are skipped with TEST_SKIP_SPENDING_TESTS).
+  await testClient.setBalance({
+    address: altAccount.address,
+    value: parseEther('10'),
+  });
+  await l2.wsteth.approve({ to: altAccount.address, amount: 1000n });
+  await l2.steth.approve({ to: altAccount.address, amount: 1000n });
 };
 
 describe('LidoSDKL2', () => {

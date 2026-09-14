@@ -65,9 +65,12 @@ export type CreateVaultProps = CommonTransactionProps & {
 
 export type CreateVaultResult = LidoSDKVaultEntity;
 
-export type FundPros = CommonTransactionProps & {
+export type FundProps = CommonTransactionProps & {
   value: bigint;
 };
+
+/** @deprecated Use `FundProps` instead. */
+export type FundPros = FundProps;
 
 export type WithdrawProps = CommonTransactionProps & {
   address: Address;
@@ -192,6 +195,14 @@ export type VaultReport = {
 
 export type GetLatestVaultReportProps = {
   gateway?: string;
+};
+
+/**
+ * Pins the reads of a view method to a specific block. When omitted the reads
+ * are made at the latest block.
+ */
+export type BlockNumberProps = {
+  blockNumber?: bigint;
 };
 
 export type VaultReportProps = {

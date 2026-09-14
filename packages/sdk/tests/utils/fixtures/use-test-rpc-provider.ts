@@ -6,6 +6,7 @@ import {
   type TestClient,
 } from 'viem';
 import { useTestsEnvs } from './use-test-envs.js';
+import { useAnvilUrl } from './use-anvil-url.js';
 import { CHAINS, VIEM_CHAINS } from '../../../src/index.js';
 
 let cached: {
@@ -16,10 +17,9 @@ export const useTestRpcProvider = () => {
   if (cached) return cached;
   const { chainId } = useTestsEnvs();
 
-  const port = Number(process.env.VITEST_ANVIL_PORT);
   const testClient = createTestClient({
     mode: 'anvil',
-    transport: http(`http://127.0.0.1:${port}`),
+    transport: http(useAnvilUrl()),
     name: 'testClient',
     chain: VIEM_CHAINS[chainId as CHAINS],
   });
