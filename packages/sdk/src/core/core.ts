@@ -136,6 +136,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       // eslint-disable-next-line deprecation/deprecation
       web3Provider,
       contractAddressManifest,
+      customSupportedChains,
     }: LidoSDKCoreProps,
     _version?: string,
   ) {
@@ -146,12 +147,42 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       chainIdProp ??
       (publicClientProp ? (publicClientProp.chain?.id as CHAINS) : undefined);
 
-    if (chainId === undefined || !SUPPORTED_CHAINS.includes(chainId)) {
+    if (customSupportedChains) {
+      if (customSupportedChains.length === 0) {
+        throw this.error({
+          message: `customSupportedChains is empty`,
+          code: ERROR_CODE.INVALID_ARGUMENT,
+        });
+      }
+
+      if (
+        customSupportedChains.some(
+          (chain) => !chain || typeof chain.id !== 'number',
+        )
+      ) {
+        throw this.error({
+          message: `Malformed customSupportedChains, must be an array of viem Chain definitions`,
+          code: ERROR_CODE.INVALID_ARGUMENT,
+        });
+      }
+    }
+
+    const viemCustomChain = customSupportedChains?.find(
+      (chain) => chain.id === chainId,
+    );
+
+    if (
+      chainId === undefined ||
+      (!SUPPORTED_CHAINS.includes(chainId as CHAINS) && !viemCustomChain)
+    ) {
       throw this.error({
         message: `Unsupported chain: ${chainId}`,
         code: ERROR_CODE.INVALID_ARGUMENT,
       });
     }
+
+    // custom chain definition takes precedence over the built-in one
+    const chain: Chain = viemCustomChain ?? VIEM_CHAINS[chainId as CHAINS];
 
     if (!publicClientProp && (!rpcUrls || rpcUrls.length === 0)) {
       throw this.error({
@@ -166,7 +197,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
         batch: {
           multicall: true,
         },
-        chain: VIEM_CHAINS[chainId],
+        chain,
         // rpcUrls are checked above
         transport: fallback((rpcUrls as string[]).map((url) => http(url))),
       });
@@ -213,8 +244,6 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       // rebuild clean object
       contractAddressManifest = Object.fromEntries(entries);
     }
-
-    const chain = VIEM_CHAINS[chainId];
 
     return {
       chain,
