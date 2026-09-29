@@ -1,3 +1,22 @@
+# 4.10.0
+
+## SDK
+
+### Added
+
+- `earn` module for Lido EarnETH and EarnUSD (Mellow vaults), available as `sdk.earn.eth` / `sdk.earn.usd` and via the `@lidofinance/lido-ethereum-sdk/earn` entry point
+  - Reads: `collect`, `balance`, `getPosition`, `getFees`, `previewDeposit`, `previewWithdraw`, `convertStethToWsteth`, `getWithdrawAvailability`, `getDepositAllowance`, `getDepositRequests`, `getDepositQueueRequest`, `getWithdrawalRequests`, `getAllWithdrawalRequests`
+  - Transactions, each with `PopulateTx`, `EstimateGas` and `SimulateTx` variants: `prepareDepositApproval`, `depositToQueue`, `withdraw` (`auto`, `sync` or `async` route), `cancelDepositRequest`, `claimDepositShares`, `claimWithdrawals`
+  - Mainnet deployment manifest; custom deployments and Collector settings via `new LidoSDKEarn({ core, vaults })`
+  - `EarnExecutionError` with the failed step and submitted hash
+  - Earn contract ABIs exported with the `EARN_` prefix
+- Earn module docs: overview, reads and transactions
+
+## Playground
+
+- `Earn` module added (EarnETH and EarnUSD reads and transactions)
+- `TokenInput` supports an optional `decimals` prop
+
 # 4.9.0
 
 ## SDK
