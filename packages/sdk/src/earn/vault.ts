@@ -178,11 +178,17 @@ export class LidoSDKEarnVault<V extends EarnVaultId> extends LidoSDKModule {
   async getPosition(account: Address, options: EarnReadOptions = {}) {
     const shares = await this.balance(account, options);
     const token = this.deployment().valuationToken;
-    const queue = this.asyncQueue(token);
-    const preview = await this.collector().read.getWithdrawalParams(
-      [shares, queue.address, this.collectorConfig],
+    const syncQueue = this.redeemQueue(token, 'sync');
+    let preview = await this.collector().read.getWithdrawalParams(
+      [shares, this.asyncQueue(token).address, this.collectorConfig],
       options,
     );
+    // A paused queue makes Collector return zero assets; value via the sync queue instead.
+    if (!preview.isWithdrawalPossible && syncQueue)
+      preview = await this.collector().read.getWithdrawalParams(
+        [shares, syncQueue.address, this.collectorConfig],
+        options,
+      );
     return {
       shares,
       assets: preview.assets,
@@ -292,17 +298,23 @@ export class LidoSDKEarnVault<V extends EarnVaultId> extends LidoSDKModule {
         client: this.core.publicClient,
       });
       const opts = { blockNumber: props.blockNumber };
-      const [, remainingDailyLimit] =
-        await contract.read.remainingDailyLimit(opts);
+      const [[, remainingDailyLimit], { isWithdrawalPossible, assets }] =
+        await Promise.all([
+          contract.read.remainingDailyLimit(opts),
+          this.collector().read.getWithdrawalParams(
+            [props.shares, queue.address, this.collectorConfig],
+            opts,
+          ),
+        ]);
+      // Collector's flag only reflects Vault.isPausedQueue; the other checks are ours.
+      if (!isWithdrawalPossible)
+        return { status: 'unavailable', reason: 'paused' };
       if (props.shares > remainingDailyLimit)
         return { status: 'unavailable', reason: 'daily-limit' };
-      const [{ assets }, liquidAssets] = await Promise.all([
-        this.collector().read.getWithdrawalParams(
-          [props.shares, queue.address, this.collectorConfig],
-          opts,
-        ),
-        contract.read.getLiquidAssets(opts),
-      ]);
+      // Collector returns zero on a suspicious or missing oracle report; the queue reverts on zero output too.
+      if (assets === 0n)
+        return { status: 'unavailable', reason: 'zero-output' };
+      const liquidAssets = await contract.read.getLiquidAssets(opts);
       // The daily limit is in shares (checked above); liquidity is in payout-token units.
       if (assets > liquidAssets)
         return { status: 'unavailable', reason: 'liquidity' };

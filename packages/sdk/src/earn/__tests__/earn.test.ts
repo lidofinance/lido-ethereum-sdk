@@ -221,7 +221,8 @@ describe('Earn withdrawal routing', () => {
     let liquidAssets = 1_000_000n;
     mockRead(read, ({ functionName }) => {
       if (functionName === 'remainingDailyLimit') return [0n, 10n ** 18n];
-      if (functionName === 'getWithdrawalParams') return { assets: 1_000_000n };
+      if (functionName === 'getWithdrawalParams')
+        return { isWithdrawalPossible: true, assets: 1_000_000n };
       if (functionName === 'getLiquidAssets') return liquidAssets;
       throw new Error(functionName);
     });
@@ -243,6 +244,34 @@ describe('Earn withdrawal routing', () => {
     ).toEqual({ status: 'unavailable', reason: 'daily-limit' });
   });
 
+  it('reports a paused sync queue and an invalid oracle report, and auto falls back to async', async () => {
+    const { earn, read } = setup();
+    let preview = { isWithdrawalPossible: false, assets: 0n };
+    mockRead(read, ({ functionName }) => {
+      if (functionName === 'remainingDailyLimit') return [0n, 10n ** 18n];
+      if (functionName === 'getWithdrawalParams') return preview;
+      if (functionName === 'getLiquidAssets') return 10n ** 18n;
+      throw new Error(functionName);
+    });
+    const props = { token: 'wsteth', shares: 10n } as const;
+    expect(await earn.eth.getWithdrawAvailability(props)).toEqual({
+      status: 'unavailable',
+      reason: 'paused',
+    });
+    expect((await earn.eth.prepareWithdraw(props)).step.route).toBe('async');
+    await expect(
+      earn.eth.prepareWithdraw({ ...props, mode: 'sync' }),
+    ).rejects.toThrow('Instant withdrawal unavailable');
+    preview = { isWithdrawalPossible: true, assets: 0n };
+    expect(await earn.eth.getWithdrawAvailability(props)).toEqual({
+      status: 'unavailable',
+      reason: 'zero-output',
+    });
+    expect(read).not.toHaveBeenCalledWith(
+      expect.objectContaining({ functionName: 'getLiquidAssets' }),
+    );
+  });
+
   it('never attempts a sync USDT route', async () => {
     const { earn, read } = setup();
     const tx = await earn.usd.prepareWithdraw({ token: 'usdt', shares: 10n });
@@ -257,7 +286,8 @@ describe('Earn withdrawal routing', () => {
     const { earn, read } = setup();
     mockRead(read, ({ functionName }) => {
       if (functionName === 'remainingDailyLimit') return [0n, 10n];
-      if (functionName === 'getWithdrawalParams') return { assets: 5n };
+      if (functionName === 'getWithdrawalParams')
+        return { isWithdrawalPossible: true, assets: 5n };
       if (functionName === 'getLiquidAssets') return 5n;
       throw new Error(functionName);
     });
@@ -284,6 +314,30 @@ describe('Earn withdrawal routing', () => {
     await expect(
       earn.eth.prepareWithdraw({ token: 'wsteth', shares: 10n, mode: 'sync' }),
     ).rejects.toThrow('Instant withdrawal unavailable');
+  });
+});
+
+describe('Earn position', () => {
+  it('values shares via the sync queue when the async queue is paused', async () => {
+    const { earn, read } = setup();
+    const deployment = EARN_MAINNET_DEPLOYMENTS.eth;
+    const queueOf = (kind: 'sync' | 'async') =>
+      deployment.redeemQueues.find(
+        (q) => q.token === 'wsteth' && q.kind === kind,
+      )!.address;
+    mockRead(read, ({ functionName, args }) => {
+      if (functionName === 'balanceOf') return 10n;
+      if (functionName === 'getWithdrawalParams')
+        return args![1] === queueOf('async')
+          ? { isWithdrawalPossible: false, assets: 0n }
+          : { isWithdrawalPossible: true, assets: 8n };
+      throw new Error(functionName);
+    });
+    expect(await earn.eth.getPosition(account)).toMatchObject({
+      shares: 10n,
+      assets: 8n,
+      token: 'wsteth',
+    });
   });
 });
 

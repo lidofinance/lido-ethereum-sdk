@@ -265,8 +265,11 @@ await tx.send({ account, callback });
 - `sync`: fail if instant withdrawal is unavailable or unknown.
 - `async`: use the async queue without probing sync availability.
 
-`getWithdrawAvailability` distinguishes available, unavailable (no queue, daily
-limit, liquidity) and unknown (RPC failure). Daily limits are measured in shares;
+`getWithdrawAvailability` distinguishes available, unavailable (no queue, paused
+queue, daily limit, zero output, liquidity) and unknown (RPC failure). `auto`
+falls back to async when the sync queue is paused. It does not check whether the
+async queue is paused (use `previewWithdraw({ mode: 'async' })` and read
+`isWithdrawalPossible`). Daily limits are measured in shares;
 liquidity is measured in the payout asset. Availability can change before signing.
 An already-sent or failed sync withdrawal is never automatically resubmitted via
 async. Recheck availability and ask the user to choose another operation.

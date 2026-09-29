@@ -116,7 +116,12 @@ export type EarnAvailability =
     }
   | {
       status: 'unavailable';
-      reason: 'no-sync-queue' | 'daily-limit' | 'liquidity';
+      reason:
+        | 'no-sync-queue'
+        | 'paused'
+        | 'daily-limit'
+        | 'zero-output'
+        | 'liquidity';
     }
   | { status: 'unknown'; error: unknown };
 export type EarnRequestIdentity = {

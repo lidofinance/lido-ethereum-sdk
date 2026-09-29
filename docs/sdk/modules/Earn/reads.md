@@ -101,7 +101,9 @@ configured valuation token's async queue. Returns:
 | `shareManager`                 | ShareManager address                              |
 
 EarnUSD uses USDC for position valuation, even if the user intends to withdraw
-USDT. This valuation is not a guarantee of immediately available liquidity.
+USDT. If the async queue is paused, the sync queue for the same token is used
+for valuation. `assets` is `0n` when both are paused or the oracle report is
+invalid. This valuation is not a guarantee of immediately available liquidity.
 
 ```ts
 const position = await earn.usd.getPosition(account);
@@ -212,18 +214,33 @@ Returns Collector fields `isWithdrawalPossible`, `asset`, `shares`, `sharesUSDC`
 `assetDecimals`. This method calculates output; it does not perform the same
 liquidity and daily-limit checks as `getWithdrawAvailability`.
 
+`isWithdrawalPossible` only means the Vault has not paused the queue
+(`Vault.isPausedQueue`). When it is `false`, `assets`, `assetsUSDC`, and `eta`
+are zero and `redeem` reverts. When it is `true`, `assets` is still zero if the
+oracle report is suspicious or missing. The sync route's `penaltyD6`, maximum
+report age, daily limit, and liquidity are not reflected here.
+
 ### `getWithdrawAvailability(props)`
 
 Arguments: `token`, positive uint256 `shares`, and optional `blockNumber`.
-Checks the sync queue's remaining daily limit against the requested shares, then
-compares the Collector-estimated output with the queue's liquid assets. When the
-daily limit is exceeded, the output and liquidity are not read.
+Checks, in order: that the sync queue is not paused (Collector
+`isWithdrawalPossible`), the remaining daily limit against the requested shares,
+that the Collector-estimated output is non-zero, and finally that output against
+the queue's liquid assets. Liquidity is read only if the earlier checks pass.
 
 | `status`      | Other fields                                                 |
 | ------------- | ------------------------------------------------------------ |
 | `available`   | `queue`, `assets`, `remainingDailyLimit`, `liquidAssets`     |
-| `unavailable` | `reason`: `no-sync-queue`, `daily-limit`, or `liquidity`     |
+| `unavailable` | `reason`: see below                                          |
 | `unknown`     | `error`: the failure encountered while checking availability |
+
+| `reason`        | Meaning                                                                        |
+| --------------- | ------------------------------------------------------------------------------ |
+| `no-sync-queue` | The token has no sync redeem queue                                             |
+| `paused`        | The Vault paused the sync queue                                                |
+| `daily-limit`   | Requested shares exceed the remaining daily limit                              |
+| `zero-output`   | Collector estimated zero output (suspicious or missing oracle report, or dust) |
+| `liquidity`     | Estimated output exceeds the queue's liquid assets                             |
 
 ```ts
 const availability = await earn.usd.getWithdrawAvailability({
