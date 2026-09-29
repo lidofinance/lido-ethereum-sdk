@@ -176,7 +176,15 @@ export class LidoSDKEarnVault<V extends EarnVaultId> extends LidoSDKModule {
   }
 
   async getPosition(account: Address, options: EarnReadOptions = {}) {
-    const shares = await this.balance(account, options);
+    assertEarnAddress(account);
+    // sharesOf adds processed-but-unclaimed deposit shares; redeem auto-claims them in the same call.
+    const shares = await this.core.publicClient.readContract({
+      address: this.deployment().shareManager,
+      abi: EARN_SHARE_MANAGER_ABI,
+      functionName: 'sharesOf',
+      args: [account],
+      ...options,
+    });
     const token = this.deployment().valuationToken;
     const syncQueue = this.redeemQueue(token, 'sync');
     let preview = await this.collector().read.getWithdrawalParams(

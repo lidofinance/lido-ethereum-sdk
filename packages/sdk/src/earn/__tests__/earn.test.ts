@@ -326,7 +326,7 @@ describe('Earn position', () => {
         (q) => q.token === 'wsteth' && q.kind === kind,
       )!.address;
     mockRead(read, ({ functionName, args }) => {
-      if (functionName === 'balanceOf') return 10n;
+      if (functionName === 'sharesOf') return 10n;
       if (functionName === 'getWithdrawalParams')
         return args![1] === queueOf('async')
           ? { isWithdrawalPossible: false, assets: 0n }
@@ -562,14 +562,19 @@ describe('Earn prepared calls and previews', () => {
   it('uses USDC for USD position valuation even when USDT withdrawal is supported', async () => {
     const { earn, read } = setup();
     mockRead(read, ({ functionName }) =>
-      functionName === 'balanceOf' ? 10n : { assets: 1_000_000n },
+      functionName === 'sharesOf'
+        ? 10n
+        : { isWithdrawalPossible: true, assets: 1_000_000n },
     );
     const position = await earn.usd.getPosition(account);
     expect(position).toMatchObject({
       token: 'usdc',
       decimals: 6,
+      shares: 10n,
       assets: 1_000_000n,
     });
+    expect(read.mock.calls[0]?.[0].functionName).toBe('sharesOf');
+    expect(read).toHaveBeenCalledTimes(2);
     expect(read.mock.calls[1]?.[0].args?.[1]).toBe(
       EARN_MAINNET_DEPLOYMENTS.usd.redeemQueues.find(
         (q) => q.token === 'usdc' && q.kind === 'async',

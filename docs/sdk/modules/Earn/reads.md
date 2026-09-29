@@ -86,16 +86,23 @@ The SDK does not interpret each queue's raw `values` array.
 ### `balance(account, options?)`
 
 Reads `ShareManager.balanceOf(account)` and returns `bigint` shares. This is not a
-balance of the underlying deposit token.
+balance of the underlying deposit token. It is the ERC20 balance only and
+excludes processed async deposits that have not been claimed yet; use
+`getPosition` for the redeemable amount.
 
 ### `getPosition(account, options?)`
 
-Reads the share balance and calls `Collector.getWithdrawalParams` using the
-configured valuation token's async queue. Returns:
+Reads `ShareManager.sharesOf(account)` (the ERC20 balance plus claimable shares
+from processed async deposits) and calls `Collector.getWithdrawalParams` using
+the configured valuation token's async queue. Claimable shares need no separate
+claim before withdrawal: `redeem` claims them in the same transaction, so
+`position.shares` can be passed to `withdraw` as the maximum. With mint paused
+or the account removed from the whitelist, that auto-claim reverts `redeem`
+even for already-claimed shares. Returns:
 
 | Field                          | Meaning                                           |
 | ------------------------------ | ------------------------------------------------- |
-| `shares`                       | Account's share balance                           |
+| `shares`                       | Active plus claimable shares                      |
 | `assets`                       | Estimated underlying value                        |
 | `token`, `address`, `decimals` | Valuation token identifier, address, and decimals |
 | `shareManager`                 | ShareManager address                              |
