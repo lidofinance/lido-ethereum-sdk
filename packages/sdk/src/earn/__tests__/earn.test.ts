@@ -318,26 +318,76 @@ describe('Earn withdrawal routing', () => {
 });
 
 describe('Earn position', () => {
-  it('values shares via the sync queue when the async queue is paused', async () => {
-    const { earn, read } = setup();
-    const deployment = EARN_MAINNET_DEPLOYMENTS.eth;
-    const queueOf = (kind: 'sync' | 'async') =>
-      deployment.redeemQueues.find(
-        (q) => q.token === 'wsteth' && q.kind === kind,
-      )!.address;
-    mockRead(read, ({ functionName, args }) => {
-      if (functionName === 'sharesOf') return 10n;
-      if (functionName === 'getWithdrawalParams')
-        return args![1] === queueOf('async')
-          ? { isWithdrawalPossible: false, assets: 0n }
-          : { isWithdrawalPossible: true, assets: 8n };
+  const oracle = '0x00000000000000000000000000000000000000aa' as Address;
+  const feeManager = '0x00000000000000000000000000000000000000bb' as Address;
+  const mockPosition = (
+    read: ReturnType<typeof setup>['read'],
+    report: { priceD18: bigint; timestamp: number; isSuspicious: boolean },
+    redeemFeeD6 = 0,
+  ) =>
+    mockRead(read, ({ functionName }) => {
+      if (functionName === 'sharesOf') return 10n ** 18n;
+      if (functionName === 'oracle') return oracle;
+      if (functionName === 'feeManager') return feeManager;
+      if (functionName === 'getReport') return report;
+      if (functionName === 'redeemFeeD6') return redeemFeeD6;
       throw new Error(functionName);
     });
+
+  it('values active plus claimable shares from the oracle price, minus the redeem fee, without Collector', async () => {
+    const { earn, read } = setup();
+    // 1 share = 0.8 wstETH, 1% redeem fee.
+    mockPosition(
+      read,
+      { priceD18: 125n * 10n ** 16n, timestamp: 1, isSuspicious: false },
+      10_000,
+    );
     expect(await earn.eth.getPosition(account)).toMatchObject({
-      shares: 10n,
-      assets: 8n,
+      shares: 10n ** 18n,
+      assets: 792n * 10n ** 15n,
       token: 'wsteth',
     });
+    const calls = read.mock.calls.map(([call]) => call);
+    expect(calls.find((c) => c.functionName === 'getReport')).toMatchObject({
+      address: oracle,
+      args: [EARN_MAINNET_DEPLOYMENTS.eth.tokens.wsteth.address],
+    });
+    expect(calls.find((c) => c.functionName === 'redeemFeeD6')?.address).toBe(
+      feeManager,
+    );
+    expect(calls.map((c) => c.functionName)).not.toContain(
+      'getWithdrawalParams',
+    );
+  });
+
+  it('returns zero assets for a suspicious or missing oracle report', async () => {
+    const { earn, read } = setup();
+    mockPosition(read, {
+      priceD18: 10n ** 18n,
+      timestamp: 1,
+      isSuspicious: true,
+    });
+    expect((await earn.eth.getPosition(account)).assets).toBe(0n);
+    mockPosition(read, { priceD18: 0n, timestamp: 0, isSuspicious: false });
+    expect((await earn.eth.getPosition(account)).assets).toBe(0n);
+  });
+
+  it('uses USDC for USD position valuation even when USDT withdrawal is supported', async () => {
+    const { earn, read } = setup();
+    // 1e18 shares at priceD18 = 1e30 is 1 USDC (6 decimals).
+    mockPosition(read, {
+      priceD18: 10n ** 30n,
+      timestamp: 1,
+      isSuspicious: false,
+    });
+    expect(await earn.usd.getPosition(account)).toMatchObject({
+      token: 'usdc',
+      decimals: 6,
+      assets: 1_000_000n,
+    });
+    expect(
+      read.mock.calls.find(([c]) => c.functionName === 'getReport')?.[0].args,
+    ).toEqual([EARN_MAINNET_DEPLOYMENTS.usd.tokens.usdc.address]);
   });
 });
 
@@ -556,29 +606,6 @@ describe('Earn prepared calls and previews', () => {
     });
     await expect(claim.populate({ account: zeroAddress })).rejects.toThrow(
       'different account',
-    );
-  });
-
-  it('uses USDC for USD position valuation even when USDT withdrawal is supported', async () => {
-    const { earn, read } = setup();
-    mockRead(read, ({ functionName }) =>
-      functionName === 'sharesOf'
-        ? 10n
-        : { isWithdrawalPossible: true, assets: 1_000_000n },
-    );
-    const position = await earn.usd.getPosition(account);
-    expect(position).toMatchObject({
-      token: 'usdc',
-      decimals: 6,
-      shares: 10n,
-      assets: 1_000_000n,
-    });
-    expect(read.mock.calls[0]?.[0].functionName).toBe('sharesOf');
-    expect(read).toHaveBeenCalledTimes(2);
-    expect(read.mock.calls[1]?.[0].args?.[1]).toBe(
-      EARN_MAINNET_DEPLOYMENTS.usd.redeemQueues.find(
-        (q) => q.token === 'usdc' && q.kind === 'async',
-      )?.address,
     );
   });
 

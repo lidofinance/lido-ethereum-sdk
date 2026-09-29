@@ -6,3 +6,4 @@ export * from './share-manager.js';
 export * from './collector.js';
 export * from './vault-contract.js';
 export * from './fee-manager.js';
+export * from './oracle.js';

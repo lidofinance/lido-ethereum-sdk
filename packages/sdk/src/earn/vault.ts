@@ -26,6 +26,7 @@ import {
   EARN_SHARE_MANAGER_ABI,
   EARN_VAULT_ABI,
   EARN_FEE_MANAGER_ABI,
+  EARN_ORACLE_ABI,
 } from './abi/index.js';
 import { EARN_MAINNET_DEPLOYMENTS } from './deployments.js';
 import {
@@ -177,32 +178,59 @@ export class LidoSDKEarnVault<V extends EarnVaultId> extends LidoSDKModule {
 
   async getPosition(account: Address, options: EarnReadOptions = {}) {
     assertEarnAddress(account);
-    // sharesOf adds processed-but-unclaimed deposit shares; redeem auto-claims them in the same call.
-    const shares = await this.core.publicClient.readContract({
-      address: this.deployment().shareManager,
-      abi: EARN_SHARE_MANAGER_ABI,
-      functionName: 'sharesOf',
-      args: [account],
-      ...options,
-    });
-    const token = this.deployment().valuationToken;
-    const syncQueue = this.redeemQueue(token, 'sync');
-    let preview = await this.collector().read.getWithdrawalParams(
-      [shares, this.asyncQueue(token).address, this.collectorConfig],
-      options,
-    );
-    // A paused queue makes Collector return zero assets; value via the sync queue instead.
-    if (!preview.isWithdrawalPossible && syncQueue)
-      preview = await this.collector().read.getWithdrawalParams(
-        [shares, syncQueue.address, this.collectorConfig],
-        options,
-      );
+    const { vault, shareManager, valuationToken: token } = this.deployment();
+    const client = this.core.publicClient;
+    const [shares, oracle, feeManager] = await Promise.all([
+      // sharesOf includes claimable deposit shares; redeem auto-claims them in the same tx.
+      client.readContract({
+        address: shareManager,
+        abi: EARN_SHARE_MANAGER_ABI,
+        functionName: 'sharesOf',
+        args: [account],
+        ...options,
+      }),
+      client.readContract({
+        address: vault,
+        abi: EARN_VAULT_ABI,
+        functionName: 'oracle',
+        ...options,
+      }),
+      client.readContract({
+        address: vault,
+        abi: EARN_VAULT_ABI,
+        functionName: 'feeManager',
+        ...options,
+      }),
+    ]);
+    const [report, redeemFeeD6] = await Promise.all([
+      client.readContract({
+        address: oracle,
+        abi: EARN_ORACLE_ABI,
+        functionName: 'getReport',
+        args: [this.token(token).address],
+        ...options,
+      }),
+      client.readContract({
+        address: feeManager,
+        abi: EARN_FEE_MANAGER_ABI,
+        functionName: 'redeemFeeD6',
+        ...options,
+      }),
+    ]);
+    // Same math as Collector.getWithdrawalParams, minus its queue-pause gate:
+    // pausing a queue blocks withdrawals, not the value of the shares.
+    // A suspicious or missing report has no usable price, so the value is 0.
+    const isReportValid =
+      !report.isSuspicious && report.timestamp !== 0 && report.priceD18 !== 0n;
+    const gross = isReportValid ? (shares * 10n ** 18n) / report.priceD18 : 0n;
+    // Like Collector, deduct the redeem fee from assets (the queue takes it from shares; equal up to rounding).
+    const assets = gross - (gross * BigInt(redeemFeeD6)) / 1_000_000n;
     return {
       shares,
-      assets: preview.assets,
+      assets,
       token,
       ...this.token(token),
-      shareManager: this.deployment().shareManager,
+      shareManager,
     };
   }
 

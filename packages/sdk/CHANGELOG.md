@@ -7,10 +7,10 @@
 - `earn` module for Lido EarnETH and EarnUSD (Mellow vaults), available as `sdk.earn.eth` / `sdk.earn.usd` and via the `@lidofinance/lido-ethereum-sdk/earn` entry point
   - Reads: `collect`, `balance`, `getPosition`, `getFees`, `previewDeposit`, `previewWithdraw`, `convertStethToWsteth`, `getWithdrawAvailability`, `getDepositAllowance`, `getDepositRequests`, `getDepositQueueRequest`, `getWithdrawalRequests`, `getAllWithdrawalRequests`
   - Transactions, each with `PopulateTx`, `EstimateGas` and `SimulateTx` variants: `prepareDepositApproval`, `depositToQueue`, `withdraw` (`auto`, `sync` or `async` route), `cancelDepositRequest`, `claimDepositShares`, `claimWithdrawals`
-  - `getWithdrawAvailability` reports `paused` (from Collector `isWithdrawalPossible`) and `zero-output` (invalid oracle report); `getPosition` counts claimable deposit shares (`sharesOf`) and values them via the sync queue when the async queue is paused
+  - `getWithdrawAvailability` reports `paused` (from Collector `isWithdrawalPossible`) and `zero-output` (invalid oracle report); `getPosition` counts claimable deposit shares (`sharesOf`) and values them directly from the vault oracle and redeem fee, so queue pauses no longer zero the position
   - Mainnet deployment manifest; custom deployments and Collector settings via `new LidoSDKEarn({ core, vaults })`
   - `EarnExecutionError` with the failed step and submitted hash
-  - Earn contract ABIs exported with the `EARN_` prefix
+  - Earn contract ABIs exported with the `EARN_` prefix, including `EARN_ORACLE_ABI` (vault oracle `getReport`)
 - Earn module docs: overview, reads and transactions
 
 ## Playground

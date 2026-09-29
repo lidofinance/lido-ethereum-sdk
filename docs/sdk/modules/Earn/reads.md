@@ -93,12 +93,14 @@ excludes processed async deposits that have not been claimed yet; use
 ### `getPosition(account, options?)`
 
 Reads `ShareManager.sharesOf(account)` (the ERC20 balance plus claimable shares
-from processed async deposits) and calls `Collector.getWithdrawalParams` using
-the configured valuation token's async queue. Claimable shares need no separate
-claim before withdrawal: `redeem` claims them in the same transaction, so
-`position.shares` can be passed to `withdraw` as the maximum. With mint paused
-or the account removed from the whitelist, that auto-claim reverts `redeem`
-even for already-claimed shares. Returns:
+from processed async deposits) and values them from the vault oracle's report
+for the valuation token: `shares × 1e18 / priceD18`, minus the redeem fee. This
+is the same math as `Collector.getWithdrawalParams`, but queue pauses do not
+affect it: a paused queue blocks withdrawals, not the value of the shares.
+Claimable shares need no separate claim before withdrawal: `redeem` claims them
+in the same transaction, so `position.shares` can be passed to `withdraw` as the
+maximum. With mint paused or the account removed from the whitelist, that
+auto-claim reverts `redeem` even for already-claimed shares. Returns:
 
 | Field                          | Meaning                                           |
 | ------------------------------ | ------------------------------------------------- |
@@ -108,9 +110,9 @@ even for already-claimed shares. Returns:
 | `shareManager`                 | ShareManager address                              |
 
 EarnUSD uses USDC for position valuation, even if the user intends to withdraw
-USDT. If the async queue is paused, the sync queue for the same token is used
-for valuation. `assets` is `0n` when both are paused or the oracle report is
-invalid. This valuation is not a guarantee of immediately available liquidity.
+USDT. `assets` is `0n` when the oracle report is suspicious or missing. The sync
+route's `penaltyD6` is not deducted. This valuation is not a guarantee of
+immediately available liquidity.
 
 ```ts
 const position = await earn.usd.getPosition(account);
