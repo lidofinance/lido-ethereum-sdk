@@ -12,11 +12,13 @@ import { LidoSDKShares } from './shares/index.js';
 import { LidoSDKL2 } from './l2/index.js';
 import { LidoSDKDualGovernance } from './dual-governance/index.js';
 import { LidoSDKVaultModule } from './stvault/index.js';
+import { LidoSDKEarn } from './earn/index.js';
 
 import { version } from './version.js';
 
 export class LidoSDK {
   readonly core: LidoSDKCore;
+  readonly earn: LidoSDKEarn;
   readonly stake: LidoSDKStake;
   readonly wrap: LidoSDKWrap;
   readonly withdraw: LidoSDKWithdraw;
@@ -58,5 +60,7 @@ export class LidoSDK {
     this.dualGovernance = new LidoSDKDualGovernance({ ...props, core });
     // Vault functionality
     this.stVaultModule = new LidoSDKVaultModule({ ...props, core });
+    // Earn functionality
+    this.earn = new LidoSDKEarn({ core });
   }
 }

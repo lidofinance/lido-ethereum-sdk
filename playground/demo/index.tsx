@@ -18,6 +18,7 @@ import { useChainId } from 'wagmi';
 import { L2_CHAINS } from 'providers/web3';
 import { L2 } from './l2';
 import { StVaultDemo } from './stvault';
+import { EarnDemo } from './earn';
 
 export const Demo = () => {
   const chain = useChainId();
@@ -27,6 +28,7 @@ export const Demo = () => {
       <StVaultDemo />
       <StakeDemo />
       <WrapDemo />
+      <EarnDemo />
       <CoreDemo />
       <WithdrawalsRequestDemo />
       <WithdrawalsClaimDemo />
