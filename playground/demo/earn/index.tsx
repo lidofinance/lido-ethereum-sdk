@@ -1,5 +1,5 @@
-import { Accordion } from '@lidofinance/lido-ui';
 import type { EarnVaultId } from '@lidofinance/lido-ethereum-sdk';
+import { ModulePartTitle, ModuleSection } from 'components/module-section';
 import { EarnReadsDemo } from './reads';
 import { EarnTransactionsDemo } from './transactions';
 import { useEarnVault } from './use-earn-vault';
@@ -9,24 +9,22 @@ const EarnVaultDemo = ({ id, title }: { id: EarnVaultId; title: string }) => {
 
   if (!info.deployment) {
     return (
-      <Accordion summary={title}>
-        Earn is deployed on Ethereum mainnet only. Switch the network to use{' '}
-        {title}.
-      </Accordion>
+      <ModuleSection
+        title={title}
+        description={`Earn is deployed on Ethereum mainnet only. Switch the network to use ${title}.`}
+      />
     );
   }
 
   return (
-    <>
-      <EarnReadsDemo title={title} info={info} />
-      <EarnTransactionsDemo title={title} info={info} />
-    </>
+    <ModuleSection title={title} description={`sdk.earn.${id}`}>
+      <ModulePartTitle>Reads</ModulePartTitle>
+      <EarnReadsDemo info={info} />
+      <ModulePartTitle>Transactions</ModulePartTitle>
+      <EarnTransactionsDemo info={info} />
+    </ModuleSection>
   );
 };
 
-export const EarnDemo = () => (
-  <>
-    <EarnVaultDemo id="eth" title="Earn ETH" />
-    <EarnVaultDemo id="usd" title="Earn USD" />
-  </>
-);
+export const EarnEthDemo = () => <EarnVaultDemo id="eth" title="Earn ETH" />;
+export const EarnUsdDemo = () => <EarnVaultDemo id="usd" title="Earn USD" />;

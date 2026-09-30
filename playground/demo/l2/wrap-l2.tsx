@@ -1,4 +1,4 @@
-import { Accordion } from '@lidofinance/lido-ui';
+import { ModuleSection } from 'components/module-section';
 
 import { Action, renderTokenResult } from 'components/action';
 import { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
@@ -16,7 +16,7 @@ export const WrapL2Demo = () => {
   const { l2 } = useLidoSDK();
 
   return (
-    <Accordion summary="L2 Wrap">
+    <ModuleSection title="L2 Wrap">
       <Action
         title="Get wstETH balance"
         walletAction
@@ -119,6 +119,6 @@ export const WrapL2Demo = () => {
           })
         }
       />
-    </Accordion>
+    </ModuleSection>
   );
 };

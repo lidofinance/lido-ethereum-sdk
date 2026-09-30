@@ -1,10 +1,5 @@
-import {
-  Input,
-  Accordion,
-  Select,
-  Option,
-  Checkbox,
-} from '@lidofinance/lido-ui';
+import { ModuleSection } from 'components/module-section';
+import { Input, Select, Option, Checkbox } from '@lidofinance/lido-ui';
 import { Action } from 'components/action';
 import { useAddressState } from 'hooks/useAddressState';
 import { useLidoSDK } from 'providers/sdk';
@@ -46,7 +41,7 @@ export const RewardsDemo = () => {
   } as any;
 
   return (
-    <Accordion summary="Rewards">
+    <ModuleSection title="Rewards">
       <Action
         title="Get Rewards From Chain"
         renderResult={renderRewards}
@@ -123,6 +118,6 @@ export const RewardsDemo = () => {
         renderResult={renderRewards}
         title="Get Rewards From Subgraph"
       ></Action>
-    </Accordion>
+    </ModuleSection>
   );
 };

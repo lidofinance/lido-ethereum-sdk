@@ -1,4 +1,3 @@
 export interface LayoutProps {
-  title?: React.ReactNode;
-  subtitle?: React.ReactNode;
+  sidebar?: React.ReactNode;
 }

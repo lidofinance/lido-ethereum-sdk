@@ -1,4 +1,5 @@
-import { Accordion, Input, Select, Option } from '@lidofinance/lido-ui';
+import { ModuleSection } from 'components/module-section';
+import { Input, Select, Option } from '@lidofinance/lido-ui';
 import { Action } from 'components/action';
 import {
   useBackArgumentState,
@@ -30,7 +31,7 @@ export const EventsDemo = () => {
   } as any;
 
   return (
-    <Accordion summary="Events">
+    <ModuleSection title="Events">
       <Action
         title="Last Rebase event"
         action={() => events.stethEvents.getLastRebaseEvent()}
@@ -94,6 +95,6 @@ export const EventsDemo = () => {
           onChange={(event) => setStep(event.currentTarget.valueAsNumber)}
         />
       </Action>
-    </Accordion>
+    </ModuleSection>
   );
 };
