@@ -1,10 +1,5 @@
-import {
-  Accordion,
-  Checkbox,
-  Input,
-  Option,
-  Select,
-} from '@lidofinance/lido-ui';
+import { ModuleSection } from 'components/module-section';
+import { Checkbox, Input, Option, Select } from '@lidofinance/lido-ui';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { Action } from 'components/action';
 import TokenInput, { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
@@ -78,7 +73,7 @@ export const StVaultDemo = () => {
   }, [constants]);
 
   return (
-    <Accordion summary="Vault">
+    <ModuleSection title="stVault">
       <ActionBlock>
         <Select
           fullwidth
@@ -512,6 +507,6 @@ export const StVaultDemo = () => {
           }
         }}
       ></Action>
-    </Accordion>
+    </ModuleSection>
   );
 };

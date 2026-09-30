@@ -1,3 +1,7 @@
+---
+sidebar_position: 17
+---
+
 # Dual Governance
 The Dual Governance module provides an interface to interact with Lido's Dual Governance system, which implements a governance mechanism with veto signaling and rage quit capabilities. This module allows applications to query the current state of governance, monitor veto signaling thresholds, and interact with the relevant contracts.
 

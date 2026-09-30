@@ -1,45 +1,23 @@
-import { CoreDemo } from './core';
-import { StakeDemo } from './stake';
-import { WrapDemo } from './wrap';
-import {
-  WithdrawalsRequestDemo,
-  WithdrawalsViewsDemo,
-  WithdrawalsClaimDemo,
-  WithdrawalsContractDemo,
-} from './withdrawals';
-import { StethDemo, WstethDemo } from './tokens';
-import { UnstethDemo } from './unsteth';
-import { EventsDemo } from './events';
-import { StatisticsDemo } from './statistics';
-import { RewardsDemo } from './rewards';
-import { ShareDemo } from './shares';
-import { DualGovernanceDemo } from './dual-governance';
 import { useChainId } from 'wagmi';
 import { L2_CHAINS } from 'providers/web3';
-import { L2 } from './l2';
-import { StVaultDemo } from './stvault';
+import { DEMO_MODULES, type DemoLayer, type DemoModule } from './registry';
 
-export const Demo = () => {
-  const chain = useChainId();
-  if (L2_CHAINS.includes(chain)) return <L2 />;
-  return (
-    <>
-      <StVaultDemo />
-      <StakeDemo />
-      <WrapDemo />
-      <CoreDemo />
-      <WithdrawalsRequestDemo />
-      <WithdrawalsClaimDemo />
-      <WithdrawalsViewsDemo />
-      <WithdrawalsContractDemo />
-      <StethDemo />
-      <WstethDemo />
-      <UnstethDemo />
-      <ShareDemo />
-      <EventsDemo />
-      <StatisticsDemo />
-      <RewardsDemo />
-      <DualGovernanceDemo />
-    </>
-  );
+export { DEMO_MODULES, type DemoModule } from './registry';
+
+export const useDemoLayer = (): DemoLayer =>
+  L2_CHAINS.includes(useChainId()) ? 'l2' : 'l1';
+
+/** Module to show for the given hash; falls back to the first one available on the layer. */
+export const resolveDemoModule = (hash: string, layer: DemoLayer) => {
+  const available = DEMO_MODULES.filter((entry) => entry.layer === layer);
+  return available.find((entry) => entry.id === hash) ?? available[0];
+};
+
+type DemoProps = { module?: DemoModule };
+
+export const Demo = ({ module: entry }: DemoProps) => {
+  if (!entry) return null;
+  const { Component, id } = entry;
+  // key resets module state when switching between modules
+  return <Component key={id} />;
 };

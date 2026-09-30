@@ -1,4 +1,5 @@
-import { Input, Accordion } from '@lidofinance/lido-ui';
+import { ModuleSection } from 'components/module-section';
+import { Input } from '@lidofinance/lido-ui';
 import { Action } from 'components/action';
 import { useLidoSDK } from 'providers/sdk';
 import { useState } from 'react';
@@ -8,7 +9,7 @@ export const StatisticsDemo = () => {
   const { statistics } = useLidoSDK();
 
   return (
-    <Accordion summary="Statistic">
+    <ModuleSection title="Statistics">
       <Action title="Last Apr" action={() => statistics.apr.getLastApr()} />
       <Action
         title="SMA Apr"
@@ -27,6 +28,6 @@ export const StatisticsDemo = () => {
           onChange={(e) => setDaysValue(e.target.valueAsNumber)}
         />
       </Action>
-    </Accordion>
+    </ModuleSection>
   );
 };

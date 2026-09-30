@@ -1,1 +1,5 @@
-export { CustomRpcInput } from './custom-rpc-input';
+export {
+  CustomRpcInput,
+  CustomRpcModal,
+  useIsCustomRpc,
+} from './custom-rpc-input';

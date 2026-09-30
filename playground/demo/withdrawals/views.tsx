@@ -1,4 +1,4 @@
-import { Accordion } from '@lidofinance/lido-ui';
+import { ModuleSection } from 'components/module-section';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { Action, renderTokenResult } from 'components/action';
 import { useLidoSDK } from 'providers/sdk';
@@ -10,7 +10,7 @@ export const WithdrawalsViewsDemo = () => {
   const account = web3account as `0x{string}`;
 
   return (
-    <Accordion summary="Withdrawals views">
+    <ModuleSection title="Withdrawals views">
       <Action
         title="Get request ids"
         walletAction
@@ -54,6 +54,6 @@ export const WithdrawalsViewsDemo = () => {
         title="Is Turbo mode"
         action={() => withdraw.views.isTurboModeActive()}
       />
-    </Accordion>
+    </ModuleSection>
   );
 };
