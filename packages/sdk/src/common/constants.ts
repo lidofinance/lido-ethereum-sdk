@@ -10,6 +10,9 @@ import {
   soneium,
   unichain,
   unichainSepolia,
+  arbitrum,
+  base,
+  linea,
 } from 'viem/chains';
 
 export enum CHAINS {
@@ -23,6 +26,9 @@ export enum CHAINS {
   SoneiumMinato = 1946,
   Unichain = 130,
   UnichainSepolia = 1301,
+  Base = 8453,
+  Linea = 59144,
+  Arbitrum = 42161,
 }
 
 export const APPROX_BLOCKS_BY_DAY = 7600n;
@@ -38,6 +44,9 @@ export const SUPPORTED_CHAINS: CHAINS[] = [
   CHAINS.SoneiumMinato,
   CHAINS.Unichain,
   CHAINS.UnichainSepolia,
+  CHAINS.Base,
+  CHAINS.Linea,
+  CHAINS.Arbitrum,
 ];
 
 export const SUBMIT_EXTRA_GAS_TRANSACTION_RATIO = 1.05;
@@ -118,6 +127,7 @@ export const WSTETH_REFERRAL_STAKER: { [key in CHAINS]?: Address } = {
 export enum LIDO_L2_CONTRACT_NAMES {
   wsteth = 'wsteth',
   steth = 'steth',
+  stakeReceiver = 'stakeReceiver',
 }
 
 export const VAULT_VIEWER_CONTRACT_ADDRESSES: {
@@ -130,13 +140,14 @@ export const VAULT_VIEWER_CONTRACT_ADDRESSES: {
 export const LIDO_L2_CONTRACT_ADDRESSES: {
   [key in CHAINS]?: { [key2 in LIDO_L2_CONTRACT_NAMES]?: Address };
 } = {
-  [CHAINS.OptimismSepolia]: {
-    wsteth: '0x24B47cd3A74f1799b32B2de11073764Cb1bb318B',
-    steth: '0xf49d208b5c7b10415c7beafe9e656f2df9edfe3b',
-  },
   [CHAINS.Optimism]: {
     wsteth: '0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb',
     steth: '0x76A50b8c7349cCDDb7578c6627e79b5d99D24138',
+    stakeReceiver: '0x328de900860816d29D1367F6903a24D8ed40C997',
+  },
+  [CHAINS.OptimismSepolia]: {
+    wsteth: '0x24B47cd3A74f1799b32B2de11073764Cb1bb318B',
+    steth: '0xf49d208b5c7b10415c7beafe9e656f2df9edfe3b',
   },
   [CHAINS.Soneium]: {
     wsteth: '0xaA9BD8c957D803466FA92504BDd728cC140f8941',
@@ -153,6 +164,18 @@ export const LIDO_L2_CONTRACT_ADDRESSES: {
   [CHAINS.UnichainSepolia]: {
     wsteth: '0xE66e1B0931345900024b524A88BBE58f09A18FD0',
     steth: '0x4436b2d6A2a0807b211c6a725E905b736dF8511F',
+  },
+  [CHAINS.Base]: {
+    wsteth: '0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452',
+    stakeReceiver: '0x328de900860816d29D1367F6903a24D8ed40C997',
+  },
+  [CHAINS.Linea]: {
+    wsteth: '0xB5beDd42000b71FddE22D3eE8a79Bd49A568fC8F',
+    stakeReceiver: '0x328de900860816d29D1367F6903a24D8ed40C997',
+  },
+  [CHAINS.Arbitrum]: {
+    wsteth: '0x5979D7b546E38E414F7E9822514be443A4800529',
+    stakeReceiver: '0x72229141D4B016682d3618ECe47c046f30Da4AD1',
   },
 };
 
@@ -201,6 +224,9 @@ export const VIEM_CHAINS: {
   [CHAINS.SoneiumMinato]: soneiumMinato,
   [CHAINS.Unichain]: unichain,
   [CHAINS.UnichainSepolia]: unichainSepolia,
+  [CHAINS.Base]: base,
+  [CHAINS.Linea]: linea,
+  [CHAINS.Arbitrum]: arbitrum,
 };
 
 export const WQ_API_URLS: { [key in CHAINS]?: string } = {

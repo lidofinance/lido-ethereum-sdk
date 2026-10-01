@@ -1,3 +1,8 @@
+# 4.10.0
+
+- Added optional `customSupportedChains` prop to SDK constructor to pass custom `viem` chain definitions. A custom chain overrides the built-in definition for a supported chain id and allows chain ids outside of `SUPPORTED_CHAINS` (e.g. devnets).
+- Added various exports to help build custom SDK modules
+
 # 4.9.0
 
 ## SDK
