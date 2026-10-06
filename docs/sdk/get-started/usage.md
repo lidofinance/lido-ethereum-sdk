@@ -138,6 +138,37 @@ const core = new LidoSDKCore(params);
 const wrap = new LidoSDKWrap({ core });
 ```
 
+## Custom chains & contracts
+
+By default the SDK accepts only chain ids from `SUPPORTED_CHAINS` and uses the matching `viem` chain definition. The `customSupportedChains` option lets you pass your own `viem` `Chain` definitions:
+
+- if a custom chain has the same id as a supported chain, it replaces the built-in definition (for example to set custom RPC URLs or a custom `multicall3` address);
+- if a custom chain has an id that is not in `SUPPORTED_CHAINS`, that id becomes accepted by the SDK (for example for devnets).
+
+The resolved chain is exposed as `core.chain` and is used for the public client created from `rpcUrls`. Chains that do not have Lido contracts built into the SDK need `customLidoLocatorAddress` to resolve contract addresses, and `contractAddressManifest` can be used to verify them.
+
+```ts
+import { LidoSDK } from '@lidofinance/lido-ethereum-sdk';
+import { defineChain } from 'viem';
+import { hoodi } from 'viem/chains';
+
+const devnet = defineChain({
+  ...hoodi,
+  id: 999999,
+  name: 'Lido Devnet',
+  rpcUrls: { default: { http: ['<DEVNET_RPC_URL>'] } },
+});
+
+const sdk = new LidoSDK({
+  chainId: devnet.id,
+  rpcUrls: ['<DEVNET_RPC_URL>'],
+  customSupportedChains: [devnet],
+  customLidoLocatorAddress: '<DEVNET_LIDO_LOCATOR_ADDRESS>',
+});
+```
+
+An empty `customSupportedChains` array or an entry without a numeric `id` is rejected with `INVALID_ARGUMENT`. A chain id that is neither supported nor present in `customSupportedChains` is rejected with `INVALID_ARGUMENT` as well.
+
 ## Typescript and Type Registration
 
 The SDK is written fully in TypeScript, each module exports helper types, specific types for ABIs and contract instances.

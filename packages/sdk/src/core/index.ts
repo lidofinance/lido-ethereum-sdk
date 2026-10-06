@@ -6,6 +6,7 @@ export { LidoAbi } from './abi/lido.js';
 export { default as LidoSDKCore } from './core.js';
 export type {
   LidoSDKCoreProps,
+  LidoSDKChainId,
   LOG_MODE,
   // Types for public and wallet client registration
   ClientRegister,
