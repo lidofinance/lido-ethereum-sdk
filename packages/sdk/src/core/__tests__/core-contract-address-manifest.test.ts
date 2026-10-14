@@ -55,6 +55,16 @@ describe('Core contract address manifest', () => {
     );
   });
 
+  test('undefined address is rejected with INVALID_ARGUMENT', async () => {
+    const manifest = {
+      [LIDO_CONTRACT_NAMES.lido]: undefined,
+    } as LidoSDKCore['contractAddressManifest'];
+    await expectSDKError(
+      () => createCoreWithManifest(manifest),
+      ERROR_CODE.INVALID_ARGUMENT,
+    );
+  });
+
   test('getContractAddress passes verification for matching address', async () => {
     const core = createCoreWithManifest({
       [LIDO_CONTRACT_NAMES.lido]: lidoAddress,

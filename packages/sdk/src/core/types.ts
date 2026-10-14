@@ -13,6 +13,7 @@ import type {
 
 import type {
   LIDO_CONTRACT_NAMES,
+  STVAULT_CONTRACT_NAMES,
   LIDO_TOKENS,
   SUPPORTED_CHAINS,
 } from '../common/constants.js';
@@ -96,12 +97,17 @@ export type ContractAddressManifest = {
   [key in LIDO_CONTRACT_NAMES]?: Address;
 };
 
+export type StVaultContractAddressManifest = {
+  [key in STVAULT_CONTRACT_NAMES]?: Address;
+};
+
 export type LidoSDKCoreProps = {
   /** Required with `rpcUrls`, otherwise inferred from `publicClient.chain.id` */
   chainId?: LidoSDKChainId;
   logMode?: LOG_MODE;
   customLidoLocatorAddress?: Address;
   contractAddressManifest?: ContractAddressManifest;
+  stVaultContractAddressManifest?: StVaultContractAddressManifest;
   /**
    * Custom viem `Chain` definitions. A chain from this list is used instead of
    * the built-in definition when its id matches `chainId`, which also allows

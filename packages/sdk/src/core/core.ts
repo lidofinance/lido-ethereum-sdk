@@ -41,6 +41,7 @@ import {
   NOOP,
   PERMIT_MESSAGE_TYPES,
   SUBRGRAPH_ID_BY_CHAIN,
+  STVAULT_CONTRACT_NAMES,
   SUPPORTED_CHAINS,
   VAULT_VIEWER_CONTRACT_ADDRESSES,
   VIEM_CHAINS,
@@ -64,6 +65,7 @@ import type {
   PermitSignature,
   ResolvedClientRegister,
   SignPermitProps,
+  StVaultContractAddressManifest,
   TransactionOptions,
   TransactionResult,
 } from './types.js';
@@ -86,6 +88,9 @@ export default class LidoSDKCore extends LidoSDKCacheable {
   readonly chain: Chain;
   readonly publicClient: ResolvedClientRegister['publicClient'];
   readonly contractAddressManifest: ContractAddressManifest | undefined;
+  readonly stVaultContractAddressManifest:
+    | StVaultContractAddressManifest
+    | undefined;
 
   readonly logMode: LOG_MODE;
   // for devnets
@@ -112,14 +117,20 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     this.logMode = props.logMode ?? 'none';
     this.customLidoLocatorAddress = props.customLidoLocatorAddress;
 
-    const { chain, publicClient, walletClient, contractAddressManifest } =
-      this.init(props, version);
+    const {
+      chain,
+      publicClient,
+      walletClient,
+      contractAddressManifest,
+      stVaultContractAddressManifest,
+    } = this.init(props, version);
 
     this.chain = chain;
     this.chainId = chain.id as CHAINS;
     this.publicClient = publicClient;
     this.#walletClient = walletClient;
     this.contractAddressManifest = contractAddressManifest;
+    this.stVaultContractAddressManifest = stVaultContractAddressManifest;
   }
 
   @Initialize('Init:')
@@ -136,6 +147,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       // eslint-disable-next-line deprecation/deprecation
       web3Provider,
       contractAddressManifest,
+      stVaultContractAddressManifest,
       customSupportedChains,
     }: LidoSDKCoreProps,
     _version?: string,
@@ -219,7 +231,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     if (contractAddressManifest) {
       const entries = Object.entries(contractAddressManifest).map(([k, v]) => [
         k as LIDO_CONTRACT_NAMES,
-        v.toLocaleLowerCase('en-US') as Address,
+        v?.toLocaleLowerCase('en-US') as Address,
       ]);
       if (entries.length === 0)
         throw this.error({
@@ -245,11 +257,45 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       contractAddressManifest = Object.fromEntries(entries);
     }
 
+    if (stVaultContractAddressManifest) {
+      const entries = Object.entries(stVaultContractAddressManifest).map(
+        ([k, v]) => [
+          k as STVAULT_CONTRACT_NAMES,
+          v?.toLocaleLowerCase('en-US') as Address,
+        ],
+      );
+      if (entries.length === 0)
+        throw this.error({
+          message: `stVault contract address manifest is empty`,
+          code: ERROR_CODE.INVALID_ARGUMENT,
+        });
+
+      if (
+        entries.some(
+          ([contract, address]) =>
+            !address ||
+            !isAddress(address, { strict: false }) ||
+            STVAULT_CONTRACT_NAMES[
+              contract as STVAULT_CONTRACT_NAMES
+            ] === undefined,
+        )
+      ) {
+        throw this.error({
+          message: `Malformed stVaultContractAddressManifest, must be a mapping of STVAULT_CONTRACT_NAMES to valid addresses`,
+          code: ERROR_CODE.INVALID_ARGUMENT,
+        });
+      }
+
+      // rebuild clean object
+      stVaultContractAddressManifest = Object.fromEntries(entries);
+    }
+
     return {
       chain,
       publicClient,
       walletClient: walletClientProp,
       contractAddressManifest,
+      stVaultContractAddressManifest,
     };
   }
 
@@ -504,6 +550,28 @@ export default class LidoSDKCore extends LidoSDKCacheable {
       });
     }
     return addressFromLocator;
+  }
+
+  @Logger('Utils:')
+  @Cache(30 * 60 * 1000, ['chain.id'])
+  public async getStVaultContractAddress(
+    contract: STVAULT_CONTRACT_NAMES,
+  ): Promise<Address> {
+    const addressToVerify = this.stVaultContractAddressManifest?.[contract];
+    let addressFromChain;
+    if (contract === STVAULT_CONTRACT_NAMES.vaultViewer) {
+      addressFromChain = this.getVaultViewerAddress();
+    } else {
+      const lidoLocator = this.getContractLidoLocator();
+      addressFromChain = await lidoLocator.read[contract]();
+    }
+    if (addressToVerify && !isAddressEqual(addressToVerify, addressFromChain)) {
+      throw this.error({
+        code: ERROR_CODE.PROVIDER_ERROR,
+        message: `Contract address for ${contract} is not correct. Expected: ${addressToVerify}, got: ${addressFromChain}`,
+      });
+    }
+    return addressFromChain;
   }
 
   @Logger('Utils:')

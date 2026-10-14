@@ -2,6 +2,7 @@
 
 - Added optional `customSupportedChains` prop to SDK constructor to pass custom `viem` chain definitions. A custom chain overrides the built-in definition for a supported chain id and allows chain ids outside of `SUPPORTED_CHAINS` (e.g. devnets).
 - Added various exports to help build custom SDK modules
+- Added optional `stVaultContractAddressManifest` prop to SDK constructor to pin stVault contract addresses (`vaultHub`, `vaultFactory`, `lazyOracle`, `predepositGuarantee`, `operatorGrid`, `vaultViewer`). Resolved addresses are checked against the manifest and a mismatch throws `PROVIDER_ERROR`. Exposed `STVAULT_CONTRACT_NAMES` with the pinnable stVault contract names.
 
 # 4.9.0
 
