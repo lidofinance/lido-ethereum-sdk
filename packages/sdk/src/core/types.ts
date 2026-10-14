@@ -53,10 +53,19 @@ export type LidoSdkKeyedClient = {
 
 // Core Props
 
+/**
+ * Chain id accepted by the SDK: one of the built-in `SUPPORTED_CHAINS`
+ * or any id present in `customSupportedChains`.
+ */
+// `number & NonNullable<unknown>` keeps `CHAINS` autocomplete while accepting any number
+export type LidoSDKChainId =
+  | (typeof SUPPORTED_CHAINS)[number]
+  | (number & NonNullable<unknown>);
+
 type LidoSDKCorePropsPublicClientProps =
   | {
       rpcUrls: string[];
-      chainId: (typeof SUPPORTED_CHAINS)[number];
+      chainId: LidoSDKChainId;
       publicClient?: undefined;
       rpcProvider?: undefined;
     }
@@ -88,10 +97,17 @@ export type ContractAddressManifest = {
 };
 
 export type LidoSDKCoreProps = {
-  chainId?: (typeof SUPPORTED_CHAINS)[number];
+  /** Required with `rpcUrls`, otherwise inferred from `publicClient.chain.id` */
+  chainId?: LidoSDKChainId;
   logMode?: LOG_MODE;
   customLidoLocatorAddress?: Address;
   contractAddressManifest?: ContractAddressManifest;
+  /**
+   * Custom viem `Chain` definitions. A chain from this list is used instead of
+   * the built-in definition when its id matches `chainId`, which also allows
+   * chain ids outside of `SUPPORTED_CHAINS` (e.g. devnets).
+   */
+  customSupportedChains?: Chain[];
 } & LidoSDKCorePropsPublicClientProps &
   LidoSDKCorePropsWalletClientProps;
 
