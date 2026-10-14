@@ -99,9 +99,6 @@ export enum LIDO_CONTRACT_NAMES {
   oracleDaemonConfig = 'oracleDaemonConfig',
   wsteth = 'wsteth',
   wstethReferralStaker = 'wstethReferralStaker',
-}
-
-export enum STVAULT_CONTRACT_NAMES {
   vaultHub = 'vaultHub',
   vaultFactory = 'vaultFactory',
   lazyOracle = 'lazyOracle',

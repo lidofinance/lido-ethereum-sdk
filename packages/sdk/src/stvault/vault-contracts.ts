@@ -15,7 +15,7 @@ import {
 import { Cache, Logger } from '../common/decorators/index.js';
 import { BusModule } from './bus-module.js';
 import { getEncodableContract } from '../common/index.js';
-import { STVAULT_CONTRACT_NAMES } from '../common/constants.js';
+import { LIDO_CONTRACT_NAMES } from '../common/constants.js';
 import type {
   DashboardContractType,
   LazyOracleContractType,
@@ -75,8 +75,8 @@ export class LidoSDKVaultContracts extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractVaultHub(): Promise<VaultHubContractType> {
-    const address = await this.bus.core.getStVaultContractAddress(
-      STVAULT_CONTRACT_NAMES.vaultHub,
+    const address = await this.bus.core.getContractAddress(
+      LIDO_CONTRACT_NAMES.vaultHub,
     );
 
     return getEncodableContract(
@@ -91,8 +91,8 @@ export class LidoSDKVaultContracts extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractVaultFactory(): Promise<VaultFactoryContractType> {
-    const address = await this.bus.core.getStVaultContractAddress(
-      STVAULT_CONTRACT_NAMES.vaultFactory,
+    const address = await this.bus.core.getContractAddress(
+      LIDO_CONTRACT_NAMES.vaultFactory,
     );
 
     return getEncodableContract(
@@ -107,8 +107,8 @@ export class LidoSDKVaultContracts extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractVaultViewer(): Promise<VaultViewerContractType> {
-    const address = await this.bus.core.getStVaultContractAddress(
-      STVAULT_CONTRACT_NAMES.vaultViewer,
+    const address = await this.bus.core.getContractAddress(
+      LIDO_CONTRACT_NAMES.vaultViewer,
     );
 
     return getEncodableContract(
@@ -123,8 +123,8 @@ export class LidoSDKVaultContracts extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractLazyOracle(): Promise<LazyOracleContractType> {
-    const address = await this.bus.core.getStVaultContractAddress(
-      STVAULT_CONTRACT_NAMES.lazyOracle,
+    const address = await this.bus.core.getContractAddress(
+      LIDO_CONTRACT_NAMES.lazyOracle,
     );
 
     return getEncodableContract(
@@ -139,8 +139,8 @@ export class LidoSDKVaultContracts extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractPredepositGuarantee(): Promise<PredepositGuaranteeContractType> {
-    const address = await this.bus.core.getStVaultContractAddress(
-      STVAULT_CONTRACT_NAMES.predepositGuarantee,
+    const address = await this.bus.core.getContractAddress(
+      LIDO_CONTRACT_NAMES.predepositGuarantee,
     );
 
     return getEncodableContract(
@@ -155,8 +155,8 @@ export class LidoSDKVaultContracts extends BusModule {
   @Logger('Contracts:')
   @Cache(30 * 60 * 1000, ['bus.core.chain.id'])
   public async getContractOperatorGrid(): Promise<OperatorGridContractType> {
-    const address = await this.bus.core.getStVaultContractAddress(
-      STVAULT_CONTRACT_NAMES.operatorGrid,
+    const address = await this.bus.core.getContractAddress(
+      LIDO_CONTRACT_NAMES.operatorGrid,
     );
 
     return getEncodableContract(

@@ -4,8 +4,8 @@ import type { Address } from 'viem';
 import { LidoSDKCore } from '../index.js';
 import {
   ERROR_CODE,
+  LIDO_CONTRACT_NAMES,
   LidoSDKVaultModule,
-  STVAULT_CONTRACT_NAMES,
 } from '../../index.js';
 import { useTestsEnvs } from '../../../tests/utils/fixtures/use-test-envs.js';
 import { usePublicRpcProvider } from '../../../tests/utils/fixtures/use-test-rpc-provider.js';
@@ -15,18 +15,18 @@ import { expectAddress } from '../../../tests/utils/expect/expect-address.js';
 
 const WRONG_ADDRESS: Address = '0x0000000000000000000000000000000000000001';
 
-describe('Core stvault contract address manifest', () => {
+describe('Core stvault contract address pinning', () => {
   const { chainId } = useTestsEnvs();
   const rpcCore = useRpcCore();
 
-  const createCoreWithStVaultManifest = (
-    stVaultContractAddressManifest: LidoSDKCore['stVaultContractAddressManifest'],
+  const createCoreWithManifest = (
+    contractAddressManifest: LidoSDKCore['contractAddressManifest'],
   ) =>
     new LidoSDKCore({
       chainId,
       publicClient: usePublicRpcProvider(),
       logMode: 'none',
-      stVaultContractAddressManifest,
+      contractAddressManifest,
     });
 
   // real addresses resolved by a manifest-less core
@@ -34,96 +34,79 @@ describe('Core stvault contract address manifest', () => {
   let vaultViewerAddress: Address;
 
   beforeAll(async () => {
-    vaultHubAddress = await rpcCore.getStVaultContractAddress(
-      STVAULT_CONTRACT_NAMES.vaultHub,
+    vaultHubAddress = await rpcCore.getContractAddress(
+      LIDO_CONTRACT_NAMES.vaultHub,
     );
     vaultViewerAddress = rpcCore.getVaultViewerAddress();
     expectAddress(vaultHubAddress);
     expectAddress(vaultViewerAddress);
   });
 
-  test('stvault manifest is stored on core', () => {
-    const manifest = { [STVAULT_CONTRACT_NAMES.vaultHub]: WRONG_ADDRESS };
-    const core = createCoreWithStVaultManifest(manifest);
-    expect(core.stVaultContractAddressManifest).toEqual(manifest);
-  });
-
-  test('core without stvault manifest has no stvault manifest', () => {
-    expect(rpcCore.stVaultContractAddressManifest).toBeUndefined();
-  });
-
-  test('empty stvault manifest is rejected', async () => {
-    await expectSDKError(
-      () => createCoreWithStVaultManifest({}),
-      ERROR_CODE.INVALID_ARGUMENT,
-    );
-  });
-
-  test('undefined address is rejected with INVALID_ARGUMENT', async () => {
-    const manifest = {
-      [STVAULT_CONTRACT_NAMES.vaultHub]: undefined,
-    } as LidoSDKCore['stVaultContractAddressManifest'];
-    await expectSDKError(
-      () => createCoreWithStVaultManifest(manifest),
-      ERROR_CODE.INVALID_ARGUMENT,
-    );
-  });
-
-  test('getStVaultContractAddress passes for matching locator contract', async () => {
-    const core = createCoreWithStVaultManifest({
-      [STVAULT_CONTRACT_NAMES.vaultHub]: vaultHubAddress,
-    });
+  test('resolves a locator-based stvault contract', async () => {
     await expect(
-      core.getStVaultContractAddress(STVAULT_CONTRACT_NAMES.vaultHub),
+      rpcCore.getContractAddress(LIDO_CONTRACT_NAMES.vaultHub),
     ).resolves.toBe(vaultHubAddress);
   });
 
-  test('getStVaultContractAddress passes for matching vaultViewer constant', async () => {
-    const core = createCoreWithStVaultManifest({
-      [STVAULT_CONTRACT_NAMES.vaultViewer]: vaultViewerAddress,
-    });
+  test('resolves the vaultViewer constant', async () => {
     await expect(
-      core.getStVaultContractAddress(STVAULT_CONTRACT_NAMES.vaultViewer),
+      rpcCore.getContractAddress(LIDO_CONTRACT_NAMES.vaultViewer),
     ).resolves.toBe(vaultViewerAddress);
   });
 
-  test('stvault address comparison is case-insensitive', async () => {
-    const core = createCoreWithStVaultManifest({
-      [STVAULT_CONTRACT_NAMES.vaultHub]:
-        vaultHubAddress.toLowerCase() as Address,
+  test('matching manifest passes for locator-based stvault contract', async () => {
+    const core = createCoreWithManifest({
+      [LIDO_CONTRACT_NAMES.vaultHub]: vaultHubAddress,
     });
     await expect(
-      core.getStVaultContractAddress(STVAULT_CONTRACT_NAMES.vaultHub),
+      core.getContractAddress(LIDO_CONTRACT_NAMES.vaultHub),
     ).resolves.toBe(vaultHubAddress);
   });
 
-  test('getStVaultContractAddress throws on mismatching address', async () => {
-    const core = createCoreWithStVaultManifest({
-      [STVAULT_CONTRACT_NAMES.vaultHub]: WRONG_ADDRESS,
+  test('matching manifest passes for vaultViewer constant', async () => {
+    const core = createCoreWithManifest({
+      [LIDO_CONTRACT_NAMES.vaultViewer]: vaultViewerAddress,
+    });
+    await expect(
+      core.getContractAddress(LIDO_CONTRACT_NAMES.vaultViewer),
+    ).resolves.toBe(vaultViewerAddress);
+  });
+
+  test('mismatching stvault address throws PROVIDER_ERROR', async () => {
+    const core = createCoreWithManifest({
+      [LIDO_CONTRACT_NAMES.vaultHub]: WRONG_ADDRESS,
     });
     await expectSDKError(
-      () => core.getStVaultContractAddress(STVAULT_CONTRACT_NAMES.vaultHub),
+      () => core.getContractAddress(LIDO_CONTRACT_NAMES.vaultHub),
       ERROR_CODE.PROVIDER_ERROR,
     );
   });
 
-  test('vaultViewer mismatch throws', async () => {
-    const core = createCoreWithStVaultManifest({
-      [STVAULT_CONTRACT_NAMES.vaultViewer]: WRONG_ADDRESS,
+  test('mismatching vaultViewer address throws PROVIDER_ERROR', async () => {
+    const core = createCoreWithManifest({
+      [LIDO_CONTRACT_NAMES.vaultViewer]: WRONG_ADDRESS,
     });
     await expectSDKError(
-      () =>
-        core.getStVaultContractAddress(STVAULT_CONTRACT_NAMES.vaultViewer),
+      () => core.getContractAddress(LIDO_CONTRACT_NAMES.vaultViewer),
       ERROR_CODE.PROVIDER_ERROR,
     );
+  });
+
+  test('stvault address comparison is case-insensitive', async () => {
+    const core = createCoreWithManifest({
+      [LIDO_CONTRACT_NAMES.vaultHub]: vaultHubAddress.toLowerCase() as Address,
+    });
+    await expect(
+      core.getContractAddress(LIDO_CONTRACT_NAMES.vaultHub),
+    ).resolves.toBe(vaultHubAddress);
   });
 
   test('contracts absent from manifest are not verified', async () => {
-    const core = createCoreWithStVaultManifest({
-      [STVAULT_CONTRACT_NAMES.vaultHub]: WRONG_ADDRESS,
+    const core = createCoreWithManifest({
+      [LIDO_CONTRACT_NAMES.vaultHub]: WRONG_ADDRESS,
     });
     await expect(
-      core.getStVaultContractAddress(STVAULT_CONTRACT_NAMES.vaultViewer),
+      core.getContractAddress(LIDO_CONTRACT_NAMES.vaultViewer),
     ).resolves.toBe(vaultViewerAddress);
   });
 
@@ -132,8 +115,8 @@ describe('Core stvault contract address manifest', () => {
       chainId,
       publicClient: usePublicRpcProvider(),
       logMode: 'none',
-      stVaultContractAddressManifest: {
-        [STVAULT_CONTRACT_NAMES.vaultHub]: WRONG_ADDRESS,
+      contractAddressManifest: {
+        [LIDO_CONTRACT_NAMES.vaultHub]: WRONG_ADDRESS,
       },
     });
     const vaultModule = new LidoSDKVaultModule({ core });
@@ -148,8 +131,8 @@ describe('Core stvault contract address manifest', () => {
       chainId,
       publicClient: usePublicRpcProvider(),
       logMode: 'none',
-      stVaultContractAddressManifest: {
-        [STVAULT_CONTRACT_NAMES.vaultHub]: vaultHubAddress,
+      contractAddressManifest: {
+        [LIDO_CONTRACT_NAMES.vaultHub]: vaultHubAddress,
       },
     });
     const vaultModule = new LidoSDKVaultModule({ core });
