@@ -19,6 +19,13 @@ describe('Core stvault contract address pinning', () => {
   const { chainId } = useTestsEnvs();
   const rpcCore = useRpcCore();
 
+  const createCore = () =>
+    new LidoSDKCore({
+      chainId,
+      publicClient: usePublicRpcProvider(),
+      logMode: 'none',
+    });
+
   const createCoreWithManifest = (
     contractAddressManifest: LidoSDKCore['contractAddressManifest'],
   ) =>
@@ -44,13 +51,13 @@ describe('Core stvault contract address pinning', () => {
 
   test('resolves a locator-based stvault contract', async () => {
     await expect(
-      rpcCore.getContractAddress(LIDO_CONTRACT_NAMES.vaultHub),
+      createCore().getContractAddress(LIDO_CONTRACT_NAMES.vaultHub),
     ).resolves.toBe(vaultHubAddress);
   });
 
   test('resolves the vaultViewer constant', async () => {
     await expect(
-      rpcCore.getContractAddress(LIDO_CONTRACT_NAMES.vaultViewer),
+      createCore().getContractAddress(LIDO_CONTRACT_NAMES.vaultViewer),
     ).resolves.toBe(vaultViewerAddress);
   });
 
