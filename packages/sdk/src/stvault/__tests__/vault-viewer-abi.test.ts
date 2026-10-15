@@ -187,16 +187,21 @@ describe('VaultViewer ABI decoding', () => {
 
     expect(decoded).toHaveLength(2);
 
-    expect(decoded[0]!.vaultAddress).toBe(getAddress(zeroFee.vaultAddress));
-    expect(decoded[0]!.totalValue).toBe(1111n);
-    expect(decoded[0]!.accruedFee).toBe(0n);
-    expect(decoded[0]!.isReportFresh).toBe(false);
-    expect(decoded[0]!.quarantineInfo.totalValueRemainder).toBe(77n);
+    const [first, second] = decoded;
+    if (!first || !second) {
+      throw new Error('Expected two vaultsDataBatch entries');
+    }
 
-    expect(decoded[1]!.vaultAddress).toBe(getAddress(nonzeroFee.vaultAddress));
-    expect(decoded[1]!.totalValue).toBe(2222n);
-    expect(decoded[1]!.accruedFee).toBe(42n);
-    expect(decoded[1]!.isReportFresh).toBe(true);
-    expect(decoded[1]!.quarantineInfo.totalValueRemainder).toBe(77n);
+    expect(first.vaultAddress).toBe(getAddress(zeroFee.vaultAddress));
+    expect(first.totalValue).toBe(1111n);
+    expect(first.accruedFee).toBe(0n);
+    expect(first.isReportFresh).toBe(false);
+    expect(first.quarantineInfo.totalValueRemainder).toBe(77n);
+
+    expect(second.vaultAddress).toBe(getAddress(nonzeroFee.vaultAddress));
+    expect(second.totalValue).toBe(2222n);
+    expect(second.accruedFee).toBe(42n);
+    expect(second.isReportFresh).toBe(true);
+    expect(second.quarantineInfo.totalValueRemainder).toBe(77n);
   });
 });
