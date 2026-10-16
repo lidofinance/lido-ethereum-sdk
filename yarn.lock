@@ -4654,7 +4654,7 @@ __metadata:
     "@fastify/swagger-ui": ^4.0.0
     "@lidofinance/lido-ethereum-sdk": "workspace:*"
     "@types/node": ^20.14.10
-    fastify: ^5.8.5
+    fastify: ^5.12.5
     fastify-plugin: ^4.5.1
     nodemon: ^3.1.4
     reflect-metadata: ^0.2.2
@@ -14195,6 +14195,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fast-json-stringify@npm:^7.0.0":
+  version: 7.1.0
+  resolution: "fast-json-stringify@npm:7.1.0"
+  dependencies:
+    "@fastify/merge-json-schemas": ^0.2.0
+    ajv: ^8.12.0
+    ajv-formats: ^3.0.1
+    fast-uri: ^4.0.0
+    json-schema-ref-resolver: ^3.0.0
+    rfdc: ^1.2.0
+  checksum: b94c953dcb51b19d919f3f243371401ed281a7ff27bdc9647fe8200a4076b623927dcb234d9207c196819d9677750a616d0599fc5cff287643bf7625ffa348b4
+  languageName: node
+  linkType: hard
+
 "fast-levenshtein@npm:^2.0.6":
   version: 2.0.6
   resolution: "fast-levenshtein@npm:2.0.6"
@@ -14232,6 +14246,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fast-uri@npm:^4.0.0":
+  version: 4.2.2
+  resolution: "fast-uri@npm:4.2.2"
+  checksum: a25e44ccef9cc9f74429255f78dc23e49783617d0234a6770c2210033c5b06dd358706500767fd989b7d15282dcd88dbb77ecd1d8e7b6e3ecb0d9c3a19c2715c
+  languageName: node
+  linkType: hard
+
 "fastest-levenshtein@npm:^1.0.16":
   version: 1.0.16
   resolution: "fastest-levenshtein@npm:1.0.16"
@@ -14246,9 +14267,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify@npm:^5.8.5":
-  version: 5.8.5
-  resolution: "fastify@npm:5.8.5"
+"fastify@npm:^5.12.5":
+  version: 5.12.5
+  resolution: "fastify@npm:5.12.5"
   dependencies:
     "@fastify/ajv-compiler": ^4.0.5
     "@fastify/error": ^4.0.0
@@ -14256,16 +14277,16 @@ __metadata:
     "@fastify/proxy-addr": ^5.0.0
     abstract-logging: ^2.0.1
     avvio: ^9.0.0
-    fast-json-stringify: ^6.0.0
-    find-my-way: ^9.0.0
+    fast-json-stringify: ^7.0.0
+    find-my-way: ^9.6.0
     light-my-request: ^6.0.0
     pino: ^9.14.0 || ^10.1.0
-    process-warning: ^5.0.0
+    process-warning: ^5.1.0
     rfdc: ^1.3.1
     secure-json-parse: ^4.0.0
     semver: ^7.6.0
     toad-cache: ^3.7.0
-  checksum: cd20265ae5535d26b065468fe0f6d8e73809209f6c04f3ebb4630a174edf67812837dc28f16769862f91188092f91f1c0127767d98bd817f043419864f007c94
+  checksum: ee17a8829efe5e3b6e9d333b6062331b964b3f5c0e4d636ee6ea882861593711a23af7f42f62fffc9938854a7662168273a81a411534f5e269f38dd0f168de4f
   languageName: node
   linkType: hard
 
@@ -14447,14 +14468,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"find-my-way@npm:^9.0.0":
-  version: 9.7.0
-  resolution: "find-my-way@npm:9.7.0"
+"find-my-way@npm:^9.6.0":
+  version: 9.10.0
+  resolution: "find-my-way@npm:9.10.0"
   dependencies:
     fast-deep-equal: ^3.1.3
     fast-querystring: ^1.0.0
     safe-regex2: ^5.0.0
-  checksum: e309644aed0331dece79eae634995310390d913699f832d703d30f5299d775337967b7c81867e42d910f995d2abd7b26acffbcd67ddfda8ae8ad821924f90cf4
+  checksum: 016fd89ef9ab2d9816e9d31ca511254a2ff3380f1ed2347f71f074a20b449da55785f8e5c5110f4b6dacf9b956631d0824bd6c8f7c46686de1d0dc0570c066d2
   languageName: node
   linkType: hard
 
@@ -22170,6 +22191,13 @@ __metadata:
   version: 5.0.0
   resolution: "process-warning@npm:5.0.0"
   checksum: 99bce32133a67d45f3efff1202d0895548da3464501ad2acf6ad6d5f6a879b246868f2f382ff8a5872e2bb17b0d800dc1961885947ea9b3344db9cb91405cd88
+  languageName: node
+  linkType: hard
+
+"process-warning@npm:^5.1.0":
+  version: 5.1.1
+  resolution: "process-warning@npm:5.1.1"
+  checksum: 5f08a6a53eb37b04db1b89100c956d065e51d206857f2d4d50d092086d64ea182d422efbd839a142ce7a329165e59e8507b2948704abeb62b86c652844e3504a
   languageName: node
   linkType: hard
 
