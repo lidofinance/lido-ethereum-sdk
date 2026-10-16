@@ -99,6 +99,12 @@ export enum LIDO_CONTRACT_NAMES {
   oracleDaemonConfig = 'oracleDaemonConfig',
   wsteth = 'wsteth',
   wstethReferralStaker = 'wstethReferralStaker',
+  vaultHub = 'vaultHub',
+  vaultFactory = 'vaultFactory',
+  lazyOracle = 'lazyOracle',
+  predepositGuarantee = 'predepositGuarantee',
+  operatorGrid = 'operatorGrid',
+  vaultViewer = 'vaultViewer',
 }
 
 export enum DUAL_GOVERNANCE_CONTRACT_NAMES {
