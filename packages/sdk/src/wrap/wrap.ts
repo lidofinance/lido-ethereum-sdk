@@ -465,6 +465,9 @@ export class LidoSDKWrap extends LidoSDKModule {
     receipt: TransactionReceipt,
     address: Address,
   ): Promise<WrapResults> {
+    const stethAddress = await this.core.getContractAddress(
+      LIDO_CONTRACT_NAMES.lido,
+    );
     const wstethAddress = await this.contractAddressWstETH();
 
     let stethWrapped: bigint | undefined;
@@ -472,15 +475,22 @@ export class LidoSDKWrap extends LidoSDKModule {
     for (const log of receipt.logs) {
       // skips non-relevant events
       if (log.topics[0] !== LidoSDKWrap.TRANSFER_SIGNATURE) continue;
+      // only stETH and wstETH logs count (e.g. not EIP-7708 ETH transfer logs)
+      const isStethLog = isAddressEqual(log.address, stethAddress);
+      const isWstethLog = isAddressEqual(log.address, wstethAddress);
+      if (!isStethLog && !isWstethLog) continue;
       const parsedLog = decodeEventLog({
         // fits both wsteth and steth events
         abi: PartialTransferEventAbi,
         strict: true,
         ...log,
       });
-      if (isAddressEqual(parsedLog.args.to, address)) {
+      if (isWstethLog && isAddressEqual(parsedLog.args.to, address)) {
         wstethReceived = parsedLog.args.value;
-      } else if (isAddressEqual(parsedLog.args.to, wstethAddress)) {
+      } else if (
+        isStethLog &&
+        isAddressEqual(parsedLog.args.to, wstethAddress)
+      ) {
         stethWrapped = parsedLog.args.value;
       }
     }
@@ -505,19 +515,28 @@ export class LidoSDKWrap extends LidoSDKModule {
     receipt: TransactionReceipt,
     address: Address,
   ): Promise<UnwrapResults> {
+    const stethAddress = await this.core.getContractAddress(
+      LIDO_CONTRACT_NAMES.lido,
+    );
+    const wstethAddress = await this.contractAddressWstETH();
+
     let stethReceived: bigint | undefined;
     let wstethUnwrapped: bigint | undefined;
     for (const log of receipt.logs) {
       // skips non-relevant events
       if (log.topics[0] !== LidoSDKWrap.TRANSFER_SIGNATURE) continue;
+      // only stETH and wstETH logs count (e.g. not EIP-7708 ETH transfer logs)
+      const isStethLog = isAddressEqual(log.address, stethAddress);
+      const isWstethLog = isAddressEqual(log.address, wstethAddress);
+      if (!isStethLog && !isWstethLog) continue;
       const parsedLog = decodeEventLog({
         abi: PartialTransferEventAbi,
         strict: true,
         ...log,
       });
-      if (isAddressEqual(parsedLog.args.from, address)) {
+      if (isWstethLog && isAddressEqual(parsedLog.args.from, address)) {
         wstethUnwrapped = parsedLog.args.value;
-      } else if (isAddressEqual(parsedLog.args.to, address)) {
+      } else if (isStethLog && isAddressEqual(parsedLog.args.to, address)) {
         stethReceived = parsedLog.args.value;
       }
     }

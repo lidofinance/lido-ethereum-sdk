@@ -193,11 +193,18 @@ export class LidoSDKL2 extends LidoSDKModule {
     receipt: TransactionReceipt,
     address: Address,
   ): Promise<WrapResults> {
+    const stethAddress = await this.contractAddress();
+    const wstethAddress = await this.wsteth.contractAddress();
+
     let stethReceived: bigint | undefined;
     let wstethWrapped: bigint | undefined;
     for (const log of receipt.logs) {
       // skips non-relevant events
       if (log.topics[0] !== LidoSDKL2.TRANSFER_SIGNATURE) continue;
+      // only stETH and wstETH logs count (e.g. not EIP-7708 ETH transfer logs)
+      const isStethLog = isAddressEqual(log.address, stethAddress);
+      const isWstethLog = isAddressEqual(log.address, wstethAddress);
+      if (!isStethLog && !isWstethLog) continue;
       const parsedLog = decodeEventLog({
         abi: rebasableL2StethAbi,
         strict: true,
@@ -205,9 +212,9 @@ export class LidoSDKL2 extends LidoSDKModule {
         data: log.data,
         topics: log.topics,
       });
-      if (isAddressEqual(parsedLog.args.from, address)) {
+      if (isWstethLog && isAddressEqual(parsedLog.args.from, address)) {
         wstethWrapped = parsedLog.args.value;
-      } else if (isAddressEqual(parsedLog.args.to, address)) {
+      } else if (isStethLog && isAddressEqual(parsedLog.args.to, address)) {
         stethReceived = parsedLog.args.value;
       }
     }
@@ -318,11 +325,18 @@ export class LidoSDKL2 extends LidoSDKModule {
     receipt: TransactionReceipt,
     address: Address,
   ): Promise<UnwrapResults> {
+    const stethAddress = await this.contractAddress();
+    const wstethAddress = await this.wsteth.contractAddress();
+
     let stethUnwrapped: bigint | undefined;
     let wstethReceived: bigint | undefined;
     for (const log of receipt.logs) {
       // skips non-relevant events
       if (log.topics[0] !== LidoSDKL2.TRANSFER_SIGNATURE) continue;
+      // only stETH and wstETH logs count (e.g. not EIP-7708 ETH transfer logs)
+      const isStethLog = isAddressEqual(log.address, stethAddress);
+      const isWstethLog = isAddressEqual(log.address, wstethAddress);
+      if (!isStethLog && !isWstethLog) continue;
       const parsedLog = decodeEventLog({
         abi: rebasableL2StethAbi,
         strict: true,
@@ -330,9 +344,9 @@ export class LidoSDKL2 extends LidoSDKModule {
         data: log.data,
         eventName: 'Transfer',
       });
-      if (isAddressEqual(parsedLog.args.from, address)) {
+      if (isStethLog && isAddressEqual(parsedLog.args.from, address)) {
         stethUnwrapped = parsedLog.args.value;
-      } else if (isAddressEqual(parsedLog.args.to, address)) {
+      } else if (isWstethLog && isAddressEqual(parsedLog.args.to, address)) {
         wstethReceived = parsedLog.args.value;
       }
     }

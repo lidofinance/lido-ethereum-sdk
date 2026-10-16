@@ -33,6 +33,7 @@ import {
   formatEther,
   getAbiItem,
   toEventHash,
+  isAddressEqual,
 } from 'viem';
 import { parseValue } from '../../common/utils/parse-value.js';
 import { PartialWithdrawalQueueEventsAbi } from '../abi/withdrawalQueue.js';
@@ -397,7 +398,10 @@ export class LidoSDKWithdrawRequest extends BusModule {
     receipt: TransactionReceipt,
   ): Promise<WithdrawalResult> {
     const requests: WithdrawalEventRequest[] = [];
+    const withdrawalQueueAddress =
+      await this.bus.contract.contractAddressWithdrawalQueue();
     for (const log of receipt.logs) {
+      if (!isAddressEqual(log.address, withdrawalQueueAddress)) continue;
       if (log.topics[0] !== LidoSDKWithdrawRequest.WITHDRAW_SIGNATURE) continue;
       const parsedLog = decodeEventLog({
         // lightweight abi
