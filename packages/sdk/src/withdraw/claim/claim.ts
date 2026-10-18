@@ -4,6 +4,7 @@ import {
   decodeEventLog,
   getAbiItem,
   toEventHash,
+  isAddressEqual,
 } from 'viem';
 
 import { Logger, ErrorHandler } from '../../common/decorators/index.js';
@@ -156,7 +157,10 @@ export class LidoSDKWithdrawClaim extends BusModule {
     receipt: TransactionReceipt,
   ): Promise<ClaimResult> {
     const requests: ClaimResultEvent[] = [];
+    const withdrawalQueueAddress =
+      await this.bus.contract.contractAddressWithdrawalQueue();
     for (const log of receipt.logs) {
+      if (!isAddressEqual(log.address, withdrawalQueueAddress)) continue;
       if (log.topics[0] !== LidoSDKWithdrawClaim.CLAIM_SIGNATURE) continue;
       const parsedLog = decodeEventLog({
         // fits both wsteth and steth events

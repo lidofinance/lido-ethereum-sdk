@@ -166,13 +166,17 @@ export class LidoSDKStake extends LidoSDKModule {
   }
 
   @Logger('Utils:')
-  private submitParseEvents(
+  private async submitParseEvents(
     receipt: TransactionReceipt,
     address: Address,
-  ): StakeResult {
+  ): Promise<StakeResult> {
+    const stethAddress = await this.contractAddressStETH();
+
     let stethReceived: bigint | undefined;
     let sharesReceived: bigint | undefined;
     for (const log of receipt.logs) {
+      // skips events from other contracts (e.g. EIP-7708 ETH transfer logs)
+      if (!isAddressEqual(log.address, stethAddress)) continue;
       // skips non-relevant events
       if (
         log.topics[0] !== LidoSDKStake.TRANSFER_SIGNATURE &&
