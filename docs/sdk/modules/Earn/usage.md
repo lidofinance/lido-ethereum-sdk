@@ -179,7 +179,7 @@ await sdk.earn.eth.depositToQueue({
 Deposit exactly `wrapped.result.wstethReceived`, the wstETH amount minted by
 that wrap. Do not use these amounts instead:
 
-- **A `convertStethToWsteth` estimate.** The stETH/wstETH rate changes with each
+- **A `wrap.convertStethToWsteth` estimate.** The stETH/wstETH rate changes with each
   rebase, so the wrap can mint slightly less than an earlier estimate. Depositing
   the estimate can then revert or take wstETH the account already held.
 - **The account's whole wstETH balance.** It may include wstETH the user did not

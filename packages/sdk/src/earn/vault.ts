@@ -1,4 +1,3 @@
-import { abi as WSTETH_WRAP_ABI } from '../wrap/abi/wsteth.js';
 import {
   encodeFunctionData,
   erc20Abi,
@@ -9,6 +8,7 @@ import {
 } from 'viem';
 import type { Address } from 'viem';
 import { LidoSDKModule } from '../common/class-primitives/sdk-module.js';
+import { LidoSDKWrap } from '../wrap/wrap.js';
 import { CHAINS } from '../common/constants.js';
 import type { LidoSDKCommonProps } from '../core/types.js';
 import {
@@ -77,6 +77,7 @@ export type EarnVaultOptions = {
 export class LidoSDKEarnVault<V extends EarnVaultId> extends LidoSDKModule {
   private readonly resolvedDeployment?: EarnDeployment;
   private readonly collectorConfig: EarnCollectorConfig;
+  private readonly wrap: LidoSDKWrap;
 
   constructor(
     props: LidoSDKCommonProps,
@@ -97,6 +98,7 @@ export class LidoSDKEarnVault<V extends EarnVaultId> extends LidoSDKModule {
       ...EARN_COLLECTOR_CONFIG,
       ...options.collectorConfig,
     };
+    this.wrap = new LidoSDKWrap({ core: this.core });
   }
 
   /** Internal snapshot; never returned to callers without cloning. */
@@ -253,16 +255,19 @@ export class LidoSDKEarnVault<V extends EarnVaultId> extends LidoSDKModule {
     return { feeManager: address, protocolFeeD6, performanceFeeD6 };
   }
 
-  async convertStethToWsteth(assets: bigint, options: EarnReadOptions = {}) {
-    assertEarnAmount(assets, 256, true);
+  // Read the wrap module contract directly. wrap.convertStethToWsteth does not accept a block number.
+  private async convertStethToWsteth(
+    assets: bigint,
+    options: EarnReadOptions,
+  ): Promise<bigint> {
     invariantArgument(this.id === 'eth', 'stETH wrapping requires EarnETH');
-    return this.core.publicClient.readContract({
-      address: this.token('wsteth').address,
-      abi: WSTETH_WRAP_ABI,
-      functionName: 'getWstETHByStETH',
-      args: [assets],
-      ...options,
-    });
+    const wsteth = await this.wrap.getContractWstETH();
+    invariant(
+      isAddressEqual(wsteth.address, this.token('wsteth').address),
+      'Earn wstETH does not match Lido wstETH',
+      ERROR_CODE.NOT_SUPPORTED,
+    );
+    return wsteth.read.getWstETHByStETH([assets], options);
   }
 
   async previewDeposit(

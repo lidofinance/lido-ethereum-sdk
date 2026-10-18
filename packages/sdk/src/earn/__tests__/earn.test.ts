@@ -612,19 +612,26 @@ describe('Earn prepared calls and previews', () => {
   it('returns collector eligibility and converts stETH before previewing', async () => {
     const { earn, read } = setup();
     mockRead(read, ({ functionName }) =>
-      functionName === 'getWstETHByStETH'
-        ? 7n
-        : {
-            shares: 5n,
-            assets: 7n,
-            isDepositPossible: false,
-            isDepositorWhitelisted: false,
-            isMerkleProofRequired: true,
-            eta: 123n,
-          },
+      functionName === 'wstETH'
+        ? EARN_MAINNET_DEPLOYMENTS.eth.tokens.wsteth.address
+        : functionName === 'getWstETHByStETH'
+          ? 7n
+          : {
+              shares: 5n,
+              assets: 7n,
+              isDepositPossible: false,
+              isDepositorWhitelisted: false,
+              isMerkleProofRequired: true,
+              eta: 123n,
+            },
     );
     expect(
-      await earn.eth.previewDeposit({ token: 'steth', assets: 10n, account }),
+      await earn.eth.previewDeposit({
+        token: 'steth',
+        assets: 10n,
+        account,
+        blockNumber: 9n,
+      }),
     ).toMatchObject({
       shares: 5n,
       token: 'wsteth',
@@ -632,10 +639,31 @@ describe('Earn prepared calls and previews', () => {
       isDepositPossible: false,
       isMerkleProofRequired: true,
     });
-    expect(read.mock.calls[1]?.[0].args?.[1]).toBe(7n);
-    // Only read options reach the conversion call, not preview props.
-    expect(read.mock.calls[0]?.[0]).not.toHaveProperty('account');
-    expect(read.mock.calls[0]?.[0]).not.toHaveProperty('token');
+    // The wrap module resolves wstETH through the locator first.
+    const convert = read.mock.calls.find(
+      ([call]) => call.functionName === 'getWstETHByStETH',
+    )?.[0];
+    expect(convert).toMatchObject({
+      address: EARN_MAINNET_DEPLOYMENTS.eth.tokens.wsteth.address,
+      args: [10n],
+      blockNumber: 9n,
+    });
+    expect(convert).not.toHaveProperty('account');
+    expect(convert).not.toHaveProperty('token');
+    const preview = read.mock.calls.find(
+      ([call]) => call.functionName === 'getDepositParams',
+    )?.[0];
+    expect(preview?.args?.[1]).toBe(7n);
+  });
+
+  it('rejects stETH previews when Lido wstETH differs from the vault token', async () => {
+    const { earn, read } = setup();
+    mockRead(read, ({ functionName }) =>
+      functionName === 'wstETH' ? account : 7n,
+    );
+    await expect(
+      earn.eth.previewDeposit({ token: 'steth', assets: 10n, account }),
+    ).rejects.toThrow('Earn wstETH does not match Lido wstETH');
   });
 
   it('resolves FeeManager from the vault and preserves raw D6 fees', async () => {

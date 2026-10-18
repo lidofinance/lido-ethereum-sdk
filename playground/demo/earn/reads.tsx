@@ -51,7 +51,6 @@ export const EarnReadsDemo = ({ info }: EarnReadsProps) => {
   const [queue, setQueue] = useState<Address | undefined>(
     asyncDepositQueues[0]?.address,
   );
-  const [stethValue, setStethValue] = useState<ValueType>(null);
 
   return (
     <>
@@ -95,21 +94,6 @@ export const EarnReadsDemo = ({ info }: EarnReadsProps) => {
           method="getFees"
           action={() => vault.getFees()}
         />
-        {vault.id === 'eth' && (
-          <Action
-            title="Convert stETH -> wstETH"
-            method="convertStethToWsteth"
-            renderResult={renderUnits(18, 'wstETH')}
-            action={() => vault.convertStethToWsteth(stethValue ?? ZERO)}
-          >
-            <TokenInput
-              label="stETH"
-              value={stethValue}
-              placeholder="0.0"
-              onChange={setStethValue}
-            />
-          </Action>
-        )}
       </ActionGroup>
 
       <ActionGroup

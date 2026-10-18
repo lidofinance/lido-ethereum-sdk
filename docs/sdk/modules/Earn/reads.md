@@ -168,12 +168,6 @@ console.log(
 
 The SDK does not obtain Merkle proofs or submit a deposit as part of previewing.
 
-### `convertStethToWsteth(assets, options?)`
-
-EarnETH-only helper calling wstETH's `getWstETHByStETH`. Accepts a nonnegative
-uint256 amount of stETH and returns estimated wstETH units. It does not wrap tokens.
-The conversion may change before a later transaction executes.
-
 ## Deposit allowance
 
 ### `getDepositAllowance(props)`
