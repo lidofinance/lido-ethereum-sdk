@@ -12,6 +12,7 @@
   - `EarnExecutionError` with the failed step and submitted hash
   - Earn contract ABIs exported with the `EARN_` prefix, including `EARN_ORACLE_ABI` (vault oracle `getReport`)
 - Earn module docs: overview, reads and transactions
+- `wrap.convertStethToWsteth` and `wrap.convertWstethToSteth` accept optional `{ blockNumber }` to read at a pinned block
 
 ## Playground
 

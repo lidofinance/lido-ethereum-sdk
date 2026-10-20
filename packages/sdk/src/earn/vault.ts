@@ -255,19 +255,20 @@ export class LidoSDKEarnVault<V extends EarnVaultId> extends LidoSDKModule {
     return { feeManager: address, protocolFeeD6, performanceFeeD6 };
   }
 
-  // Read the wrap module contract directly. wrap.convertStethToWsteth does not accept a block number.
   private async convertStethToWsteth(
     assets: bigint,
     options: EarnReadOptions,
   ): Promise<bigint> {
     invariantArgument(this.id === 'eth', 'stETH wrapping requires EarnETH');
-    const wsteth = await this.wrap.getContractWstETH();
     invariant(
-      isAddressEqual(wsteth.address, this.token('wsteth').address),
+      isAddressEqual(
+        await this.wrap.contractAddressWstETH(),
+        this.token('wsteth').address,
+      ),
       'Earn wstETH does not match Lido wstETH',
       ERROR_CODE.NOT_SUPPORTED,
     );
-    return wsteth.read.getWstETHByStETH([assets], options);
+    return this.wrap.convertStethToWsteth(assets, options);
   }
 
   async previewDeposit(
