@@ -7,7 +7,6 @@ type ToggleProps = {
   title: string;
 } & Omit<ComponentProps<typeof Button>, 'value' | 'onChange'>;
 
-// TODO: change color on state
 export const ToggleButton = ({
   onChange,
   value,
@@ -15,7 +14,13 @@ export const ToggleButton = ({
   ...props
 }: ToggleProps) => {
   return (
-    <Button {...props} onClick={() => onChange(!value)}>
+    <Button
+      variant={value ? 'filled' : 'outlined'}
+      color={value ? 'success' : 'secondary'}
+      aria-pressed={value}
+      {...props}
+      onClick={() => onChange(!value)}
+    >
       {title}: {value ? 'ON' : 'OFF'}
     </Button>
   );

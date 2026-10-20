@@ -1,4 +1,5 @@
-import { Input, Accordion } from '@lidofinance/lido-ui';
+import { ModuleSection } from 'components/module-section';
+import { Input } from '@lidofinance/lido-ui';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { Action, renderTokenResult } from 'components/action';
 import { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
@@ -24,7 +25,7 @@ export const ShareDemo = () => {
   const [sharesAmount, setSharesAmount] = useState<ValueType>(DEFAULT_VALUE);
 
   return (
-    <Accordion summary={'Shares'}>
+    <ModuleSection title="Shares">
       <Action
         walletAction
         title="Balance Shares"
@@ -113,6 +114,6 @@ export const ShareDemo = () => {
           onChange={setStethAmount}
         />
       </Action>
-    </Accordion>
+    </ModuleSection>
   );
 };

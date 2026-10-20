@@ -1,0 +1,260 @@
+export const EARN_ASYNC_REDEEM_QUEUE_ABI = [
+  {
+    inputs: [
+      { internalType: 'string', name: 'name_', type: 'string' },
+      { internalType: 'uint256', name: 'version_', type: 'uint256' },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'constructor',
+  },
+  { inputs: [], name: 'CheckpointUnorderedInsertion', type: 'error' },
+  { inputs: [], name: 'FailedCall', type: 'error' },
+  { inputs: [], name: 'Forbidden', type: 'error' },
+  {
+    inputs: [
+      { internalType: 'uint256', name: 'balance', type: 'uint256' },
+      { internalType: 'uint256', name: 'needed', type: 'uint256' },
+    ],
+    name: 'InsufficientBalance',
+    type: 'error',
+  },
+  { inputs: [], name: 'InvalidInitialization', type: 'error' },
+  { inputs: [], name: 'InvalidReport', type: 'error' },
+  { inputs: [], name: 'NotInitializing', type: 'error' },
+  { inputs: [], name: 'QueuePaused', type: 'error' },
+  { inputs: [], name: 'ReentrancyGuardReentrantCall', type: 'error' },
+  {
+    inputs: [{ internalType: 'address', name: 'token', type: 'address' }],
+    name: 'SafeERC20FailedOperation',
+    type: 'error',
+  },
+  { inputs: [], name: 'ZeroValue', type: 'error' },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint64',
+        name: 'version',
+        type: 'uint64',
+      },
+    ],
+    name: 'Initialized',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'bytes',
+        name: 'initParams',
+        type: 'bytes',
+      },
+    ],
+    name: 'Initialized',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'receiver',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'assets',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint32',
+        name: 'timestamp',
+        type: 'uint32',
+      },
+    ],
+    name: 'RedeemRequestClaimed',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'shares',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'timestamp',
+        type: 'uint256',
+      },
+    ],
+    name: 'RedeemRequested',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'counter',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'demand',
+        type: 'uint256',
+      },
+    ],
+    name: 'RedeemRequestsHandled',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint224',
+        name: 'priceD18',
+        type: 'uint224',
+      },
+      {
+        indexed: false,
+        internalType: 'uint32',
+        name: 'timestamp',
+        type: 'uint32',
+      },
+    ],
+    name: 'ReportHandled',
+    type: 'event',
+  },
+  {
+    inputs: [],
+    name: 'asset',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'index', type: 'uint256' }],
+    name: 'batchAt',
+    outputs: [
+      { internalType: 'uint256', name: 'assets', type: 'uint256' },
+      { internalType: 'uint256', name: 'shares', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'canBeRemoved',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'receiver', type: 'address' },
+      { internalType: 'uint32[]', name: 'timestamps', type: 'uint32[]' },
+    ],
+    name: 'claim',
+    outputs: [{ internalType: 'uint256', name: 'assets', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getState',
+    outputs: [
+      { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+      { internalType: 'uint256', name: '', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'batches', type: 'uint256' }],
+    name: 'handleBatches',
+    outputs: [{ internalType: 'uint256', name: 'counter', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'uint224', name: 'priceD18', type: 'uint224' },
+      { internalType: 'uint32', name: 'timestamp', type: 'uint32' },
+    ],
+    name: 'handleReport',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'bytes', name: 'data', type: 'bytes' }],
+    name: 'initialize',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'shares', type: 'uint256' }],
+    name: 'redeem',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'account', type: 'address' },
+      { internalType: 'uint256', name: 'offset', type: 'uint256' },
+      { internalType: 'uint256', name: 'limit', type: 'uint256' },
+    ],
+    name: 'requestsOf',
+    outputs: [
+      {
+        components: [
+          { internalType: 'uint256', name: 'timestamp', type: 'uint256' },
+          { internalType: 'uint256', name: 'shares', type: 'uint256' },
+          { internalType: 'bool', name: 'isClaimable', type: 'bool' },
+          { internalType: 'uint256', name: 'assets', type: 'uint256' },
+        ],
+        internalType: 'struct IRedeemQueue.Request[]',
+        name: 'requests',
+        type: 'tuple[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'vault',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  { stateMutability: 'payable', type: 'receive' },
+] as const;

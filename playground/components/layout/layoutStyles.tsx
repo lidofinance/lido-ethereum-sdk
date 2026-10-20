@@ -1,27 +1,26 @@
-import { H1 } from '@lidofinance/lido-ui';
 import styled from 'styled-components';
+import { SIDEBAR_WIDTH } from './sidebar';
 
-export const LayoutTitleStyle = styled(H1)`
-  font-weight: 800;
-  font-size: ${({ theme }) => theme.fontSizesMap.xl}px;
-  margin-bottom: 0.2em;
-  line-height: 1.2em;
-  text-align: center;
+export const LayoutBodyStyle = styled.div<{ $withSidebar: boolean }>`
+  display: grid;
+  grid-template-columns: ${({ $withSidebar }) =>
+    $withSidebar ? `${SIDEBAR_WIDTH}px minmax(0, 1fr)` : 'minmax(0, 1fr)'};
+  gap: ${({ theme }) => theme.spaceMap.xxl}px;
+  align-items: start;
 
-  &:empty {
-    display: none;
+  ${({ theme }) => theme.mediaQueries.lg} {
+    grid-template-columns: minmax(0, 1fr);
+    gap: ${({ theme }) => theme.spaceMap.md}px;
   }
 `;
 
-export const LayoutSubTitleStyle = styled.h4`
-  font-weight: 500;
-  color: var(--lido-color-textSecondary);
-  margin-bottom: ${({ theme }) => theme.spaceMap.md}px;
-  font-size: ${({ theme }) => theme.fontSizesMap.xxs}px;
-  line-height: 1.5em;
-  text-align: center;
+export const LayoutSidebarStyle = styled.aside`
+  display: contents;
+`;
 
-  &:empty {
-    display: none;
-  }
+export const LayoutContentStyle = styled.div`
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spaceMap.md}px;
 `;

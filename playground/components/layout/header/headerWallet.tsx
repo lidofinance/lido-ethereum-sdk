@@ -7,7 +7,10 @@ import { ThemeToggler } from '@lidofinance/lido-ui';
 import WalletButton from 'components/layout/header/walletButton';
 import WalletConnect from 'components/layout/header/walletConnect';
 
-import { HeaderWalletChainStyle } from './headerWalletStyles';
+import { HeaderChipStyle, HeaderWalletChainStyle } from './headerWalletStyles';
+import { useIsCustomRpc } from 'components/custom-rpc-input';
+import { useModal } from 'hooks/useModal';
+import { MODAL } from 'providers';
 
 import { useChains } from 'wagmi';
 
@@ -15,7 +18,7 @@ const tryGetColor = (chainId: number) => {
   try {
     return getChainColor(chainId);
   } catch {
-    return '#FFFFFF';
+    return 'var(--lido-color-textSecondary)';
   }
 };
 
@@ -24,6 +27,8 @@ const HeaderWallet: FC = () => {
   const chains = useChains();
 
   const currentChain = chains.find((chain) => chain.id === chainId);
+  const isCustomRpc = useIsCustomRpc();
+  const { openModal: openRpcModal } = useModal(MODAL.rpc);
 
   return (
     <>
@@ -32,6 +37,14 @@ const HeaderWallet: FC = () => {
           {currentChain?.name}
         </HeaderWalletChainStyle>
       )}
+      <HeaderChipStyle
+        type="button"
+        $highlighted={isCustomRpc}
+        title="Configure RPC for the current chain"
+        onClick={openRpcModal}
+      >
+        RPC: {isCustomRpc ? 'custom' : 'default'}
+      </HeaderChipStyle>
       {active ? <WalletButton /> : <WalletConnect size="sm" />}
       <ThemeToggler />
     </>

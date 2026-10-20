@@ -1,9 +1,6 @@
-import { CHAINS } from '@lido-sdk/constants';
 import { Block } from '@lidofinance/lido-ui';
-import { useSupportedChains, useWeb3 } from 'reef-knot/web3-react';
-import { useMemo } from 'react';
+import { useWeb3 } from 'reef-knot/web3-react';
 import styled from 'styled-components';
-import { useAccount } from 'wagmi';
 
 const ErrorBlock = styled(Block)`
   text-align: center;
@@ -14,22 +11,7 @@ const ErrorBlock = styled(Block)`
 
 export const ConnectionError = () => {
   const { error } = useWeb3();
-  const { isConnected } = useAccount();
-  const { isUnsupported, supportedChains } = useSupportedChains();
-
-  const chains = useMemo(() => {
-    const chains = supportedChains
-      .map(({ chainId, name }) => CHAINS[chainId] || name)
-      .filter((chain) => chain !== 'unknown');
-    const lastChain = chains.pop();
-
-    return [chains.join(', '), lastChain].filter((chain) => chain).join(' or ');
-  }, [supportedChains]);
-
-  if (isConnected && isUnsupported) {
-    return `Unsupported chain. Please switch to ${chains} in your wallet and restart the page.`;
-  }
-
+  // Unsupported chain is reported by UnsupportedChainBanner.
   if (!error) {
     return;
   }

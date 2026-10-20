@@ -2,7 +2,7 @@ import { Input } from '@lidofinance/lido-ui';
 import MaxButton from 'components/tokenInput/maxButton';
 import { TokenInputStyle } from './tokenInputStyles';
 import { TokenInputComponent } from './types';
-import { formatEther, maxUint256, parseEther } from 'viem';
+import { formatUnits, maxUint256, parseUnits } from 'viem';
 import { useCallback, useEffect, useState } from 'react';
 
 const handleWheel: React.WheelEventHandler<HTMLInputElement> = (event) => {
@@ -14,10 +14,11 @@ const TokenInput: TokenInputComponent = ({
   value,
   onChange,
   disabled,
+  decimals = 18,
   ...rest
 }) => {
   const [stringValue, setStringValue] = useState(() =>
-    value ? formatEther(value) : '',
+    value ? formatUnits(value, decimals) : '',
   );
 
   const handleChange = useCallback(
@@ -42,7 +43,7 @@ const TokenInput: TokenInputComponent = ({
         onChange?.(null);
       }
 
-      const value = parseEther(e.currentTarget.value);
+      const value = parseUnits(e.currentTarget.value, decimals);
       if (value) {
         const cappedValue = value > maxUint256 ? maxUint256 : value;
         onChange?.(cappedValue);
@@ -51,20 +52,20 @@ const TokenInput: TokenInputComponent = ({
       // we set string value anyway to allow intermediate input
       setStringValue(e.currentTarget.value);
     },
-    [onChange],
+    [onChange, decimals],
   );
 
   useEffect(() => {
     if (!value) setStringValue('');
     else {
-      const parsedValue = parseEther(stringValue);
+      const parsedValue = parseUnits(stringValue, decimals);
       // only change string state if casted values differ
       // this allows user to enter 0.100 without immediate change to 0.1
       if (!parsedValue || parsedValue !== value) {
-        setStringValue(formatEther(value));
+        setStringValue(formatUnits(value, decimals));
       }
     }
-  }, [stringValue, value]);
+  }, [stringValue, value, decimals]);
 
   const handleClickMax =
     onChange && maxValue ? () => onChange(maxValue) : undefined;

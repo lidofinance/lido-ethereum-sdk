@@ -1,4 +1,5 @@
-import { Checkbox, Accordion } from '@lidofinance/lido-ui';
+import { ModuleSection } from 'components/module-section';
+import { Checkbox } from '@lidofinance/lido-ui';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { RequestStatusWithId } from '@lidofinance/lido-ethereum-sdk';
 import { Action } from 'components/action';
@@ -21,7 +22,7 @@ export const WithdrawalsClaimDemo = () => {
   const account = web3account as `0x{string}`;
 
   return (
-    <Accordion summary="Withdrawals claim">
+    <ModuleSection title="Withdrawals claim">
       <Action
         walletAction
         title="Get claimable request info"
@@ -84,6 +85,6 @@ export const WithdrawalsClaimDemo = () => {
           })
         }
       ></Action>
-    </Accordion>
+    </ModuleSection>
   );
 };

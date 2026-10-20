@@ -5,6 +5,7 @@ import {
   HeaderStyle,
   HeaderLogoStyle,
   HeaderActionsStyle,
+  HeaderTitleStyle,
 } from './headerStyles';
 import HeaderWallet from './headerWallet';
 
@@ -15,6 +16,7 @@ const Header: FC = () => (
         <LidoLogo />
       </Link>
     </HeaderLogoStyle>
+    <HeaderTitleStyle>SDK Playground</HeaderTitleStyle>
     <HeaderActionsStyle>
       <HeaderWallet />
     </HeaderActionsStyle>

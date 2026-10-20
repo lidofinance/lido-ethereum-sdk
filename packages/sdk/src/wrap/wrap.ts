@@ -418,18 +418,24 @@ export class LidoSDKWrap extends LidoSDKModule {
 
   @Logger('Views:')
   @ErrorHandler()
-  public async convertStethToWsteth(steth_value: EtherValue): Promise<bigint> {
+  public async convertStethToWsteth(
+    steth_value: EtherValue,
+    options: { blockNumber?: bigint } = {},
+  ): Promise<bigint> {
     const value = parseValue(steth_value);
     const contract = await this.getContractWstETH();
-    return contract.read.getWstETHByStETH([value]);
+    return contract.read.getWstETHByStETH([value], options);
   }
 
   @Logger('Views:')
   @ErrorHandler()
-  public async convertWstethToSteth(wsteth_value: EtherValue): Promise<bigint> {
+  public async convertWstethToSteth(
+    wsteth_value: EtherValue,
+    options: { blockNumber?: bigint } = {},
+  ): Promise<bigint> {
     const value = parseValue(wsteth_value);
     const contract = await this.getContractWstETH();
-    return contract.read.getStETHByWstETH([value]);
+    return contract.read.getStETHByWstETH([value], options);
   }
 
   /// Utils

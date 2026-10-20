@@ -1,0 +1,93 @@
+// Read-only surface of Mellow's FeeManager (implementation behind the per-vault proxy).
+// Write functions, events and errors are intentionally omitted.
+export const EARN_FEE_MANAGER_ABI = [
+  {
+    inputs: [{ internalType: 'address', name: 'vault', type: 'address' }],
+    name: 'baseAsset',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'shares', type: 'uint256' }],
+    name: 'calculateDepositFee',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'vault', type: 'address' },
+      { internalType: 'address', name: 'asset', type: 'address' },
+      { internalType: 'uint256', name: 'priceD18', type: 'uint256' },
+      { internalType: 'uint256', name: 'totalShares', type: 'uint256' },
+    ],
+    name: 'calculateFee',
+    outputs: [{ internalType: 'uint256', name: 'shares', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: 'shares', type: 'uint256' }],
+    name: 'calculateRedeemFee',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'depositFeeD6',
+    outputs: [{ internalType: 'uint24', name: '', type: 'uint24' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'feeRecipient',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'vault', type: 'address' }],
+    name: 'minPriceD18',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'owner',
+    outputs: [{ internalType: 'address', name: '', type: 'address' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'performanceFeeD6',
+    outputs: [{ internalType: 'uint24', name: '', type: 'uint24' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'protocolFeeD6',
+    outputs: [{ internalType: 'uint24', name: '', type: 'uint24' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'redeemFeeD6',
+    outputs: [{ internalType: 'uint24', name: '', type: 'uint24' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'vault', type: 'address' }],
+    name: 'timestamps',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+] as const;

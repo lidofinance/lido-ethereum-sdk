@@ -1,16 +1,19 @@
-import { Block } from '@lidofinance/lido-ui';
 import styled from 'styled-components';
 
 export const Controls = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  gap: 20px;
+  gap: ${({ theme }) => theme.spaceMap.md}px;
+
+  & > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
 `;
 
-export const StyledBlock = styled(Block)`
+export const StyledBlock = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 20px;
+  gap: ${({ theme }) => theme.spaceMap.lg}px;
+  width: 100%;
 `;

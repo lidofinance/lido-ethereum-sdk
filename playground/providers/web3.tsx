@@ -83,6 +83,7 @@ const Web3Provider: FC<PropsWithChildren> = ({ children }) => {
       [CHAINS.Holesky]: getRpc(CHAINS.Holesky),
       [CHAINS.Hoodi]: getRpc(CHAINS.Hoodi),
       [CHAINS.Sepolia]: getRpc(CHAINS.Sepolia),
+      [CHAINS.Optimism]: getRpc(CHAINS.Optimism),
       // OP sepolia
       [CHAINS.OptimismSepolia]: getRpc(CHAINS.OptimismSepolia),
       // Soneium Minato

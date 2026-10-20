@@ -1,167 +1,219 @@
-import dynamic from 'next/dynamic';
-
-const ReactJSON = dynamic(() => import('react-json-view'), {
-  ssr: false,
-});
-
-import { Button, Accordion } from '@lidofinance/lido-ui';
-import { PropsWithChildren, useReducer } from 'react';
-import { type SDKError } from '@lidofinance/lido-ethereum-sdk';
+import { Button } from '@lidofinance/lido-ui';
 import {
-  ActionBlock,
-  Controls,
-  ErrorMessage,
-  ResultCode,
-  SuccessMessage,
-} from './styles';
+  type KeyboardEvent,
+  type PropsWithChildren,
+  type ReactNode,
+  useReducer,
+} from 'react';
+import copy from 'copy-to-clipboard';
+import { ToastInfo } from '@lidofinance/lido-ui';
+import { type SDKError } from '@lidofinance/lido-ethereum-sdk';
 import { useWeb3 } from 'reef-knot/web3-react';
+import { useIsUnsupportedChain } from 'components/unsupported-chain-banner';
+import {
+  ActionCard,
+  ActionHeader,
+  ActionMain,
+  ActionMethod,
+  ActionTitle,
+  Badge,
+  Controls,
+  Hint,
+  ResultBody,
+  ResultHeader,
+  ResultHeaderActions,
+  ResultPanel,
+  ResultPlaceholder,
+  ResultStatus,
+  RunRow,
+} from './styles';
+import {
+  defaultRenderError,
+  defaultRenderResult,
+  stringifyError,
+  stringifyResult,
+} from './render-default';
 
 type ActionProps<TResult> = PropsWithChildren<{
   action: () => Promise<TResult> | TResult;
   title: string;
+  /** SDK method being called, shown under the title, e.g. `stake.stakeEth`. */
+  method?: string;
   renderResult?: (result: TResult) => React.JSX.Element;
   renderError?: (error: SDKError) => React.JSX.Element;
   walletAction?: boolean;
 }>;
 
+type Status = 'idle' | 'loading' | 'success' | 'error';
+
 type ReducerAction<TResult> =
-  | {
-      type: 'loading';
-    }
-  | {
-      type: 'error';
-      error: SDKError;
-    }
-  | {
-      type: 'success';
-      result: TResult;
-    }
-  | {
-      type: 'reset';
-    };
+  | { type: 'loading' }
+  | { type: 'error'; error: SDKError; duration: number }
+  | { type: 'success'; result: TResult; duration: number }
+  | { type: 'reset' };
 
 type ReducerState<TResult> = {
-  loading: boolean;
-  error: SDKError | undefined;
-  result: TResult | undefined;
+  status: Status;
+  error?: SDKError;
+  result?: TResult;
+  duration?: number;
 };
+
+const INITIAL_STATE = { status: 'idle' } as const;
 
 const reducer = <TResult,>(
   state: ReducerState<TResult>,
-  action?: ReducerAction<TResult>,
+  action: ReducerAction<TResult>,
 ): ReducerState<TResult> => {
-  if (!action) {
-    return state;
-  }
   switch (action.type) {
     case 'loading':
-      return {
-        error: undefined,
-        result: undefined,
-        loading: true,
-      };
+      return { status: 'loading' };
     case 'error':
       return {
+        status: 'error',
         error: action.error,
-        result: undefined,
-        loading: false,
+        duration: action.duration,
       };
     case 'success':
       return {
-        error: undefined,
+        status: 'success',
         result: action.result,
-        loading: false,
+        duration: action.duration,
       };
     case 'reset':
-      return {
-        error: undefined,
-        result: undefined,
-        loading: false,
-      };
+      return INITIAL_STATE;
+    default:
+      return state;
   }
 };
 
-const defaultRenderError = (error: SDKError) => {
-  return (
-    <Accordion
-      summary={
-        <ErrorMessage>
-          {error.code}:{String(error.errorMessage).slice(0, 30) + '...'}
-        </ErrorMessage>
-      }
-    >
-      <ErrorMessage>{String(error.errorMessage)}</ErrorMessage>
-    </Accordion>
-  );
+const STATUS_LABEL: Record<Status, string> = {
+  idle: 'Not run yet',
+  loading: 'Running…',
+  success: 'Success',
+  error: 'Error',
 };
 
-const defaultRenderResult = <TResult,>(result: TResult) => {
-  const stringfyed = JSON.stringify(
-    result,
-    (_, value) => (typeof value === 'bigint' ? value.toString() : value),
-    2,
-  );
-
-  if (typeof result !== 'object') {
-    return <ResultCode>{stringfyed}</ResultCode>;
-  }
-  return (
-    <Accordion summary={<SuccessMessage>Success</SuccessMessage>}>
-      <ReactJSON
-        theme={'pop'}
-        name={null}
-        displayDataTypes={false}
-        src={JSON.parse(stringfyed)}
-        collapseStringsAfterLength={30}
-      />
-    </Accordion>
-  );
-};
+// Platform-neutral to keep SSR and client markup identical.
+const RUN_SHORTCUT = '⌘/Ctrl + Enter';
 
 export const Action = <TResult,>({
   action,
   title,
+  method,
   walletAction = false,
   renderResult = defaultRenderResult,
   renderError = defaultRenderError,
   children,
 }: ActionProps<TResult>) => {
   const { active } = useWeb3();
-  const [{ result, error, loading }, dispatch] = useReducer(
+  const isUnsupportedChain = useIsUnsupportedChain();
+  const [state, dispatch] = useReducer(
     reducer<TResult>,
-    {
-      error: undefined,
-      result: undefined,
-      loading: false,
-    },
-    reducer,
+    INITIAL_STATE as ReducerState<TResult>,
   );
+  const { status, result, error, duration } = state;
+  const disabled = walletAction && !active;
 
-  const startLoading = async () => {
+  const run = async () => {
+    if (disabled || status === 'loading') return;
+    dispatch({ type: 'loading' });
+    const startedAt = performance.now();
     try {
-      dispatch({ type: 'loading' });
       const result = await action();
-      dispatch({ type: 'success', result });
+      dispatch({
+        type: 'success',
+        result,
+        duration: performance.now() - startedAt,
+      });
     } catch (error) {
       console.error(error);
-      dispatch({ type: 'error', error: error as SDKError });
+      dispatch({
+        type: 'error',
+        error: error as SDKError,
+        duration: performance.now() - startedAt,
+      });
     }
   };
 
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+      event.preventDefault();
+      void run();
+    }
+  };
+
+  const handleCopy = () => {
+    const text =
+      status === 'error' && error
+        ? stringifyError(error)
+        : stringifyResult(result);
+    copy(text);
+    ToastInfo('Copied to clipboard', { position: 'bottom-center' });
+  };
+
+  let body: ReactNode = null;
+  if (status === 'success') body = renderResult(result as TResult);
+  if (status === 'error' && error) body = renderError(error);
+  if (status === 'loading')
+    body = <ResultPlaceholder>Waiting for response…</ResultPlaceholder>;
+
+  const hasOutput = status === 'success' || status === 'error';
+
   return (
-    <ActionBlock>
-      {children && <Controls>{children}</Controls>}
-      <Controls>
-        <Button
-          disabled={walletAction && !active}
-          loading={loading}
-          onClick={startLoading}
-        >
-          {title}
-        </Button>
-        {result !== undefined && renderResult(result)}
-        {!!error && renderError(error)}
-      </Controls>
-    </ActionBlock>
+    <ActionCard>
+      <ActionMain onKeyDown={handleKeyDown}>
+        <ActionHeader>
+          <ActionTitle>{title}</ActionTitle>
+          {walletAction && <Badge $tone="warning">wallet</Badge>}
+          {method && <ActionMethod>{method}</ActionMethod>}
+        </ActionHeader>
+        {children && <Controls>{children}</Controls>}
+        <RunRow>
+          <Button
+            size="sm"
+            disabled={disabled}
+            loading={status === 'loading'}
+            onClick={run}
+          >
+            Run
+          </Button>
+          <Hint>
+            {disabled
+              ? isUnsupportedChain
+                ? 'Switch to a supported network to run'
+                : 'Connect a wallet to run'
+              : children
+                ? `${RUN_SHORTCUT} to run`
+                : null}
+          </Hint>
+        </RunRow>
+      </ActionMain>
+
+      <ResultPanel aria-live="polite">
+        <ResultHeader>
+          <ResultStatus $status={status}>{STATUS_LABEL[status]}</ResultStatus>
+          {hasOutput && duration !== undefined && (
+            <Hint>{Math.round(duration)} ms</Hint>
+          )}
+          {hasOutput && (
+            <ResultHeaderActions>
+              <Button size="xxs" variant="ghost" onClick={handleCopy}>
+                Copy
+              </Button>
+              <Button
+                size="xxs"
+                variant="ghost"
+                color="secondary"
+                onClick={() => dispatch({ type: 'reset' })}
+              >
+                Clear
+              </Button>
+            </ResultHeaderActions>
+          )}
+        </ResultHeader>
+        {status !== 'idle' && <ResultBody>{body}</ResultBody>}
+      </ResultPanel>
+    </ActionCard>
   );
 };

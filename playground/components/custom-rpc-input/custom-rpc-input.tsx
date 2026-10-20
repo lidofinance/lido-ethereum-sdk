@@ -1,16 +1,28 @@
 import { useWeb3 } from 'reef-knot/web3-react';
-import { Accordion, Button, DataTableRow, Input } from '@lidofinance/lido-ui';
+import {
+  Button,
+  DataTableRow,
+  Input,
+  Modal,
+  ModalProps,
+} from '@lidofinance/lido-ui';
 import { useCustomRpc } from 'providers/web3';
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Controls, StyledBlock } from './styles';
 import { dynamics } from 'config';
 
+/** Whether the current chain uses a user-provided RPC url. */
+export const useIsCustomRpc = () => {
+  const { chainId = dynamics.defaultChain } = useWeb3();
+  const { activeRpc, customRpc } = useCustomRpc();
+  return !!customRpc[chainId] && activeRpc[chainId] === customRpc[chainId];
+};
+
 export const CustomRpcInput = () => {
   const { chainId = dynamics.defaultChain } = useWeb3();
-  const { activeRpc, setCustomRpcUrl, customRpc } = useCustomRpc();
+  const { setCustomRpcUrl, customRpc } = useCustomRpc();
+  const isCustom = useIsCustomRpc();
   const [url, setUrl] = useState('');
-
-  const isDefault = activeRpc[chainId] !== customRpc[chainId];
 
   useEffect(() => {
     const customUrl = customRpc[chainId] ?? '';
@@ -19,30 +31,42 @@ export const CustomRpcInput = () => {
   }, [chainId]);
 
   return (
-    <Accordion summary="Custom RPC">
-      <StyledBlock>
-        <Input
-          value={url}
-          onChange={(e) => setUrl(e.currentTarget.value)}
-          label={`RPC Url for chain ${chainId}`}
-        />
-        <Controls>
-          <Button
-            disabled={!url}
-            fullwidth
-            onClick={() => setCustomRpcUrl(chainId, url)}
-          >
-            Save
-          </Button>
-          <Button fullwidth onClick={() => setCustomRpcUrl(chainId, null)}>
-            Reset
-          </Button>
-        </Controls>
+    <StyledBlock>
+      <Input
+        fullwidth
+        value={url}
+        onChange={(e) => setUrl(e.currentTarget.value)}
+        label={`RPC Url for chain ${chainId}`}
+      />
+      <Controls>
+        <Button
+          disabled={!url}
+          fullwidth
+          onClick={() => setCustomRpcUrl(chainId, url)}
+        >
+          Save
+        </Button>
+        <Button
+          fullwidth
+          variant="outlined"
+          onClick={() => {
+            setCustomRpcUrl(chainId, null);
+            setUrl('');
+          }}
+        >
+          Reset
+        </Button>
+      </Controls>
 
-        <DataTableRow title="Current RPC">
-          {isDefault ? 'default' : 'custom'}
-        </DataTableRow>
-      </StyledBlock>
-    </Accordion>
+      <DataTableRow title="Current RPC">
+        {isCustom ? 'custom' : 'default'}
+      </DataTableRow>
+    </StyledBlock>
   );
 };
+
+export const CustomRpcModal: FC<ModalProps> = (props) => (
+  <Modal title="Custom RPC" {...props}>
+    <CustomRpcInput />
+  </Modal>
+);

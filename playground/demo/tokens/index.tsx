@@ -1,5 +1,6 @@
+import { ModuleSection } from 'components/module-section';
 import { AbstractLidoSDKErc20 } from '@lidofinance/lido-ethereum-sdk/dist/types/erc20';
-import { Input, Accordion } from '@lidofinance/lido-ui';
+import { Input } from '@lidofinance/lido-ui';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { Action, renderTokenResult } from 'components/action';
 import { DEFAULT_VALUE, ValueType } from 'components/tokenInput';
@@ -47,7 +48,7 @@ export const TokenDemo = ({ instance, name }: TokenDemoProps) => {
   const [toPermit, setToPermit] = useAddressState();
 
   return (
-    <Accordion summary={name}>
+    <ModuleSection title={name}>
       <Action
         title="Balance"
         walletAction
@@ -210,6 +211,6 @@ export const TokenDemo = ({ instance, name }: TokenDemoProps) => {
         title="Contract Address"
         action={() => instance.contractAddress()}
       />
-    </Accordion>
+    </ModuleSection>
   );
 };

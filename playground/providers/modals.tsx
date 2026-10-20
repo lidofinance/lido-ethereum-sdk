@@ -8,6 +8,7 @@ import {
   PropsWithChildren,
 } from 'react';
 import WalletModal from 'components/walletModal';
+import { CustomRpcModal } from 'components/custom-rpc-input';
 
 export type ModalContextValue = {
   openModal: (modal: MODAL) => void;
@@ -16,6 +17,7 @@ export type ModalContextValue = {
 
 export enum MODAL {
   wallet,
+  rpc,
 }
 
 export const ModalContext = createContext({} as ModalContextValue);
@@ -47,6 +49,7 @@ const ModalProvider: FC<PropsWithChildren> = ({ children }) => {
     <ModalContext.Provider value={value}>
       {children}
       <WalletModal open={active === MODAL.wallet} {...common} />
+      <CustomRpcModal open={active === MODAL.rpc} {...common} />
     </ModalContext.Provider>
   );
 };

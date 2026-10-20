@@ -86,6 +86,11 @@
       "default": "./dist/cjs/stvault/index.js",
       "types": "./dist/types/stvault/index.d.ts"
     },
+    "./earn": {
+      "types": "./dist/types/earn/index.d.ts",
+      "import": "./dist/esm/earn/index.js",
+      "default": "./dist/cjs/earn/index.js"
+    },
     "./package.json": "./package.json"
   },
   "typesVersions": {
@@ -128,6 +133,9 @@
       ],
       "stvault": [
         "./dist/types/stvault/index.d.ts"
+      ],
+      "earn": [
+        "./dist/types/earn/index.d.ts"
       ]
     }
   },

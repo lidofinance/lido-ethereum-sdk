@@ -1,4 +1,5 @@
-import { Input, Accordion } from '@lidofinance/lido-ui';
+import { ModuleSection } from 'components/module-section';
+import { Input } from '@lidofinance/lido-ui';
 import { useWeb3 } from 'reef-knot/web3-react';
 import { Action } from 'components/action';
 import { ToggleButton } from 'components/toggle-button';
@@ -31,7 +32,7 @@ export const UnstethDemo = () => {
   const [allow, setAllow] = useState(true);
 
   return (
-    <Accordion summary={'unstETH'}>
+    <ModuleSection title="unstETH (NFT)">
       <Action title="NFTs" action={() => unsteth.getNFTsByAccount(owner)}>
         <Input
           label="Owner address"
@@ -229,6 +230,6 @@ export const UnstethDemo = () => {
         title="Contract Metadata"
         action={() => unsteth.getContractMetadata()}
       />
-    </Accordion>
+    </ModuleSection>
   );
 };

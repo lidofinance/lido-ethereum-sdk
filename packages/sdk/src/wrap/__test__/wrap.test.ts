@@ -58,6 +58,19 @@ describe('LidoSDKWrap read methods', () => {
     expectAlmostEqualBn(amount, backConversion, 2n);
   });
 
+  test('convert at a pinned block', async () => {
+    const amount = 100000000n;
+    const blockNumber = await wrap.core.publicClient.getBlockNumber();
+    const amountWsteth = await wrap.convertStethToWsteth(amount, {
+      blockNumber,
+    });
+    expect(amountWsteth).toEqual(await wrap.convertStethToWsteth(amount));
+    const backConversion = await wrap.convertWstethToSteth(amountWsteth, {
+      blockNumber,
+    });
+    expectAlmostEqualBn(amount, backConversion, 2n);
+  });
+
   test('get allowance', async () => {
     const allowance = await wrap.getStethForWrapAllowance(address);
     expectNonNegativeBn(allowance);

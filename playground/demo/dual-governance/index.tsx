@@ -1,5 +1,6 @@
+import { ModuleSection } from 'components/module-section';
 import { useLidoSDK } from '../../providers/sdk';
-import { Accordion, Input } from '@lidofinance/lido-ui';
+import { Input } from '@lidofinance/lido-ui';
 import { Action } from '../../components/action';
 import { useState } from 'react';
 
@@ -8,7 +9,7 @@ export const DualGovernanceDemo = () => {
   const { dualGovernance } = useLidoSDK();
 
   return (
-    <Accordion summary="DualGovernance">
+    <ModuleSection title="Dual Governance">
       <Action
         title="Get Dual Governance Warning status"
         action={() =>
@@ -26,6 +27,6 @@ export const DualGovernanceDemo = () => {
           onChange={(e) => setTriggerPercent(e.target.valueAsNumber)}
         />
       </Action>
-    </Accordion>
+    </ModuleSection>
   );
 };
