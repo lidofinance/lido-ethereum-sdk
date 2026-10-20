@@ -66,6 +66,8 @@ describe('LidoSDKEvents', () => {
     const events = await stethEvents.getRebaseEvents({
       back: { days: 10n },
       maxCount: 10,
+      // Both endpoints count toward the RPC limit of 10,000 blocks.
+      stepBlock: 9999,
     });
     expect(events.length).toBeGreaterThanOrEqual(9);
     expect(events.length).toBeLessThanOrEqual(10);
