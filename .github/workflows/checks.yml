@@ -43,7 +43,7 @@ jobs:
         run: yarn types
 
       - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@908c540300062bd5a7e473851cdb4282204cee09
+        uses: foundry-rs/foundry-toolchain@dba66c27052e63476d886f22216e119ba7e615bf
 
       - name: Tests
         run: yarn test
