@@ -1,4 +1,9 @@
-import { decodeEventLog, encodeFunctionData, isAddress } from 'viem';
+import {
+  decodeEventLog,
+  encodeFunctionData,
+  isAddress,
+  isAddressEqual,
+} from 'viem';
 import type {
   Address,
   Hash,
@@ -180,9 +185,13 @@ export class LidoSDKVaultFactory extends BusModule {
   private async createVaultParseEvents(
     receipt: TransactionReceipt,
   ): Promise<CreateVaultResult> {
+    const { address: vaultFactoryAddress } =
+      await this.bus.contracts.getContractVaultFactory();
+
     let vault: Address | undefined;
     let dashboard: Address | undefined;
     for (const log of receipt.logs) {
+      if (!isAddressEqual(log.address, vaultFactoryAddress)) continue;
       if (log.topics[0] === LidoSDKVaultContracts.VAULT_CREATED_SIGNATURE) {
         const parsedLog = decodeEventLog({
           abi: VaultCreatedEventAbi,

@@ -219,7 +219,7 @@ export default class LidoSDKCore extends LidoSDKCacheable {
     if (contractAddressManifest) {
       const entries = Object.entries(contractAddressManifest).map(([k, v]) => [
         k as LIDO_CONTRACT_NAMES,
-        v.toLocaleLowerCase('en-US') as Address,
+        v?.toLocaleLowerCase('en-US') as Address,
       ]);
       if (entries.length === 0)
         throw this.error({
@@ -490,6 +490,8 @@ export default class LidoSDKCore extends LidoSDKCacheable {
         ERROR_CODE.NOT_SUPPORTED,
       );
       addressFromLocator = contractAddress;
+    } else if (contract === 'vaultViewer') {
+      addressFromLocator = this.getVaultViewerAddress();
     } else {
       const contractName = contract === 'wsteth' ? 'wstETH' : contract;
       addressFromLocator = await lidoLocator.read[contractName]();
